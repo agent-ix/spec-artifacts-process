@@ -1,0 +1,174 @@
+manifest_version: 1.0.0
+name: spec-artifacts-process
+version: 0.1.0
+description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
+archetypes:
+- kind: adr
+  name: ADR
+  doc_backed: true
+  supports_membership: false
+  composition:
+    states:
+    - proposed
+    - accepted
+    - superseded
+    - rejected
+- kind: plan
+  name: Plan
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - Task
+- kind: review
+  name: Review
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - Finding
+- kind: test-matrix
+  name: Test Matrix
+  doc_backed: true
+  supports_membership: false
+- kind: standard
+  name: Standard
+  doc_backed: true
+  supports_membership: false
+grammars:
+- name: process-artifacts
+  version: 0.1.0
+  description: Process artifacts grammar (ADR, plan, review, etc.)
+  doc_kinds:
+  - adr
+  - plan
+  - review
+  - test-matrix
+  - standard
+  - finding
+artifact_types:
+- name: ADR
+  grammar_ref: process-artifacts
+  template_ref: templates/adr.md.j2
+  frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: ADR-{next:03d}
+  allowed_links:
+  - supersedes
+  - superseded_by
+  - relates_to
+  - depends_on
+  examples: []
+  lint_rules_ref: []
+- name: Plan
+  grammar_ref: process-artifacts
+  template_ref: templates/plan.md.j2
+  frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: Plan-{next:03d}
+  allowed_links:
+  - contains
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: Task
+  grammar_ref: process-artifacts
+  template_ref: templates/task.md.j2
+  frontmatter_schema_ref: schemas/task-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: Task-{next:03d}
+  allowed_links:
+  - depends_on
+  - verifies
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: Review
+  grammar_ref: process-artifacts
+  template_ref: templates/review.md.j2
+  frontmatter_schema_ref: schemas/review-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: Review-{next:03d}
+  allowed_links:
+  - reviews
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: Finding
+  grammar_ref: process-artifacts
+  template_ref: templates/finding.md.j2
+  frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: Finding-{next:03d}
+  allowed_links:
+  - found_in
+  - blocks
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: TestMatrix
+  grammar_ref: process-artifacts
+  template_ref: templates/testmatrix.md.j2
+  frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: TestMatrix-{next:03d}
+  allowed_links:
+  - covers
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: Standard
+  grammar_ref: process-artifacts
+  template_ref: templates/standard.md.j2
+  frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
+  required_sections:
+  - name: Description
+    level: 2
+  - name: Dependencies
+    level: 2
+  defaults:
+    id_pattern: Standard-{next:03d}
+  allowed_links:
+  - references
+  examples: []
+  lint_rules_ref: []
+doc_kinds:
+- adr
+- plan
+- review
+- test-matrix
+- standard
+- finding
+object_types: []
+lint_rules: []
