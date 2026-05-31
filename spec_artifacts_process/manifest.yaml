@@ -170,5 +170,64 @@ doc_kinds:
 - test-matrix
 - standard
 - finding
-object_types: []
+object_types:
+- name: standard
+  data_schema:
+    type: object
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      guide:
+        type: string
+      link:
+        type: string
+    required:
+    - code
+  body_extraction:
+    yield_pattern:
+      match:
+        id:
+          from: frontmatter_field
+          path:
+          - id
+          required: false
+        title:
+          from: frontmatter_field
+          path:
+          - title
+          required: false
+        artifact_type:
+          from: frontmatter_field
+          path:
+          - artifact_type
+          required: false
+        code:
+          from: frontmatter_field
+          path:
+          - code
+          required: true
+        name:
+          from: frontmatter_field
+          path:
+          - name
+          required: false
+        link:
+          from: frontmatter_field
+          path:
+          - link
+          required: false
+        description:
+          from: section_body
+          after_heading: Description
+          required: false
+        guide:
+          from: section_body
+          after_heading: Application Guidance
+          required: false
+  allowed_links:
+    references: []
 lint_rules: []

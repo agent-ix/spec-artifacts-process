@@ -2,7 +2,11 @@
 id: {{ id }}
 title: "{{ title }}"
 artifact_type: {{ artifact_type }}
-{% if relationships %}relationships:
+object: standard
+code: {{ code }}
+name: "{{ name | default(title) }}"
+{% if link %}link: {{ link }}
+{% endif %}{% if relationships %}relationships:
 {% for rel in relationships %}  - target: "{{ rel.target }}"
     type: "{{ rel.type }}"
 {% endfor %}{% endif %}---
@@ -10,11 +14,11 @@ artifact_type: {{ artifact_type }}
 
 ## Description
 
-{{ description | default("Describe the artifact's purpose and content.") }}
+{{ description | default("Describe what the standard defines.") }}
 
-## Body
+## Application Guidance
 
-{{ body | default("Replace with the artifact body. See examples/ for canonical references.") }}
+{{ guide | default("Describe when and how to apply this standard.") }}
 
 ## Dependencies
 

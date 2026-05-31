@@ -2,6 +2,7 @@
 
 Pulls the FR-035 JSON Schema URL or uses a local copy bundled with the package.
 """
+
 from __future__ import annotations
 
 import json
@@ -24,18 +25,22 @@ def test_manifest_loads() -> None:
 
 
 def test_manifest_validates_against_fr035_schema() -> None:
-    """Skip if jsonschema does not support draft 2020-12 (use CI check-jsonschema instead)."""
+    """Skip if jsonschema lacks draft 2020-12 (use CI check-jsonschema instead)."""
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
         pytest.skip("jsonschema lib missing draft 2020-12 support")
-    schema_path = pathlib.Path(__file__).resolve().parent / "module-manifest.schema.json"
+    schema_path = (
+        pathlib.Path(__file__).resolve().parent / "module-manifest.schema.json"
+    )
     if not schema_path.exists():
         pytest.skip("FR-035 schema not bundled with tests")
     schema = json.loads(schema_path.read_text())
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     errors = list(Draft202012Validator(schema).iter_errors(manifest))
-    assert not errors, [f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors]
+    assert not errors, [
+        f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors
+    ]
 
 
 def _render(template_text: str, ctx: dict) -> str:
