@@ -52,13 +52,7 @@ grammars:
 artifact_types:
 - name: ADR
   grammar_ref: process-artifacts
-  template_ref: templates/adr.md.j2
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: ADR-{next:03d}
   allowed_links:
@@ -70,13 +64,7 @@ artifact_types:
   lint_rules_ref: []
 - name: Plan
   grammar_ref: process-artifacts
-  template_ref: templates/plan.md.j2
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: Plan-{next:03d}
   allowed_links:
@@ -87,13 +75,7 @@ artifact_types:
   lint_rules_ref: []
 - name: Task
   grammar_ref: process-artifacts
-  template_ref: templates/task.md.j2
   frontmatter_schema_ref: schemas/task-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: Task-{next:03d}
   allowed_links:
@@ -104,13 +86,7 @@ artifact_types:
   lint_rules_ref: []
 - name: Review
   grammar_ref: process-artifacts
-  template_ref: templates/review.md.j2
   frontmatter_schema_ref: schemas/review-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: Review-{next:03d}
   allowed_links:
@@ -120,13 +96,7 @@ artifact_types:
   lint_rules_ref: []
 - name: Finding
   grammar_ref: process-artifacts
-  template_ref: templates/finding.md.j2
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: Finding-{next:03d}
   allowed_links:
@@ -137,13 +107,7 @@ artifact_types:
   lint_rules_ref: []
 - name: TestMatrix
   grammar_ref: process-artifacts
-  template_ref: templates/testmatrix.md.j2
   frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: TestMatrix-{next:03d}
   allowed_links:
@@ -153,13 +117,7 @@ artifact_types:
   lint_rules_ref: []
 - name: Standard
   grammar_ref: process-artifacts
-  template_ref: templates/standard.md.j2
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
-  required_sections:
-  - name: Description
-    level: 2
-  - name: Dependencies
-    level: 2
   defaults:
     id_pattern: Standard-{next:03d}
   allowed_links:
