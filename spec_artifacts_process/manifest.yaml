@@ -27,6 +27,9 @@ archetypes:
   composition:
     expected_artifacts:
     - Finding
+    nav:
+      top_level: true
+      order: 12
 - kind: test-matrix
   name: Test Matrix
   doc_backed: true
