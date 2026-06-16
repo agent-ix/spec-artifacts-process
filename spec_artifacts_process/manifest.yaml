@@ -140,10 +140,10 @@ object_types:
           path:
           - title
           required: false
-        artifact_type:
+        type:
           from: frontmatter_field
           path:
-          - artifact_type
+          - type
           required: false
         code:
           from: frontmatter_field

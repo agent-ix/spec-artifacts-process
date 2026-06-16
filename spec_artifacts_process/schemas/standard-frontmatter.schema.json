@@ -4,7 +4,7 @@
   "required": [
     "id",
     "title",
-    "artifact_type",
+    "type",
     "code"
   ],
   "additionalProperties": true,
@@ -17,7 +17,7 @@
       "type": "string",
       "minLength": 1
     },
-    "artifact_type": {
+    "type": {
       "const": "Standard"
     },
     "object": {
