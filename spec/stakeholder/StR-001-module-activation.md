@@ -1,7 +1,7 @@
 ---
 id: StR-001
 title: "Process artifact templates"
-artifact_type: StR
+type: StR
 ---
 # [StR-001] Process artifact templates
 
