@@ -2,6 +2,42 @@ manifest_version: 1.0.0
 name: spec-artifacts-process
 version: 0.1.0
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
+archetypes:
+- kind: adr
+  name: ADR
+  doc_backed: true
+  supports_membership: false
+  composition:
+    states:
+    - proposed
+    - accepted
+    - superseded
+    - rejected
+- kind: plan
+  name: Plan
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - Task
+- kind: review
+  name: Review
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - Finding
+    nav:
+      top_level: true
+      order: 12
+- kind: test-matrix
+  name: Test Matrix
+  doc_backed: true
+  supports_membership: false
+- kind: standard
+  name: Standard
+  doc_backed: true
+  supports_membership: false
 grammars:
 - name: process-artifacts
   version: 0.1.0
@@ -24,12 +60,6 @@ artifact_types:
   - superseded_by
   - relates_to
   - depends_on
-  composition:
-    states:
-    - proposed
-    - accepted
-    - superseded
-    - rejected
   examples: []
   lint_rules_ref: []
 - name: Plan
@@ -41,9 +71,6 @@ artifact_types:
   - contains
   - depends_on
   - references
-  composition:
-    expected_artifacts:
-    - Task
   examples: []
   lint_rules_ref: []
 - name: Task
@@ -65,12 +92,6 @@ artifact_types:
   allowed_links:
   - reviews
   - references
-  composition:
-    expected_artifacts:
-    - Finding
-    nav:
-      top_level: true
-      order: 12
   examples: []
   lint_rules_ref: []
 - name: Finding
