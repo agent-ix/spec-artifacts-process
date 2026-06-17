@@ -5,21 +5,25 @@ type: StR
 ---
 # [StR-001] Process artifact templates
 
-## Stakeholder
+## Stakeholder Need
 
-Filament platform / spec authors / agent CLI generators.
+Engineering teams, spec authors, and agent CLI generators require standardized templates for ADRs, plans, reviews, findings, test matrices, and standards. The platform shall provide a Module whose activation registers these process archetypes so that authors and generators can produce consistent, valid process artifacts.
 
-## Need
+## Rationale
 
-Engineering teams need standardized templates for ADRs, plans, reviews, findings, test matrices, and standards.
+Process artifacts today are authored ad hoc, producing inconsistent structure that downstream tooling cannot reliably parse or validate. Shipping the templates, schemas, and archetypes as an activatable Module gives both human authors (via spec authoring) and agent CLI generators (via minijinja-cli) a single authoritative source, reducing drift and rework.
 
-## Acceptance Criteria
+## Validation Criteria
 
-| ID | Criteria |
-|----|----------|
-| StR-001-AC-1 | A Module activation against filament-core registers the contents this module declares. |
-| StR-001-AC-2 | Agent CLI generators (minijinja-cli) can produce valid artifacts using the templates and schemas this module ships. |
+This need is satisfied when:
+
+- A Module activation against filament-core registers the contents this module declares (5 archetypes, 1 grammar, and 7 artifact types).
+- Agent CLI generators (minijinja-cli) can produce valid artifacts using the templates and schemas this module ships.
+
+## Stakeholders
+
+The primary stakeholders are the Filament platform, spec authors, and agent CLI generators that rely on these archetypes.
 
 ## Dependencies
 
-- **Upstream**: filament-core-service FR-035 (Module Manifest Schema)
+**Upstream**: filament-core-service FR-035 (Module Manifest Schema).
