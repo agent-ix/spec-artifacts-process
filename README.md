@@ -2,7 +2,7 @@
 
 > Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates
 
-Agent-IX Filament module loaded by [`quire-cli`](https://github.com/agent-ix/quire-cli) and [`ix-spec`](https://github.com/agent-ix/ix-spec).
+Agent-IX Filament module loaded by [`quire-cli`](https://github.com/agent-ix/quire-cli) and [`quoin`](https://github.com/agent-ix/quoin).
 
 ## Installing quire-cli
 
@@ -40,17 +40,17 @@ The module also exposes a `standard` object type. It extracts a stable `code` sl
 
 ## How this module is used
 
-### With ix-spec (recommended)
+### With quoin (recommended)
 
 ```bash
-ix-spec plugin install path:../spec-artifacts-process
-ix-spec catalog list
-ix-spec catalog show ADR
-ix-spec write . --types ADR,Plan
-ix-spec review
+quoin plugin install path:../spec-artifacts-process
+quoin catalog list
+quoin catalog show ADR
+quoin write . --types ADR,Plan
+quoin review
 ```
 
-See https://github.com/agent-ix/ix-spec.
+See https://github.com/agent-ix/quoin.
 
 ### With quire-cli directly
 
