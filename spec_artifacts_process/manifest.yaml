@@ -30,6 +30,14 @@ archetypes:
     nav:
       top_level: true
       order: 12
+- kind: spec-review
+  name: SpecReview
+  doc_backed: true
+  supports_membership: false
+  composition:
+    nav:
+      top_level: true
+      order: 13
 - kind: test-matrix
   name: Test Matrix
   doc_backed: true
@@ -46,6 +54,7 @@ grammars:
   - adr
   - plan
   - review
+  - spec-review
   - test-matrix
   - standard
   - finding
@@ -94,6 +103,35 @@ artifact_types:
   - references
   examples: []
   lint_rules_ref: []
+- name: SpecReview
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/spec-review-frontmatter.schema.json
+  defaults:
+    id_pattern: SR-{next:03d}
+  allowed_links:
+  - reviews
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        summary:
+          from: section_body
+          after_heading: Summary
+          required: true
+        findings:
+          from: table_row
+          under_section: Findings
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Severity, Summary, Refs]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^FND-\d+$'
+            column_choices:
+              Severity: [low, medium, high]
 - name: Finding
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
@@ -128,6 +166,7 @@ doc_kinds:
 - adr
 - plan
 - review
+- spec-review
 - test-matrix
 - standard
 - finding
