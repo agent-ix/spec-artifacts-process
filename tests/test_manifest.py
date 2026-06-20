@@ -53,6 +53,20 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     schema = json.loads(schema_path.read_text())
     assert schema["properties"]["type"]["const"] == "SpecReview"
 
+    # An authoring skeleton must exist so `quoin write --types SpecReview`
+    # emits the authoritative template (catalog resolves skeletons/<Name>.md).
+    skeleton = pack.PACK_ROOT / "skeletons" / "SpecReview.md"
+    assert skeleton.is_file()
+    body = skeleton.read_text()
+    assert "type: SpecReview" in body
+    header = next(line for line in body.splitlines() if line.strip().startswith("| ID"))
+    assert [c.strip() for c in header.strip().strip("|").split("|")] == [
+        "ID",
+        "Severity",
+        "Summary",
+        "Refs",
+    ]
+
 
 def test_manifest_validates_against_fr035_schema() -> None:
     """Skip if jsonschema lacks draft 2020-12 (use CI check-jsonschema instead)."""
