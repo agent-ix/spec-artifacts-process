@@ -10,7 +10,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^[A-Z]{2,4}-[0-9]+$"
+      "pattern": "^[A-Za-z]{2,4}-[0-9]+$"
     },
     "title": {
       "type": "string",
