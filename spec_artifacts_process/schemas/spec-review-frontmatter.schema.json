@@ -28,7 +28,8 @@
         "dependency",
         "evidence",
         "risk-complexity",
-        "scope-boundary"
+        "scope-boundary",
+        "gap-analysis"
       ]
     },
     "scope": {
