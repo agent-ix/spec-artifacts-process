@@ -13,7 +13,7 @@ review_set: subset
      - Frontmatter: `type: SpecReview`; `id` matches ^[A-Z]{2,4}-[0-9]+$
        (e.g. SR-001); set `analysis` to this doc's analysis
        (base|failure-domain|integrity|dependency|evidence|risk-complexity|
-       scope-boundary), `scope` to the spec paths/ids reviewed, and
+       scope-boundary|gap-analysis), `scope` to the spec paths/ids reviewed, and
        `review_set` to base|all|subset.
      - REQUIRED (level 2): Summary, Findings.
      - `## Findings` MUST be a table with headers EXACTLY:
