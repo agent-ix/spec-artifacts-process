@@ -58,6 +58,7 @@ grammars:
   - test-matrix
   - standard
   - finding
+  - feedback
 artifact_types:
 - name: ADR
   grammar_ref: process-artifacts
@@ -143,6 +144,23 @@ artifact_types:
   - references
   examples: []
   lint_rules_ref: []
+- name: Feedback
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/feedback-frontmatter.schema.json
+  defaults:
+    id_pattern: FB-{next:03d}
+  allowed_links:
+  - references
+  - found_in
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        comment:
+          from: section_body
+          after_heading: Comment
+          required: true
 - name: TestMatrix
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json
@@ -170,6 +188,7 @@ doc_kinds:
 - test-matrix
 - standard
 - finding
+- feedback
 object_types:
 - name: standard
   data_schema:
