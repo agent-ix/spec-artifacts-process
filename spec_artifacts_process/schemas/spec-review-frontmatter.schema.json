@@ -29,7 +29,8 @@
         "evidence",
         "risk-complexity",
         "scope-boundary",
-        "gap-analysis"
+        "gap-analysis",
+        "ears-conformance"
       ]
     },
     "scope": {
