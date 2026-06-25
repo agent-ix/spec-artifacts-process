@@ -7,7 +7,7 @@ relationships:
     type: "requires"
     cardinality: "1:1"
 ---
-# [FR-002] SpecReview archetype for validated per-analysis review docs
+# FR-002: SpecReview archetype for validated per-analysis review docs
 
 ## Description
 

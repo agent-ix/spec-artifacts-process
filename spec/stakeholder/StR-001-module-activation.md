@@ -3,7 +3,7 @@ id: StR-001
 title: "Process artifact templates"
 type: StR
 ---
-# [StR-001] Process artifact templates
+# StR-001: Process artifact templates
 
 ## Stakeholder Need
 
