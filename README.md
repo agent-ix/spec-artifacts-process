@@ -6,19 +6,31 @@ Agent-IX Filament module loaded by [`quire-cli`](https://github.com/agent-ix/qui
 
 ## Installing quire-cli
 
-This module is consumed by the `quire` binary. Install it from GitHub Packages.
-
-```ini
-# .npmrc
-@agent-ix:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+`@agent-ix` packages are published to public npm. Install the CLI globally:
 
 ```bash
 npm install -g @agent-ix/quire-cli
 ```
 
 See https://github.com/agent-ix/quire-cli#install for details.
+
+## Install this module via npm
+
+This module is also published as a config-only npm package: `@agent-ix/spec-artifacts-process`.
+The package root **is** the Filament module (`manifest.yaml` + schemas/skeletons),
+so it works directly as a `--module` target or via quoin's `package:` source.
+
+```bash
+npm install @agent-ix/spec-artifacts-process
+```
+
+```bash
+# quoin — resolve the module from npm by name
+quoin plugin install package:@agent-ix/spec-artifacts-process
+
+# or point any tool at the installed package root
+quire validate spec/**/*.md --module node_modules/@agent-ix/spec-artifacts-process
+```
 
 ## Artifact types provided
 
