@@ -2,7 +2,7 @@
   "name": "@agent-ix/spec-artifacts-process",
   "version": "0.0.0-managed",
   "description": "Filament Module: process-artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard)",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "Agent IX <agents@agent-ix.dev>",
   "keywords": [
     "agent-ix",
