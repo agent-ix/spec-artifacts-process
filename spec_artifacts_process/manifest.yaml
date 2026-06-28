@@ -1,7 +1,7 @@
 manifest_version: 1.0.0
 name: spec-artifacts-process
-version: 0.1.0
-description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
+version: 0.2.0
+description: "Filament Module: process artifact templates (ADR, Plan, Track, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
   name: ADR
@@ -15,6 +15,14 @@ archetypes:
     - rejected
 - kind: plan
   name: Plan
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - Track
+    - Task
+- kind: track
+  name: Track
   doc_backed: true
   supports_membership: true
   composition:
@@ -53,6 +61,7 @@ grammars:
   doc_kinds:
   - adr
   - plan
+  - track
   - review
   - spec-review
   - test-matrix
@@ -77,6 +86,17 @@ artifact_types:
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
   defaults:
     id_pattern: Plan-{next:03d}
+  allowed_links:
+  - contains
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: Track
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/track-frontmatter.schema.json
+  defaults:
+    id_pattern: TRK-{next:03d}
   allowed_links:
   - contains
   - depends_on
@@ -183,6 +203,7 @@ artifact_types:
 doc_kinds:
 - adr
 - plan
+- track
 - review
 - spec-review
 - test-matrix

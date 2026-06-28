@@ -68,6 +68,52 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     ]
 
 
+def test_track_archetype_registered_as_node_between_plan_and_task() -> None:
+    """Track is a first-class node inserted BETWEEN Plan and Task so a four-level
+    Spec -> Plan -> Track -> Task hierarchy can map onto external trackers
+    (TC-010). Plan expects Track (and, for backward compatibility, still Task);
+    Track expects Task. The legacy `track:` field on Task remains valid."""
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+
+    # Registered as an archetype with Task as its expected member.
+    archetypes = {a["name"]: a for a in manifest["archetypes"]}
+    assert "Track" in archetypes, "Track archetype must be registered"
+    track = archetypes["Track"]
+    assert track["supports_membership"] is True
+    assert track["composition"]["expected_artifacts"] == ["Task"]
+
+    # Inserted into the containment chain: Plan now expects Track (Task kept
+    # for backward compatibility with legacy Plan -> Task bundles).
+    plan = archetypes["Plan"]
+    assert plan["composition"]["expected_artifacts"] == ["Track", "Task"]
+
+    # Registered as an artifact type with schema + container links.
+    track_type = next(t for t in manifest["artifact_types"] if t["name"] == "Track")
+    assert (
+        track_type["frontmatter_schema_ref"]
+        == "schemas/track-frontmatter.schema.json"
+    )
+    assert "contains" in track_type["allowed_links"]
+
+    # Schema validates the Track node shape.
+    schema_path = pack.PACK_ROOT / "schemas" / "track-frontmatter.schema.json"
+    assert schema_path.is_file()
+    schema = json.loads(schema_path.read_text())
+    assert schema["properties"]["type"]["const"] == "Track"
+
+    # Authoring skeleton exists so `quoin write --types Track` resolves it.
+    skeleton = pack.PACK_ROOT / "skeletons" / "Track.md"
+    assert skeleton.is_file()
+    assert "type: Track" in skeleton.read_text()
+
+    # Backward compatibility: legacy `track:` field still valid on Task.
+    task_schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "task-frontmatter.schema.json").read_text()
+    )
+    assert task_schema["properties"]["track"]["type"] == "string"
+    assert "track" not in task_schema.get("required", [])
+
+
 def test_manifest_validates_against_fr035_schema() -> None:
     """Skip if jsonschema lacks draft 2020-12 (use CI check-jsonschema instead)."""
     try:

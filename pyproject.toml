@@ -6,7 +6,7 @@ license = "AGPL-3.0-or-later"
 [tool.poetry]
 name = "spec_artifacts_process"
 version = "0.1.0"  # Placeholder, dynamically replaced
-description = "Filament Module: process-artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates and archetypes"
+description = "Filament Module: process-artifact templates (ADR, Plan, Track, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates and archetypes"
 authors = ["Agent IX <agents@agent-ix.dev>"]
 packages = [{ include = "spec_artifacts_process" }]
 include = [

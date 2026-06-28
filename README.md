@@ -1,6 +1,6 @@
 # spec-artifacts-process
 
-> Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates
+> Filament Module: process artifact templates (ADR, Plan, Track, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates
 
 Agent-IX Filament module loaded by [`quire-cli`](https://github.com/agent-ix/quire-cli) and [`quoin`](https://github.com/agent-ix/quoin).
 
@@ -37,8 +37,9 @@ quire validate spec/**/*.md --module node_modules/@agent-ix/spec-artifacts-proce
 | Kind | ID pattern | Description |
 |------|------------|-------------|
 | ADR | `ADR-{next:03d}` | Architecture Decision Record capturing a decision, its context and consequences; moves through `proposed → accepted → superseded → rejected` states and links via `supersedes`/`superseded_by`/`relates_to`/`depends_on`. |
-| Plan | `Plan-{next:03d}` | An implementation plan that owns a set of member Tasks (expected artifact `Task`); links via `contains`/`depends_on`/`references`. |
-| Task | `Task-{next:03d}` | A single unit of implementation work; links via `depends_on`/`verifies`/`references`. |
+| Plan | `Plan-{next:03d}` | An implementation plan that owns member Tracks and/or Tasks (expected artifacts `Track`, `Task`); links via `contains`/`depends_on`/`references`. |
+| Track | `TRK-{next:03d}` | A first-class node between Plan and Task that groups related Tasks into a parallelizable workstream (expected artifact `Task`); enables a Spec → Plan → Track → Task hierarchy. Links via `contains`/`depends_on`/`references`. |
+| Task | `Task-{next:03d}` | A single unit of implementation work; links via `depends_on`/`verifies`/`references`. Retains an optional legacy `track:` string field (superseded by the nodal `Track`). |
 | Review | `Review-{next:03d}` | A review document that owns a set of member Findings (expected artifact `Finding`); top-level nav item, links via `reviews`/`references`. |
 | Finding | `Finding-{next:03d}` | An individual review finding/issue; links via `found_in`/`blocks`/`references`. |
 | TestMatrix | `TestMatrix-{next:03d}` | A requirement-to-test coverage matrix; links via `covers`/`references`. |
