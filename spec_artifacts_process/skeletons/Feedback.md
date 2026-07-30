@@ -15,7 +15,7 @@ anchor:
     headingPath: ["FR-003", "Acceptance Criteria"]
     blockIndex: 0
 relationships:
-  - target: ix://agent-ix/example/FR-003
+  - target: ix://example-org/example/FR-003
     type: references
 ---
 <!-- Feedback authoring skeleton (spec-artifacts-process). A transient review
