@@ -16,7 +16,7 @@ anchor:
     headingPath: ["FR-001", "Description"]
     blockIndex: 0
 relationships:
-  - target: ix://agent-ix/filament-ide/FR-001
+  - target: ix://example-org/example/FR-001
     type: references
 ---
 # [FB-001] Bound the project root the main process may open
