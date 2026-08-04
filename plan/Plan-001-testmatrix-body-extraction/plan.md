@@ -27,7 +27,8 @@ relationships:
 
 ### Explicit Non-Scope
 - **No quire-rs engine work.** `column_choices` / `column_patterns` table asserts already exist (quire-rs FR-033, CR-010). This plan is manifest **data** + fixtures/tests + rollout choreography only.
-- FR-001 / FR-002 implementation (already shipped; FR-002's own coverage gap is tracked as TM-001 GAP-001, out of plan scope).
+- FR-001 / FR-002 implementation (already shipped). Executing FR-002's planned matrix coverage (TC-019..TC-023, added closing TM-001 GAP-001 / SR-001 FND-002) is likewise outside this plan.
+- **FR-003-AC-11 enforcement (TC-024).** Test ID uniqueness is normative in FR-003, but quire-rs exposes no uniqueness assert (`LocatorAssert`/`assert_eval` verified 2026-08-04) — enforcement is blocked on an external quire-rs engine capability and is explicitly NOT delivered by this plan (no engine work). TC-024 stays ⚠️ blocked in TM-001.
 
 ## Dependency Graph
 
@@ -36,6 +37,8 @@ relationships:
   Reason: manifest activation is the carrier — the `body_extraction` contract ships inside the already-activating manifest.
 - `quire-rs FR-033 -> FR-003`
   Reason: the contract's `column_choices`/`column_patterns` asserts are engine capabilities; already released, consumed as-is.
+- `quire-rs uniqueness assert (does not exist yet) -> FR-003-AC-11 / TC-024`
+  Reason: external dependency, mirroring the FR-033 pattern — AC-11 (Test ID uniqueness) cannot be machine-enforced until quire-rs ships an id-uniqueness table assert; tracked as a capability request, out of this plan's scope.
 - `FR-003 (contract exists) -> FR-003-CON-1 sweep`
   Reason: the sweep validates ecosystem `tests.md` files against the candidate contract, so the contract must exist (locally, unpublished) first.
 - `FR-003-CON-1 sign-off -> enforcing publish`
@@ -64,6 +67,7 @@ TC-001..TC-018). Grouping by target:
 - [ ] **test_optional_tables_omitted_or_malformed** (TC-014, TC-015: FR-003-AC-7)
 - [ ] **test_min_rows_boundary** (TC-016: FR-003-AC-1, FR-003-AC-2)
 - [ ] **test_manifest_scope_unchanged** (TC-017: FR-003-AC-9 — manifest diff assertion complementing Inspection)
+- [ ] **test_duplicate_test_id_rejected** (TC-024: FR-003-AC-11 — ⚠️ BLOCKED: requires the quire-rs uniqueness assert; do not scaffold until the engine capability exists)
 
 ### Verification (process constraint)
 - [ ] **verify_normalize_before_enforce** (FR-003-CON-1): Inspection — sweep report with per-repo diffs exists and user sign-off is recorded BEFORE the enforcing version is tagged/published.

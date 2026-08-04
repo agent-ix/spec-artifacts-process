@@ -60,6 +60,13 @@ validation engine's cross-reference job and is out of scope here.
   existence of the referenced ids is **not** checked by this contract.
 - Test-case rows **SHALL** be extractable as records (`multiple: true`) so
   tooling (gap analysis, planning) can select each test case by id.
+- `Test ID` values **SHALL** be unique within the `Test Case Summary` (a
+  duplicate id makes record selection by id ambiguous). NOTE: the quire-rs
+  extraction assert vocabulary (`LocatorAssert`: `columns`, `min_rows`,
+  `id_column`/`id_pattern`, `choices`, `column_choices`, `column_patterns`)
+  currently provides **no uniqueness assert**, so this criterion is normative
+  but not yet machine-enforceable — enforcement depends on a new quire-rs
+  engine capability (see Dependencies).
 - The `Stakeholder Requirement Coverage`
   (`Stakeholder Req | Trace to US/FR | Test/Validation | Coverage Status`),
   `User Story Coverage`
@@ -96,6 +103,7 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-8 | Test-case rows are extracted as one record per row (`multiple: true`) | Test (TC-001) |
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` | Test (TC-001) |
+| FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
 
 ## Dependencies
 
@@ -104,5 +112,10 @@ validation engine's cross-reference job and is out of scope here.
   [FR-033](ix://agent-ix/quire-rs/spec/functional/FR-033) (CR-010
   `column_choices` / `column_patterns` table asserts),
   [US-001](../usecase/US-001-machine-validated-test-matrix.md)
+- **External (not yet available)**: a quire-rs id-uniqueness table assert
+  (follow-on to [FR-033](ix://agent-ix/quire-rs/spec/functional/FR-033);
+  verified absent from `LocatorAssert`/`assert_eval` as of 2026-08-04) —
+  required to machine-enforce FR-003-AC-11; until it ships, AC-11 is normative
+  guidance verified by review
 - **Downstream**: the quoin `spec-matrix` flow that authors `tests.md`, and
   gap-analysis/planning tooling that consumes extracted test-case records

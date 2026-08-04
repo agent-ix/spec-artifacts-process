@@ -17,7 +17,7 @@ Process artifacts today are authored ad hoc, producing inconsistent structure th
 
 This need is satisfied when:
 
-- A Module activation against filament-core registers the contents this module declares (5 archetypes, 1 grammar, and 7 artifact types).
+- A Module activation against filament-core registers the contents this module declares (6 archetypes, 1 grammar, and 9 artifact types).
 - Agent CLI generators (minijinja-cli) can produce valid artifacts using the templates and schemas this module ships.
 
 ## Stakeholders
