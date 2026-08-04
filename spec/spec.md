@@ -49,6 +49,7 @@ The Filament platform, spec authors, and agent CLI generators that rely on these
 The requirement classes that make up this specification trace as follows:
 
 - `stakeholder/` — StR-XXX stakeholder requirements.
+- `usecase/` — US-XXX user stories.
 - `functional/` — FR-XXX functional requirements.
 - `integration/` — IT-XXX integration tests.
 - `tests.md` — test matrix linking FRs to integration tests.
