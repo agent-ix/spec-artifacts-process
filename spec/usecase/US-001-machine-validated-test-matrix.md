@@ -57,4 +57,7 @@ potential relationships, not formal traceability.
 
 Open question raised in discovery: should coverage tables for requirement
 classes a repository does not use (e.g. NFR) be demanded anyway? Captured here
-for requirements analysis; it introduces no requirement.
+for requirements analysis; it introduces no requirement. Resolved during
+requirements analysis: [FR-003](../functional/FR-003-testmatrix-body-extraction.md)
+declares those tables as optional (`required: false`) extractions whose column
+sets are asserted only when present.
