@@ -9,3 +9,4 @@ description: "Chronological log of structural changes to this bundle."
 
 * **2026-06-15** — Adopted OKF-compatible bundle structure with directory indexes.
 * **2026-08-04** — Added `usecase/` (US-001) and FR-003 (TestMatrix `body_extraction`); restructured `tests.md` to the spec-matrix table shape.
+* **2026-08-04** — FR-003 refined per review: `Priority` `column_choices` (P0–P4 vocabulary), widened `Traces To` tokens (CON rows, IT ids/success criteria), normalize-before-enforce rollout constraint (FR-003-CON-1).
