@@ -103,7 +103,11 @@ Task-001 (fixtures + red tests)
 - **Estimated new code:** ~60 lines
 - **Exit criteria:** Full suite green including TC-017; `quire validate` clean on this repo.
 
-#### Gate: Contract green
+#### Gate: Contract green — **PASSED 2026-08-04**
+TC-001..TC-018 green through the `quire validate` harness, TC-024 a strict
+xfail on the documented engine gap, `make test` and `make lint` clean, and
+`quire validate --scope . "spec/**/*.md"` exits 0.
+
 - **Measures:** All TC-001..TC-018 pass; this repo self-validates under the candidate contract.
 - **Pass criteria:** `make test` green; `quire validate --scope . "spec/**/*.md"` error-free.
 - **If fails:** Fix contract data or FR-003 spec drift before any sweep or publish work.
@@ -139,9 +143,9 @@ and Task-004 can run in parallel. Track C is strictly post-gate.
 
 | Task | Track | Owns | Verifies | Status |
 |------|-------|------|----------|--------|
-| Task-001 | A | FR-003 (fixtures/tests) | TC-001..TC-016, TC-018 | not_started |
-| Task-002 | A | FR-003 (manifest contract) | TC-001..TC-016, TC-018 | not_started |
-| Task-003 | A | FR-003-AC-9, self-validation | TC-017 | not_started |
+| Task-001 | A | FR-003 (fixtures/tests) | TC-001..TC-016, TC-018 | completed |
+| Task-002 | A | FR-003 (manifest contract) | TC-001..TC-016, TC-018 | completed |
+| Task-003 | A | FR-003-AC-9, self-validation | TC-017 | completed |
 | Task-004 | S | FR-003-CON-1 (sweep) | FR-003-CON-1 (Inspection input) | not_started |
 | Task-005 | Gate | FR-003-CON-1 (sign-off) | FR-003-CON-1 | not_started |
 | Task-006 | C | Enforcing release | IT-001 | not_started |

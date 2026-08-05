@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shutil
+import subprocess
 
 import pytest
 import yaml
@@ -85,3 +87,112 @@ def test_manifest_validates_against_fr035_schema() -> None:
     assert not errors, [
         f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors
     ]
+
+
+def test_testmatrix_body_extraction_contract() -> None:
+    """FR-003: the TestMatrix contract is manifest data — required coverage +
+    summary tables, the Test ID pattern, and the Type/Priority/Status/Traces To
+    cell vocabularies. The behavioural side is
+    `test_testmatrix_body_extraction.py`, which drives `quire validate`."""
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
+    match = tm["body_extraction"]["yield_pattern"]["match"]
+
+    coverage = match["functional_coverage"]
+    assert coverage["from"] == "table_row"
+    assert coverage["under_section"] == "Functional Requirement Coverage"
+    assert coverage["required"] is True
+    assert coverage["assert"]["columns"] == [
+        "Functional Req",
+        "Acceptance Criteria",
+        "Test Cases",
+        "Coverage Status",
+    ]
+    assert coverage["assert"]["min_rows"] == 1
+
+    cases = match["test_cases"]
+    assert cases["required"] is True
+    assert cases["multiple"] is True, "one record per test-case row (FR-003-AC-8)"
+    assert cases["assert"]["columns"] == [
+        "Test ID",
+        "Title",
+        "Type",
+        "Priority",
+        "Traces To",
+        "Status",
+    ]
+    assert cases["assert"]["id_column"] == "Test ID"
+    assert cases["assert"]["id_pattern"] == r"^TC(-INT)?-\d+[a-z]?$"
+    choices = cases["assert"]["column_choices"]
+    assert choices["Type"] == ["Unit", "Integration", "E2E", "Property"]
+    assert choices["Priority"] == ["P0", "P1", "P2", "P3", "P4"]
+    assert choices["Status"] == ["✅", "⚠️", "❌", "🚧"]
+    assert "Traces To" in cases["assert"]["column_patterns"]
+
+    # The three optional coverage tables: absent is fine, present is asserted.
+    for key, section in [
+        ("stakeholder_coverage", "Stakeholder Requirement Coverage"),
+        ("user_story_coverage", "User Story Coverage"),
+        ("non_functional_coverage", "Non-Functional Requirement Coverage"),
+    ]:
+        assert match[key]["required"] is False
+        assert match[key]["under_section"] == section
+        assert match[key]["assert"]["columns"]
+        assert "min_rows" not in match[key]["assert"], (
+            "an optional table must not require rows — a bundle without those "
+            "artifacts would have to fabricate them (FR-003-AC-7)"
+        )
+
+
+def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
+    """TC-017 (FR-003-AC-9): the contract is additive. The TestMatrix
+    frontmatter schema is untouched, and no other archetype gained or lost a
+    `body_extraction`."""
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "testmatrix-frontmatter.schema.json").read_text()
+    )
+    assert schema["required"] == ["id", "title", "type"]
+    assert schema["properties"]["type"]["const"] == "TestMatrix"
+    assert set(schema["properties"]) == {
+        "id",
+        "title",
+        "type",
+        "object",
+        "relationships",
+    }
+
+    with_contract = {
+        t["name"] for t in manifest["artifact_types"] if "body_extraction" in t
+    }
+    assert with_contract == {"Feedback", "SpecReview", "TestMatrix"}, (
+        "FR-003 adds the TestMatrix contract only; Feedback and SpecReview keep "
+        "the body_extraction they already had, and nothing else gains one"
+    )
+
+    tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
+    assert tm["frontmatter_schema_ref"] == "schemas/testmatrix-frontmatter.schema.json"
+    assert tm["allowed_links"] == ["covers", "references"]
+    assert tm["defaults"]["id_pattern"] == "TestMatrix-{next:03d}"
+
+
+def test_repo_test_matrix_self_validates() -> None:
+    """Gate (contract green): this repo's own `spec/tests.md` satisfies the
+    candidate contract — the module does not ship a shape it violates."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for self-validation")
+    repo_root = pathlib.Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--module",
+            str(pack.PACK_ROOT),
+            str(repo_root / "spec" / "tests.md"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr

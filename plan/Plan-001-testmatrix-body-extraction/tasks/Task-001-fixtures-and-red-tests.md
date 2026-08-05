@@ -2,7 +2,7 @@
 id: Task-001
 title: "FR-003 — fixture corpus + failing validation tests (TDD red)"
 type: Task
-status: not_started
+status: completed
 track: A
 priority: P0
 relationships:
@@ -54,21 +54,21 @@ change, with each failure asserting the documented reason.
 
 ## Subtasks
 
-- [ ] **Conforming fixture.** Full spec-matrix-shaped `tests.md` fixture (all
+- [x] **Conforming fixture.** Full spec-matrix-shaped `tests.md` fixture (all
       coverage tables + Test Case Summary) exercising a mixed vocabulary
       combination (TC-001) and record extraction (`multiple: true`, FR-003-AC-8).
-- [ ] **Structural-drift fixtures.** Missing Test Case Summary (TC-002), missing
+- [x] **Structural-drift fixtures.** Missing Test Case Summary (TC-002), missing
       Functional Requirement Coverage (TC-003), header-only tables for the
       `min_rows` boundary (TC-016), omitted optional tables (TC-014), optional
       table with a renamed column (TC-015).
-- [ ] **Vocabulary fixtures.** Pass-side permutations for Type (TC-004),
+- [x] **Vocabulary fixtures.** Pass-side permutations for Type (TC-004),
       Priority (TC-010), Status (TC-008); fail-side cells `Manual`, `P5`,
       `Done`/decorated `✅ Complete` (TC-005, TC-011, TC-009).
-- [ ] **Id/token fixtures.** Test ID shapes `TC-001`/`TC-INT-010`/`TC-INT-010a`
+- [x] **Id/token fixtures.** Test ID shapes `TC-001`/`TC-INT-010`/`TC-INT-010a`
       pass, `TC1`/`tc-001`/`TC-`/`TCX-001` fail (TC-006, TC-007); Traces To token
       permutations per kind + comma lists pass, semicolons/space-before-comma/TC
       tokens/truncated ids/trailing comma/empty cell fail (TC-012, TC-013, TC-018).
-- [ ] **Harness.** Pytest wrapper invoking `quire validate` with the local module
+- [x] **Harness.** Pytest wrapper invoking `quire validate` with the local module
       (manifest + schemas) against a fixture doc, asserting pass/fail and the
       failure reason (`missing` vs `assert`); reusable by the Track S sweep.
 
@@ -81,3 +81,21 @@ change, with each failure asserting the documented reason.
 
 - Mirror the existing SpecReview `body_extraction` test approach if present.
 - Unblocks: Task-002 (green step), Task-004 (sweep reuses the harness).
+
+## Implementation record (2026-08-04)
+
+- `tests/fixtures/testmatrix/` — 28 fixtures: one conforming matrix (all four
+  coverage tables, mixed vocabulary, four records), structural-drift docs
+  (missing required table, header-only tables for the `min_rows` boundary,
+  optional tables omitted, optional table with a renamed column), pass/fail
+  permutations for Type / Priority / Status, Test ID shapes, and Traces To
+  tokens, plus the duplicate-Test-ID doc for the blocked TC-024.
+- `tests/test_testmatrix_body_extraction.py` drives the **real**
+  `quire validate --module <pack>` per fixture and asserts the bracketed reason
+  token (`missing` vs `assert`), so the contract is tested as an author meets
+  it. The module skips when the `quire` CLI is absent.
+- Red confirmed before Task-002: 20 failed / 7 passed — every "must fail" case
+  passed validation because no contract existed yet.
+- TC-024 is a `strict=True` xfail carrying the engine-gap reason, so it stays
+  executable and flips to a suite failure the day quire-rs ships an
+  id-uniqueness assert.

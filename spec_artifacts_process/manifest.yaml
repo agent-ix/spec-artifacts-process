@@ -171,6 +171,62 @@ artifact_types:
   - references
   examples: []
   lint_rules_ref: []
+  # FR-003: structural + vocabulary contract over the matrix the quoin
+  # `spec-matrix` template emits. Whether a referenced requirement id exists is
+  # the engine's cross-reference job, not this contract's.
+  body_extraction:
+    yield_pattern:
+      match:
+        functional_coverage:
+          from: table_row
+          under_section: Functional Requirement Coverage
+          required: true
+          multiple: true
+          assert:
+            columns: [Functional Req, Acceptance Criteria, Test Cases, Coverage Status]
+            min_rows: 1
+        test_cases:
+          from: table_row
+          under_section: Test Case Summary
+          required: true
+          multiple: true
+          assert:
+            columns: [Test ID, Title, Type, Priority, Traces To, Status]
+            min_rows: 1
+            id_column: Test ID
+            id_pattern: '^TC(-INT)?-\d+[a-z]?$'
+            column_choices:
+              Type: [Unit, Integration, E2E, Property]
+              Priority: [P0, P1, P2, P3, P4]
+              Status: ["✅", "⚠️", "❌", "🚧"]
+            column_patterns:
+              # Comma-separated requirement/AC/CON tokens or IT ids and their
+              # success criteria. Test-case ids are NOT trace tokens.
+              Traces To: '^((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?)(,\s*((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?))*$'
+        # Optional: the spec-matrix template emits these unconditionally, but a
+        # bundle with no StR/US/NFR artifacts cannot truthfully populate them.
+        # Absent is fine; present is asserted.
+        stakeholder_coverage:
+          from: table_row
+          under_section: Stakeholder Requirement Coverage
+          required: false
+          multiple: true
+          assert:
+            columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Coverage Status]
+        user_story_coverage:
+          from: table_row
+          under_section: User Story Coverage
+          required: false
+          multiple: true
+          assert:
+            columns: [User Story, Acceptance Criteria, Test Cases, Coverage Status]
+        non_functional_coverage:
+          from: table_row
+          under_section: Non-Functional Requirement Coverage
+          required: false
+          multiple: true
+          assert:
+            columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
 - name: Standard
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json

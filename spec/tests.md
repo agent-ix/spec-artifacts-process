@@ -29,40 +29,40 @@ type: TestMatrix
 | FR-002 | FR-002-AC-3 | TC-021 | 🚧 Planned |
 | FR-002 | FR-002-AC-4 | TC-022 | 🚧 Planned |
 | FR-002 | FR-002-AC-5 | TC-023 | 🚧 Planned |
-| FR-003 | FR-003-AC-1 | TC-001, TC-003, TC-016 | 🚧 Planned |
-| FR-003 | FR-003-AC-2 | TC-002, TC-016 | 🚧 Planned |
-| FR-003 | FR-003-AC-3 | TC-004, TC-005 | 🚧 Planned |
-| FR-003 | FR-003-AC-4 | TC-006, TC-007 | 🚧 Planned |
-| FR-003 | FR-003-AC-5 | TC-008, TC-009 | 🚧 Planned |
-| FR-003 | FR-003-AC-6 | TC-012, TC-013, TC-018 | 🚧 Planned |
-| FR-003 | FR-003-AC-7 | TC-014, TC-015 | 🚧 Planned |
-| FR-003 | FR-003-AC-8 | TC-001 | 🚧 Planned |
-| FR-003 | FR-003-AC-9 | TC-017 (+ Inspection) | 🚧 Planned |
-| FR-003 | FR-003-AC-10 | TC-010, TC-011 | 🚧 Planned |
+| FR-003 | FR-003-AC-1 | TC-001, TC-003, TC-016 | ✅ Complete |
+| FR-003 | FR-003-AC-2 | TC-002, TC-016 | ✅ Complete |
+| FR-003 | FR-003-AC-3 | TC-004, TC-005 | ✅ Complete |
+| FR-003 | FR-003-AC-4 | TC-006, TC-007 | ✅ Complete |
+| FR-003 | FR-003-AC-5 | TC-008, TC-009 | ✅ Complete |
+| FR-003 | FR-003-AC-6 | TC-012, TC-013, TC-018 | ✅ Complete |
+| FR-003 | FR-003-AC-7 | TC-014, TC-015 | ✅ Complete |
+| FR-003 | FR-003-AC-8 | TC-001 | ✅ Complete |
+| FR-003 | FR-003-AC-9 | TC-017 (+ Inspection) | ✅ Complete |
+| FR-003 | FR-003-AC-10 | TC-010, TC-011 | ✅ Complete |
 | FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | ⚠️ Blocked |
 
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
-| TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | 🚧 |
-| TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | 🚧 |
-| TC-003 | Doc missing the Functional Requirement Coverage table fails with reason `missing` | Unit | P1 | FR-003, FR-003-AC-1 | 🚧 |
-| TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | 🚧 |
-| TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | 🚧 |
-| TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | 🚧 |
-| TC-007 | Malformed Test ID (`TC1`, `tc-001`, `TC-`, `TCX-001`) fails validation | Unit | P0 | FR-003-AC-4 | 🚧 |
-| TC-008 | Status marker permutation: ✅, ⚠️, ❌, 🚧 each accepted bare | Unit | P1 | FR-003-AC-5 | 🚧 |
-| TC-009 | Status cell outside the marker vocabulary (`Done`, decorated `✅ Complete`) fails via `column_choices` | Unit | P0 | FR-003-AC-5 | 🚧 |
-| TC-010 | Priority vocabulary permutation: P0, P1, P2, P3, P4 each accepted | Unit | P1 | FR-003-AC-10 | 🚧 |
-| TC-011 | Priority cell outside the vocabulary (`P5`, `High`) fails via `column_choices` | Unit | P0 | FR-003-AC-10 | 🚧 |
-| TC-012 | Traces To valid-token permutation: each token kind (StR/US/FR/NFR bare, -AC-, -CON-, IT, IT-SC) alone and comma-separated | Unit | P1 | FR-003-AC-6 | 🚧 |
-| TC-013 | Malformed Traces To rejected: semicolon separator, space-before-comma, TC token, truncated `FR--AC-1`, trailing comma | Unit | P0 | FR-003-AC-6 | 🚧 |
-| TC-014 | Doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Unit | P1 | FR-003-AC-7 | 🚧 |
-| TC-015 | Optional coverage table present with a wrong column set fails via column assert | Unit | P1 | FR-003-AC-7 | 🚧 |
-| TC-016 | `min_rows` boundary: required table with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-1, FR-003-AC-2 | 🚧 |
-| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion) | Unit | P2 | FR-003-AC-9 | 🚧 |
-| TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | 🚧 |
+| TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
+| TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
+| TC-003 | Doc missing the Functional Requirement Coverage table fails with reason `missing` | Unit | P1 | FR-003, FR-003-AC-1 | ✅ |
+| TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |
+| TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
+| TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
+| TC-007 | Malformed Test ID (`TC1`, `tc-001`, `TC-`, `TCX-001`) fails validation | Unit | P0 | FR-003-AC-4 | ✅ |
+| TC-008 | Status marker permutation: ✅, ⚠️, ❌, 🚧 each accepted bare | Unit | P1 | FR-003-AC-5 | ✅ |
+| TC-009 | Status cell outside the marker vocabulary (`Done`, decorated `✅ Complete`) fails via `column_choices` | Unit | P0 | FR-003-AC-5 | ✅ |
+| TC-010 | Priority vocabulary permutation: P0, P1, P2, P3, P4 each accepted | Unit | P1 | FR-003-AC-10 | ✅ |
+| TC-011 | Priority cell outside the vocabulary (`P5`, `High`) fails via `column_choices` | Unit | P0 | FR-003-AC-10 | ✅ |
+| TC-012 | Traces To valid-token permutation: each token kind (StR/US/FR/NFR bare, -AC-, -CON-, IT, IT-SC) alone and comma-separated | Unit | P1 | FR-003-AC-6 | ✅ |
+| TC-013 | Malformed Traces To rejected: semicolon separator, space-before-comma, TC token, truncated `FR--AC-1`, trailing comma | Unit | P0 | FR-003-AC-6 | ✅ |
+| TC-014 | Doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Unit | P1 | FR-003-AC-7 | ✅ |
+| TC-015 | Optional coverage table present with a wrong column set fails via column assert | Unit | P1 | FR-003-AC-7 | ✅ |
+| TC-016 | `min_rows` boundary: required table with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-1, FR-003-AC-2 | ✅ |
+| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion) | Unit | P2 | FR-003-AC-9 | ✅ |
+| TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | ✅ |
 | TC-019 | Conforming SpecReview doc validates; doc missing the Findings table fails with reason `missing` | Unit | P1 | FR-002-AC-1 | 🚧 |
 | TC-020 | Severity vocabulary permutation: low/medium/high accepted; cell outside fails via `column_choices` (reason `assert`) | Unit | P1 | FR-002-AC-2 | 🚧 |
 | TC-021 | Findings ID shapes: `FND-001` accepted; `FND-`, `fnd-1`, `F-001` fail the `id_pattern` | Unit | P1 | FR-002-AC-3 | 🚧 |
