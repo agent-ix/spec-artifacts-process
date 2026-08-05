@@ -17,4 +17,11 @@ description: "Chronological log of changes to the Plan-001 bundle."
   marks TC-001..TC-018 ✅ and FR-003-AC-11/TC-024 ⚠️ blocked on the absent
   quire-rs uniqueness assert. **Nothing published** — Task-004's sweep and the
   Task-005 sign-off gate (FR-003-CON-1) are untouched.
+* **2026-08-04** — Task-004 (Track S) completed, read-only: swept 189 ecosystem
+  `spec/tests.md` files against the candidate contract — 6 pass, 171 fail, 12
+  are not TestMatrix documents. Report + per-repo diagnostics in
+  `reports/2026-08-04-tests-md-sweep.{md,json}`. The sweep surfaced contract
+  questions (Type/Status/Traces To vocabularies vs. real corpus usage) that the
+  Task-005 gate must settle before any normalization. No repository was
+  modified; nothing published.
 

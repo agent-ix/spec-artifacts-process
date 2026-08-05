@@ -146,7 +146,7 @@ and Task-004 can run in parallel. Track C is strictly post-gate.
 | Task-001 | A | FR-003 (fixtures/tests) | TC-001..TC-016, TC-018 | completed |
 | Task-002 | A | FR-003 (manifest contract) | TC-001..TC-016, TC-018 | completed |
 | Task-003 | A | FR-003-AC-9, self-validation | TC-017 | completed |
-| Task-004 | S | FR-003-CON-1 (sweep) | FR-003-CON-1 (Inspection input) | not_started |
+| Task-004 | S | FR-003-CON-1 (sweep) | FR-003-CON-1 (Inspection input) | completed |
 | Task-005 | Gate | FR-003-CON-1 (sign-off) | FR-003-CON-1 | not_started |
 | Task-006 | C | Enforcing release | IT-001 | not_started |
 
