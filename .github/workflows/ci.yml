@@ -2,9 +2,19 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the package to pypi as well as running checks"
+        type: boolean
+        default: false
 
 jobs:
+  # Publishing is opt-in. Dispatching this workflow to run the checks used to
+  # publish as a side effect, which is a hazard while FR-003-CON-1 keeps the
+  # enforcing module version behind a sign-off gate: asking for a test run
+  # would have shipped the thing the gate exists to hold back.
   publish-to-pypi:
+    if: inputs.publish
     runs-on: ubuntu-latest
 
     steps:
