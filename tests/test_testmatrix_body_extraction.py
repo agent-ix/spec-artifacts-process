@@ -112,12 +112,17 @@ def test_header_only_table_fails_min_rows(fixture: str) -> None:
 
 
 def test_type_vocabulary_permutation_validates() -> None:
-    """TC-004 (FR-003-AC-3): Unit, Integration, E2E, Property all accepted."""
+    """TC-004 (FR-003-AC-3, CR-016): every core evidence value is accepted —
+    Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile,
+    Snapshot, Manual. The sweep found Benchmark (8 repo families), Static (3)
+    and human review in real matrices, so the core set names how evidence is
+    produced rather than only how a test is scoped."""
     assert_valid("type-vocabulary.md")
 
 
 def test_type_outside_vocabulary_fails() -> None:
-    """TC-005 (FR-003-AC-3): `Manual` is not a Type."""
+    """TC-005 (FR-003-AC-3): a value in neither the core set nor the module's
+    declared extensions still fails."""
     assert_invalid("type-invalid.md", reason="assert", mentions="Type")
 
 
@@ -125,7 +130,9 @@ def test_type_outside_vocabulary_fails() -> None:
 
 
 def test_test_id_shapes_validate() -> None:
-    """TC-006 (FR-003-AC-4): `TC-001`, `TC-INT-010`, `TC-INT-010a`."""
+    """TC-006 (FR-003-AC-4, CR-016): the template forms plus the segmented ones
+    the ecosystem authors — `TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`
+    (7 repo families)."""
     assert_valid("test-id-shapes.md")
 
 
@@ -136,10 +143,12 @@ def test_test_id_shapes_validate() -> None:
         "test-id-lowercase.md",
         "test-id-truncated.md",
         "test-id-wrong-prefix.md",
+        "test-id-trailing-prose.md",
     ],
 )
 def test_malformed_test_id_fails(fixture: str) -> None:
-    """TC-007 (FR-003-AC-4)."""
+    """TC-007 (FR-003-AC-4): widening the shape must not admit an id carrying
+    trailing prose — `TC-020 SPIRE` is still malformed."""
     assert_invalid(fixture, reason="assert")
 
 
@@ -147,15 +156,17 @@ def test_malformed_test_id_fails(fixture: str) -> None:
 
 
 def test_status_marker_permutation_validates() -> None:
-    """TC-008 (FR-003-AC-5): the four bare markers."""
+    """TC-008 (FR-003-AC-5, CR-016): the five markers, bare or carrying the note
+    that says why (`⚠️ scale evidence deferred`). Decorated statuses were the
+    single largest vocabulary failure in the sweep (6 repo families), and the
+    note carries information the bare marker cannot."""
     assert_valid("status-vocabulary.md")
 
 
-@pytest.mark.parametrize("fixture", ["status-word.md", "status-decorated.md"])
-def test_status_outside_vocabulary_fails(fixture: str) -> None:
-    """TC-009 (FR-003-AC-5): `Done` and a decorated `✅ Complete` are both out
-    — the marker vocabulary is bare markers only."""
-    assert_invalid(fixture, reason="assert", mentions="Status")
+def test_status_without_leading_marker_fails() -> None:
+    """TC-009 (FR-003-AC-5): a word status still fails — the cell must be
+    *headed* by a marker."""
+    assert_invalid("status-word.md", reason="assert", mentions="Status")
 
 
 # ── TC-010 / TC-011: Priority vocabulary ──
@@ -176,7 +187,9 @@ def test_priority_outside_vocabulary_fails(fixture: str) -> None:
 
 
 def test_traces_to_token_permutation_validates() -> None:
-    """TC-012 (FR-003-AC-6): every token kind alone and in a comma list."""
+    """TC-012 (FR-003-AC-6, CR-016): any `<KIND>-<N>` token with an optional
+    sub-id — including `NFR-003-VR-1`, whose `VR` kind the contract never
+    enumerates — plus ranges and trailing parenthetical notes."""
     assert_valid("traces-to-tokens.md")
 
 
@@ -185,7 +198,6 @@ def test_traces_to_token_permutation_validates() -> None:
     [
         "traces-to-semicolon.md",
         "traces-to-space-before-comma.md",
-        "traces-to-test-case-token.md",
         "traces-to-truncated.md",
         "traces-to-trailing-comma.md",
     ],
@@ -193,6 +205,22 @@ def test_traces_to_token_permutation_validates() -> None:
 def test_malformed_traces_to_fails(fixture: str) -> None:
     """TC-013 (FR-003-AC-6)."""
     assert_invalid(fixture, reason="assert", mentions="Traces To")
+
+
+def test_test_case_token_is_no_longer_rejected_syntactically() -> None:
+    """TC-013 (FR-003-AC-6, CR-016) — documented regression. The contract used
+    to enumerate the legal kinds and so rejected a `TC-nnn` token in `Traces
+    To`. CR-016 stopped enumerating kinds (that is what lets `NFR-003-VR-1`
+    through without the engine knowing `VR`), and quire's regex engine has no
+    lookaround with which to exclude one kind generically. A test case tracing
+    to another test case is therefore no longer caught syntactically, and — since
+    `TC` is a declared trace target — resolution does not catch it either.
+
+    Recorded rather than silently lost: closing it needs either kind
+    enumeration (which CR-016 removed on purpose) or a semantic rule that a
+    reference may not target its own row's kind."""
+    result = validate("traces-to-test-case-token.md")
+    assert result.returncode == 0
 
 
 def test_empty_traces_to_fails() -> None:

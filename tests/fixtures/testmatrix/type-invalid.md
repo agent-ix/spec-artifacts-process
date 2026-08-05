@@ -17,4 +17,4 @@ type: TestMatrix
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
-| TC-001 | Manual case | Manual | P0 | FR-003-AC-3 | 🚧 |
+| TC-001 | Vibes-based check | Vibes | P0 | FR-003-AC-3 | 🚧 |

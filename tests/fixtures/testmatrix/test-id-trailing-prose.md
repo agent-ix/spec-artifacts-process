@@ -1,9 +1,9 @@
 ---
-id: TM-017
-title: "Decorated status marker"
+id: TM-025
+title: "Test ID carrying prose"
 type: TestMatrix
 ---
-# TM-017: Decorated status marker
+# TM-025: Test ID carrying prose
 
 ## Requirements Traceability
 
@@ -17,4 +17,4 @@ type: TestMatrix
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
-| TC-001 | Decorated status | Unit | P0 | FR-003-AC-5 | ✅ Complete |
+| TC-020 SPIRE | Id with prose | Unit | P0 | FR-003-AC-4 | 🚧 |

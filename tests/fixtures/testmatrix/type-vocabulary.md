@@ -1,9 +1,9 @@
 ---
 id: TM-010
-title: "Every Type value"
+title: "Every core Type value"
 type: TestMatrix
 ---
-# TM-010: Every Type value
+# TM-010: Every core Type value
 
 ## Requirements Traceability
 
@@ -21,3 +21,9 @@ type: TestMatrix
 | TC-002 | Integration | Integration | P0 | FR-003-AC-3 | 🚧 |
 | TC-003 | E2E | E2E | P0 | FR-003-AC-3 | 🚧 |
 | TC-004 | Property | Property | P0 | FR-003-AC-3 | 🚧 |
+| TC-005 | Fuzz | Fuzz | P0 | FR-003-AC-3 | 🚧 |
+| TC-006 | Benchmark | Benchmark | P0 | FR-003-AC-3 | 🚧 |
+| TC-007 | Static | Static | P0 | FR-003-AC-3 | 🚧 |
+| TC-008 | Compile | Compile | P0 | FR-003-AC-3 | 🚧 |
+| TC-009 | Snapshot | Snapshot | P0 | FR-003-AC-3 | 🚧 |
+| TC-010 | Manual | Manual | P0 | FR-003-AC-3 | 🚧 |

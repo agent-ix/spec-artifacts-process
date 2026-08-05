@@ -20,3 +20,6 @@ type: TestMatrix
 | TC-001 | Plain | Unit | P0 | FR-003-AC-4 | 🚧 |
 | TC-INT-010 | Integration | Integration | P0 | FR-003-AC-4 | 🚧 |
 | TC-INT-010a | Lettered | Integration | P0 | FR-003-AC-4 | 🚧 |
+| TC-060-01 | Sub-numbered | Unit | P0 | FR-003-AC-4 | 🚧 |
+| TC-SB-001 | Segmented | Snapshot | P0 | FR-003-AC-4 | 🚧 |
+| TC-001-HEADER-PARSE | Named segment | Unit | P0 | FR-003-AC-4 | 🚧 |

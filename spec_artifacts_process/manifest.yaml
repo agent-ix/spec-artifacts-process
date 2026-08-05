@@ -194,15 +194,27 @@ artifact_types:
             columns: [Test ID, Title, Type, Priority, Traces To, Status]
             min_rows: 1
             id_column: Test ID
-            id_pattern: '^TC(-INT)?-\d+[a-z]?$'
+            # CR-016: segmented ids the ecosystem authors (TC-060-01,
+            # TC-SB-001, TC-001-HEADER-PARSE) are legal; TC1 / tc-001 / TC- /
+            # TCX-001 and ids carrying prose are not.
+            id_pattern: '^TC(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$'
             column_choices:
-              Type: [Unit, Integration, E2E, Property]
+              # Core evidence vocabulary + this module's declared extensions.
+              # The list mirrors `traceability.vocabularies.test_type`, which is
+              # the single source; `test_manifest.py` asserts they agree.
+              Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual]
               Priority: [P0, P1, P2, P3, P4]
-              Status: ["✅", "⚠️", "❌", "🚧"]
             column_patterns:
-              # Comma-separated requirement/AC/CON tokens or IT ids and their
-              # success criteria. Test-case ids are NOT trace tokens.
-              Traces To: '^((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?)(,\s*((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?))*$'
+              # A leading status marker, optionally followed by the note that
+              # says why (`⚠️ scale evidence deferred`). Classes live in
+              # `traceability.status`.
+              Status: '^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$'
+              # Comma-separated `<KIND>-<N>` tokens with an optional
+              # `-<SUBKIND>-<M>` sub-id. The contract enumerates no kind names:
+              # the legal set follows from the declared trace targets, and
+              # existence is checked by reference resolution, not here. A
+              # same-prefix range or a trailing parenthetical note is allowed.
+              Traces To: '^[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, [A-Za-z]+-\d+(-[A-Za-z]+-\d+)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?( \([^)]*\))?)*$'
         # Optional: the spec-matrix template emits these unconditionally, but a
         # bundle with no StR/US/NFR artifacts cannot truthfully populate them.
         # Absent is fine; present is asserted.
@@ -306,3 +318,23 @@ object_types:
   allowed_links:
     references: []
 lint_rules: []
+
+# ── Traceability model (quire-rs FR-050) ──────────────────────────────────
+# The single source for what this module's matrix columns mean. The TestMatrix
+# `body_extraction` above validates the *shape*; these declarations tell the
+# coverage rollup how to read the same columns, so a contract and its coverage
+# computation cannot drift (CR-015 / CR-016).
+traceability:
+  trace_targets:
+  - name: test-case
+    document: tests.md
+    section: Test Case Summary
+    id_column: Test ID
+  status:
+    column: Status
+    complete: ["✅"]
+    pending: ["🚧"]
+    failed: ["❌"]
+    retired: ["⛔"]
+  vocabularies:
+    test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual]

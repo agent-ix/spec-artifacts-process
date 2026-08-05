@@ -122,12 +122,30 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Status",
     ]
     assert cases["assert"]["id_column"] == "Test ID"
-    assert cases["assert"]["id_pattern"] == r"^TC(-INT)?-\d+[a-z]?$"
+    assert (
+        cases["assert"]["id_pattern"]
+        == r"^TC(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$"
+    )
     choices = cases["assert"]["column_choices"]
-    assert choices["Type"] == ["Unit", "Integration", "E2E", "Property"]
+    assert choices["Type"] == [
+        "Unit",
+        "Integration",
+        "E2E",
+        "Property",
+        "Fuzz",
+        "Benchmark",
+        "Static",
+        "Compile",
+        "Snapshot",
+        "Manual",
+    ]
     assert choices["Priority"] == ["P0", "P1", "P2", "P3", "P4"]
-    assert choices["Status"] == ["✅", "⚠️", "❌", "🚧"]
-    assert "Traces To" in cases["assert"]["column_patterns"]
+    # CR-016: Status moved from an enum to a pattern, because the marker heads
+    # the cell and the note that says *why* follows it.
+    assert "Status" not in choices
+    patterns = cases["assert"]["column_patterns"]
+    assert patterns["Status"] == r"^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$"
+    assert "Traces To" in patterns
 
     # The three optional coverage tables: absent is fine, present is asserted.
     for key, section in [
@@ -175,6 +193,31 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     assert tm["frontmatter_schema_ref"] == "schemas/testmatrix-frontmatter.schema.json"
     assert tm["allowed_links"] == ["covers", "references"]
     assert tm["defaults"]["id_pattern"] == "TestMatrix-{next:03d}"
+
+
+def test_column_vocabularies_have_one_source() -> None:
+    """CR-015/CR-016: the traceability model owns the column vocabularies, and
+    the body_extraction contract must not drift from it. Until quire grows a
+    `from_vocabulary` reference, the contract restates the list and this test is
+    what keeps the two honest."""
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    traceability = manifest["traceability"]
+    tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
+    cases = tm["body_extraction"]["yield_pattern"]["match"]["test_cases"]
+
+    assert (
+        cases["assert"]["column_choices"]["Type"]
+        == traceability["vocabularies"]["test_type"]
+    ), "the Type enum must equal the declared test_type vocabulary"
+
+    status = traceability["status"]
+    assert status["column"] == "Status"
+    declared_markers = (
+        status["complete"] + status["pending"] + status["failed"] + status["retired"]
+    )
+    pattern = cases["assert"]["column_patterns"]["Status"]
+    for marker in declared_markers:
+        assert marker in pattern, f"{marker} is classed but not admitted by the pattern"
 
 
 def test_repo_test_matrix_self_validates() -> None:

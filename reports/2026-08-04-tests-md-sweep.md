@@ -288,3 +288,30 @@ quire-rs CR-013/CR-014 removed.
 
 **Decision (2026-08-05, with the user): normalize.** One required heading, one
 column set; the four renamed matrices are normalized during the sweep.
+
+---
+
+# Re-sweep after the CR-016 amendment (2026-08-05)
+
+Same read-only method, against the amended contract:
+
+**6/177 → 13/177 passing.** (The C0 simulation projected 18; it was looser than
+the patterns finally shipped, since space-before-comma and trailing commas in
+`Traces To` were tightened back to failing after the simulation ran. The
+difference is 5 repos whose only remaining failure is that formatting.)
+
+Remaining causes are the structural ones the addendum already identified:
+missing Test Case Summary (114), missing Functional Requirement Coverage (109),
+then Status (180 cells), Type (164 cells).
+
+The Status and Type counts are cell-level, and both are now *failures of the
+corpus rather than of the contract*: the marker vocabulary admits a trailing
+note, so what remains are word statuses (`Implemented`, `Planned: …`) and
+markers outside the set (`⬜`, `🔴`); the Type vocabulary admits ten core values
+plus module extensions, so what remains are harness names (`pg_test`) and
+compound cells (`Unit / pg_test`) that normalization moves to `Title` or splits
+into rows.
+
+**The gate position is unchanged: nothing published, no repo edited.** The
+amendment removes the contract's own errors; the remaining 164 need the
+normalization work that Task-005 exists to authorize.
