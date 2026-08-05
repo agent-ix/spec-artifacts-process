@@ -238,3 +238,53 @@ Full diagnostics per repo are in `2026-08-04-tests-md-sweep.json` (machine-reada
 ## Status
 
 **No repository was modified and nothing was published.** The next step is the Task-005 gate: the user decides (a) whether the `Type`/`Status`/`Traces To` vocabularies change, and (b) whether the normalization sweep proceeds. Until that sign-off is recorded, the enforcing module version stays unreleased (FR-003-CON-1).
+
+---
+
+# Addendum (2026-08-05): simulating the amended vocabularies, and what the
+# "missing table" population really is
+
+## Simulated pass rate
+
+Running the four amended vocabularies (Type core set + module extensions;
+Status marker + optional note; Traces To with ranges, parentheticals and
+declaration-derived kinds; the widened Test ID shape) against all 177 matrices:
+
+**6/177 passing today → 18/177 (10.2%) with the amendment.**
+
+Remaining failure causes: missing Test Case Summary 116, missing Functional
+Requirement Coverage 111, Type 27, Traces To 15, Status 14, Test ID 13,
+column set 11.
+
+The vocabulary work is worth doing — it stops the contract rejecting categories
+the corpus legitimately uses, and it fixes 12 repos outright — but it is **not**
+what stands between the ecosystem and a green sweep.
+
+## The "missing Test Case Summary" population, examined
+
+Of the 116 matrices with no `## Test Case Summary`:
+
+- **70** have no id-column table anywhere. They are coverage narratives —
+  `Coverage Summary` (19), `Overview` (14), `Traceability` (11),
+  `Coverage Status` (10). No contract change reaches these; they need authoring.
+- **44** do have an id-column table under another heading, but inspecting the
+  column sets shows these are mostly **different artifacts**, not renamed
+  summaries:
+
+| Heading | Repos | Columns | What it is |
+|---|---|---|---|
+| `Edge Cases` (+ variants) | 9 | `ID \| Description \| Related Req \| Test Case \| Risk if Untested` | risk register (already non-required scaffolding) |
+| `3. Constraint / Invariant → TC` | 5 | `ID \| TC \| Status` | constraint→test coverage map |
+| `Test Cases` | 4 | `TC ID \| Requirements Mapped \| Description \| Type \| Priority \| Status` | **a real test-case summary, renamed** |
+| per-FR sections, `State Transition Tests`, … | ~6 | bespoke | ad-hoc breakdowns |
+
+**So the honest split is ~150 repos needing authoring and ~4 needing a rename**,
+not "116 authoring / 44 renaming". Accepting alternative headings would recover
+those 4 — and only if a second *column* vocabulary were accepted too, since they
+renamed `Test ID`→`TC ID`, `Title`→`Description`, `Traces To`→`Requirements
+Mapped`. That is a worse trade than asking four repos to rename a heading and
+three columns, and it would re-introduce the engine-facing alias lists that
+quire-rs CR-013/CR-014 removed.
+
+**Decision (2026-08-05, with the user): normalize.** One required heading, one
+column set; the four renamed matrices are normalized during the sweep.
