@@ -17,11 +17,7 @@
       "minLength": 1
     },
     "type": {
-      "const": "Task"
-    },
-    "track": {
-      "type": "string",
-      "description": "Legacy grouping label (e.g. \"C\"). Retained for backward compatibility; the nodal form is a first-class Track artifact that `contains` this Task."
+      "const": "Track"
     },
     "object": {
       "type": "string"
