@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 
@@ -146,6 +147,28 @@ def test_testmatrix_body_extraction_contract() -> None:
     patterns = cases["assert"]["column_patterns"]
     assert patterns["Status"] == r"^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$"
     assert "Traces To" in patterns
+
+    # CR-017: the `Traces To` pattern admits two authoring shorthands the
+    # FR-003-CON-1 sweep found in real matrices, and keeps rejecting a cell that
+    # traces to nothing — which is exactly what a traceability matrix exists to
+    # surface. (agent-ix/spec-artifacts-process#12)
+    traces = re.compile(patterns["Traces To"])
+    for cell in [
+        "FR-001",
+        "FR-001-AC-2",
+        "FR-001-AC-1, FR-002-AC-2",
+        "FR-012-AC-1..FR-012-AC-3",
+        "FR-001 (note)",
+        # continuation — the parent id is elided on following tokens
+        "FR-001-AC-2, -AC-3, -AC-4",
+        "FR-004-AC-4, -CON-2",
+        # slash enumeration of sub-ids
+        "FR-016-AC-1/2/3/6/7/8",
+        "FR-005-AC-5/6/7, FR-016-AC-1/2/3, NFR-007-AC-1, US-009",
+    ]:
+        assert traces.match(cell), f"CR-017 should admit {cell!r}"
+    for cell in ["", "—", "Future Task 13", "FR-002 error path", "-AC-1"]:
+        assert not traces.match(cell), f"should stay rejected: {cell!r}"
 
     # The three optional coverage tables: absent is fine, present is asserted.
     for key, section in [
