@@ -84,6 +84,13 @@ validation engine's cross-reference job and is out of scope here.
   to IT ids and their success criteria), i.e. the cell pattern
   `^((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?)(,\s*((StR|US|FR|NFR)-\d+(-(AC|CON)-\d+)?|IT-\d+(-SC-\d+)?))*$`;
   existence of the referenced ids is **not** checked by this contract.
+  A cell MAY additionally use either **authoring shorthand** admitted by
+  CR-017 — *continuation*, where a following token elides the parent id
+  (`FR-001-AC-2, -AC-3, -AC-4`), and *slash enumeration* of sub-ids
+  (`FR-016-AC-1/2/3/6`). Both denote exactly what the expanded list denotes.
+  An **empty cell** and a placeholder dash (`—`) SHALL NOT be admitted: a test
+  case that traces to nothing is precisely what a traceability matrix exists to
+  surface.
 - Test-case rows **SHALL** be extractable as records (`multiple: true`) so
   tooling (gap analysis, planning) can select each test case by id.
 - `Test ID` values **SHALL** be unique within the `Test Case Summary` (a
@@ -130,6 +137,59 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
+
+> **CR-017 note (2026-08-06):** The FR-003-CON-1 gate was re-run and the 171
+> failures classified (report: `reports/2026-08-06-fr003-signoff-gate.md`,
+> agent-ix/spec-artifacts-process#12). The harness is now committed at
+> `scripts/testmatrix_sweep.py`; the original run's was not, which is why the
+> figure could not be re-derived.
+>
+> **The headline was inflated.** `ecaz` carries 20 worktree checkouts under
+> `.worktrees/` and `.claude/worktrees/`, each a byte-copy of its `tests.md`, so
+> that one repo's diagnostics were counted 20 times — 945 `Status` cell failures
+> collapse to 111 once deduplicated. Deduplicated: 169 TestMatrix documents,
+> **13 passing (7.7%)**. The pass rate stands; the composition does not.
+>
+> **Only 42 repos have a matrix that could be normalized.** Classified:
+> `missing-table` **70** (no `Test Case Summary` and no id-column table
+> anywhere), `renamable` **44** (an id-column table under another heading —
+> which the earlier addendum showed is a *different artifact* in all but ~4
+> cases), `malformed` **42**. So ~110 repos have never authored a matrix, and no
+> amendment to this contract will change that. A 92% failure rate reads as
+> over-strictness; two thirds of it is a missing artifact.
+>
+> **Is the contract too narrow? Almost nowhere.** `Type` (158 cells, 21 repos) —
+> **no amendment**: what remains is abbreviations of declared values (`Bench`,
+> `Perf`), annotations belonging in `Title` (`Unit (git)`), harness names that
+> are not test types (`pg_test`, `Storybook`, `axe-core`), and verification
+> methods in the wrong column (`Inspection`, `Review`). CR-016 widened this once
+> already; widening again would be fitting the check to non-conforming data.
+> `Status` (111 cells, 7 repos) — **no amendment**: the pattern already admits a
+> marker plus a note, and what remains is markers outside the set (`⬜`, `🔴`,
+> `⊘`) and bare word statuses. Column headers (87 mismatches, 40 repos) — **no
+> amendment**: only 4 documents fail on headers alone, and the rest are
+> genuinely different tables, mostly in the *optional* coverage sections.
+>
+> **One amendment, and only one.** `Traces To` rejects two legitimate authoring
+> shorthands — continuation (`FR-001-AC-2, -AC-3, -AC-4`) and slash enumeration
+> (`FR-016-AC-1/2/3/6`) — ~25 cells across ~6 repos. Both denote exactly what
+> the expanded list denotes and expanding them by hand makes matrices longer and
+> no clearer, so the pattern now admits them. The other `Traces To` failures,
+> `—` (10) and empty (6), stay failing on purpose.
+>
+> **Proportion, which is what the gate issue existed to determine:** contract
+> too narrow ≈ 25 cells / 6 repos; corpus non-conformant = 42 repos; artifact
+> never authored ≈ 110 repos.
+>
+> **Publishing.** The gate has been framed as "publishing fails every repo
+> simultaneously". Module adoption is per-repo — a repo installs this module
+> explicitly and picks up a new contract when it updates — so the blast radius
+> is repos that update, not all repos at once. That is not licence to publish
+> carelessly, and one prerequisite is unchecked: whether
+> `quoin module ensure-defaults` resolves to latest, which would turn adoption
+> into a broadcast. Recommended sequence: this amendment → normalize the 42
+> malformed matrices (Task-005, user-gated) → verify `ensure-defaults` → publish,
+> treating the ~110 unauthored matrices as a backlog rather than a blocker.
 
 > **CR-016 note:** The FR-003-CON-1 sweep
 > (`reports/2026-08-04-tests-md-sweep.md`) validated this contract against all
