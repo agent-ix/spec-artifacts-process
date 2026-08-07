@@ -53,6 +53,11 @@ SKIP_DIRS = {
     # every diagnostic by 20 and makes one repo look like a corpus-wide trend.
     "worktrees",
     ".worktrees",
+    # The ticket runner materializes a full checkout at
+    # `.ticket-runner/<org>-<repo>-<ticket>/` while a ticket is in flight and
+    # removes it afterwards. Transient, so leaving it in makes the same sweep
+    # return different totals depending on whether a ticket was running.
+    ".ticket-runner",
 }
 
 SUMMARY_HEADING = re.compile(r"^##\s+Test Case Summary\s*$", re.MULTILINE)
