@@ -177,6 +177,15 @@ def test_priority_vocabulary_permutation_validates() -> None:
     assert_valid("priority-vocabulary.md")
 
 
+def test_priority_column_may_be_omitted_entirely() -> None:
+    """TC-025 (FR-003-AC-10, CR-018): a matrix that never authored a priority
+    validates. 49 of 169 ecosystem matrices are in exactly this shape — real
+    test-case rows, no priority anywhere — and the alternative to admitting
+    them was writing an invented priority into each. Neither the missing
+    column nor its absent cells may be reported."""
+    assert_valid("priority-column-omitted.md")
+
+
 @pytest.mark.parametrize("fixture", ["priority-invalid.md", "priority-word.md"])
 def test_priority_outside_vocabulary_fails(fixture: str) -> None:
     """TC-011 (FR-003-AC-10): `P5` and `High` are both out."""

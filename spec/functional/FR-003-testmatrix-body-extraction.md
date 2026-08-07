@@ -56,9 +56,11 @@ validation engine's cross-reference job and is out of scope here.
   is the distinction a matrix consumer acts on. Harness names (`pg_test`,
   `terraform plan`, `ecaz bench suite`) belong in `Title`, and a compound cell
   (`Unit / pg_test`) is two rows (CR-016).
-- The `Priority` column **SHALL** be constrained via `column_choices` to
-  exactly `P0 | P1 | P2 | P3 | P4`, where P0 = must-pass blocker,
-  P1 = critical path, P2 = standard, P3 = low, and P4 = nice-to-have/deferred.
+- The `Priority` column **SHALL** be declared `optional_columns` — a matrix MAY
+  omit it entirely — and, **when authored**, **SHALL** be constrained via
+  `column_choices` to exactly `P0 | P1 | P2 | P3 | P4`, where P0 = must-pass
+  blocker, P1 = critical path, P2 = standard, P3 = low, and
+  P4 = nice-to-have/deferred (CR-018).
 - The `Status` column **SHALL** be constrained via `column_patterns` to a
   leading status marker followed by an optional note:
   `^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$`. The marker carries the class and the note carries
@@ -135,9 +137,24 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-7 | A doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Test (TC-001) |
 | FR-003-AC-8 | Test-case rows are extracted as one record per row (`multiple: true`) | Test (TC-001) |
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
-| FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` | Test (TC-001) |
+| FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
 
+> **CR-018 note (2026-08-07):** `Priority` is now declared in
+> `optional_columns` rather than required outright. The FR-003-CON-1 sweep
+> found that 49 of 169 ecosystem matrices carry real, well-formed test-case
+> rows with **no priority anywhere in the document** — not a formatting drift
+> that a sweep can normalize, but planning data that was simply never
+> recorded. The only two ways to enforce presence were to leave all 49
+> permanently failing, or to write an invented priority into each. The second
+> fabricates planning data to satisfy a checker, which is the exact failure
+> mode this contract exists to catch, so the contract was fixed instead of the
+> corpus. Nothing else relaxes: the column is still declared, still ordered,
+> and its values are still constrained to `P0..P4` in every matrix that
+> authors it (quire-rs FR-033-AC-14/15, CR-023). Requires an engine at
+> **v0.16.0 or later** — an older engine rejects `optional_columns` as an
+> unknown assert key at load time.
+>
 > **CR-017 note (2026-08-06):** The FR-003-CON-1 gate was re-run and the 171
 > failures classified (report: `reports/2026-08-06-fr003-signoff-gate.md`,
 > agent-ix/spec-artifacts-process#12). The harness is now committed at

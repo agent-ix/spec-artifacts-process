@@ -38,7 +38,7 @@ type: TestMatrix
 | FR-003 | FR-003-AC-7 | TC-014, TC-015 | ✅ Complete |
 | FR-003 | FR-003-AC-8 | TC-001 | ✅ Complete |
 | FR-003 | FR-003-AC-9 | TC-017 (+ Inspection) | ✅ Complete |
-| FR-003 | FR-003-AC-10 | TC-010, TC-011 | ✅ Complete |
+| FR-003 | FR-003-AC-10 | TC-010, TC-011, TC-025 | ✅ Complete |
 | FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | ⚠️ Blocked |
 
 ## Test Case Summary
@@ -69,6 +69,7 @@ type: TestMatrix
 | TC-022 | Bundled `skeletons/SpecReview.md` is itself a valid SpecReview and ships in the wheel | Unit | P2 | FR-002-AC-4 | 🚧 |
 | TC-023 | SpecReview registration leaves the freeform Review archetype unaltered (manifest diff assertion) | Unit | P2 | FR-002-AC-5 | 🚧 |
 | TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | ⚠️ |
+| TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |
 
 ## Option Permutation Matrix
 
