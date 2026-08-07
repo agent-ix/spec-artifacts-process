@@ -23,3 +23,5 @@ type: TestMatrix
 | TC-060-01 | Sub-numbered | Unit | P0 | FR-003-AC-4 | 🚧 |
 | TC-SB-001 | Segmented | Snapshot | P0 | FR-003-AC-4 | 🚧 |
 | TC-001-HEADER-PARSE | Named segment | Unit | P0 | FR-003-AC-4 | 🚧 |
+| IT-001 | Integration test document (CR-019) | Integration | P0 | FR-003-AC-4 | 🚧 |
+| IT-042-SC-2 | Segmented IT id | Integration | P0 | FR-003-AC-4 | 🚧 |

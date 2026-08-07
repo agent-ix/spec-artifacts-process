@@ -32,7 +32,7 @@ type: TestMatrix
 | FR-003 | FR-003-AC-1 | TC-001, TC-003, TC-016 | ✅ Complete |
 | FR-003 | FR-003-AC-2 | TC-002, TC-016 | ✅ Complete |
 | FR-003 | FR-003-AC-3 | TC-004, TC-005 | ✅ Complete |
-| FR-003 | FR-003-AC-4 | TC-006, TC-007 | ✅ Complete |
+| FR-003 | FR-003-AC-4 | TC-006, TC-007, TC-026 | ✅ Complete |
 | FR-003 | FR-003-AC-5 | TC-008, TC-009 | ✅ Complete |
 | FR-003 | FR-003-AC-6 | TC-012, TC-013, TC-018 | ✅ Complete |
 | FR-003 | FR-003-AC-7 | TC-014, TC-015 | ✅ Complete |
@@ -70,6 +70,7 @@ type: TestMatrix
 | TC-023 | SpecReview registration leaves the freeform Review archetype unaltered (manifest diff assertion) | Unit | P2 | FR-002-AC-5 | 🚧 |
 | TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | ⚠️ |
 | TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |
+| TC-026 | An `IT-` id validates; a prefix naming no declared archetype (`BENCH-001`) fails (CR-019) | Unit | P0 | FR-003-AC-4 | ✅ |
 
 ## Option Permutation Matrix
 
