@@ -15,10 +15,11 @@ Process artifacts today are authored ad hoc, producing inconsistent structure th
 
 ## Validation Criteria
 
-This need is satisfied when:
 
-- A Module activation against filament-core registers the contents this module declares (6 archetypes, 1 grammar, and 9 artifact types).
-- Agent CLI generators (minijinja-cli) can produce valid artifacts using the templates and schemas this module ships.
+| ID | Criteria | Validation |
+|----|----------|------------|
+| StR-001-VC-1 | A Module activation against filament-core registers the contents this module declares (6 archetypes, 1 grammar, and 9 artifact types). | Demonstration |
+| StR-001-VC-2 | Agent CLI generators (minijinja-cli) can produce valid artifacts using the templates and schemas this module ships. | Demonstration |
 
 ## Stakeholders
 
