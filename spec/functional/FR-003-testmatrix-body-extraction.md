@@ -41,11 +41,14 @@ validation engine's cross-reference job and is out of scope here.
   extraction with columns exactly
   `Test ID | Title | Type | Priority | Traces To | Status` and at least one row.
 - The `Test ID` column **SHALL** be the id column and match
-  `^TC(-[A-Za-z0-9]+)+$` with at least one numeric segment. This admits the
+  `^(TC|IT)(-[A-Za-z0-9]+)+$` with at least one numeric segment. This admits the
   plain `TC-NNN` form, the template's `TC-INT-NNN`/lettered variants, and the
   segmented forms the ecosystem authors (`TC-060-01`, `TC-SB-001`,
   `TC-001-HEADER-PARSE` — 7 repo families), while still rejecting `TC1`,
   `tc-001`, `TC-`, `TCX-001`, and ids carrying trailing prose (CR-016).
+  The prefix set mirrors the **declared evidence archetypes**, not a list of
+  test kinds: `TC` and `IT` are the only two artifact types any module mints
+  test ids for (CR-019).
 - The `Type` column **SHALL** be constrained via the Quire `column_choices`
   assert (requires [FR-033](ix://agent-ix/quire-rs/spec/functional/FR-033)) to
   the **core evidence vocabulary** `Unit | Integration | E2E | Property | Fuzz |
@@ -131,7 +134,7 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-1 | A `TestMatrix` doc with a conforming `Functional Requirement Coverage` table and `Test Case Summary` validates | Test (TC-001) |
 | FR-003-AC-2 | A doc missing the `Test Case Summary` table fails with reason `missing` | Test (TC-001) |
 | FR-003-AC-3 | A `Type` cell outside the core evidence vocabulary and the module's declared extensions fails via `column_choices` (reason `assert`); every core value and every declared extension passes | Test (TC-001) |
-| FR-003-AC-4 | A `Test ID` cell not matching `^TC(-[A-Za-z0-9]+)+$` with a numeric segment fails validation; the segmented ecosystem forms (`TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`) pass | Test (TC-001) |
+| FR-003-AC-4 | A `Test ID` cell not matching `^(TC\|IT)(-[A-Za-z0-9]+)+$` with a numeric segment fails validation; the segmented ecosystem forms (`TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`) pass, as does an `IT-NNN` id (CR-019); a prefix naming no declared archetype (`BENCH-001`, `AUDIT-001`, `SB-001`, `TCX-001`) fails | Test (TC-001) |
 | FR-003-AC-5 | A `Status` cell not headed by one of `✅ ⚠️ ❌ 🚧 ⛔` fails via `column_patterns`; a marker followed by a note (`✅ Complete`, `⚠️ scale evidence deferred`) passes | Test (TC-001) |
 | FR-003-AC-6 | A `Traces To` cell that is not comma-separated `<KIND>-<N>` tokens (with an optional `-<SUBKIND>-<M>` sub-id, a same-prefix range, or a trailing parenthetical note) fails via `column_patterns`; the contract enumerates no kind names | Test (TC-001) |
 | FR-003-AC-7 | A doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Test (TC-001) |
@@ -140,6 +143,30 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
 
+> **CR-019 note (2026-08-07):** The `Test ID` prefix set is `TC|IT`, mirroring
+> the declared **evidence archetypes** rather than enumerating kinds of
+> testing. `spec-artifacts-iso` mints exactly two test-id families —
+> `TC-{next:03d}` and `IT-{next:03d}` — so a contract admitting only `TC`
+> contradicted a sibling module: `quire-cli` alone carries 84 `IT-` ids
+> referenced across seven of its spec files, minted the way the iso module
+> declares. Every other artifact type that mints an id (`FR`, `NFR`, `US`,
+> `SR`, `ADR`, `FB`, `GLO`) is a requirement or process artifact, not evidence.
+>
+> This is deliberately **not** a widening toward "whatever the corpus writes".
+> The two axes are separate: *what kind of testing* a row records is the `Type`
+> column's job and that vocabulary is open and module-extensible, while *what
+> kind of artifact* an id names is closed, one prefix per declared archetype. A
+> new technique — mutation, contract, chaos testing — is a new `Type` value and
+> needs no new prefix, because it is still a test case in the matrix. A new
+> prefix is justified only when a module declares a new archetype with its own
+> document shape, at which point the manifest and this pattern change together.
+>
+> The three prefixes the sweep found that name no archetype — `BENCH-`/`AUDIT-`
+> (quire-cli, 6 ids) and `SB-`/`IS-` (chat-window, 12 ids) — encode in the id
+> what the row already states one column over (`Type: Benchmark | Static |
+> Snapshot`), so they were renamed to `TC-` rather than admitted. No
+> information is lost by that rename.
+>
 > **CR-018 note (2026-08-07):** `Priority` is now declared in
 > `optional_columns` rather than required outright. The FR-003-CON-1 sweep
 > found that 49 of 169 ecosystem matrices carry real, well-formed test-case

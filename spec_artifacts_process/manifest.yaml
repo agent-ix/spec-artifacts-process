@@ -204,7 +204,15 @@ artifact_types:
             # CR-016: segmented ids the ecosystem authors (TC-060-01,
             # TC-SB-001, TC-001-HEADER-PARSE) are legal; TC1 / tc-001 / TC- /
             # TCX-001 and ids carrying prose are not.
-            id_pattern: '^TC(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$'
+            #
+            # CR-019: the prefix set mirrors the declared *evidence archetypes*
+            # — `TC` and `IT` are the only two artifact types any module mints
+            # test ids for (spec-artifacts-iso `id_pattern: TC-{next:03d}` /
+            # `IT-{next:03d}`). It is deliberately not a list of test kinds:
+            # what kind of testing a row records is the `Type` column's job,
+            # and that vocabulary is open. A new technique is a new `Type`
+            # value, not a new prefix.
+            id_pattern: '^(TC|IT)(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$'
             column_choices:
               # Core evidence vocabulary + this module's declared extensions.
               # The list mirrors `traceability.vocabularies.test_type`, which is

@@ -123,9 +123,11 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Status",
     ]
     assert cases["assert"]["id_column"] == "Test ID"
+    # CR-019: the prefix set mirrors the declared evidence archetypes (`TC`,
+    # `IT`) — not a list of test kinds, which is the `Type` column's job.
     assert (
         cases["assert"]["id_pattern"]
-        == r"^TC(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$"
+        == r"^(TC|IT)(-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*(-[A-Za-z0-9]+)*$"
     )
     choices = cases["assert"]["column_choices"]
     assert choices["Type"] == [

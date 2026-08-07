@@ -130,9 +130,10 @@ def test_type_outside_vocabulary_fails() -> None:
 
 
 def test_test_id_shapes_validate() -> None:
-    """TC-006 (FR-003-AC-4, CR-016): the template forms plus the segmented ones
-    the ecosystem authors — `TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`
-    (7 repo families)."""
+    """TC-006 (FR-003-AC-4, CR-016, CR-019): the template forms plus the
+    segmented ones the ecosystem authors — `TC-060-01`, `TC-SB-001`,
+    `TC-001-HEADER-PARSE` (7 repo families) — and the `IT-` family, which
+    spec-artifacts-iso mints as a declared archetype (`IT-{next:03d}`)."""
     assert_valid("test-id-shapes.md")
 
 
@@ -144,6 +145,7 @@ def test_test_id_shapes_validate() -> None:
         "test-id-truncated.md",
         "test-id-wrong-prefix.md",
         "test-id-trailing-prose.md",
+        "test-id-undeclared-prefix.md",
     ],
 )
 def test_malformed_test_id_fails(fixture: str) -> None:
