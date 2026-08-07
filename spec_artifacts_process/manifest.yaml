@@ -192,6 +192,13 @@ artifact_types:
           multiple: true
           assert:
             columns: [Test ID, Title, Type, Priority, Traces To, Status]
+            # CR-018: `Priority` is the one asserted column much of the corpus
+            # never authored — 49 of 169 ecosystem matrices carry real test-case
+            # rows with no priority anywhere. Requiring it would either fail all
+            # 49 forever or force an invented priority into each. The column
+            # stays declared, and its values stay constrained when authored;
+            # only its presence is optional (quire-rs FR-033-AC-14/15).
+            optional_columns: [Priority]
             min_rows: 1
             id_column: Test ID
             # CR-016: segmented ids the ecosystem authors (TC-060-01,
