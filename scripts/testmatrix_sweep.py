@@ -202,7 +202,12 @@ def main() -> int:
         vals: Counter[str] = Counter()
         for f in failures:
             for msg in f["errors"]:
-                m = re.search(rf"'{re.escape(col)}'.*?value '([^']*)'", msg)
+                # The engine words this as `column 'X' cell 'Y' is not one of
+                # [...]`, not `value 'Y'`. The stale spelling matched nothing,
+                # so `--show-values` printed an empty list while the cause
+                # table reported 21 `cell:Type` failures — a silent
+                # under-report in the tool used to scope the normalization.
+                m = re.search(rf"'{re.escape(col)}'.*?cell '([^']*)'", msg)
                 if m:
                     vals[m.group(1)] += 1
         for v, n in vals.most_common(40):
