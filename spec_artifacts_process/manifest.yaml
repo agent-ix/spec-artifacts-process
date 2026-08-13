@@ -349,11 +349,221 @@ lint_rules: []
 # coverage rollup how to read the same columns, so a contract and its coverage
 # computation cannot drift (CR-015 / CR-016).
 traceability:
+  # ── What mints trace ids ──
+  #
+  # The Test Matrix is bound by **path**, not by archetype, and both halves of
+  # that are the finding (#22 decision 4):
+  #
+  #   * `archetype: TestMatrix` cannot see the canonical matrix at all. The
+  #     corpus walk skips every file named `tests.md` outright — quire-rs
+  #     `corpus/walk.rs` `DEFAULT_SKIP = ["README.md", "tests.md"]`, inherited
+  #     from the Python loader's `_DEFAULT_SKIP` — and `spec/tests.md` is what
+  #     most repos in this ecosystem call their Test Matrix.
+  #   * Worse, archetype binding sees matrices that are *test data*. Scanning
+  #     this module's own repo by archetype minted 67 test-case ids from
+  #     `tests/fixtures/testmatrix/*.md` — deliberately malformed documents —
+  #     and reported 50 of them "backed", because a fixture reusing `TC-017`
+  #     collides with the real `TC-017`. A phantom backed row is precisely the
+  #     lie this rollup exists to catch, so the fixture-blind form does not ship.
+  #
+  # Paths, therefore, and one entry per name the ecosystem actually uses. An
+  # entry declares exactly one origin (`TraceabilityModel::validate` rejects
+  # both), so each matrix filename gets its own entry; an absent file simply
+  # contributes no rows.
   trace_targets:
   - name: test-case
-    document: tests.md
+    document: spec/tests.md
     section: Test Case Summary
     id_column: Test ID
+  - name: test-case-matrix
+    document: spec/matrix.md
+    section: Test Case Summary
+    id_column: Test ID
+  - name: test-case-evals
+    document: spec/evals.md
+    section: Test Case Summary
+    id_column: Test ID
+  - name: acceptance-criterion
+    archetype: FR
+    section: Acceptance Criteria
+    id_column: ID
+  - name: nfr-acceptance-criterion
+    archetype: NFR
+    section: Acceptance Criteria
+    id_column: ID
+  # Requirement documents stay archetype-bound: they are ordinary corpus
+  # documents, the walk does not skip them, and no fixture in the ecosystem is
+  # typed `FR`/`NFR`.
+  #
+  # Deliberately not minted: `US` criteria are authored as a bullet list, not a
+  # table, and `declared_tables::scan` reads tables only; `StR` criteria sit
+  # under `## Validation Criteria` with a `Validation` column and are validated
+  # by review rather than by a test. Neither is a denominator a test tag could
+  # ever satisfy, and a denominator nothing can satisfy is noise.
+
+  # ── What references those ids ──
+  #
+  # `expand_ranges` and `strip_annotations` are opt-in per declaration
+  # (FR-050-AC-12) and both are needed here: the corpus authors
+  # `FR-001-AC-1 .. FR-001-AC-4` and `TC-024 (blocked: no uniqueness assert)`.
+  #
+  # Known limit, recorded rather than papered over: the two CR-017 authoring
+  # shorthands the *shape* contract admits — continuation (`FR-001-AC-2, -AC-3`)
+  # and slash enumeration (`FR-016-AC-1/2/3`) — are not expanded by the engine,
+  # so such a cell contributes its first token only. The row is still backed
+  # when that token is backed; it just under-counts the rest.
+  document_references:
+  # Most `Verification` cells carry no test id at all — a sweep over quire-rs,
+  # quoin and this repo found 285 bare `Test`, 99 `Test (TC-nnn)`, and ~100
+  # naming a file rather than an id (`Test (org.test.ts)`), plus `Eval (EV-nnn)`.
+  # The pattern extracts what is there; a row naming no id is still answerable
+  # for its own criterion id, which is what a tag on the test binds.
+  - name: verification
+    archetype: FR
+    section: Acceptance Criteria
+    column: Verification
+    row_id_column: ID
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case, test-case-matrix, test-case-evals]
+    expand_ranges: true
+    strip_annotations: false
+  - name: nfr-verification
+    archetype: NFR
+    section: Acceptance Criteria
+    column: Verification
+    row_id_column: ID
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case, test-case-matrix, test-case-evals]
+    expand_ranges: true
+    strip_annotations: false
+  - name: traces-to
+    document: spec/tests.md
+    section: Test Case Summary
+    column: Traces To
+    row_id_column: Test ID
+    pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'
+    targets: [acceptance-criterion, nfr-acceptance-criterion]
+    expand_ranges: true
+    strip_annotations: true
+  - name: traces-to-matrix
+    document: spec/matrix.md
+    section: Test Case Summary
+    column: Traces To
+    row_id_column: Test ID
+    pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'
+    targets: [acceptance-criterion, nfr-acceptance-criterion]
+    expand_ranges: true
+    strip_annotations: true
+  - name: traces-to-evals
+    document: spec/evals.md
+    section: Test Case Summary
+    column: Traces To
+    row_id_column: Test ID
+    pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'
+    targets: [acceptance-criterion, nfr-acceptance-criterion]
+    expand_ranges: true
+    strip_annotations: true
+  - name: functional-coverage
+    document: spec/tests.md
+    section: Functional Requirement Coverage
+    column: Test Cases
+    row_id_column: Functional Req
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case, test-case-matrix, test-case-evals]
+    expand_ranges: true
+    strip_annotations: true
+  - name: functional-coverage-matrix
+    document: spec/matrix.md
+    section: Functional Requirement Coverage
+    column: Test Cases
+    row_id_column: Functional Req
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case, test-case-matrix, test-case-evals]
+    expand_ranges: true
+    strip_annotations: true
+  - name: functional-coverage-evals
+    document: spec/evals.md
+    section: Functional Requirement Coverage
+    column: Test Cases
+    row_id_column: Functional Req
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case, test-case-matrix, test-case-evals]
+    expand_ranges: true
+    strip_annotations: true
+
+  # ── How a test carries a trace id (FR-051) ──
+  #
+  # FR-051 specified all three marker forms and deferred this declaration to
+  # "a follow-up change in spec-artifacts-iso". It lands here instead: the rest
+  # of the traceability model is already here, the TestMatrix that mints test
+  # ids is this module's archetype, and splitting one model across two modules
+  # would let the halves version apart (#22 decision 1).
+  trace_tags:
+    markers:
+    - name: rust-trace-attribute
+      language: rust
+      pattern: '#\[trace\(([^)]*)\)\]'
+      template: '#[trace({ids})]'
+    - name: pytest-trace-marker
+      language: python
+      pattern: '@pytest\.mark\.trace\(([^)]*)\)'
+      template: '@pytest.mark.trace({ids})'
+    - name: ts-trace-helper
+      language: typescript
+      pattern: '\btrace\(([^)]*)\)'
+      template: 'trace({ids})'
+    # A legacy form names exactly one `rewrite_to` marker, so a form that spans
+    # languages can only ever suggest the wrong syntax for two of the three —
+    # the fixture points all of them at `rust-trace-attribute`, which would tell
+    # a `.py` file to grow a Rust attribute. Split per language instead, so the
+    # suggestion is valid in the file it is offered for (#22 decision 3).
+    legacy:
+    - name: rust-trace-line
+      language: rust
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: rust-trace-attribute
+    - name: python-trace-line
+      language: python
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: pytest-trace-marker
+    - name: typescript-trace-line
+      language: typescript
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: ts-trace-helper
+    - name: rust-comment-id
+      language: rust
+      pattern: '//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: rust-trace-attribute
+    - name: python-comment-id
+      language: python
+      pattern: '#\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: pytest-trace-marker
+    - name: typescript-comment-id
+      language: typescript
+      pattern: '//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: ts-trace-helper
+    - name: rust-test-name-id
+      language: rust
+      pattern: '\bfn (?i:tc)(\d+)_'
+      id_format: 'TC-{1}'
+      rewrite_to: rust-trace-attribute
+    # FR-051-AC-11's fourth form, "docstring bare id". Anchored to the *first*
+    # token of the doc comment, which is the authored convention across the
+    # corpus (`"""TC-017 (FR-003-AC-9): the contract is additive."""`). An
+    # unanchored form would bind every id a docstring merely mentions in prose,
+    # and a test that names a requirement is not a test that verifies it.
+    - name: python-docstring-id
+      language: python
+      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: pytest-trace-marker
+    - name: rust-doc-comment-id
+      language: rust
+      pattern: '(?m)^\s*///\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: rust-trace-attribute
+    - name: typescript-doc-comment-id
+      language: typescript
+      pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      rewrite_to: ts-trace-helper
   status:
     column: Status
     complete: ["✅"]
