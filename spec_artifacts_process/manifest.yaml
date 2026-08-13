@@ -217,7 +217,7 @@ artifact_types:
               # Core evidence vocabulary + this module's declared extensions.
               # The list mirrors `traceability.vocabularies.test_type`, which is
               # the single source; `test_manifest.py` asserts they agree.
-              Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual]
+              Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
               Priority: [P0, P1, P2, P3, P4]
             column_patterns:
               # A leading status marker, optionally followed by the note that
@@ -591,4 +591,4 @@ traceability:
     failed: ["❌"]
     retired: ["⛔"]
   vocabularies:
-    test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual]
+    test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]

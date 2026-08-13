@@ -168,6 +168,11 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Compile",
         "Snapshot",
         "Manual",
+        # CR-020: an agent-behaviour eval is a kind of testing, not a kind of
+        # artifact. CR-019 renamed BENCH-/AUDIT-/SB-/IS- to `TC-` for exactly
+        # this reason; `EV-` is the same case and needs this value to exist
+        # before the rename is expressible.
+        "Eval",
     ]
     assert choices["Priority"] == ["P0", "P1", "P2", "P3", "P4"]
     # CR-016: Status moved from an enum to a pattern, because the marker heads
