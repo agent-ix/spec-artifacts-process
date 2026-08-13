@@ -499,18 +499,25 @@ traceability:
   # ids is this module's archetype, and splitting one model across two modules
   # would let the halves version apart (#22 decision 1).
   trace_tags:
+    # Arguments must be **quoted**. `bind_symbol` scans a symbol's raw source
+    # with no comment awareness, so a marker written in prose binds like a real
+    # one: `#[trace(...)]` in a doc comment explaining the form minted a trace id
+    # of literally `...`. Quoted-only admits every authored marker (FR-051 writes
+    # them quoted, and `marker_ids` prefers the quoted reading) and rejects the
+    # placeholder. A module wanting bare-identifier markers declares its own
+    # pattern — the engine still supports them.
     markers:
     - name: rust-trace-attribute
       language: rust
-      pattern: '#\[trace\(([^)]*)\)\]'
+      pattern: '#\[trace\(((?:\s*"[^"]*"\s*,?)+)\)\]'
       template: '#[trace({ids})]'
     - name: pytest-trace-marker
       language: python
-      pattern: '@pytest\.mark\.trace\(([^)]*)\)'
+      pattern: '@pytest\.mark\.trace\(((?:\s*"[^"]*"\s*,?)+)\)'
       template: '@pytest.mark.trace({ids})'
     - name: ts-trace-helper
       language: typescript
-      pattern: '\btrace\(([^)]*)\)'
+      pattern: '\btrace\(((?:\s*"[^"]*"\s*,?)+)\)'
       template: 'trace({ids})'
     # A legacy form names exactly one `rewrite_to` marker, so a form that spans
     # languages can only ever suggest the wrong syntax for two of the three —
@@ -530,17 +537,30 @@ traceability:
       language: typescript
       pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
       rewrite_to: ts-trace-helper
+    # The line-comment form requires the id to be **followed by punctuation** —
+    # `:`, `/`, `(`, `,`, a dash, or end of line. That is what separates a tag
+    # from prose that merely names a requirement.
+    #
+    # Measured, not guessed. quire-rs writes 344 of these and its convention is
+    # an id *plus* prose — `// TC-480 / FR-025-AC-1: len == number of parsed
+    # artifacts.` — so requiring a bare id would have discarded 64 real bindings
+    # (148 backed rows down to 84). But an unanchored form binds prose: this
+    # repo's own `# FR-003-CON-1 sweep found in real matrices` claimed a
+    # constraint the test does not verify. It surfaced only because CON ids are
+    # not minted; the same wrapped line naming an `-AC-` id would have marked
+    # that criterion backed, silently. The delimiter admits every authored tag
+    # in the corpus and rejects a sentence that flows through the id.
     - name: rust-comment-id
       language: rust
-      pattern: '//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: rust-trace-attribute
     - name: python-comment-id
       language: python
-      pattern: '#\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)#\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: pytest-trace-marker
     - name: typescript-comment-id
       language: typescript
-      pattern: '//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: ts-trace-helper
     - name: rust-test-name-id
       language: rust
