@@ -30,6 +30,11 @@ because each is a trap the next declaration will hit.
 | FND-003 | low | A pattern used a Rust-regex-only escape (`\x{2013}`) that `re.compile` rejects | spec_artifacts_process/manifest.yaml:555 |
 | FND-004 | low | `document: spec/evals.md` is one repo's filename in an ecosystem-wide module; harmless but carried by every consumer | spec_artifacts_process/manifest.yaml:390 |
 
+**Disposition.** FND-001 to FND-003 are fixed on this branch. FND-004 is the
+visible cost of an engine gap — a trace target cannot exclude fixture paths, so
+archetype binding is unusable and paths must be enumerated — filed as
+agent-ix/quire-rs#61 and left in place until it lands.
+
 ## Detail
 
 **FND-001.** `# FR-003-CON-1 sweep found in real matrices` — a wrapped prose line
@@ -61,12 +66,16 @@ assertion exists.
 **FND-004.** `spec/evals.md` exists in exactly one repo out of the ecosystem
 (quoin), against `spec/tests.md` in 184 and `spec/matrix.md` in 3. An absent file
 contributes no rows, so the cost is a dead declaration everyone carries; the
-alternative is quoin shipping its own module, which is heavier. Left as-is,
-recorded so the tradeoff is visible.
+alternative is quoin shipping its own module, which is heavier.
+
+The path enumeration exists only because archetype binding drags test fixtures
+in and cannot see `tests.md` at all. Both are engine gaps, filed as
+agent-ix/quire-rs#61. When that lands, nine declaration entries collapse to two
+and this finding disappears with them.
 
 ## Coverage
 
 - Reconciliation: quire coverage (module spec-artifacts-process, working tree)
-- Rows backed by a tagged test: 26 / 60 (this repo), 143 / 905 (quire-rs), 94 / 273 (quoin)
+- Rows backed by a tagged test: 27 / 60 (this repo), 144 / 907 (quire-rs), 94 / 273 (quoin)
 - Module test suite: 43 passed, 1 skipped, 1 xfailed
 - Semantic review: skipped

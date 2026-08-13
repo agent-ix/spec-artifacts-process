@@ -62,11 +62,18 @@ the matrix carries the AC→TC mapping, so criteria are reachable through the
 matrix rather than directly from source. Recorded because the `acceptance-criterion`
 group reads `0/27` and that number invites a wrong conclusion on its own.
 
+## Disposition
+
+FND-003 is fixed (quire-rs CR-037). FND-001, FND-004 and the plan-hygiene half of
+FND-002 are pre-existing and not introduced by the FR-004 work, so they are filed
+as #24 rather than folded into that change. FND-002's task gate is #12 and is
+deliberate. FND-005 is informational.
+
 ## Coverage
 
 - Reconciliation: quire coverage (module spec-artifacts-process, working tree)
 - Tasks done: 4 / 6
-- Rows backed by a tagged test: 27 / 60 — test-case 27/33, acceptance-criterion 0/27
+- Rows backed by a tagged test: 27 / 60 — test-case 27/33, acceptance-criterion 0/27 (final engine, post CR-037)
 - Status lies: 1 (TC-026)
 - Untracked symbols: 0
 - Untraced behaviors / stubs: none — the package is 21 lines of resource paths with no logic to under-specify
