@@ -71,6 +71,33 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     ]
 
 
+def test_spec_review_analysis_admits_both_review_families() -> None:
+    """TC-027 (FR-002-AC-6): the `analysis` enum covers analyses *of a spec* and
+    reviews of an *implementation against its spec*. A review with no fitting
+    value does not become a smaller review — it becomes an unvalidated file
+    outside the system, or no artifact at all (see #11)."""
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "spec-review-frontmatter.schema.json").read_text()
+    )
+    analysis = schema["properties"]["analysis"]["enum"]
+
+    spec_analyses = [
+        "base",
+        "failure-domain",
+        "integrity",
+        "dependency",
+        "evidence",
+        "risk-complexity",
+        "scope-boundary",
+        "gap-analysis",
+        "ears-conformance",
+    ]
+    implementation_reviews = ["code-review", "spec-correctness"]
+
+    assert analysis == spec_analyses + implementation_reviews
+    assert len(analysis) == len(set(analysis)), "enum values must be unique"
+
+
 def test_manifest_validates_against_fr035_schema() -> None:
     """Skip if jsonschema lacks draft 2020-12 (use CI check-jsonschema instead)."""
     try:
@@ -141,6 +168,11 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Compile",
         "Snapshot",
         "Manual",
+        # CR-020: an agent-behaviour eval is a kind of testing, not a kind of
+        # artifact. CR-019 renamed BENCH-/AUDIT-/SB-/IS- to `TC-` for exactly
+        # this reason; `EV-` is the same case and needs this value to exist
+        # before the rename is expressible.
+        "Eval",
     ]
     assert choices["Priority"] == ["P0", "P1", "P2", "P3", "P4"]
     # CR-016: Status moved from an enum to a pattern, because the marker heads

@@ -143,6 +143,29 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
 
+> **CR-020 note (2026-08-13):** `Eval` joins the `test_type` vocabulary.
+>
+> CR-019 below settled that a prefix naming no declared archetype encodes in the
+> id what the row already states one column over, and renamed `BENCH-`, `AUDIT-`,
+> `SB-` and `IS-` to `TC-` on exactly that reasoning. `EV-` is the same case and
+> was missed: quoin's `spec/evals.md` carries **40 bare `EV-nnn` ids shadowing 40
+> `TC-EV-nnn` rows** — the same evals, numbered twice, with the code and the FR
+> `Verification` cells (`Eval (EV-050)`) referring to the bare form.
+>
+> Collapsing that shadow needs a `Type` value to move the information into, and
+> there was none: the rows sit at `Type: E2E`, which is not what an
+> agent-behaviour eval is. This amendment adds the value; the rename itself is
+> the consuming repo's, tracked in agent-ix/quoin#65.
+>
+> The two axes stay separate exactly as CR-019 states them — this is a new *kind
+> of testing*, so it is a new `Type` value and needs no new prefix. It is also a
+> pure widening: no document that validates today stops validating.
+>
+> One concrete consequence for coverage: a `Verification` cell reading
+> `Eval (EV-050)` extracts no test id under the FR-004 reference patterns, which
+> admit `TC`/`IT` only, so those rows fall back to their own criterion id. After
+> the rename they bind directly.
+
 > **CR-019 note (2026-08-07):** The `Test ID` prefix set is `TC|IT`, mirroring
 > the declared **evidence archetypes** rather than enumerating kinds of
 > testing. `spec-artifacts-iso` mints exactly two test-id families —
