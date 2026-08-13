@@ -30,7 +30,14 @@ bodies across the ecosystem and is left unconstrained.
 ## Behavior
 
 - The frontmatter **SHALL** require `id`/`title`/`type: SpecReview` and admit
-  `analysis` (the six analyses plus `base`), `scope`, and `review_set`.
+  `analysis`, `scope`, and `review_set`. The `analysis` enum **SHALL** cover both
+  families of review the ecosystem runs: analyses *of a spec* (`base`,
+  `failure-domain`, `integrity`, `dependency`, `evidence`, `risk-complexity`,
+  `scope-boundary`, `gap-analysis`, `ears-conformance`) and reviews of an
+  *implementation against the spec it claims to satisfy* (`code-review`,
+  `spec-correctness`). A review that fits no declared value is the failure this
+  archetype exists to prevent — its producer either invents an unvalidated format
+  outside the system or drops the output entirely.
 - `body_extraction` **SHALL** require a `## Summary` section and a `## Findings`
   `table_row` with columns exactly `ID | Severity | Summary | Refs`, at least one
   row, an `ID` column matching `^FND-\d+$`, and a `Severity` column constrained to
@@ -50,6 +57,7 @@ bodies across the ecosystem and is left unconstrained.
 | FR-002-AC-3 | An `ID` cell not matching `^FND-\d+$` fails validation | Test |
 | FR-002-AC-4 | The bundled `skeletons/SpecReview.md` is itself a valid `SpecReview` and ships in the wheel | Test |
 | FR-002-AC-5 | The `SpecReview` archetype is registered without altering the freeform `Review` archetype | Inspection |
+| FR-002-AC-6 | `analysis: code-review` and `analysis: spec-correctness` validate; a value outside the declared enum fails | Test |
 
 ## Dependencies
 

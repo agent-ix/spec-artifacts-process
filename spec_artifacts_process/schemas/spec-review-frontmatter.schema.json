@@ -30,7 +30,9 @@
         "risk-complexity",
         "scope-boundary",
         "gap-analysis",
-        "ears-conformance"
+        "ears-conformance",
+        "code-review",
+        "spec-correctness"
       ]
     },
     "scope": {

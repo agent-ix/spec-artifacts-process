@@ -29,6 +29,7 @@ type: TestMatrix
 | FR-002 | FR-002-AC-3 | TC-021 | 🚧 Planned |
 | FR-002 | FR-002-AC-4 | TC-022 | 🚧 Planned |
 | FR-002 | FR-002-AC-5 | TC-023 | 🚧 Planned |
+| FR-002 | FR-002-AC-6 | TC-027 | ✅ Complete |
 | FR-003 | FR-003-AC-1 | TC-001, TC-003, TC-016 | ✅ Complete |
 | FR-003 | FR-003-AC-2 | TC-002, TC-016 | ✅ Complete |
 | FR-003 | FR-003-AC-3 | TC-004, TC-005 | ✅ Complete |
@@ -71,6 +72,7 @@ type: TestMatrix
 | TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | ⚠️ |
 | TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |
 | TC-026 | An `IT-` id validates; a prefix naming no declared archetype (`BENCH-001`) fails (CR-019) | Unit | P0 | FR-003-AC-4 | ✅ |
+| TC-027 | `analysis` enum admits both review families: the nine spec analyses plus `code-review` and `spec-correctness` | Unit | P1 | FR-002-AC-6 | ✅ |
 
 ## Option Permutation Matrix
 
