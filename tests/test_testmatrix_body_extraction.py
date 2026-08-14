@@ -241,6 +241,24 @@ def test_empty_traces_to_fails() -> None:
     assert_invalid("traces-to-empty.md", reason="assert")
 
 
+# ── TC-026: declared archetypes decide which id prefixes are legal ──
+
+
+def test_id_prefix_must_name_a_declared_archetype() -> None:
+    """TC-026 (FR-003-AC-4, CR-019): the discriminating pair. `IT-` validates
+    *because* spec-artifacts-iso declares an IT archetype; `BENCH-001` fails
+    *because* no module declares a BENCH one — even though `BENCH-001` is
+    well-formed under the id shape and its row is otherwise conforming
+    (`Type: Benchmark` is itself a legal vocabulary value).
+
+    Asserted as one test rather than split across the shape cases: neither half
+    alone shows that the archetype declaration is what decides. TC-006 accepts
+    `IT-` among many shapes and TC-007 rejects malformed ids, so a rule keyed on
+    syntax instead of declarations would still pass both."""
+    assert_valid("test-id-shapes.md")
+    assert_invalid("test-id-undeclared-prefix.md", reason="assert")
+
+
 # ── TC-024: blocked on an engine capability ──
 
 
