@@ -24,4 +24,15 @@ description: "Chronological log of changes to the Plan-001 bundle."
   questions (Type/Status/Traces To vocabularies vs. real corpus usage) that the
   Task-005 gate must settle before any normalization. No repository was
   modified; nothing published.
+* **2026-08-13** — Closed the two findings the first `quire coverage`-backed gap
+  analysis raised (`reviews/2026-08-13-plan-001-gap-analysis.md`, SR-005).
+  FND-001: TC-026 was ✅ with no test behind it — the repo's one status lie —
+  now backed by `test_id_prefix_must_name_a_declared_archetype`, which asserts
+  the discriminating pair (`IT-` validates because an archetype declares it,
+  `BENCH-001` fails because none does). `quire coverage` reports 28/60 backed,
+  `status_lies: 0`. FND-004: the Requirements Summary and Test Plan checkboxes
+  were all unchecked while Tasks 001–004 were `completed`; they now reflect the
+  delivered state, with TC-024 and the FR-003-CON-1 verification deliberately
+  left unchecked. The plan verdict stays FAIL until the Task-005 sign-off gate
+  (tracked in #12) — that is the gate working, not a defect.
 

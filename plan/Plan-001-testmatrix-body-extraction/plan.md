@@ -16,13 +16,13 @@ relationships:
 ## Requirements Summary
 
 ### Stakeholder Requirements
-- [ ] **StR-001**: Process artifact templates registered by Module activation (context — activation machinery already shipped via FR-001).
+- [x] **StR-001**: Process artifact templates registered by Module activation (context — activation machinery already shipped via FR-001).
 
 ### User Stories
-- [ ] **US-001**: Trust the test matrix through machine validation — `tests.md` checked for expected coverage tables and test-case columns on every validation.
+- [x] **US-001**: Trust the test matrix through machine validation — `tests.md` checked for expected coverage tables and test-case columns on every validation.
 
 ### Functional Requirements
-- [ ] **FR-003**: `body_extraction` contract on the `TestMatrix` artifact type — required Functional Requirement Coverage + Test Case Summary tables, `Test ID` id pattern, `column_choices` on Type/Priority/Status, `column_patterns` on Traces To, optional StR/US/NFR tables, `multiple: true` records.
+- [x] **FR-003**: `body_extraction` contract on the `TestMatrix` artifact type — required Functional Requirement Coverage + Test Case Summary tables, `Test ID` id pattern, `column_choices` on Type/Priority/Status, `column_patterns` on Traces To, optional StR/US/NFR tables, `multiple: true` records.
   - Constraint **FR-003-CON-1**: normalize-before-enforce — the enforcing module version SHALL NOT be published until an ecosystem `tests.md` sweep has produced per-repo diffs and the user has signed off.
 
 ### Explicit Non-Scope
@@ -57,16 +57,17 @@ The authoritative test enumeration is the Test Matrix (`spec/tests.md`, TM-001,
 TC-001..TC-018). Grouping by target:
 
 ### Unit Tests (fixtures + `quire validate` harness)
-- [ ] **test_conforming_matrix_validates_and_extracts** (TC-001: FR-003-AC-1, FR-003-AC-8)
-- [ ] **test_missing_required_tables_fail** (TC-002, TC-003: FR-003-AC-2)
-- [ ] **test_type_vocabulary_pass_and_fail** (TC-004, TC-005: FR-003-AC-3)
-- [ ] **test_test_id_shapes_pass_and_fail** (TC-006, TC-007: FR-003-AC-4)
-- [ ] **test_status_markers_pass_and_fail** (TC-008, TC-009: FR-003-AC-5)
-- [ ] **test_priority_vocabulary_pass_and_fail** (TC-010, TC-011: FR-003-AC-10)
-- [ ] **test_traces_to_tokens_pass_and_fail** (TC-012, TC-013, TC-018: FR-003-AC-6)
-- [ ] **test_optional_tables_omitted_or_malformed** (TC-014, TC-015: FR-003-AC-7)
-- [ ] **test_min_rows_boundary** (TC-016: FR-003-AC-1, FR-003-AC-2)
-- [ ] **test_manifest_scope_unchanged** (TC-017: FR-003-AC-9 — manifest diff assertion complementing Inspection)
+- [x] **test_conforming_matrix_validates_and_extracts** (TC-001: FR-003-AC-1, FR-003-AC-8)
+- [x] **test_missing_required_tables_fail** (TC-002, TC-003: FR-003-AC-2)
+- [x] **test_type_vocabulary_pass_and_fail** (TC-004, TC-005: FR-003-AC-3)
+- [x] **test_test_id_shapes_pass_and_fail** (TC-006, TC-007: FR-003-AC-4)
+- [x] **test_status_markers_pass_and_fail** (TC-008, TC-009: FR-003-AC-5)
+- [x] **test_priority_vocabulary_pass_and_fail** (TC-010, TC-011: FR-003-AC-10)
+- [x] **test_traces_to_tokens_pass_and_fail** (TC-012, TC-013, TC-018: FR-003-AC-6)
+- [x] **test_optional_tables_omitted_or_malformed** (TC-014, TC-015: FR-003-AC-7)
+- [x] **test_min_rows_boundary** (TC-016: FR-003-AC-1, FR-003-AC-2)
+- [x] **test_manifest_scope_unchanged** (TC-017: FR-003-AC-9 — manifest diff assertion complementing Inspection)
+- [x] **test_id_prefix_must_name_a_declared_archetype** (TC-026: FR-003-AC-4, CR-019 — `IT-` validates, `BENCH-001` fails)
 - [ ] **test_duplicate_test_id_rejected** (TC-024: FR-003-AC-11 — ⚠️ BLOCKED: requires the quire-rs uniqueness assert; do not scaffold until the engine capability exists)
 
 ### Verification (process constraint)
