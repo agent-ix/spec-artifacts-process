@@ -73,6 +73,28 @@ modules can version apart.
 | FR-004-AC-4 | Every `legacy` form declares a `language`, and its `rewrite_to` names a marker of that same language | Test (TC-031) |
 | FR-004-AC-5 | Every `document_references.targets` name is a declared trace target, and every `pattern` compiles with at least one capture group | Test (TC-032) |
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
+| FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
+
+> **CR-002 note (2026-08-14):** A status lie is a row claiming evidence it does
+> not have. A row verified by an agent-behaviour eval or by a manual step cannot
+> have that evidence — neither produces a symbol a trace tag could attach to —
+> so reporting it as a lie asserts something its own declared method makes
+> impossible. Measured in `quoin`: 40 of its 55 status lies were eval rows
+> (agent-ix/quoin#65).
+>
+> `no_source_symbol` names the values that are exempt, and `test_type_column`
+> names the column they are read from. The engine withdraws the lie and nothing
+> else: the row stays in `unbacked_rows` and the backed/total counts are
+> untouched (quire-rs FR-050-AC-16).
+>
+> `Static`, `Benchmark` and `Compile` are deliberately **not** exempt. Each is
+> usually asserted by real code — this repo's own static boundary audit is a
+> test — so exempting them would hide overclaims rather than explain them.
+>
+> **Ordering:** this could not ship before quire-rs v0.20.0 / quire-cli v0.14.0.
+> `ColumnVocabularies` is `deny_unknown_fields`, so declaring the keys against an
+> older engine fails module load outright and took 31 of this repo's own tests
+> with it.
 
 ## Dependencies
 
