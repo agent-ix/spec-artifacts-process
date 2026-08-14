@@ -145,3 +145,27 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
 
     from_fixtures = [g for g in report["groups"] if g["document"].startswith("tests/")]
     assert not from_fixtures, from_fixtures
+
+
+def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
+    traceability: dict,
+) -> None:
+    """TC-034 (FR-004-AC-7, CR-002): the exemption vocabulary is declared, names
+    the column it is read from, and lists only values in the test-type
+    vocabulary.
+
+    Scope matters more than presence here. `Eval` is an agent driven against a
+    live scenario and `Manual` is a person — neither produces a symbol a trace
+    tag could attach to. `Static`, `Benchmark` and `Compile` are usually
+    asserted by real code (this repo's own static boundary audit is a test), so
+    exempting them would hide overclaims instead of explaining them.
+    """
+    vocab = traceability["vocabularies"]
+    assert vocab["test_type_column"] == "Type"
+
+    exempt = vocab["no_source_symbol"]
+    assert exempt == ["Eval", "Manual"], exempt
+    for value in exempt:
+        assert value in vocab["test_type"], f"{value} is not a declared test type"
+    for still_bindable in ("Static", "Benchmark", "Compile", "Unit"):
+        assert still_bindable not in exempt

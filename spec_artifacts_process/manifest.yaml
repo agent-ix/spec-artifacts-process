@@ -592,3 +592,18 @@ traceability:
     retired: ["⛔"]
   vocabularies:
     test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
+    # CR-002: which column carries the value above, and which of those values
+    # name a verification method that mints no source symbol (quire-rs
+    # FR-050-AC-16).
+    #
+    # An `Eval` is an agent driven against a live scenario; a `Manual` step is a
+    # person. Neither produces a symbol a trace tag could attach to, so a row
+    # verified that way can never be backed — and reporting it as a status lie
+    # asserts something its own declared method makes impossible. The row still
+    # counts as unbacked; only the accusation is withdrawn.
+    #
+    # Deliberately NOT listed: `Static`, `Benchmark` and `Compile`. Each is
+    # usually asserted by real code — this repo's own static boundary audit is a
+    # test — so exempting them would hide overclaims rather than explain them.
+    test_type_column: Type
+    no_source_symbol: [Eval, Manual]

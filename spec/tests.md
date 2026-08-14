@@ -46,7 +46,8 @@ type: TestMatrix
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
 | FR-004 | FR-004-AC-4 | TC-031 | ✅ Complete |
 | FR-004 | FR-004-AC-5 | TC-032 | ✅ Complete |
-| FR-004 | FR-004-AC-6 | TC-033 | ✅ Complete |
+| FR-004 | FR-004-AC-6 | TC-033 |
+| FR-004-AC-7 | TC-034 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -85,6 +86,7 @@ type: TestMatrix
 | TC-031 | Every legacy form declares a language and rewrites to a marker of that same language | Unit | P1 | FR-004-AC-4 | ✅ |
 | TC-032 | Every reference names declared targets only and its pattern compiles with a capture group | Unit | P1 | FR-004-AC-5 | ✅ |
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
+| TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 
 ## Option Permutation Matrix
 
