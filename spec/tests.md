@@ -46,8 +46,9 @@ type: TestMatrix
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
 | FR-004 | FR-004-AC-4 | TC-031 | ✅ Complete |
 | FR-004 | FR-004-AC-5 | TC-032 | ✅ Complete |
-| FR-004 | FR-004-AC-6 | TC-033 |
-| FR-004-AC-7 | TC-034 | ✅ Complete |
+| FR-004 | FR-004-AC-6 | TC-033 | ✅ Complete |
+| FR-004 | FR-004-AC-7 | TC-034 | ✅ Complete |
+| FR-004 | FR-004-AC-8 | TC-035 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -87,6 +88,7 @@ type: TestMatrix
 | TC-032 | Every reference names declared targets only and its pattern compiles with a capture group | Unit | P1 | FR-004-AC-5 | ✅ |
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
+| TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
 
 ## Option Permutation Matrix
 
