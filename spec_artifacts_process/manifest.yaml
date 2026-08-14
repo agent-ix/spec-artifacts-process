@@ -524,18 +524,42 @@ traceability:
     # the fixture points all of them at `rust-trace-attribute`, which would tell
     # a `.py` file to grow a Rust attribute. Split per language instead, so the
     # suggestion is valid in the file it is offered for (#22 decision 3).
+    #
+    # Every id group below is a **comma-separated list**, not a single id. The
+    # form reads naturally as `// Trace: FR-001-AC-1, FR-001-AC-2` and the corpus
+    # keeps writing it: [RAN] 98 such lines across ~/dev, worktrees and -task<N>
+    # copies excluded, carried 205 ids that bound to nothing across 17 repos —
+    # every declared shape here and all three languages. A single-id group
+    # matches once and stops at the comma, so the rest was never *read*.
+    #
+    # The engine splits capture group 1 the way `marker_ids` already splits a
+    # marker's argument list (quire-rs FR-051-AC-16, v0.21.0). Both halves are
+    # required: widening alone would hand the engine one id of `"A, B"`, and
+    # splitting alone finds nothing to split.
+    #
+    # `rust-test-name-id` is deliberately **not** widened — it declares
+    # `id_format`, and `TC-{1}` renders over a function name, which cannot carry
+    # a list. The engine leaves the template path unsplit for the same reason.
+    #
+    # The `*-comment-id` trailing delimiter still holds: it admits `,`, so a
+    # greedy list consumes the separators and the delimiter falls through to the
+    # real terminator. Verified against `// TC-033, TC-034`,
+    # `// TC-033, TC-034: why`, `// TC-033 - prose`, `// TC-033, TC-034,` and
+    # the quire-rs `// TC-480 / FR-025-AC-1: …` convention (which is `/`
+    # separated, still binds TC-480 only, unchanged). The prose guard is intact:
+    # `# FR-003-CON-1 sweep found in real matrices` still matches nothing.
     legacy:
     - name: rust-trace-line
       language: rust
-      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*[A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: rust-trace-attribute
     - name: python-trace-line
       language: python
-      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*[A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: pytest-trace-marker
     - name: typescript-trace-line
       language: typescript
-      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: 'Trace:\s*([A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*[A-Za-z]+-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: ts-trace-helper
     # The line-comment form requires the id to be **followed by punctuation** —
     # `:`, `/`, `(`, `,`, a dash, or end of line. That is what separates a tag
@@ -552,15 +576,15 @@ traceability:
     # in the corpus and rejects a sentence that flows through the id.
     - name: rust-comment-id
       language: rust
-      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: rust-trace-attribute
     - name: python-comment-id
       language: python
-      pattern: '(?m)#\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)#\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: pytest-trace-marker
     - name: typescript-comment-id
       language: typescript
-      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)//\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: ts-trace-helper
     - name: rust-test-name-id
       language: rust
@@ -574,15 +598,15 @@ traceability:
     # and a test that names a requirement is not a test that verifies it.
     - name: python-docstring-id
       language: python
-      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: pytest-trace-marker
     - name: rust-doc-comment-id
       language: rust
-      pattern: '(?m)^\s*///\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)^\s*///\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: rust-trace-attribute
     - name: typescript-doc-comment-id
       language: typescript
-      pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)'
+      pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: ts-trace-helper
   status:
     column: Status

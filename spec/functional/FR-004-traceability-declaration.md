@@ -74,6 +74,38 @@ modules can version apart.
 | FR-004-AC-5 | Every `document_references.targets` name is a declared trace target, and every `pattern` compiles with at least one capture group | Test (TC-032) |
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
+| FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
+
+> **CR-024 note (2026-08-14):** A legacy form declaring a single id matches once
+> and stops at the comma, so `// Trace: FR-001-AC-1, FR-001-AC-2` bound the
+> first id and the rest was never *read*. **[RAN]** 98 such lines across `~/dev`,
+> worktrees and `-task<N>` copies excluded, carried **205 ids that bound to
+> nothing across 17 repos** — every shape declared here and all three languages.
+>
+> **Both halves are required, and the filing said otherwise.**
+> agent-ix/quire-rs#68 stated that no module needs to re-declare anything.
+> Verified against real input, that is false: capture group 1 is *already* a
+> single id, so splitting it in the engine converts nothing. The engine splits
+> group 1 the way `marker_ids` splits a marker's argument list (quire-rs
+> FR-051-AC-16, shipped in v0.21.0); this declaration widens the group so there
+> is something to split.
+>
+> **`rust-test-name-id` is not widened.** It declares `id_format`, and `TC-{1}`
+> renders over a function name, which cannot carry a list. The engine leaves the
+> template path unsplit for the same reason, so widening it here would be a
+> declaration the engine ignores.
+>
+> **The delimiter still holds.** The `*-comment-id` forms admit `,` as an id
+> terminator, so a greedy list consumes the separators and the delimiter falls
+> through to the real terminator. Verified against `// TC-033, TC-034`,
+> `// TC-033, TC-034: why`, `// TC-033 - prose`, `// TC-033, TC-034,` and the
+> quire-rs `// TC-480 / FR-025-AC-1: …` convention, which is `/`-separated and
+> still binds `TC-480` alone. The prose guard CR-002's predecessor measured is
+> intact: `# FR-003-CON-1 sweep found in real matrices` still matches nothing.
+>
+> **Ordering:** this cannot ship against an engine older than quire-rs v0.21.0.
+> A widened group there yields a single id of literally `"A, B"`, which resolves
+> to nothing — strictly worse than today.
 
 > **CR-002 note (2026-08-14):** A status lie is a row claiming evidence it does
 > not have. A row verified by an agent-behaviour eval or by a manual step cannot

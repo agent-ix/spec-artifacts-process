@@ -102,6 +102,64 @@ def test_legacy_forms_rewrite_within_their_own_language(traceability: dict) -> N
         re.compile(legacy["pattern"])
 
 
+def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> None:
+    """TC-035 (FR-004-AC-8, CR-024): a form declaring a single id matches once
+    and stops at the comma, so the rest of the line is never read — 205 ids
+    across 17 repos. The engine splits capture group 1 (quire-rs FR-051-AC-16);
+    this asserts the declaration gives it something to split.
+
+    `rust-test-name-id` is deliberately excluded: `TC-{1}` renders over a
+    function name, which cannot carry a list, so the engine leaves the
+    `id_format` path unsplit and widening it here would be inert.
+    """
+    legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
+
+    listed = ["FR-001-AC-1", "FR-001-AC-2", "FR-001-AC-4"]
+    lines = {
+        "rust-trace-line": "// Trace: " + ", ".join(listed),
+        "python-trace-line": "# Trace: " + ", ".join(listed),
+        "typescript-trace-line": " * Trace: " + ", ".join(listed),
+        "rust-comment-id": "// TC-033, TC-034",
+        "python-comment-id": "# TC-033, TC-034",
+        "typescript-comment-id": "// TC-033, TC-034",
+        "python-docstring-id": '    """FR-007-AC-1, FR-005-AC-1',
+        "rust-doc-comment-id": "/// TC-058, TC-198",
+        "typescript-doc-comment-id": " * TC-058, TC-198",
+    }
+    assert set(lines) | {"rust-test-name-id"} == set(legacy), set(legacy)
+
+    for name, line in lines.items():
+        form = legacy[name]
+        assert "id_format" not in form, f"{name} renders a template"
+        match = re.search(form["pattern"], line)
+        assert match, f"{name} does not match {line!r}"
+        ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
+        assert len(ids) > 1, f"{name} captured only {ids} from {line!r}"
+
+    # The template path stays single-id, exactly as the engine reads it.
+    assert legacy["rust-test-name-id"]["id_format"] == "TC-{1}"
+    assert re.search(legacy["rust-test-name-id"]["pattern"], "fn tc753_legacy()")
+
+    # The delimiter that separates a tag from prose is unchanged: quire-rs
+    # writes `// TC-480 / FR-025-AC-1: …` and that is one id, not a list, while
+    # a sentence flowing through an id still matches nothing.
+    comment = legacy["rust-comment-id"]["pattern"]
+    slashed = re.search(comment, "// TC-480 / FR-025-AC-1: len == n")
+    assert slashed and slashed.group(1) == "TC-480"
+    assert not re.search(
+        legacy["python-comment-id"]["pattern"],
+        "# FR-003-CON-1 sweep found in real matrices",
+    )
+    for line, expected in (
+        ("// TC-033, TC-034: why", ["TC-033", "TC-034"]),
+        ("// TC-033 - prose", ["TC-033"]),
+        ("// TC-033,  TC-034 ,", ["TC-033", "TC-034"]),
+    ):
+        match = re.search(comment, line)
+        assert match, line
+        assert [p.strip() for p in match.group(1).split(",") if p.strip()] == expected
+
+
 def test_references_resolve_against_declared_targets(traceability: dict) -> None:
     """TC-032 (FR-004-AC-5): a reference naming an undeclared target resolves
     against nothing, which reads identically to a row nothing backs."""
