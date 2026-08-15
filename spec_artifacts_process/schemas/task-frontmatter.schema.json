@@ -19,6 +19,11 @@
     "type": {
       "const": "Task"
     },
+    "track": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional grouping label for parallel execution tracks within a plan (e.g. \"A\", \"Gate\"). A track is a property of a Task; consumers that need a tree node synthesize one from this value."
+    },
     "object": {
       "type": "string"
     },
