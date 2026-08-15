@@ -385,15 +385,29 @@ traceability:
     id_column: Test ID
   - name: acceptance-criterion
     archetype: FR
+    exclude: ['tests/**']
     section: Acceptance Criteria
     id_column: ID
   - name: nfr-acceptance-criterion
     archetype: NFR
+    exclude: ['tests/**']
     section: Acceptance Criteria
     id_column: ID
-  # Requirement documents stay archetype-bound: they are ordinary corpus
-  # documents, the walk does not skip them, and no fixture in the ecosystem is
-  # typed `FR`/`NFR`.
+  # Requirement documents stay archetype-bound — but archetype binding requires
+  # scope exclusion, because fixtures are legitimately typed. A test fixture
+  # that exercises the `FR` contract *is* `type: FR`; that is what makes it a
+  # fixture. `quire-cli/tests/fixtures/validate-mod/docs/valid-fr.md` is
+  # `type: FR, id: FR-001` with an `## Acceptance Criteria` table minting
+  # `FR-001-AC-1`/`-AC-2`, colliding with the real `FR-001` in `quire-cli/spec/`
+  # — siblings `broken-fr.md`, `placeholder-fr.md`, `override-fr.md`,
+  # `missing-section-fr.md`, `unknown-object-fr.md`, `lint-mod/docs/*.md`,
+  # `iso-docs/{FR,NFR}-*.md`. `quire coverage --scope` defaults to the repo
+  # root, so this is the *default* invocation, not an opt-in one.
+  #
+  # The same failure the `tests/fixtures/testmatrix/*.md` incident produced (67
+  # phantom ids, 50 reported "backed", recorded below). That one was fixed by
+  # switching to path binding; these targets get the exclusion instead, because
+  # `FR`/`NFR` have no canonical single path to bind to.
   #
   # Deliberately not minted: `US` criteria are authored as a bullet list, not a
   # table, and `declared_tables::scan` reads tables only; `StR` criteria sit
@@ -420,6 +434,7 @@ traceability:
   # for its own criterion id, which is what a tag on the test binds.
   - name: verification
     archetype: FR
+    exclude: ['tests/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
@@ -429,6 +444,7 @@ traceability:
     strip_annotations: false
   - name: nfr-verification
     archetype: NFR
+    exclude: ['tests/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
