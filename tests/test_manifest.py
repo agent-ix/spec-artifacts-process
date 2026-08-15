@@ -296,3 +296,60 @@ def test_repo_test_matrix_self_validates() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_task_schema_declares_track_property() -> None:
+    """TC-037 (FR-005-AC-1/AC-2): the `track` label 230 task files already carry
+    is a declared, optional string — not a key that passes because
+    `additionalProperties` admits anything (SR-074 FND-002/FND-004)."""
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "task-frontmatter.schema.json").read_text()
+    )
+
+    track = schema["properties"]["track"]
+    assert track["type"] == "string"
+    assert track["minLength"] == 1, "an empty track names no track"
+    assert track["description"]
+    assert "track" not in schema["required"], (
+        "a serial plan has no tracks, and a task outside a plan bundle has none "
+        "to name (FR-005-AC-1)"
+    )
+    # FR-005: values are open. A–F, S and G are all authored in the ecosystem.
+    assert "enum" not in track
+
+    try:
+        import jsonschema
+    except ImportError:  # pragma: no cover - CI uses check-jsonschema
+        pytest.skip("jsonschema not installed")
+    try:
+        validator = jsonschema.Draft202012Validator(schema)
+    except AttributeError:  # pragma: no cover - old jsonschema
+        pytest.skip("jsonschema lacks draft 2020-12")
+
+    base = {"id": "Task-001", "title": "A task", "type": "Task"}
+    validator.validate({**base, "track": "C"})
+    validator.validate(base)  # absent is legal
+    for bad in ["", 3, None]:
+        assert list(validator.iter_errors({**base, "track": bad})), (
+            f"track={bad!r} should fail (FR-005-AC-2)"
+        )
+
+
+def test_track_stays_a_task_property_not_an_archetype() -> None:
+    """TC-038 (FR-005-AC-3): scope guard. FR-005 declares a property and nothing
+    else — no `Track` document type, and the Task artifact type is otherwise
+    untouched. The nodal form was closed as #9 per filament-ide-rs SR-074."""
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+
+    assert "Track" not in {a["name"] for a in manifest["archetypes"]}
+    assert "Track" not in {t["name"] for t in manifest["artifact_types"]}
+
+    task = next(t for t in manifest["artifact_types"] if t["name"] == "Task")
+    assert task["frontmatter_schema_ref"] == "schemas/task-frontmatter.schema.json"
+    assert task["defaults"]["id_pattern"] == "Task-{next:03d}"
+    assert task["allowed_links"] == ["depends_on", "verifies", "references"], (
+        "a track is not a link; Task gains no `contains` edge"
+    )
+
+    plan = next(t for t in manifest["artifact_types"] if t["name"] == "Plan")
+    assert plan["allowed_links"] == ["contains", "depends_on", "references"]
