@@ -205,6 +205,35 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     assert not from_fixtures, from_fixtures
 
 
+def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> None:
+    """TC-036 (FR-004-AC-9, CR-025): archetype binding admits fixtures, because a
+    fixture exercising the `FR` contract *is* typed `FR`. TC-033 cannot catch
+    this — it measures this repo, whose fixtures are Test Matrices, and matrix
+    targets are path-bound. The phantom lands in consuming repos:
+    `quire-cli/tests/fixtures/validate-mod/docs/valid-fr.md` is `type: FR,
+    id: FR-001` and put 9 phantom criteria in that repo's denominator. Only a
+    declaration-level assertion holds everywhere this module is installed.
+
+    The test tree is not one glob: `cloudmanager-local-sync` and
+    `filament-parser-lib` keep typed-`FR` fixtures under `tests_integration/`,
+    each colliding with a real `FR-001`, which `tests/**` alone never covers."""
+    entries = traceability["trace_targets"] + traceability["document_references"]
+    archetype_bound = [e for e in entries if e.get("archetype")]
+    assert archetype_bound, "no archetype-bound entry — has the model changed?"
+
+    for entry in archetype_bound:
+        excludes = entry.get("exclude") or []
+        assert excludes, (
+            f"{entry['name']} binds by archetype {entry['archetype']!r} with no "
+            "exclude — a typed fixture mints ids into the rollup"
+        )
+        for prefix in ("tests/", "tests_integration/"):
+            assert any(glob.startswith(prefix) for glob in excludes), (
+                f"{entry['name']}: exclude {excludes} does not cover "
+                f"{prefix}** — a typed fixture there mints ids into the rollup"
+            )
+
+
 def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
     traceability: dict,
 ) -> None:
