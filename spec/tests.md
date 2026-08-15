@@ -90,7 +90,7 @@ type: TestMatrix
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 | TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
-| TC-036 | Every archetype-bound trace target and document reference declares a non-empty `exclude` covering the test tree, so a typed `FR`/`NFR` fixture mints no id in a consuming repo (CR-025) | Unit | P0 | FR-004-AC-9 | ✅ |
+| TC-036 | Every archetype-bound trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`), so a typed `FR`/`NFR` fixture mints no id in a consuming repo (CR-025) | Unit | P0 | FR-004-AC-9 | ✅ |
 
 ## Option Permutation Matrix
 

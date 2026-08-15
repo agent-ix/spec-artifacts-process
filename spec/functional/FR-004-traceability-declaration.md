@@ -50,8 +50,9 @@ modules can version apart.
   a fixture reusing a real test id reports that id as backed, which is the exact
   falsehood the rollup exists to surface.
 - Requirement targets **SHALL** stay archetype-bound, and every archetype-bound
-  target and reference **SHALL** declare an `exclude` covering the repository's
-  test tree. Archetype binding admits fixtures, because a fixture exercising the
+  target and reference **SHALL** declare an `exclude` covering every test-tree
+  convention in the ecosystem — `tests/**` and `tests_integration/**`.
+  Archetype binding admits fixtures, because a fixture exercising the
   `FR` contract *is* typed `FR` — that is what makes it a fixture. Scope
   exclusion, not the absence of typed fixtures, is what keeps a phantom id out
   of the rollup.
@@ -79,7 +80,7 @@ modules can version apart.
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
-| FR-004-AC-9 | Every archetype-bound `trace_targets` entry and every archetype-bound `document_references` entry declares a non-empty `exclude` matching the repository test tree, so a typed fixture mints no id in any consuming repository. | Test (TC-036) |
+| FR-004-AC-9 | Every archetype-bound `trace_targets` entry and every archetype-bound `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`), so a typed fixture mints no id in any consuming repository. | Test (TC-036) |
 
 > **CR-025 note (2026-08-15):** FR-004-AC-6 was already the right gate and this
 > declaration failed it — outside this repository. TC-033 measures `quire
@@ -97,10 +98,17 @@ modules can version apart.
 > that repo, nothing was falsely *backed*; the damage was denominator
 > inflation, not a false green.
 >
-> **[RAN]** Ecosystem sweep for typed `FR`/`NFR` under a top-level `tests/`:
-> `quire-cli` (15 files) and `filament-parser-lib` (1). All fixtures. No
-> repository authors a real requirement under `tests/`, so `tests/**` is safe
-> as the declared exclusion.
+> **[RAN]** Ecosystem sweep for typed `FR`/`NFR` under any test tree:
+> `quire-cli` (13 corpus docs — an earlier grep said 15 by counting two `.rs`
+> hits), `filament-parser-lib` (2), `cloudmanager-local-sync` (1). All
+> fixtures; no repository authors a real requirement under a test tree. Two of
+> them sit under `tests_integration/`, which `tests/**` alone never covers —
+> `cloudmanager-local-sync/tests_integration/fixtures/fastapi-service/spec/FR-001-test.md`
+> and `filament-parser-lib/tests_integration/fixtures/FR-001.md`, both typed
+> `FR` and both colliding with a real `FR-001` in their repo. Neither mints AC
+> rows today, so no phantom is live, but the first Acceptance Criteria table
+> added to one would mint silently; the declared exclusion covers both
+> conventions so it cannot.
 >
 > AC-9 exists because AC-6 is only checkable where the phantom happens to
 > land. A declaration-level assertion holds in every consuming repository,

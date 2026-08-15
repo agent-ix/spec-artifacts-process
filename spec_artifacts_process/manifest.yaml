@@ -385,12 +385,12 @@ traceability:
     id_column: Test ID
   - name: acceptance-criterion
     archetype: FR
-    exclude: ['tests/**']
+    exclude: ['tests/**', 'tests_integration/**']
     section: Acceptance Criteria
     id_column: ID
   - name: nfr-acceptance-criterion
     archetype: NFR
-    exclude: ['tests/**']
+    exclude: ['tests/**', 'tests_integration/**']
     section: Acceptance Criteria
     id_column: ID
   # Requirement documents stay archetype-bound — but archetype binding requires
@@ -434,7 +434,7 @@ traceability:
   # for its own criterion id, which is what a tag on the test binds.
   - name: verification
     archetype: FR
-    exclude: ['tests/**']
+    exclude: ['tests/**', 'tests_integration/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
@@ -444,7 +444,7 @@ traceability:
     strip_annotations: false
   - name: nfr-verification
     archetype: NFR
-    exclude: ['tests/**']
+    exclude: ['tests/**', 'tests_integration/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
