@@ -13,3 +13,4 @@ description: "Index of artifacts in this directory."
 * [FR-004: Traceability declaration: what mints trace ids, what references them, how a test carries one](./FR-004-traceability-declaration.md)
 * [FR-005: Task `track` property: the declared contract for parallel execution tracks](./FR-005-task-track-property.md)
 * [FR-006: Evidence-layer archetypes: the authored half of the evidence store](./FR-006-evidence-layer-archetypes.md)
+* [FR-007: Verification-method catalog: the 29119-4 method registry as module data](./FR-007-verification-method-catalog.md)
