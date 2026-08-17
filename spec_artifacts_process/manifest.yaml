@@ -739,6 +739,34 @@ traceability:
     pending: ["🚧"]
     failed: ["❌"]
     retired: ["⛔"]
+  # ── What states an obligation (quire-rs FR-053) ──
+  #
+  # An obligation is DERIVED, never authored: choosing an acceptance criterion's
+  # `Verification` method IS minting it. Without these declarations the engine's
+  # obligation machinery is inert — it ships and derives nothing — which is why
+  # they land with the evidence layer rather than after it.
+  obligations:
+  - name: acceptance-criterion
+    target: acceptance-criterion
+    statement_column: Criteria
+    method_column: Verification
+  - name: nfr-acceptance-criterion
+    target: nfr-acceptance-criterion
+    statement_column: Criteria
+    method_column: Verification
+  # The second source, and not an afterthought: an NFR `Measurement and
+  # Evaluation` row states one number three times over — the spec threshold, the
+  # benchmark assertion and the evidence gate are the same quantity. Its rows
+  # carry no id of their own, which is why `id_format` exists.
+  - name: nfr-metric
+    archetype: NFR
+    section: Measurement and Evaluation
+    id_format: "{document}-M-{row}"
+    statement_column: Metric
+    method_column: Method
+    parameters:
+      target: Target
+      threshold: Threshold
   vocabularies:
     test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
     # CR-002: which column carries the value above, and which of those values

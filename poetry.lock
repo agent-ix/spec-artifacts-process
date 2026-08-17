@@ -1124,14 +1124,14 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "spec-artifacts-iso"
-version = "0.11.0"
+version = "0.12.0"
 description = "Filament Module: ISO-style spec artifacts (FR/NFR/StR/US/IT/TC/AC/CON) — unified-shape archetypes + authoring skeletons + frontmatter JSON Schemas + iso-spec-core grammar, validated by quire-rs (no render templates)"
 optional = false
 python-versions = ">=3.13,<3.14"
 groups = ["dev"]
 files = [
-    {file = "spec_artifacts_iso-0.11.0-py3-none-any.whl", hash = "sha256:012c9ce1c1ab07f12e31e6dc2952f7dc85776e8b61b6c029e24c6792eaf919d9"},
-    {file = "spec_artifacts_iso-0.11.0.tar.gz", hash = "sha256:277d3efa6390aac2ba32efaf61096a33a9f0e8252c56243f7164d198e7a1e97e"},
+    {file = "spec_artifacts_iso-0.12.0-py3-none-any.whl", hash = "sha256:fe30d7eb0be8215821bcb8f294baf2fc00dc99cb4b44bc15e860f1ec35385be5"},
+    {file = "spec_artifacts_iso-0.12.0.tar.gz", hash = "sha256:2a798ddf6b399c2b1db9d1dfffb81a4fc664d133f99d24a603ea971bf00edffd"},
 ]
 
 [package.source]
@@ -1154,4 +1154,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "13b52c75e7988391fda1615fefef71863bd931a4f006a905104a8b2fcedf2e74"
+content-hash = "5c6941bde66b1b8ba5dc6c926b176ff6bc7857987cfc90e8bab416a16913a758"
