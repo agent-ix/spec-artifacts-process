@@ -42,7 +42,7 @@ type: TestMatrix
 | FR-003 | FR-003-AC-10 | TC-010, TC-011, TC-025 | ✅ Complete |
 | FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | ⚠️ Blocked |
 | FR-004 | FR-004-AC-1 | TC-028 | ✅ Complete |
-| FR-004 | FR-004-AC-2 | TC-029 | ✅ Complete |
+| FR-004 | FR-004-AC-2 | TC-029, TC-039 | ✅ Complete |
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
 | FR-004 | FR-004-AC-4 | TC-031 | ✅ Complete |
 | FR-004 | FR-004-AC-5 | TC-032 | ✅ Complete |
@@ -86,16 +86,17 @@ type: TestMatrix
 | TC-026 | An `IT-` id validates; a prefix naming no declared archetype (`BENCH-001`) fails (CR-019) | Unit | P0 | FR-003-AC-4 | ✅ |
 | TC-027 | `analysis` enum admits both review families: the nine spec analyses plus `code-review` and `spec-correctness` | Unit | P1 | FR-002-AC-6 | ✅ |
 | TC-028 | Trace targets mint test-case ids from the Test Matrix and criterion ids from FR and NFR | Unit | P0 | FR-004-AC-1 | ✅ |
-| TC-029 | Every matrix binding is by `document` under `spec/`; requirement bindings are by `archetype`; no entry declares both origins | Unit | P0 | FR-004-AC-2 | ✅ |
+| TC-029 | Every trace target and document reference binds by `archetype` and declares no `document` key; matrix entries bind `TestMatrix` and additionally exclude test data (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-030 | Exactly one templated canonical marker per language (rust, python, typescript) | Unit | P1 | FR-004-AC-3 | ✅ |
 | TC-031 | Every legacy form declares a language and rewrites to a marker of that same language | Unit | P1 | FR-004-AC-4 | ✅ |
 | TC-032 | Every reference names declared targets only and its pattern compiles with a capture group | Unit | P1 | FR-004-AC-5 | ✅ |
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 | TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
-| TC-036 | Every archetype-bound trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`), so a typed `FR`/`NFR` fixture mints no id in a consuming repo (CR-025) | Unit | P0 | FR-004-AC-9 | ✅ |
+| TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
+| TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 
 ## Option Permutation Matrix
 

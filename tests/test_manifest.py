@@ -330,9 +330,9 @@ def test_task_schema_declares_track_property() -> None:
     validator.validate({**base, "track": "C"})
     validator.validate(base)  # absent is legal
     for bad in ["", 3, None]:
-        assert list(validator.iter_errors({**base, "track": bad})), (
-            f"track={bad!r} should fail (FR-005-AC-2)"
-        )
+        assert list(
+            validator.iter_errors({**base, "track": bad})
+        ), f"track={bad!r} should fail (FR-005-AC-2)"
 
 
 def test_track_stays_a_task_property_not_an_archetype() -> None:
@@ -347,9 +347,11 @@ def test_track_stays_a_task_property_not_an_archetype() -> None:
     task = next(t for t in manifest["artifact_types"] if t["name"] == "Task")
     assert task["frontmatter_schema_ref"] == "schemas/task-frontmatter.schema.json"
     assert task["defaults"]["id_pattern"] == "Task-{next:03d}"
-    assert task["allowed_links"] == ["depends_on", "verifies", "references"], (
-        "a track is not a link; Task gains no `contains` edge"
-    )
+    assert task["allowed_links"] == [
+        "depends_on",
+        "verifies",
+        "references",
+    ], "a track is not a link; Task gains no `contains` edge"
 
     plan = next(t for t in manifest["artifact_types"] if t["name"] == "Plan")
     assert plan["allowed_links"] == ["contains", "depends_on", "references"]

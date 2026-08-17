@@ -43,15 +43,17 @@ modules can version apart.
 
 - `trace_targets` **SHALL** mint test-case ids from the Test Matrix and
   acceptance-criterion ids from `FR` and `NFR` documents.
-- Test Matrix targets **SHALL** be bound by **document path**, not by archetype.
-  Archetype binding is wrong twice over: the corpus walk unconditionally skips
-  files named `tests.md` (quire-rs `corpus/walk.rs` `DEFAULT_SKIP`), which is
-  the canonical matrix filename, and it admits matrices that are *test data* —
-  a fixture reusing a real test id reports that id as backed, which is the exact
-  falsehood the rollup exists to surface.
-- Requirement targets **SHALL** stay archetype-bound, and every archetype-bound
-  target and reference **SHALL** declare an `exclude` covering every test-tree
-  convention in the ecosystem — `tests/**` and `tests_integration/**`.
+- **Every** target and reference **SHALL** be bound by `archetype`, the Test
+  Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
+  deleted that form (CR-062) and rejects the key outright.
+- There **SHALL** be one entry per *kind* of table, never one per filename. The
+  retired form needed three near-identical entries — `spec/tests.md`,
+  `spec/matrix.md`, `spec/evals.md` — and still reached nothing nested, so a
+  matrix at `spec/<module>/matrix/tests.md` minted zero ids however correctly it
+  was authored. A matrix is reached by what it *is*, not by what it is called.
+- Every target and reference **SHALL** declare an `exclude` covering every
+  test-tree convention in the ecosystem — `tests/**`, `tests_integration/**` and
+  `fixtures/**`.
   Archetype binding admits fixtures, because a fixture exercising the
   `FR` contract *is* typed `FR` — that is what makes it a fixture. Scope
   exclusion, not the absence of typed fixtures, is what keeps a phantom id out
@@ -73,14 +75,45 @@ modules can version apart.
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR` and `NFR`, and loads without a validation error | Test (TC-028) |
-| FR-004-AC-2 | Every Test Matrix trace target and reference is bound by `document`, never by `archetype`; requirement targets are bound by `archetype` | Test (TC-029) |
+| FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`, `functional-coverage`), never one per matrix filename | Test (TC-029, TC-039) |
 | FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python and typescript, and each declares a `template` | Test (TC-030) |
 | FR-004-AC-4 | Every `legacy` form declares a `language`, and its `rewrite_to` names a marker of that same language | Test (TC-031) |
 | FR-004-AC-5 | Every `document_references.targets` name is a declared trace target, and every `pattern` compiles with at least one capture group | Test (TC-032) |
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
-| FR-004-AC-9 | Every archetype-bound `trace_targets` entry and every archetype-bound `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`), so a typed fixture mints no id in any consuming repository. | Test (TC-036) |
+| FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
+
+> **CR-062 note (2026-08-17):** FR-004-AC-2 **reverses**: every entry is now
+> archetype-bound and `document:` is gone, because quire-rs deleted the form
+> (agent-ix/quire-rs#74). Both halves of the original justification changed.
+>
+> The first half is simply void: the corpus walk no longer skips `tests.md`
+> (type-driven membership, quire-rs#73, v0.26.0), so archetype binding sees the
+> canonical matrix. The second half — archetype binding admits matrices that are
+> test data — is still true, and is answered by `exclude:` rather than by path
+> enumeration. That is why AC-9 now covers the matrix entries as well, and why
+> the exclusion is asserted rather than assumed: dropping it readmits the 67
+> phantom ids from `tests/fixtures/testmatrix/*.md` that this declaration
+> recorded, 50 of them reported "backed".
+>
+> Enumeration was the cost nobody had priced. Three entries per table kind, one
+> per filename the ecosystem happens to use, reaching nothing nested. **[RAN]**
+> `scripts/sweep_coverage.py` over `~/dev`, 238 repositories, worktrees deduped:
+> collapsing nine declarations to three takes ecosystem dead trace tags from
+> **1,401 occurrences / 1,052 distinct ids to 1,207 / 873**, and
+> `filament-ide-rs` — the one repository authoring nested module matrices — from
+> **214 dead tags to 20**, its rollup going 17/850 to **473/2,184** rows backed.
+> Rebinding only `test-case` leaves 49 there: `traces-to` and
+> `functional-coverage` were path-bound too and could not read the nested
+> matrices they describe, which is why all three collapse together.
+>
+> One ecosystem precondition had to land first, and it is the reason this is not
+> a pure win on its own: a **mistyped** matrix now mints nothing, where under
+> path binding frontmatter was irrelevant. 6 matrices in the ecosystem declared
+> `type: index` while carrying a Test Case Summary; uncorrected, this change took
+> repositories minting zero test-case ids from 154 to **159**. All six were
+> corrected first and the sweep re-run: **153**.
 
 > **CR-025 note (2026-08-15):** FR-004-AC-6 was already the right gate and this
 > declaration failed it — outside this repository. TC-033 measures `quire

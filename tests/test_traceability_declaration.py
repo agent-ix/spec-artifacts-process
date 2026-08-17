@@ -46,27 +46,61 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     assert criteria == {"FR", "NFR"}, criteria
 
 
-def test_matrices_bind_by_path_and_requirements_by_archetype(
+def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
     traceability: dict,
 ) -> None:
-    """TC-029 (FR-004-AC-2): archetype binding is wrong for the matrix twice
-    over — the corpus walk skips `tests.md` outright (quire-rs
-    `corpus/walk.rs::DEFAULT_SKIP`), and it admits matrices that are test data,
-    where a fixture reusing a real test id reports that id as backed."""
+    """TC-029 (FR-004-AC-2): `archetype:` is the only origin (quire-rs CR-062),
+    and the matrix entries carry `exclude:` — which is what makes archetype
+    binding safe.
+
+    This reverses the earlier rule. Path binding existed because the corpus walk
+    skipped `tests.md` outright; type-driven membership (quire-rs #73) removed
+    that skip, and quire-rs #74 deleted the `document:` form. What survives is
+    the *second* half of the original finding: archetype binding admits matrices
+    that are test data, where a fixture reusing a real test id reports that id as
+    backed. `exclude:` answers it, so the exclusion is asserted rather than
+    assumed — dropping it silently readmits 67 phantom ids from
+    `tests/fixtures/testmatrix/*.md`.
+    """
     entries = traceability["trace_targets"] + traceability["document_references"]
 
     for entry in entries:
-        # An entry declares exactly one origin (`TraceabilityModel::validate`).
-        assert ("archetype" in entry) ^ ("document" in entry), entry["name"]
+        assert "document" not in entry, (
+            f"{entry['name']} uses the retired `document:` form; quire-rs "
+            "rejects the key outright since CR-062"
+        )
+        assert entry.get("archetype"), f"{entry['name']} declares no archetype"
 
         if entry["section"] in ("Test Case Summary", "Functional Requirement Coverage"):
-            assert "document" in entry, (
-                f"{entry['name']} binds the Test Matrix by archetype; "
-                "the walk would skip spec/tests.md and admit tests/fixtures/*"
+            assert entry["archetype"] == "TestMatrix", entry["name"]
+            excluded = entry.get("exclude") or []
+            assert any(pattern.startswith("tests/") for pattern in excluded), (
+                f"{entry['name']} binds TestMatrix by archetype without excluding "
+                "test data — a fixture matrix would mint phantom ids"
             )
-            assert entry["document"].startswith("spec/"), entry["document"]
         elif entry["section"] == "Acceptance Criteria":
-            assert entry.get("archetype") in ("FR", "NFR"), entry["name"]
+            assert entry["archetype"] in ("FR", "NFR"), entry["name"]
+
+
+def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> None:
+    """TC-039 (FR-004-AC-2, quire-rs CR-062): one entry per *kind* of table, not
+    one per filename the ecosystem happens to use.
+
+    The retired form needed three near-identical entries — `spec/tests.md`,
+    `spec/matrix.md`, `spec/evals.md` — and still reached nothing nested, so a
+    matrix at `spec/<module>/matrix/tests.md` minted zero ids. A matrix is
+    reached by what it *is*, not by what it is called.
+    """
+    entries = traceability["trace_targets"] + traceability["document_references"]
+    matrix_entries = [
+        e["name"]
+        for e in entries
+        if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
+    ]
+    expected = ["functional-coverage", "test-case", "traces-to"]
+    assert (
+        sorted(matrix_entries) == expected
+    ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
 def test_one_templated_marker_per_language(traceability: dict) -> None:
@@ -206,17 +240,23 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
 
 
 def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> None:
-    """TC-036 (FR-004-AC-9, CR-025): archetype binding admits fixtures, because a
-    fixture exercising the `FR` contract *is* typed `FR`. TC-033 cannot catch
-    this — it measures this repo, whose fixtures are Test Matrices, and matrix
-    targets are path-bound. The phantom lands in consuming repos:
+    """TC-036 (FR-004-AC-9, CR-025, widened CR-062): archetype binding admits
+    fixtures, because a fixture exercising a contract *is* typed as that contract.
+    The phantom lands in consuming repos:
     `quire-cli/tests/fixtures/validate-mod/docs/valid-fr.md` is `type: FR,
     id: FR-001` and put 9 phantom criteria in that repo's denominator. Only a
     declaration-level assertion holds everywhere this module is installed.
 
     The test tree is not one glob: `cloudmanager-local-sync` and
     `filament-parser-lib` keep typed-`FR` fixtures under `tests_integration/`,
-    each colliding with a real `FR-001`, which `tests/**` alone never covers."""
+    each colliding with a real `FR-001`, which `tests/**` alone never covers.
+
+    CR-062 makes this cover **every** entry rather than a subset. Matrix entries
+    used to be path-bound and so out of reach of the fixture problem; now they are
+    archetype-bound like the rest, and `tests/fixtures/testmatrix/*.md` in this
+    very repo is the 67-phantom-id population this exclusion keeps out. `exclude:`
+    went from a safeguard on some entries to the thing that makes the whole model
+    safe."""
     entries = traceability["trace_targets"] + traceability["document_references"]
     archetype_bound = [e for e in entries if e.get("archetype")]
     assert archetype_bound, "no archetype-bound entry — has the model changed?"
@@ -227,7 +267,7 @@ def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> No
             f"{entry['name']} binds by archetype {entry['archetype']!r} with no "
             "exclude — a typed fixture mints ids into the rollup"
         )
-        for prefix in ("tests/", "tests_integration/"):
+        for prefix in ("tests/", "tests_integration/", "fixtures/"):
             assert any(glob.startswith(prefix) for glob in excludes), (
                 f"{entry['name']}: exclude {excludes} does not cover "
                 f"{prefix}** — a typed fixture there mints ids into the rollup"
