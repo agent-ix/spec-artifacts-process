@@ -351,46 +351,51 @@ lint_rules: []
 traceability:
   # ── What mints trace ids ──
   #
-  # The Test Matrix is bound by **path**, not by archetype, and both halves of
-  # that are the finding (#22 decision 4):
+  # The Test Matrix is bound by **archetype**, and the fixture problem is solved
+  # by `exclude:` rather than by enumeration (quire-rs CR-062, #74).
   #
-  #   * `archetype: TestMatrix` cannot see the canonical matrix at all. The
-  #     corpus walk skips every file named `tests.md` outright — quire-rs
-  #     `corpus/walk.rs` `DEFAULT_SKIP = ["README.md", "tests.md"]`, inherited
-  #     from the Python loader's `_DEFAULT_SKIP` — and `spec/tests.md` is what
-  #     most repos in this ecosystem call their Test Matrix.
-  #   * Worse, archetype binding sees matrices that are *test data*. Scanning
+  # This reverses #22 decision 4, because both halves of that finding changed:
+  #
+  #   * `archetype: TestMatrix` could not see the canonical matrix at all — the
+  #     corpus walk skipped every file named `tests.md` (quire-rs
+  #     `corpus/walk.rs` `DEFAULT_SKIP`). Type-driven corpus membership
+  #     (quire-rs #73, v0.26.0) removed that skip, so the premise is gone.
+  #   * Archetype binding still sees matrices that are *test data* — scanning
   #     this module's own repo by archetype minted 67 test-case ids from
-  #     `tests/fixtures/testmatrix/*.md` — deliberately malformed documents —
-  #     and reported 50 of them "backed", because a fixture reusing `TC-017`
-  #     collides with the real `TC-017`. A phantom backed row is precisely the
-  #     lie this rollup exists to catch, so the fixture-blind form does not ship.
+  #     `tests/fixtures/testmatrix/*.md` and reported 50 of them "backed",
+  #     because a fixture reusing `TC-017` collides with the real one. That is
+  #     what `exclude:` is for, and it is now load-bearing rather than optional.
   #
-  # Paths, therefore, and one entry per name the ecosystem actually uses. An
-  # entry declares exactly one origin (`TraceabilityModel::validate` rejects
-  # both), so each matrix filename gets its own entry; an absent file simply
-  # contributes no rows.
+  # Enumeration was the cost of the old form: three near-identical entries, one
+  # per filename the ecosystem happens to use, reaching nothing nested. A matrix
+  # at `spec/<module>/matrix/tests.md` minted zero ids however correctly it was
+  # authored. Measured across ~/dev, 238 repos, worktrees deduped: this collapse
+  # takes ecosystem dead trace tags from 1,401 occurrences / 1,052 distinct ids
+  # to 1,207 / 873, and `filament-ide-rs` from 214 dead tags to 20 with its
+  # rollup going 17/850 -> 473/2,184 rows backed.
+  #
+  # Collapsing the *references* matters as much as the target: rebinding
+  # `test-case` alone leaves 49 dead tags there, because `traces-to` and
+  # `functional-coverage` were path-bound too and could not read the nested
+  # matrices they describe.
+  #
+  # Nine declarations collapse to three. `spec/matrix.md` and `spec/evals.md`
+  # need no entry of their own: a matrix is reached by what it *is*, not by what
+  # it is called.
   trace_targets:
   - name: test-case
-    document: spec/tests.md
-    section: Test Case Summary
-    id_column: Test ID
-  - name: test-case-matrix
-    document: spec/matrix.md
-    section: Test Case Summary
-    id_column: Test ID
-  - name: test-case-evals
-    document: spec/evals.md
+    archetype: TestMatrix
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Test Case Summary
     id_column: Test ID
   - name: acceptance-criterion
     archetype: FR
-    exclude: ['tests/**', 'tests_integration/**']
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     id_column: ID
   - name: nfr-acceptance-criterion
     archetype: NFR
-    exclude: ['tests/**', 'tests_integration/**']
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     id_column: ID
   # Requirement documents stay archetype-bound — but archetype binding requires
@@ -434,44 +439,27 @@ traceability:
   # for its own criterion id, which is what a tag on the test binds.
   - name: verification
     archetype: FR
-    exclude: ['tests/**', 'tests_integration/**']
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case, test-case-matrix, test-case-evals]
+    targets: [test-case]
     expand_ranges: true
     strip_annotations: false
   - name: nfr-verification
     archetype: NFR
-    exclude: ['tests/**', 'tests_integration/**']
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     column: Verification
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case, test-case-matrix, test-case-evals]
+    targets: [test-case]
     expand_ranges: true
     strip_annotations: false
   - name: traces-to
-    document: spec/tests.md
-    section: Test Case Summary
-    column: Traces To
-    row_id_column: Test ID
-    pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'
-    targets: [acceptance-criterion, nfr-acceptance-criterion]
-    expand_ranges: true
-    strip_annotations: true
-  - name: traces-to-matrix
-    document: spec/matrix.md
-    section: Test Case Summary
-    column: Traces To
-    row_id_column: Test ID
-    pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'
-    targets: [acceptance-criterion, nfr-acceptance-criterion]
-    expand_ranges: true
-    strip_annotations: true
-  - name: traces-to-evals
-    document: spec/evals.md
+    archetype: TestMatrix
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Test Case Summary
     column: Traces To
     row_id_column: Test ID
@@ -480,30 +468,13 @@ traceability:
     expand_ranges: true
     strip_annotations: true
   - name: functional-coverage
-    document: spec/tests.md
+    archetype: TestMatrix
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Functional Requirement Coverage
     column: Test Cases
     row_id_column: Functional Req
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case, test-case-matrix, test-case-evals]
-    expand_ranges: true
-    strip_annotations: true
-  - name: functional-coverage-matrix
-    document: spec/matrix.md
-    section: Functional Requirement Coverage
-    column: Test Cases
-    row_id_column: Functional Req
-    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case, test-case-matrix, test-case-evals]
-    expand_ranges: true
-    strip_annotations: true
-  - name: functional-coverage-evals
-    document: spec/evals.md
-    section: Functional Requirement Coverage
-    column: Test Cases
-    row_id_column: Functional Req
-    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case, test-case-matrix, test-case-evals]
+    targets: [test-case]
     expand_ranges: true
     strip_annotations: true
 
