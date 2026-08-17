@@ -10,6 +10,8 @@ import subprocess
 
 import pytest
 import yaml
+from jsonschema import Draft202012Validator
+from spec_artifacts_iso import module_manifest_schema
 
 import spec_artifacts_process as pack
 
@@ -99,17 +101,19 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
 
 
 def test_manifest_validates_against_fr035_schema() -> None:
-    """Skip if jsonschema lacks draft 2020-12 (use CI check-jsonschema instead)."""
-    try:
-        from jsonschema import Draft202012Validator
-    except ImportError:
-        pytest.skip("jsonschema lib missing draft 2020-12 support")
-    schema_path = (
-        pathlib.Path(__file__).resolve().parent / "module-manifest.schema.json"
-    )
-    if not schema_path.exists():
-        pytest.skip("FR-035 schema not bundled with tests")
-    schema = json.loads(schema_path.read_text())
+    """This manifest validates against the FR-035 module-manifest schema.
+
+    Until agent-ix/spec-artifacts-iso#15 this test **skipped in silence**: it
+    looked for a `module-manifest.schema.json` beside itself, this repo shipped
+    no copy, and `pytest.skip` reported the gate green. The whole `traceability:`
+    block and the CR-010/CR-023 assert keys were checked by nothing but the Rust
+    engine at load time.
+
+    The schema is now package data on `spec-artifacts-iso` — one source for
+    every module repository, imported rather than copied, so there is no second
+    artifact to keep in sync and no branch on which this can quietly not run.
+    """
+    schema = module_manifest_schema()
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     errors = list(Draft202012Validator(schema).iter_errors(manifest))
     assert not errors, [
@@ -317,14 +321,9 @@ def test_task_schema_declares_track_property() -> None:
     # FR-005: values are open. A–F, S and G are all authored in the ecosystem.
     assert "enum" not in track
 
-    try:
-        import jsonschema
-    except ImportError:  # pragma: no cover - CI uses check-jsonschema
-        pytest.skip("jsonschema not installed")
-    try:
-        validator = jsonschema.Draft202012Validator(schema)
-    except AttributeError:  # pragma: no cover - old jsonschema
-        pytest.skip("jsonschema lacks draft 2020-12")
+    # No skip branch: `jsonschema` is a hard dev dependency (iso#15). A gate
+    # that reports green because its validator was absent verifies nothing.
+    validator = Draft202012Validator(schema)
 
     base = {"id": "Task-001", "title": "A task", "type": "Task"}
     validator.validate({**base, "track": "C"})
