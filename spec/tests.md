@@ -53,6 +53,14 @@ type: TestMatrix
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
+| FR-006 | FR-006-AC-1 | TC-040 | ✅ Complete |
+| FR-006 | FR-006-AC-2 | TC-041 | ✅ Complete |
+| FR-006 | FR-006-AC-3 | TC-042 | ✅ Complete |
+| FR-006 | FR-006-AC-4 | TC-043 | ✅ Complete |
+| FR-006 | FR-006-AC-5 | TC-044 | ✅ Complete |
+| FR-006 | FR-006-AC-6 | TC-045 | ✅ Complete |
+| FR-006 | FR-006-AC-7 | TC-046 | ✅ Complete |
+| FR-006 | FR-006-AC-8 | TC-047 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -97,6 +105,14 @@ type: TestMatrix
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
 | TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
+| TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
+| TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |
+| TC-042 | `Evidence Kind` is byte-equal to the declared `test_type` vocabulary AND to the Test Matrix `Type` choices — one vocabulary, three uses. This test is what keeps the copies honest until `from_vocabulary` lands (quire-rs#146) (FR-006) | Unit | P0 | FR-006-AC-3 | ✅ |
+| TC-043 | `suite` and `inspection` are archetype-bound trace targets and `inspection-obligation` is a declared reference, so both id classes mint and a bad obligation cell dangles rather than recording an act against nothing (FR-006) | Unit | P0 | FR-006-AC-4 | ✅ |
+| TC-044 | A conformant suite registry validates; a kebab-slug id, a dropped required column, and an undeclared evidence kind (`SAST`) each fail (FR-006) | Unit | P0 | FR-006-AC-5 | ✅ |
+| TC-045 | A conformant inspection record validates, omitting the optional `Note` column still validates, and an undeclared verdict fails (FR-006) | Unit | P0 | FR-006-AC-6 | ✅ |
+| TC-046 | Both shipped skeletons validate against their own archetypes — a skeleton that does not sends every author who copies it into a failure (FR-006) | Unit | P1 | FR-006-AC-7 | ✅ |
+| TC-047 | A repo declaring neither evidence document validates and reports exactly as before: no scan diagnostic, no group, no mention of either archetype (FR-006) | Unit | P0 | FR-006-AC-8 | ✅ |
 
 ## Option Permutation Matrix
 

@@ -245,9 +245,20 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     with_contract = {
         t["name"] for t in manifest["artifact_types"] if "body_extraction" in t
     }
-    assert with_contract == {"Feedback", "SpecReview", "TestMatrix"}, (
-        "FR-003 adds the TestMatrix contract only; Feedback and SpecReview keep "
-        "the body_extraction they already had, and nothing else gains one"
+    assert with_contract == {
+        "Feedback",
+        "SpecReview",
+        "TestMatrix",
+        # FR-006 (agent-ix/spec-artifacts-process#34) adds the two evidence-layer
+        # archetypes. Listed explicitly rather than loosening the assertion: this
+        # guard exists to catch a contract arriving by accident, so every new
+        # entry should cost a deliberate line here.
+        "SuiteRegistry",
+        "Inspections",
+    }, (
+        "FR-003 adds the TestMatrix contract and FR-006 the two evidence-layer "
+        "archetypes; Feedback and SpecReview keep the body_extraction they "
+        "already had, and nothing else gains one"
     )
 
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
