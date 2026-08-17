@@ -272,6 +272,104 @@ artifact_types:
   - references
   examples: []
   lint_rules_ref: []
+# ── Evidence layer (agent-ix/spec-artifacts-process#34, ADR-0011) ─────────
+# The AUTHORED half of the evidence store. The machine-transcribed half —
+# bindings.json, baseline.json, runs/** — is typeless and corpus-invisible by
+# design, and its schemas are owned by quoin (agent-ix/quoin#79).
+- name: SuiteRegistry
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/suite-registry-frontmatter.schema.json
+  defaults:
+    id_pattern: SUR-{next:03d}
+  # The suite is the atomic unit of evidence: one run file per (suite, commit),
+  # aggregation is a view, and a partial run must never masquerade as a full
+  # one — the `make ci` / `make ci-python` split already caused exactly that rot
+  # (quire-rs TC-715).
+  body_extraction:
+    yield_pattern:
+      match:
+        suites:
+          from: table_row
+          under_section: Suites
+          required: true
+          multiple: true
+          assert:
+            columns:
+            - ID
+            - Name
+            - Command
+            - Tool
+            - Evidence Kind
+            min_rows: 1
+            id_column: ID
+            # Structured, doc-scoped, never renumbered. Deliberately NOT a
+            # kebab slug: everything joins on this id — run directories,
+            # bindings, freshness — and policy-immutable semantic strings are
+            # what produced the 1,014 dead tags (quire-rs#72).
+            id_pattern: "^SUITE-\\d+$"
+            column_choices:
+              # CR-015: the SAME vocabulary as the Test Matrix `Type` column and
+              # the obligation record's method. One vocabulary, three uses. The
+              # tool lives in its own column, so an adapter-fed kind (semgrep,
+              # SARIF, SBOM) needs no per-tool vocabulary entry — `Evidence
+              # Kind` stays method-class-shaped. Restated rather than
+              # referenced because `from_vocabulary` does not exist yet
+              # (quire-rs#146); the FR-003 manifest test keeps the copies honest
+              # until it does.
+              Evidence Kind:
+              - Unit
+              - Integration
+              - E2E
+              - Property
+              - Fuzz
+              - Benchmark
+              - Static
+              - Compile
+              - Snapshot
+              - Manual
+              - Eval
+  allowed_links: []
+  examples: []
+  lint_rules_ref: []
+- name: Inspections
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/inspections-frontmatter.schema.json
+  defaults:
+    id_pattern: INS-{next:03d}
+  # Inspection and Analysis evidence acts — the methods that produce no source
+  # symbol and so can never be discharged by a test run (the CR-041
+  # `no_source_symbol` class). Authored markdown rather than machine JSON,
+  # because a human performed the act and the record of who, when, and against
+  # which commit IS the evidence.
+  body_extraction:
+    yield_pattern:
+      match:
+        inspections:
+          from: table_row
+          under_section: Inspections
+          required: true
+          multiple: true
+          assert:
+            columns:
+            - ID
+            - Obligation
+            - Who
+            - Commit
+            - Verdict
+            - Note
+            optional_columns:
+            - Note
+            min_rows: 1
+            id_column: ID
+            id_pattern: "^INSP-\\d+$"
+            column_choices:
+              Verdict:
+              - Pass
+              - Fail
+              - Waived
+  allowed_links: []
+  examples: []
+  lint_rules_ref: []
 doc_kinds:
 - adr
 - plan
@@ -398,6 +496,28 @@ traceability:
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     id_column: ID
+  # ── Evidence layer (#34) ──
+  #
+  # Declaring the suite registry as a trace target is what makes `SUITE-N` a
+  # **referenceable id class**: FR-049's `dangling-trace-reference` then covers
+  # every reference to a suite for free, so a binding or a run directory naming
+  # a suite that no longer exists is reported rather than silently orphaned.
+  - name: suite
+    archetype: SuiteRegistry
+    exclude:
+    - tests/**
+    - tests_integration/**
+    - fixtures/**
+    section: Suites
+    id_column: ID
+  - name: inspection
+    archetype: Inspections
+    exclude:
+    - tests/**
+    - tests_integration/**
+    - fixtures/**
+    section: Inspections
+    id_column: ID
   # Requirement documents stay archetype-bound — but archetype binding requires
   # scope exclusion, because fixtures are legitimately typed. A test fixture
   # that exercises the `FR` contract *is* `type: FR`; that is what makes it a
@@ -432,6 +552,24 @@ traceability:
   # so such a cell contributes its first token only. The row is still backed
   # when that token is backed; it just under-counts the rest.
   document_references:
+  # An inspection names the obligation it discharges. Reusing the existing
+  # criterion targets means a typo in that cell dangles like any other broken
+  # reference, instead of recording an act against nothing (#34).
+  - name: inspection-obligation
+    archetype: Inspections
+    exclude:
+    - tests/**
+    - tests_integration/**
+    - fixtures/**
+    section: Inspections
+    column: Obligation
+    row_id_column: ID
+    pattern: "\\b([A-Za-z]{2,4}-\\d+(?:-[A-Za-z]+-\\d+)?)\\b"
+    targets:
+    - acceptance-criterion
+    - nfr-acceptance-criterion
+    expand_ranges: false
+    strip_annotations: true
   # Most `Verification` cells carry no test id at all — a sweep over quire-rs,
   # quoin and this repo found 285 bare `Test`, 99 `Test (TC-nnn)`, and ~100
   # naming a file rather than an id (`Test (org.test.ts)`), plus `Eval (EV-nnn)`.
