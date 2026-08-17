@@ -111,6 +111,54 @@ from `Verification: Test` defaulted by habit.
   entry no rule can ever select is a definition, not a catalog entry.
 - The catalog **SHALL NOT** name a tool in `evidence_kind`, `class` or an
   applicability rule. Tools appear only in `tooling`, which is documentation.
+- The catalog **SHALL NOT** carry a **cadence** as a method. *When* a check runs
+  — on every push, nightly, at release — is the suite registry's schedule, and a
+  `CI Gate` entry would let one axis stand in for the other.
+
+### What a `Method` cell should say (CR-005)
+
+quire-rs FR-054-AC-11 began reporting a declared method this catalog does not
+carry, and the first sweep — quire-rs' own 20 NFR `Measurement and Evaluation`
+tables, **55 rows, 17 distinct strings** — showed the corpus reaching for four
+different things in one column. Fifteen of the seventeen named something the
+catalog already had:
+
+| what the cell said | what it is | write instead |
+|---|---|---|
+| `Proptest`, `` `cargo-mutants` ``, `Criterion Benchmark`, `Load Benchmark`, `Criterion / pytest-benchmark`, `Fuzz Run`, `loom Exhaustive Interleaving` | a **tool** | the method it implements — `property-based-testing`, `mutation-testing`, `performance-benchmarking`, `fuzzing`, `deterministic-simulation`. The tool goes in the entry's `tooling`. |
+| `Unit Test`, `Integration Test`, `Snapshot Test`, `Static Analysis`, `Static Inspection` | a **class synonym** or an evidence kind | the method — `unit-testing`, `integration-testing`, `golden-approval-testing`, `static-quality`, `inspection`. |
+| `CI Gate`, `Scheduled CI Gate` | a **cadence** | the method actually being run (`static-quality` for a lint script's exit status, `sca-sbom` for `cargo deny check licenses`). The schedule belongs to the suite. |
+
+The remaining two were real: the corpus was verifying by means this catalog had
+no word for, and they are added rather than forced into a near neighbour
+(FR-007-AC-9).
+
+- **`compile-time-check`** — the property is encoded so a violation does not
+  build. `#![forbid(unsafe_code)]` is not `static-quality` measuring a weakness
+  over source, and not `design-by-contract` checking an executable annotation
+  wherever it runs; there is nothing to run.
+- **`dynamic-analysis-sanitizer`** — TSAN, ASAN, Miri. Not `static-quality`
+  (it executes), not `fuzzing` (it generates no input), not `fault-injection`
+  (it induces nothing). The catalog had **no dynamic-analysis entry at all**,
+  which is a real hole in a 29119-4-shaped registry.
+
+### Criticality is not an acceptance-criterion fact here (CR-005)
+
+FR-053 carries `criticality` on every obligation and this module's sources
+declare no `criticality_column`, so every obligation the ecosystem derives
+carries none. That is a **finding, not an omission**: measured across
+`~/dev`, **2,304 of 2,304** `Acceptance Criteria` tables are exactly
+`ID | Criteria | Verification`. Not one carries a priority column, so there is
+nothing for a `criticality_column` to bind to and declaring one would bind to
+nothing in every repository at once.
+
+Priority *does* exist in the corpus — on the **Test Matrix row** (`P0`..`P4`),
+where it rates the test rather than the requirement. Whether the acceptance
+criterion should carry its own criticality is a change to the ISO AC contract
+across 2,304 documents, which is a decision to take deliberately rather than a
+gap to fill here. Until it is taken, a consumer **SHALL NOT** assume any
+obligation carries a criticality: a rule keyed on one (two independent methods
+for a `P0`, say) is inert, and inert is better than silently wrong.
 
 ## Acceptance Criteria
 
@@ -124,6 +172,8 @@ from `Verification: Test` defaulted by habit.
 | FR-007-AC-6 | The derived `verification_class` vocabulary is exactly the four IADT values, and the derived `verification_method` vocabulary is exactly the catalog keys. | Test (TC-053) |
 | FR-007-AC-7 | The methods that mint no source symbol — inspection, demonstration, agent-behaviour evaluation — carry an evidence kind in the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie. | Test (TC-054) |
 | FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR measurement table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
+| FR-007-AC-9 | The catalog carries a method for verifying a property at **compile time** (a violation does not build) and one for **dynamic analysis under an instrumented runtime** (sanitizers). Neither is expressible as static analysis, executable contracts or fuzzing, and the first corpus sweep found both in use with no catalog word for them. | Test (TC-056) |
+| FR-007-AC-10 | No catalog entry names a **tool**, a **class synonym** or a **cadence** as a method: a tool belongs in the entry's `tooling`, a class is already the `class` axis, and when a check runs belongs to the suite registry's schedule. | Test (TC-057) |
 
 ## Dependencies
 

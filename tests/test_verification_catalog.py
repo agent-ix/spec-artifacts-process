@@ -1,4 +1,4 @@
-"""FR-007 — the verification-method catalog content (TC-048..TC-054).
+"""FR-007 — the verification-method catalog content (TC-048..TC-057).
 
 Manifest-data assertions plus one behavioural check that the engine actually
 reads what this module declares. The behavioural half matters more than it looks:
@@ -257,3 +257,86 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert metric["id_format"] == "{document}-M-{row}"
     assert "target" not in metric
     assert metric["parameters"] == {"target": "Target", "threshold": "Threshold"}
+
+
+# TC-056 (FR-007-AC-9): the two methods the corpus needed and the catalog
+# lacked.
+#
+# quire-rs FR-054-AC-11 began reporting a declared method no catalog carries,
+# and the first sweep — quire-rs' own 20 NFR `Measurement and Evaluation`
+# tables, 55 rows, 17 distinct strings — found these two being verified by means
+# this registry had no word for. They are added rather than forced into a near
+# neighbour, because a catalog whose nearest entry is wrong advises worse than
+# one that admits the gap.
+def test_tc056_compile_time_and_dynamic_analysis_are_catalogued() -> None:
+    catalog = _catalog()
+
+    compile_check = catalog.get("compile-time-check")
+    assert compile_check, "no method covers a property a violation cannot compile past"
+    assert compile_check["class"] == "Analysis"
+    assert compile_check["evidence_kind"] == "Compile"
+
+    sanitizer = catalog.get("dynamic-analysis-sanitizer")
+    assert sanitizer, "the catalog carries no dynamic-analysis entry at all"
+    assert sanitizer["class"] == "Analysis"
+    # It executes, so its evidence is a run — not the `Static` kind its
+    # nearest static neighbour carries.
+    assert sanitizer["evidence_kind"] == "Integration"
+
+    # And the distinction each was added for holds: neither collapses into the
+    # neighbour it was nearly filed under.
+    assert catalog["static-quality"]["evidence_kind"] == "Static"
+    assert catalog["design-by-contract"]["class"] == "Test"
+
+
+# TC-057 (FR-007-AC-10): a method is not a tool, a class, or a schedule.
+#
+# The sweep found all three standing in for a method in a `Method` cell —
+# `Proptest` (a tool), `Unit Test` (a class synonym), `CI Gate` (a cadence).
+# The catalog must not make the same conflation, or the vocabulary it publishes
+# would license the cells it is supposed to correct.
+def test_tc057_no_entry_names_a_tool_a_class_or_a_cadence() -> None:
+    catalog = _catalog()
+    ids = set(catalog)
+
+    # A cadence is the suite registry's schedule, never a method.
+    for cadence in (
+        "ci-gate",
+        "scheduled-ci-gate",
+        "nightly",
+        "on-push",
+        "release-gate",
+    ):
+        assert cadence not in ids, f"{cadence} is a cadence, not a verification method"
+
+    # A class with several methods under it is not itself a method.
+    #
+    # `inspection` and `demonstration` are deliberately NOT in this list: for
+    # those two IADT classes the class and the method genuinely coincide —
+    # there is exactly one way to inspect and one way to demonstrate, and the
+    # catalog would otherwise carry a class nothing implements. `Test` and
+    # `Analysis` each have a dozen methods under them, so an id naming either
+    # would be the conflation this AC forbids.
+    for entry in catalog.values():
+        assert entry["class"] in IADT
+    for synonym in (
+        "test",
+        "testing",
+        "analysis",
+        "unit-test",
+        "integration-test",
+        "static-test",
+    ):
+        assert (
+            synonym not in ids
+        ), f"{synonym} restates a class that has methods under it"
+
+    # Every tool named anywhere in the catalog appears ONLY in `tooling`.
+    tools = {t.lower() for e in catalog.values() for t in e.get("tooling", [])}
+    for tool in tools:
+        assert (
+            tool not in ids
+        ), f"{tool} is a tool; it belongs in `tooling`, not as a method id"
+        for entry in catalog.values():
+            assert tool != entry["class"].lower()
+            assert tool != (entry.get("evidence_kind") or "").lower()
