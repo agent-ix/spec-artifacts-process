@@ -68,6 +68,8 @@ type: TestMatrix
 | FR-007 | FR-007-AC-5 | TC-052 | ✅ Complete |
 | FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
 | FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
+| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
+| FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 
 ## Test Case Summary
 

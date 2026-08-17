@@ -221,3 +221,39 @@ def test_catalog_names_no_tool_outside_tooling() -> None:
                 f"{method_id} names the tool `{tool}` outside `tooling`; the "
                 f"suite registry's own `tool` column carries the tool"
             )
+
+
+def test_tc055_obligation_sources_are_declared() -> None:
+    """TC-055 (FR-007-AC-8): the engine's obligation machinery is inert until a
+    module declares a source, so the declaration ships with the evidence layer
+    rather than after it.
+
+    Found end-to-end: `quoin evidence record` bound nothing and reported every
+    trace id as unmatched, because no module stated an obligation for the
+    criteria the tests were tagged against.
+    """
+    sources = {s["name"]: s for s in _manifest()["traceability"]["obligations"]}
+    assert set(sources) == {
+        "acceptance-criterion",
+        "nfr-acceptance-criterion",
+        "nfr-metric",
+    }
+
+    # The two AC sources inherit from a declared trace target, so an obligation
+    # id is by construction the id the rollup and every trace tag already use.
+    for name in ("acceptance-criterion", "nfr-acceptance-criterion"):
+        src = sources[name]
+        assert src["target"] == name
+        assert "archetype" not in src, "target and archetype are mutually exclusive"
+        assert src["statement_column"] == "Criteria"
+        assert src["method_column"] == "Verification"
+
+    # The NFR measurement table mints no id of its own, which is the whole
+    # reason `id_format` exists. Its rows are quantified obligations: the spec
+    # threshold, the benchmark assertion and the evidence gate are one number.
+    metric = sources["nfr-metric"]
+    assert metric["archetype"] == "NFR"
+    assert metric["section"] == "Measurement and Evaluation"
+    assert metric["id_format"] == "{document}-M-{row}"
+    assert "target" not in metric
+    assert metric["parameters"] == {"target": "Target", "threshold": "Threshold"}

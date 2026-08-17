@@ -62,6 +62,18 @@ already read.
 > `verification_method` / `verification_class` lookups, but the *kind* axis is
 > still three literal lists kept honest by a test.
 
+### The obligation sources ship here too
+
+quire-rs FR-053 derives obligations from rows a **module** declares. Without a
+declaration the machinery is inert: it ships, runs, and derives nothing. Three
+sources are declared — the FR and NFR acceptance-criterion targets, and the NFR
+`Measurement and Evaluation` table, whose rows carry no id of their own.
+
+> **Found end-to-end, not by inspection.** `quoin evidence record` against a
+> real repository bound **nothing** and reported every trace id as unmatched,
+> because no module stated an obligation for the criteria those tests were
+> tagged against. The engine was correct and the ecosystem was silent.
+
 ### Applicability rules are this module's axes, not the engine's
 
 The engine stores and surfaces `applicability` and interprets none of it
@@ -111,6 +123,7 @@ from `Verification: Test` defaulted by habit.
 | FR-007-AC-5 | The engine loads the manifest and exposes all entries through `Registry::verification_catalog()`, with applicability rules carried verbatim. | Test (TC-052) |
 | FR-007-AC-6 | The derived `verification_class` vocabulary is exactly the four IADT values, and the derived `verification_method` vocabulary is exactly the catalog keys. | Test (TC-053) |
 | FR-007-AC-7 | The methods that mint no source symbol — inspection, demonstration, agent-behaviour evaluation — carry an evidence kind in the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie. | Test (TC-054) |
+| FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR measurement table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
 
 ## Dependencies
 
