@@ -1070,6 +1070,42 @@ verification_catalog:
     applicability:
       characteristics: [layering, module-boundary]
     tooling: [import-linter, cargo-deny bans, custom audit]
+  # ── The two gaps the corpus found (agent-ix/spec-artifacts-process#43) ──
+  #
+  # quire-rs FR-054-AC-11 started reporting a declared method no catalog
+  # carries, and the first sweep — quire-rs' own 20 NFR `Measurement and
+  # Evaluation` tables, 55 rows — turned up 17 distinct strings. Fifteen were
+  # a TOOL name (`Proptest`, `cargo-mutants`, `Criterion Benchmark`), a class
+  # SYNONYM (`Unit Test`, `Static Inspection`) or a CADENCE (`CI Gate`,
+  # `Scheduled CI Gate`) standing in for a method this catalog already carried.
+  # Two were neither: the corpus was verifying things by means the catalog had
+  # no word for.
+  compile-time-check:
+    name: Compile-time check
+    class: Analysis
+    definition: >-
+      Encode the property so that violating it does not compile — a lint
+      promoted to a hard error, a type that cannot represent the bad state, a
+      const assertion. The evidence is that the build succeeded, and there is
+      no runtime cost or runtime escape.
+    evidence_kind: Compile
+    applicability:
+      characteristics: [memory-safety, invariance, layering]
+      property_shapes: [invariant]
+    tooling: ["#![forbid(unsafe_code)]", static_assertions, "mypy --strict", "tsc --strict"]
+  dynamic-analysis-sanitizer:
+    name: Dynamic analysis (sanitizers)
+    class: Analysis
+    definition: >-
+      Run the program under an instrumented runtime that reports undefined
+      behaviour, data races, leaks or use-after-free the source does not show
+      and no assertion would catch. Distinct from fuzzing, which generates the
+      inputs, and from static analysis, which never executes.
+    evidence_kind: Integration
+    applicability:
+      characteristics: [memory-safety, concurrent, undefined-behaviour]
+      property_shapes: [concurrency]
+    tooling: [ThreadSanitizer, AddressSanitizer, MemorySanitizer, valgrind, Miri]
   static-quality:
     name: Static quality analysis (ISO 5055)
     class: Analysis

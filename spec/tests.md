@@ -69,7 +69,11 @@ type: TestMatrix
 | FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
 | FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
 | TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
+| TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
+| TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
+| FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
+| FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 
 ## Test Case Summary
 
