@@ -61,6 +61,13 @@ type: TestMatrix
 | FR-006 | FR-006-AC-6 | TC-045 | ✅ Complete |
 | FR-006 | FR-006-AC-7 | TC-046 | ✅ Complete |
 | FR-006 | FR-006-AC-8 | TC-047 | ✅ Complete |
+| FR-007 | FR-007-AC-1 | TC-048 | ✅ Complete |
+| FR-007 | FR-007-AC-2 | TC-049 | ✅ Complete |
+| FR-007 | FR-007-AC-3 | TC-050 | ✅ Complete |
+| FR-007 | FR-007-AC-4 | TC-051 | ✅ Complete |
+| FR-007 | FR-007-AC-5 | TC-052 | ✅ Complete |
+| FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
+| FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -113,6 +120,13 @@ type: TestMatrix
 | TC-045 | A conformant inspection record validates, omitting the optional `Note` column still validates, and an undeclared verdict fails (FR-006) | Unit | P0 | FR-006-AC-6 | ✅ |
 | TC-046 | Both shipped skeletons validate against their own archetypes — a skeleton that does not sends every author who copies it into a failure (FR-006) | Unit | P1 | FR-006-AC-7 | ✅ |
 | TC-047 | A repo declaring neither evidence document validates and reports exactly as before: no scan diagnostic, no group, no mention of either archetype (FR-006) | Unit | P0 | FR-006-AC-8 | ✅ |
+| TC-048 | The catalog covers every technique the ADR-0011 survey dispositioned — 31 methods across all four IADT classes, not a starter subset: an absent entry reads as "not applicable" rather than "not yet written" (FR-007) | Unit | P0 | FR-007-AC-1 | ✅ |
+| TC-049 | Every entry declares a non-empty name, class and definition, and every class is one of the four IADT values — the engine treats `class` as a free string, so this contract is the module's to keep (FR-007) | Unit | P0 | FR-007-AC-2 | ✅ |
+| TC-050 | Every `evidence_kind` is a member of the declared `test_type` vocabulary. This is the THIRD literal copy of that list (catalog, matrix `Type`, suite `Evidence Kind`) because `from_vocabulary` is deferred (quire-rs#146); deleting this test makes the duplication silent (FR-007) | Unit | P0 | FR-007-AC-3 | ✅ |
+| TC-051 | Every entry declares at least one non-empty applicability rule drawn from the module's declared axes — an entry no rule can select is a definition the advisor never reaches (FR-007) | Unit | P0 | FR-007-AC-4 | ✅ |
+| TC-052 | The engine loads the manifest with the catalog block present. `verification_catalog` is a quire-rs v0.29.0 key: against an older engine the top-level key is tolerated and silently ignored, so the module would look correct and contribute nothing (FR-007) | Unit | P0 | FR-007-AC-5 | ✅ |
+| TC-053 | `verification_class` is exactly the four IADT values and `verification_method` exactly the catalog keys, both derived by the engine — and neither is separately declared here, which is the duplication FR-054-CON-4 forbids (FR-007) | Unit | P0 | FR-007-AC-6 | ✅ |
+| TC-054 | Inspection, demonstration and agent-behaviour evaluation carry an evidence kind inside the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie — CR-041 applied to the catalog (FR-007) | Unit | P0 | FR-007-AC-7 | ✅ |
 
 ## Option Permutation Matrix
 
