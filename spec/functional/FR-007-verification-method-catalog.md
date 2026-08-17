@@ -144,21 +144,19 @@ no word for, and they are added rather than forced into a near neighbour
 
 ### Criticality is not an acceptance-criterion fact here (CR-005)
 
-FR-053 carries `criticality` on every obligation and this module's sources
-declare no `criticality_column`, so every obligation the ecosystem derives
-carries none. That is a **finding, not an omission**: measured across
-`~/dev`, **2,304 of 2,304** `Acceptance Criteria` tables are exactly
-`ID | Criteria | Verification`. Not one carries a priority column, so there is
-nothing for a `criticality_column` to bind to and declaring one would bind to
-nothing in every repository at once.
+This module declares no `criticality_column`, so every obligation the ecosystem
+derives carries none. That is the arrangement quire-rs
+[FR-053](ix://agent-ix/quire-rs/FR-053) already specifies — *"criticality is
+genuinely optional today … declaring one is a module's choice rather than a
+precondition for obligations to exist at all"* — not a gap this module left.
 
-Priority *does* exist in the corpus — on the **Test Matrix row** (`P0`..`P4`),
-where it rates the test rather than the requirement. Whether the acceptance
-criterion should carry its own criticality is a change to the ISO AC contract
-across 2,304 documents, which is a decision to take deliberately rather than a
-gap to fill here. Until it is taken, a consumer **SHALL NOT** assume any
-obligation carries a criticality: a rule keyed on one (two independent methods
-for a `P0`, say) is inert, and inert is better than silently wrong.
+The ISO acceptance-criteria contract asserts exactly
+`ID | Criteria | Verification` with no `optional_columns`, so the column cannot
+be authored without a `spec-artifacts-iso` change; `Priority` exists only on the
+Test Matrix row (`P0`..`P4`), where it rates the **test** rather than the
+requirement. A consumer **SHALL NOT** assume any obligation carries a
+criticality: a rule keyed on one is inert, and inert is better than silently
+wrong.
 
 ## Acceptance Criteria
 
