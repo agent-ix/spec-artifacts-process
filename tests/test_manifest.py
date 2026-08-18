@@ -45,7 +45,17 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     findings = sr["body_extraction"]["yield_pattern"]["match"]["findings"]
     assert findings["from"] == "table_row"
     assert findings["under_section"] == "Findings"
-    assert findings["assert"]["columns"] == ["ID", "Severity", "Summary", "Refs"]
+    # FR-008 appends an OPTIONAL `Escape Cause`. The four original columns stay
+    # required and in order, which is what keeps the 169 existing SpecReview
+    # documents valid.
+    assert findings["assert"]["columns"] == [
+        "ID",
+        "Severity",
+        "Summary",
+        "Refs",
+        "Escape Cause",
+    ]
+    assert findings["assert"]["optional_columns"] == ["Escape Cause"]
     assert findings["assert"]["column_choices"]["Severity"] == [
         "low",
         "medium",
@@ -258,7 +268,9 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     }, (
         "FR-003 adds the TestMatrix contract and FR-006 the two evidence-layer "
         "archetypes; Feedback and SpecReview keep the body_extraction they "
-        "already had, and nothing else gains one"
+        "already had, and nothing else gains one. FR-008 deliberately does NOT "
+        "appear here: it adds an optional column to SpecReview's existing "
+        "contract rather than giving Finding one"
     )
 
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
@@ -365,3 +377,106 @@ def test_track_stays_a_task_property_not_an_archetype() -> None:
 
     plan = next(t for t in manifest["artifact_types"] if t["name"] == "Plan")
     assert plan["allowed_links"] == ["contains", "depends_on", "references"]
+
+
+# ── FR-008: escape cause on the SpecReview findings table ───────────────────
+
+_ESCAPE_CAUSES = [
+    "missing-requirement",
+    "wrong-requirement",
+    "correct-requirement-no-evidence",
+    "implementation-bug-despite-evidence",
+]
+
+
+def _artifact_type(name: str) -> dict:
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    return next(t for t in manifest["artifact_types"] if t["name"] == name)
+
+
+def _findings_assert() -> dict:
+    return _artifact_type("SpecReview")["body_extraction"]["yield_pattern"]["match"][
+        "findings"
+    ]["assert"]
+
+
+def test_tc060_escape_cause_is_an_optional_findings_column() -> None:
+    """TC-060 (FR-008-AC-1).
+
+    Optional matters: 169 SpecReview documents in the corpus already carry a
+    four-column findings table. A required fifth column would have invalidated
+    every one of them on the day it shipped.
+    """
+    assert_ = _findings_assert()
+    assert assert_["columns"] == ["ID", "Severity", "Summary", "Refs", "Escape Cause"]
+    assert assert_["optional_columns"] == ["Escape Cause"]
+
+
+def test_tc061_escape_cause_and_severity_stay_independent() -> None:
+    """TC-061 (FR-008-AC-2, FR-008-AC-3).
+
+    Severity says how urgently to look. Escape cause says which layer let the
+    defect through. Either can take any value independently of the other, and
+    collapsing them would lose the only axis that answers "which layer".
+    """
+    choices = _findings_assert()["column_choices"]
+    assert choices["Escape Cause"] == _ESCAPE_CAUSES
+    assert choices["Severity"] == ["low", "medium", "high"]
+
+
+def test_tc062_skeleton_documents_the_column_and_every_cause() -> None:
+    """TC-062 (FR-008-AC-6).
+
+    An author choosing a value should never have to open the manifest.
+    """
+    text = (pack.PACK_ROOT / "skeletons" / "SpecReview.md").read_text()
+    assert "Escape Cause" in text
+    for cause in _ESCAPE_CAUSES:
+        assert cause in text, f"skeleton documents the {cause!r} cause"
+
+
+def test_tc063_finding_id_validates_and_does_not_collide() -> None:
+    """TC-063 (FR-008-AC-4).
+
+    Two properties, both regressions.
+
+    `Finding-{next:03d}` minted `Finding-001`, which fails this archetype's own
+    frontmatter schema (`^[A-Z]{2,4}-[0-9]+$` — seven letters is not
+    two-to-four). Every id it produced was invalid, so a Finding authored the
+    standard way could not validate.
+
+    And the fix must not be `FND-`: that is the id namespace of the findings
+    *rows* inside a SpecReview. A Finding is a document and a child of `Review`;
+    sharing the prefix would read as unification and be a conflation.
+    """
+    minted = _artifact_type("Finding")["defaults"]["id_pattern"].replace(
+        "{next:03d}", "001"
+    )
+
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "finding-frontmatter.schema.json").read_text()
+    )
+    id_pattern = schema["properties"]["id"]["pattern"]
+    assert re.match(id_pattern, minted), (
+        f"the default id_pattern mints {minted!r}, which fails the archetype's "
+        f"own frontmatter schema {id_pattern!r}"
+    )
+
+    row_pattern = _findings_assert()["id_pattern"]
+    assert not re.match(row_pattern, minted), (
+        f"{minted!r} must NOT fall in the SpecReview findings-row namespace "
+        f"{row_pattern!r} — a Finding document and a findings row are different "
+        "things"
+    )
+
+
+def test_tc064_finding_declares_no_body_contract() -> None:
+    """TC-064 (FR-008-AC-5).
+
+    Nothing authors a Finding: the two corpus documents carrying
+    `type: Finding` are mistyped analyses. A body contract for a form nobody
+    produces is the mistake FR-008 exists to avoid repeating — and the analysis
+    skills emit SpecReview documents by the 2026-06-20 decision, which this FR
+    does not disturb.
+    """
+    assert "body_extraction" not in _artifact_type("Finding")

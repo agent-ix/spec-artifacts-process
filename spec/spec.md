@@ -26,7 +26,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 ### In Scope
 
-- The Module manifest and the contributions it declares: 6 process archetypes (adr, plan, review, spec-review, test-matrix, standard), 1 grammar (process-artifacts), and 9 artifact types (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrix, Standard).
+- The Module manifest and the contributions it declares: 6 process archetypes (adr, plan, review, spec-review, test-matrix, standard), 1 grammar (process-artifacts), and 13 artifact types (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrix, Standard, SuiteRegistry, Inspections, and the two evidence-layer types FR-006 adds).
 - The templates and schemas this module ships for agent CLI generators (minijinja-cli).
 
 ### Out of Scope
