@@ -340,3 +340,43 @@ def test_tc057_no_entry_names_a_tool_a_class_or_a_cadence() -> None:
         for entry in catalog.values():
             assert tool != entry["class"].lower()
             assert tool != (entry.get("evidence_kind") or "").lower()
+
+
+def test_tc065_a_declared_hazard_advises_fault_injection() -> None:
+    """FR-007 CR-006 (TC-065): the presence of a safety object is an
+    applicability signal for fault injection.
+
+    Assumptions: `object_types` is an established applicability axis in this
+    catalog — `attack_surface` already drives DAST, SAST, IAST and
+    negative-abuse testing. The engine interprets none of these names
+    (quire-rs FR-054-CON-2); the advisor does.
+
+    Criteria:
+      * `fault-injection` lists both `hazard` and `failure_mode`, so a bundle
+        declaring either advises it. A declared failure mode names a failure
+        the system can suffer and a hazard names a state that failure reaches
+        — which is the applicability question this method asks, already
+        answered in the document.
+      * No NEW method was minted for safety. `fault-injection` already
+        existed; only the signal was missing. Minting `fmea` or `hazop`
+        alongside it would have made the catalog say twice what it says once
+        (agent-ix/spec-objects-security#5).
+    """
+    catalog = _catalog()
+    entry = catalog["fault-injection"]
+    applicability = entry["applicability"]
+
+    assert set(applicability["object_types"]) == {"hazard", "failure_mode"}
+    # The pre-existing signal is intact — this widened the entry, it did not
+    # replace what it keyed on.
+    assert "reliability" in applicability["characteristics"]
+
+    # Every object type any entry advises on must be one a spec-objects-*
+    # module actually declares. A typo here is a rule that silently never
+    # fires, which is indistinguishable from a method nobody needs.
+    advised = {
+        obj
+        for method in catalog.values()
+        for obj in method.get("applicability", {}).get("object_types", [])
+    }
+    assert advised == {"attack_surface", "threat", "hazard", "failure_mode"}, advised

@@ -1017,6 +1017,13 @@ verification_catalog:
       full disk, a killed process — and observe that it does.
     evidence_kind: Integration
     applicability:
+      # `hazard` and `failure_mode` are spec-objects-safety object types. A
+      # declared failure mode names a failure the system can suffer, and a
+      # hazard names a state that failure can reach — which is the applicability
+      # question this method asks, already answered, in the document. The
+      # `object_types` axis is the same one `attack_surface` already uses to
+      # advise DAST/SAST/IAST (agent-ix/spec-objects-security#5).
+      object_types: [hazard, failure_mode]
       characteristics: [reliability, fault-tolerance, degradation]
     tooling: [toxiproxy, chaos-mesh, fs fault injection]
   performance-benchmarking:

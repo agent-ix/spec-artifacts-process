@@ -172,6 +172,7 @@ wrong.
 | FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR measurement table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
 | FR-007-AC-9 | The catalog carries a method for verifying a property at **compile time** (a violation does not build) and one for **dynamic analysis under an instrumented runtime** (sanitizers). Neither is expressible as static analysis, executable contracts or fuzzing, and the first corpus sweep found both in use with no catalog word for them. | Test (TC-056) |
 | FR-007-AC-10 | No catalog entry names a **tool**, a **class synonym** or a **cadence** as a method: a tool belongs in the entry's `tooling`, a class is already the `class` axis, and when a check runs belongs to the suite registry's schedule. | Test (TC-057) |
+| FR-007-AC-11 | The presence of a declared object type is an applicability signal: `attack_surface`/`threat` advise the security methods and `hazard`/`failure_mode` advise `fault-injection`. Every object type any entry advises on is one a `spec-objects-*` module actually declares — a typo is a rule that silently never fires. | Test (TC-065) |
 
 ## Dependencies
 
