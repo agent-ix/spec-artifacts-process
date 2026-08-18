@@ -71,9 +71,20 @@ type: TestMatrix
 | TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
 | TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
 | TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
+| TC-060 | `Finding` declares a body contract: a `Summary` body and a `Classification` table with columns exactly `Escape Cause \| Detected In \| Traces`. The archetype had existed with no contract, so nothing emitted a Finding and nothing could have been aggregated if it had (FR-008) | Unit | P0 | FR-008-AC-1 | ✅ |
+| TC-061 | `Escape Cause` is exactly the four-way split of which layer leaked — missing-requirement, wrong-requirement, correct-requirement-no-evidence, implementation-bug-despite-evidence. Widening it makes the distribution unreadable; narrowing it drops a layer (FR-008) | Unit | P0 | FR-008-AC-2 | ✅ |
+| TC-062 | `skeletons/Finding.md` ships and its frontmatter id satisfies both the archetype's own schema and the `^FND-\d+$` SpecReview asserts (FR-008) | Unit | P0 | FR-008-AC-3 | ✅ |
+| TC-063 | The default `id_pattern` mints an id that satisfies the archetype's own frontmatter schema. `Finding-{next:03d}` minted `Finding-001`, which fails `^[A-Z]{2,4}-[0-9]+$` — every id it produced was invalid, so a Finding authored the standard way could not validate (FR-008) | Unit | P0 | FR-008-AC-4 | ✅ |
+| TC-064 | The skeleton's headings and `Classification` header match the manifest asserts in both directions, and every declared cause appears in its guidance so an author never opens the manifest to find the options (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
+| FR-008 | FR-008-AC-1 | TC-060 | ✅ Complete |
+| FR-008 | FR-008-AC-2 | TC-061 | ✅ Complete |
+| FR-008 | FR-008-AC-3 | TC-062 | ✅ Complete |
+| FR-008 | FR-008-AC-4 | TC-063 | ✅ Complete |
+| FR-008 | FR-008-AC-5 | TC-064 | ✅ Complete |
+| FR-008 | FR-008-AC-6 | TC-017 | ✅ Complete |
 
 ## Test Case Summary
 

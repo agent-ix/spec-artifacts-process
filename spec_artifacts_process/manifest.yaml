@@ -137,13 +137,52 @@ artifact_types:
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
   defaults:
-    id_pattern: Finding-{next:03d}
+    # FR-008: `FND-`, not `Finding-`. The previous pattern minted ids that could
+    # never validate — `Finding-001` fails this archetype's own frontmatter
+    # schema (`^[A-Z]{2,4}-[0-9]+$`, seven letters is not two-to-four) — and
+    # disagreed with the `^FND-\d+$` that SpecReview's findings table asserts.
+    # One concept, three id shapes, none of which agreed.
+    id_pattern: FND-{next:03d}
   allowed_links:
   - found_in
   - blocks
   - references
   examples: []
   lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        # What escaped, in prose. The narrative a reader needs before the
+        # classification means anything.
+        summary:
+          from: section_body
+          after_heading: Summary
+          required: true
+        # WHICH LAYER LEAKED. The whole point of escape analysis: a defect
+        # distribution across these four says whether the specification, the
+        # evidence, or the implementation is the weak link — and no other axis
+        # in this module answers that. SpecReview `Severity` classifies by
+        # reader action (how urgently to look), which is orthogonal and stays.
+        classification:
+          from: table_row
+          under_section: Classification
+          required: true
+          multiple: false
+          assert:
+            columns: [Escape Cause, Detected In, Traces]
+            min_rows: 1
+            column_choices:
+              Escape Cause:
+              # Nobody wrote the requirement. The spec is the leak.
+              - missing-requirement
+              # The requirement existed and said the wrong thing.
+              - wrong-requirement
+              # The requirement was right and nothing verified it.
+              - correct-requirement-no-evidence
+              # Requirement right, evidence present, code still wrong — the
+              # only cause that does NOT indict the spec, and the one a
+              # coverage number alone would have called healthy.
+              - implementation-bug-despite-evidence
 - name: Feedback
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/feedback-frontmatter.schema.json

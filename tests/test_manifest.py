@@ -255,10 +255,13 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
         # entry should cost a deliberate line here.
         "SuiteRegistry",
         "Inspections",
+        # FR-008 (agent-ix/spec-artifacts-process#36) adds the Finding contract.
+        # Deliberate line, per the note above.
+        "Finding",
     }, (
-        "FR-003 adds the TestMatrix contract and FR-006 the two evidence-layer "
-        "archetypes; Feedback and SpecReview keep the body_extraction they "
-        "already had, and nothing else gains one"
+        "FR-003 adds the TestMatrix contract, FR-006 the two evidence-layer "
+        "archetypes and FR-008 the Finding contract; Feedback and SpecReview "
+        "keep the body_extraction they already had, and nothing else gains one"
     )
 
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
@@ -365,3 +368,139 @@ def test_track_stays_a_task_property_not_an_archetype() -> None:
 
     plan = next(t for t in manifest["artifact_types"] if t["name"] == "Plan")
     assert plan["allowed_links"] == ["contains", "depends_on", "references"]
+
+
+# ── FR-008: the Finding body contract and escape-cause classification ────────
+
+_ESCAPE_CAUSES = [
+    "missing-requirement",
+    "wrong-requirement",
+    "correct-requirement-no-evidence",
+    "implementation-bug-despite-evidence",
+]
+
+
+def _finding_type() -> dict:
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    return next(t for t in manifest["artifact_types"] if t["name"] == "Finding")
+
+
+def test_tc060_finding_declares_a_body_contract() -> None:
+    """TC-060 (FR-008-AC-1).
+
+    The archetype existed with no contract, so nothing emitted a Finding and
+    nothing could have been aggregated if it had.
+    """
+    finding = _finding_type()
+    match = finding["body_extraction"]["yield_pattern"]["match"]
+
+    assert match["summary"]["after_heading"] == "Summary"
+    assert match["summary"]["required"] is True
+
+    classification = match["classification"]
+    assert classification["under_section"] == "Classification"
+    assert classification["required"] is True
+    assert classification["assert"]["columns"] == [
+        "Escape Cause",
+        "Detected In",
+        "Traces",
+    ]
+    assert classification["assert"]["min_rows"] == 1
+
+
+def test_tc061_escape_cause_is_the_four_way_split() -> None:
+    """TC-061 (FR-008-AC-2).
+
+    The four are a partition of *which layer leaked*. Widening this list would
+    make the distribution unreadable; narrowing it would drop a layer.
+    """
+    choices = _finding_type()["body_extraction"]["yield_pattern"]["match"][
+        "classification"
+    ]["assert"]["column_choices"]
+    assert choices["Escape Cause"] == _ESCAPE_CAUSES
+
+
+def test_tc063_default_id_pattern_satisfies_the_archetype_schema() -> None:
+    """TC-063 (FR-008-AC-4).
+
+    The regression this fixes: `Finding-{next:03d}` minted `Finding-001`, which
+    fails this archetype's own frontmatter schema (`^[A-Z]{2,4}-[0-9]+$` —
+    seven letters is not two-to-four). Every id the default pattern produced was
+    invalid, so a Finding authored the standard way could not validate.
+    """
+    finding = _finding_type()
+    pattern = finding["defaults"]["id_pattern"]
+    minted = pattern.replace("{next:03d}", "001")
+
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "finding-frontmatter.schema.json").read_text()
+    )
+    id_pattern = schema["properties"]["id"]["pattern"]
+    assert re.match(id_pattern, minted), (
+        f"the default id_pattern mints {minted!r}, which fails the archetype's "
+        f"own frontmatter schema {id_pattern!r}"
+    )
+
+    # And it agrees with the third shape — what SpecReview's findings table
+    # asserts — so one concept no longer has three disagreeing id forms.
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    spec_review = next(
+        t for t in manifest["artifact_types"] if t["name"] == "SpecReview"
+    )
+    findings_id = spec_review["body_extraction"]["yield_pattern"]["match"]["findings"][
+        "assert"
+    ]["id_pattern"]
+    assert re.match(findings_id, minted), (
+        f"{minted!r} must also satisfy the SpecReview findings id_pattern "
+        f"{findings_id!r}"
+    )
+
+
+def test_tc062_finding_skeleton_exists_and_its_id_validates() -> None:
+    """TC-062 (FR-008-AC-3)."""
+    skeleton = pack.PACK_ROOT / "skeletons" / "Finding.md"
+    assert skeleton.exists(), "skeletons/Finding.md ships with the module"
+
+    text = skeleton.read_text()
+    front = yaml.safe_load(text.split("---", 2)[1])
+    assert front["type"] == "Finding"
+
+    schema = json.loads(
+        (pack.PACK_ROOT / "schemas" / "finding-frontmatter.schema.json").read_text()
+    )
+    assert re.match(schema["properties"]["id"]["pattern"], front["id"])
+
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    spec_review = next(
+        t for t in manifest["artifact_types"] if t["name"] == "SpecReview"
+    )
+    findings_id = spec_review["body_extraction"]["yield_pattern"]["match"]["findings"][
+        "assert"
+    ]["id_pattern"]
+    assert re.match(findings_id, front["id"])
+
+
+def test_tc064_skeleton_and_manifest_asserts_agree() -> None:
+    """TC-064 (FR-008-AC-5).
+
+    The FR-002 I1/I2 parity property, in both directions: the skeleton's
+    headings and its Classification header row match the manifest asserts
+    exactly. A skeleton that drifts from its contract teaches authors the wrong
+    shape, and nothing else would catch it.
+    """
+    text = (pack.PACK_ROOT / "skeletons" / "Finding.md").read_text()
+    match = _finding_type()["body_extraction"]["yield_pattern"]["match"]
+
+    headings = re.findall(r"^## (.+)$", text, flags=re.MULTILINE)
+    assert headings == ["Summary", "Classification"], headings
+
+    header_row = next(
+        line for line in text.splitlines() if line.strip().startswith("| Escape Cause")
+    )
+    columns = [c.strip() for c in header_row.strip().strip("|").split("|")]
+    assert columns == match["classification"]["assert"]["columns"]
+
+    # Every declared cause appears in the skeleton's guidance, so an author
+    # picking a value never has to open the manifest to find the options.
+    for cause in _ESCAPE_CAUSES:
+        assert cause in text, f"skeleton documents the {cause!r} cause"
