@@ -127,62 +127,58 @@ artifact_types:
           required: true
           multiple: true
           assert:
-            columns: [ID, Severity, Summary, Refs]
+            # FR-008: `Escape Cause` is OPTIONAL (CR-023 `optional_columns`),
+            # so the 169 SpecReview documents already carrying four columns
+            # stay valid. Headers must be an ordered subsequence, so a table
+            # that adds it puts it last.
+            columns: [ID, Severity, Summary, Refs, Escape Cause]
+            optional_columns: [Escape Cause]
             min_rows: 1
             id_column: ID
             id_pattern: '^FND-\d+$'
             column_choices:
+              # How urgently to look.
               Severity: [low, medium, high]
+              # WHICH LAYER LET IT THROUGH. Orthogonal to Severity, and the
+              # only axis that answers it: a distribution over enough findings
+              # says whether the specification, the evidence, or the
+              # implementation is leaking.
+              Escape Cause:
+              # Nobody wrote the requirement. Nothing to test against.
+              - missing-requirement
+              # A requirement was written and said the wrong thing.
+              - wrong-requirement
+              # Requirement right, nothing verified it.
+              - correct-requirement-no-evidence
+              # Requirement right, evidence real, code still wrong — the only
+              # cause that does not indict the spec, and the one a green
+              # matrix would have called healthy.
+              - implementation-bug-despite-evidence
 - name: Finding
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
   defaults:
-    # FR-008: `FND-`, not `Finding-`. The previous pattern minted ids that could
-    # never validate — `Finding-001` fails this archetype's own frontmatter
-    # schema (`^[A-Z]{2,4}-[0-9]+$`, seven letters is not two-to-four) — and
-    # disagreed with the `^FND-\d+$` that SpecReview's findings table asserts.
-    # One concept, three id shapes, none of which agreed.
-    id_pattern: FND-{next:03d}
+    # FR-008: `FIND-`, not `Finding-`. The old pattern minted `Finding-001`,
+    # which fails this archetype's own frontmatter schema (^[A-Z]{2,4}-[0-9]+$
+    # — seven letters is not two-to-four), so every id it produced was invalid.
+    #
+    # Deliberately NOT `FND-`: that is the id namespace of the findings ROWS
+    # inside a SpecReview. A Finding is a document, a child of `Review`
+    # (composition.expected_artifacts). Giving the two the same prefix would
+    # read as unification and be a conflation.
+    #
+    # No body_extraction. Nothing authors a Finding today — the two documents
+    # in the corpus carrying `type: Finding` are mistyped analyses — and the
+    # review skills emit SpecReview documents with an inline findings table by
+    # the 2026-06-20 decision. A contract here would be for a form nobody
+    # produces.
+    id_pattern: FIND-{next:03d}
   allowed_links:
   - found_in
   - blocks
   - references
   examples: []
   lint_rules_ref: []
-  body_extraction:
-    yield_pattern:
-      match:
-        # What escaped, in prose. The narrative a reader needs before the
-        # classification means anything.
-        summary:
-          from: section_body
-          after_heading: Summary
-          required: true
-        # WHICH LAYER LEAKED. The whole point of escape analysis: a defect
-        # distribution across these four says whether the specification, the
-        # evidence, or the implementation is the weak link — and no other axis
-        # in this module answers that. SpecReview `Severity` classifies by
-        # reader action (how urgently to look), which is orthogonal and stays.
-        classification:
-          from: table_row
-          under_section: Classification
-          required: true
-          multiple: false
-          assert:
-            columns: [Escape Cause, Detected In, Traces]
-            min_rows: 1
-            column_choices:
-              Escape Cause:
-              # Nobody wrote the requirement. The spec is the leak.
-              - missing-requirement
-              # The requirement existed and said the wrong thing.
-              - wrong-requirement
-              # The requirement was right and nothing verified it.
-              - correct-requirement-no-evidence
-              # Requirement right, evidence present, code still wrong — the
-              # only cause that does NOT indict the spec, and the one a
-              # coverage number alone would have called healthy.
-              - implementation-bug-despite-evidence
 - name: Feedback
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/feedback-frontmatter.schema.json

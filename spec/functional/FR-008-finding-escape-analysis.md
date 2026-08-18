@@ -1,6 +1,6 @@
 ---
 id: FR-008
-title: "A Finding records which layer a defect escaped through"
+title: "A finding records which layer a defect escaped through"
 type: FR
 relationships:
   - target: "ix://agent-ix/spec-artifacts-process/StR-001"
@@ -8,83 +8,90 @@ relationships:
   - target: "ix://agent-ix/spec-artifacts-process/FR-002"
     type: "extends"
 ---
-# FR-008: A Finding records which layer a defect escaped through
+# FR-008: A finding records which layer a defect escaped through
 
 ## Description
 
-Escape analysis is the only **empirical** validation of a completeness claim. Every other signal
-this module produces says how much was written or how much was verified; a distribution of real
-escaped defects says which layer is actually leaking, and nothing else does.
+A defect that is found got past everything meant to catch it. **Escape cause records which layer
+let it through**, and it is the only axis in this module that does. Severity says how urgently to
+look; a count of defects says how many there were; neither says whether the specification, the
+evidence, or the implementation is leaking.
 
-The infrastructure half-existed. A `Finding` artifact type was declared — `allowed_links`
-`[found_in, blocks, references]`, a frontmatter schema, and the `review` archetype's composition
-already expecting Finding children — but with **no `body_extraction` contract and no skeleton**.
-So nothing emitted one, and had anything emitted one there would have been nothing to aggregate.
+`SpecReview` **SHALL** accept an optional fifth findings column, `Escape Cause`, constrained to
+four values:
 
-The module **SHALL** declare a body contract for `Finding` requiring a `Summary` and a
-`Classification` table, and **SHALL** ship an authoring skeleton so the standard path works.
-
-### The classification axis
-
-`Classification` carries `Escape Cause | Detected In | Traces`, with `Escape Cause` drawn from
-exactly four values. The four are a partition of *which layer leaked*:
-
-| Escape cause | What it says |
+| Value | What happened |
 |---|---|
-| `missing-requirement` | Nobody wrote the requirement. The specification is the leak. |
-| `wrong-requirement` | The requirement existed and said the wrong thing. |
+| `missing-requirement` | Nobody wrote the requirement. There was nothing to test against. |
+| `wrong-requirement` | A requirement was written and said the wrong thing. |
 | `correct-requirement-no-evidence` | The requirement was right and nothing verified it. |
 | `implementation-bug-despite-evidence` | Requirement right, evidence real, code still wrong. |
 
 The fourth is the one worth watching. It is the only cause that does **not** indict the
-specification, and the only one a green Test Matrix would have called healthy — which makes its
-share of the distribution the honest measure of how much the rest of this module is worth.
+specification, and the only one a fully green Test Matrix would have called healthy — which makes
+its share of the distribution the honest measure of what the rest of this module is buying.
 
-`Detected In` records the phase that **caught** the defect, not the one that introduced it; the
-cause column carries that. `Traces` names the requirement or acceptance-criterion ids concerned,
-or `-` where the cause is `missing-requirement` and there is nothing to point at — an absence that
-is itself the finding.
+### Why the column and not the `Finding` archetype
 
-### Escape cause is orthogonal to severity
+The obvious home is the `Finding` artifact type, and it is the wrong one.
 
-`SpecReview` already carries `Severity ∈ {low, medium, high}`, and it stays. Severity classifies by
-**reader action** — how urgently to look. Escape cause classifies by **origin**. A `high` severity
-defect can have any of the four causes, and a `low` one can be a `missing-requirement`. Neither
-replaces the other, and collapsing them would lose the only axis that answers "which layer".
+`SpecReview` was created on 2026-06-20 **deliberately beside** the freeform `Review` archetype —
+"NOT overloading freeform `Review`, which is used ecosystem-wide with heterogeneous bodies —
+would break" — precisely so the analysis skills would not have to touch the `Review`/`Finding`
+container-and-child path. Findings-as-inline-rows was the decision, not an accident.
 
-### The id defect this fixes
+**[RAN]** over the `~/dev` corpus: **169 `SpecReview` documents**, **90 `Review` documents**, and
+**2 documents typed `Finding`** — both of which are mistyped analyses (`AN-002 "Spec Integrity
+Analysis"`) rather than findings. Nothing has ever authored a real `Finding`.
 
-One concept had **three** id shapes, none of which agreed:
+So an escape-cause contract on `Finding` would attach the axis to a form nobody produces, and
+wiring the skills to emit one would reverse a shipped decision. The axis goes where the findings
+actually are.
 
-- `defaults.id_pattern: Finding-{next:03d}` minted `Finding-001`.
-- The archetype's own frontmatter schema requires `^[A-Z]{2,4}-[0-9]+$`. `Finding` is seven
-  letters, so **every id the default pattern minted failed the archetype's own schema.** A Finding
-  authored the standard way could not validate.
-- `SpecReview`'s findings table asserts `^FND-\d+$`, a third shape.
+### Optional, because 169 documents already exist
 
-The pattern becomes `FND-{next:03d}`, which satisfies both schemas. This is a **unification**, not
-a new spelling: `FND-` was already the form SpecReview asserted and the only one the frontmatter
-schema could accept.
+`Escape Cause` is declared in `optional_columns` (CR-023). Headers must be an ordered subsequence
+of the declared list containing every non-optional column, so a four-column table
+`ID | Severity | Summary | Refs` stays valid and a table that records the cause appends it last.
+Making it required would invalidate every SpecReview in the corpus on the day it shipped.
+
+It is optional in a second sense that matters: **not every finding is an escaped defect.** A
+completeness observation or a style note has no layer that leaked, and forcing a value would
+manufacture data. The column is recorded where the finding is a real escape and omitted where it
+is not.
+
+### The `Finding` id defect, fixed separately
+
+`Finding`'s `defaults.id_pattern` was `Finding-{next:03d}`, minting `Finding-001` — which fails
+the archetype's own frontmatter schema, `^[A-Z]{2,4}-[0-9]+$`, because seven letters is not
+two-to-four. **Every id the default pattern produced was invalid**, so a Finding authored the
+standard way could not validate. That is fixed here to `FIND-{next:03d}`.
+
+Deliberately **not** `FND-`: that is the id namespace of the findings *rows* inside a SpecReview.
+A `Finding` is a document and a child of `Review`; giving the two the same prefix would read as
+unification and be a conflation. `Finding` gains no body contract — nothing authors one, and a
+contract for a form nobody produces is the mistake this FR exists to avoid repeating.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-008-AC-1 | The `Finding` artifact type declares a `body_extraction` requiring a `Summary` section body and a `Classification` table with columns exactly `Escape Cause \| Detected In \| Traces` and at least one row. | Test (TC-060) |
-| FR-008-AC-2 | `Escape Cause` is constrained to exactly the four declared values; any other value fails validation. | Test (TC-061) |
-| FR-008-AC-3 | `skeletons/Finding.md` exists, and the id in its frontmatter satisfies both the archetype's frontmatter schema and the `^FND-\d+$` form `SpecReview` asserts. | Test (TC-062) |
-| FR-008-AC-4 | `defaults.id_pattern` mints an id that satisfies the archetype's own frontmatter schema — the property the previous `Finding-{next:03d}` violated for every id it produced. | Test (TC-063) |
-| FR-008-AC-5 | The skeleton's declared headings and its `Classification` table header match the manifest asserts exactly, in both directions (the FR-002 I1/I2 parity property). | Test (TC-064) |
-| FR-008-AC-6 | Adding this contract widens nothing else: the set of artifact types carrying a `body_extraction` gains `Finding` and no other, and no frontmatter schema changes. | Test (TC-017, extended) |
+| FR-008-AC-1 | The `SpecReview` findings assert declares `Escape Cause` as the fifth column and lists it in `optional_columns`, so a four-column findings table remains valid. | Test (TC-060) |
+| FR-008-AC-2 | `Escape Cause` is constrained to exactly the four declared values. | Test (TC-061) |
+| FR-008-AC-3 | `Severity` keeps its own vocabulary unchanged and independent — the two columns classify different things and neither derives from the other. | Test (TC-061) |
+| FR-008-AC-4 | `Finding.defaults.id_pattern` mints an id satisfying the archetype's own frontmatter schema — the property `Finding-{next:03d}` violated for every id it produced — and does **not** collide with the `^FND-\d+$` namespace SpecReview's findings rows use. | Test (TC-063) |
+| FR-008-AC-5 | `Finding` declares no `body_extraction`: nothing authors one, and the two corpus documents typed `Finding` are mistyped analyses. | Test (TC-064) |
+| FR-008-AC-6 | The `SpecReview` skeleton documents the column and all four values, so an author never opens the manifest to find the options. | Test (TC-062) |
 
 ## Constraints
 
 | ID | Constraint | Verification |
 |----|-----------|--------------|
-| FR-008-CON-1 | Classification is a **recorded human or agent judgment**, never computed. There is no automated classifier, and a Finding whose cause was inferred rather than decided is worth nothing as evidence about which layer leaks. | Inspection |
-| FR-008-CON-2 | `Escape Cause` SHALL NOT be merged into, or derived from, `SpecReview.Severity`. They classify different things — origin versus reader action — and either can take any value independently of the other. | Inspection |
+| FR-008-CON-1 | Escape cause is a **recorded human or agent judgment**, never computed. A cause that was inferred rather than decided is worth nothing as evidence about which layer leaks. | Inspection |
+| FR-008-CON-2 | `Escape Cause` SHALL NOT be merged into, or derived from, `Severity`. They classify different things — which layer leaked versus how urgently to look — and either can take any value independently of the other. | Inspection |
+| FR-008-CON-3 | The analysis skills SHALL keep emitting `SpecReview` documents. This FR adds a column; it does not move findings onto the `Review`/`Finding` path, which the 2026-06-20 decision deliberately left alone. | Inspection |
 
 ## Dependencies
 
-- **Upstream**: [FR-002](./FR-002-specreview-archetype.md) (the archetype + body-contract pattern this follows), [StR-001](../stakeholder/StR-001-module-activation.md)
-- **Downstream**: the `gap-analysis` and `code-review` skills mint a Finding per confirmed defect; the cause distribution becomes an evidence-store view (agent-ix/quoin#79) once enough exist
+- **Upstream**: [FR-002](./FR-002-specreview-archetype.md) (the SpecReview archetype and its findings contract), [StR-001](../stakeholder/StR-001-module-activation.md)
+- **Downstream**: the `code-review` and `gap-analysis` skills record a cause per escaped defect; the distribution becomes an evidence-store view (agent-ix/quoin#79) once enough exist
