@@ -158,6 +158,26 @@ requirement. A consumer **SHALL NOT** assume any obligation carries a
 criticality: a rule keyed on one is inert, and inert is better than silently
 wrong.
 
+### The one source whose arity is not one-per-row
+
+Every other obligation source mints one obligation per row: an acceptance
+criterion states one obligation, an NFR metric row states one. A
+**configuration-dimensions** table does not. It states a *space* —
+`features(default|python|wasm)` crossed with `target(linux|wasm32)`, minus
+whatever cannot co-exist — and the obligation is about the **interaction** of
+its rows. No single row can carry that, so the table mints exactly one
+(quire-rs FR-061).
+
+`strength: 2` is pairwise. Published evidence puts most configuration-space
+defects in pairs, and 3-way multiplies the target for a return nobody in this
+ecosystem has measured. The engine knows no default; a module wanting more says
+so.
+
+**This declaration is why quire-rs FR-061 and quoin FR-035 can fire at all.**
+Both shipped in ADR-0011 Phase 2 wave D against a `module-manifest.schema.json`
+that rejected the key, so zero combinatorial obligations existed anywhere —
+the third instance of the engine-before-module ordering gap in that program.
+
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
@@ -169,7 +189,8 @@ wrong.
 | FR-007-AC-5 | The engine loads the manifest and exposes all entries through `Registry::verification_catalog()`, with applicability rules carried verbatim. | Test (TC-052) |
 | FR-007-AC-6 | The derived `verification_class` vocabulary is exactly the four IADT values, and the derived `verification_method` vocabulary is exactly the catalog keys. | Test (TC-053) |
 | FR-007-AC-7 | The methods that mint no source symbol — inspection, demonstration, agent-behaviour evaluation — carry an evidence kind in the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie. | Test (TC-054) |
-| FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR measurement table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
+| FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR measurement table, and the configuration-dimensions table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
+| FR-007-AC-12 | The configuration-matrix source declares `combinatorial`, so a `## Configuration Dimensions` table mints ONE obligation for the whole table rather than one per row (quire-rs FR-061). It declares an exclusions column, because a space with forbidden combinations and no way to state them demands coverage of combinations that cannot exist. | Test (TC-055) |
 | FR-007-AC-9 | The catalog carries a method for verifying a property at **compile time** (a violation does not build) and one for **dynamic analysis under an instrumented runtime** (sanitizers). Neither is expressible as static analysis, executable contracts or fuzzing, and the first corpus sweep found both in use with no catalog word for them. | Test (TC-056) |
 | FR-007-AC-10 | No catalog entry names a **tool**, a **class synonym** or a **cadence** as a method: a tool belongs in the entry's `tooling`, a class is already the `class` axis, and when a check runs belongs to the suite registry's schedule. | Test (TC-057) |
 | FR-007-AC-11 | The presence of a declared object type is an applicability signal: `attack_surface`/`threat` advise the security methods and `hazard`/`failure_mode` advise `fault-injection`. Every object type any entry advises on is one a `spec-objects-*` module actually declares — a typo is a rule that silently never fires. | Test (TC-065) |

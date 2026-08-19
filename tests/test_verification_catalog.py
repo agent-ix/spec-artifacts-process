@@ -237,7 +237,22 @@ def test_tc055_obligation_sources_are_declared() -> None:
         "acceptance-criterion",
         "nfr-acceptance-criterion",
         "nfr-metric",
+        "configuration-matrix",
     }
+
+    # `configuration-matrix` is the only source whose arity is not one-per-row
+    # (quire-rs FR-061): the table states a configuration SPACE, and the
+    # obligation is about the interaction of every row, so one row cannot carry
+    # it. Asserted here because that is the property a reader would otherwise
+    # have to infer from the presence of `combinatorial`.
+    matrix = sources["configuration-matrix"]
+    assert matrix["combinatorial"]["strength"] == 2, "pairwise; see the manifest note"
+    assert "excludes_column" in matrix["combinatorial"], (
+        "a space with forbidden combinations and no column to declare them "
+        "demands coverage of combinations that cannot exist"
+    )
+    assert "target" not in matrix, "no trace target mints a configuration table"
+    assert matrix["archetype"] == "FR"
 
     # The two AC sources inherit from a declared trace target, so an obligation
     # id is by construction the id the rollup and every trace tag already use.
