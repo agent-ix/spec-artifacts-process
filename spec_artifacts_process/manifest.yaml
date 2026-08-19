@@ -802,6 +802,32 @@ traceability:
     parameters:
       target: Target
       threshold: Threshold
+  # The third source, and the only one whose arity is not one-per-row
+  # (quire-rs FR-061). A `## Configuration Dimensions` table states a
+  # CONFIGURATION SPACE: `features(default|python|wasm)` crossed with
+  # `target(linux|wasm32)`, minus whatever cannot co-exist. The obligation is
+  # about the INTERACTION of those rows, so no single row can carry it and the
+  # table mints exactly one.
+  #
+  # `strength: 2` — pairwise. Published evidence puts most configuration-space
+  # defects in pairs, and 3-way multiplies the target for a return nobody in
+  # this ecosystem has measured. A module wanting more says so; the engine
+  # knows no default.
+  #
+  # `Excludes` is declared because real spaces have forbidden combinations —
+  # a feature unavailable on a target, a codec absent from a build. Omitting
+  # the column on a space that has them demands coverage of combinations that
+  # cannot exist, and the target becomes permanently unreachable.
+  - name: configuration-matrix
+    archetype: FR
+    section: Configuration Dimensions
+    id_format: "{document}-CFG-{row}"
+    statement_column: Dimension
+    combinatorial:
+      dimension_column: Dimension
+      values_column: Values
+      excludes_column: Excludes
+      strength: 2
   vocabularies:
     test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
     # CR-002: which column carries the value above, and which of those values

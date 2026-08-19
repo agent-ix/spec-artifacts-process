@@ -68,7 +68,7 @@ type: TestMatrix
 | FR-007 | FR-007-AC-5 | TC-052 | ✅ Complete |
 | FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
 | FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
-| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets and the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
+| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
 | TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
 | TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
 | TC-060 | `Escape Cause` is the fifth findings column on SpecReview and is listed in `optional_columns`, so the 169 four-column SpecReview documents already in the corpus stay valid (FR-008) | Unit | P0 | FR-008-AC-1 | ✅ |
@@ -78,6 +78,7 @@ type: TestMatrix
 | TC-064 | `Finding` declares no `body_extraction`: nothing authors one — the two corpus documents typed Finding are mistyped analyses — and the review skills emit SpecReview by the 2026-06-20 decision (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
 | TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
+| FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
