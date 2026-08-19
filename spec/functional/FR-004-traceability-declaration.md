@@ -65,6 +65,16 @@ modules can version apart.
 - Every `legacy` form **SHALL** declare a `language` and a `rewrite_to` naming a
   marker of that **same** language. A form spanning languages can name only one
   target marker, so it would suggest Rust attribute syntax inside a `.py` file.
+- `trace_tags.implements` **SHALL** declare one comment form per supported
+  language, each carrying a `template`, and each **SHALL** require the literal
+  keyword `Implements:` before the id list. The keyword is the prose guard: the
+  `legacy` `*-comment-id` forms bind a bare id after `//` and need a
+  trailing-delimiter rule to stop a sentence flowing through, whereas here a
+  sentence that merely names a requirement matches nothing.
+- The module **SHALL** declare those forms as a list separate from `markers`,
+  never as a flag on one. `markers` mint `verifies` — evidence, which may back an
+  acceptance criterion — and `implements` mints scope, which may not. A shared
+  list with a discriminator field would put one typo between the two.
 - Every `document_references` entry **SHALL** name only declared `targets`, and
   **SHALL** opt into `expand_ranges` and `strip_annotations` where the corpus
   authors ranges (`FR-001-AC-1 .. FR-001-AC-4`) or qualifiers
@@ -83,6 +93,48 @@ modules can version apart.
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
+| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of rust, python and typescript; every pattern requires the literal `Implements:` before the id list and captures a comma-separated list; and a sentence naming a requirement in prose matches none of them. | Test (TC-066) |
+
+> **CR-028 note (2026-08-19):** the module declares `trace_tags.implements`
+> (quire-rs FR-062) — the marker forms that bind **production** code to the
+> requirement it is about.
+>
+> **What was missing.** `verifies` links an evidence symbol to a trace id.
+> Nothing linked a requirement to the code that implements it, so mutation
+> scoping (quoin FR-039) had no file set to mutate. **[RAN]** across quire-rs's
+> 52 functional requirements: **38 had at least one mutable target, 14 had
+> none** — and the fourteen fail for one reason, that every symbol verifying
+> them lives in `tests/`. Reach correlated with **test placement**, not with
+> requirement quality (quire-rs CR-071).
+>
+> **Why a second list and not a flag.** quire-rs CR-061 stopped `verifies`
+> binding production symbols precisely because a doc comment in `src/foo.rs`
+> that merely *cites* `FR-053-AC-1` would otherwise count as evidence backing
+> it. Widening `verifies` was the wrong fix and so is a shared list with a
+> discriminator, which puts one typo between scope and evidence. Two lists, two
+> relation types, and complementary symbol kinds — `markers` bind only
+> test/benchmark/fuzz symbols, `implements` only functions and containers — so a
+> mis-declared form binds **nothing** rather than the wrong thing.
+>
+> **A comment form, not an attribute.** `#[implements("…")]` would need a proc
+> macro in every consuming crate, and the point is to annotate production code
+> that already exists. `attached_source` spans the leading comment block, so a
+> line above the item binds to it. Comma lists, same grammar as the `Trace:`
+> forms, because authors already write them that way (CR-024 measured 98 lines
+> carrying 205 ids across `~/dev`).
+>
+> **Criterion ids are admitted** (`FR-001-AC-1`, not only `FR-001`). Scoping
+> truncates to the requirement trivially, whereas rejecting the shape would make
+> a plausibly-authored marker bind nothing silently — the failure this whole
+> programme keeps finding.
+>
+> **Ordering, and the defect it exposed.** This cannot ship against an engine
+> older than quire-rs **v0.38.0**. v0.36.0 minted the relation and v0.37.0
+> carried it into `coverage --json`, but the forms a *module* declared were
+> dropped between the manifest and the binding — `merge_traceability` and
+> `TraceabilityModel::is_empty` are hand-maintained per-field functions and
+> neither listed the key. Declaring this block is what surfaced it (quire-rs
+> CR-081); against v0.37.0 the declaration loads and mints nothing.
 
 > **CR-062 note (2026-08-17):** FR-004-AC-2 **reverses**: every entry is now
 > archetype-bound and `document:` is gone, because quire-rs deleted the form

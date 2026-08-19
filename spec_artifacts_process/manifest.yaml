@@ -768,6 +768,60 @@ traceability:
       language: typescript
       pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
       rewrite_to: ts-trace-helper
+    # ── implements: what code a requirement is ABOUT (quire-rs FR-062) ──
+    #
+    # A SEPARATE list from `markers`, and the separation is the whole point:
+    #
+    #   markers    -> verifies    "this test would fail if the behaviour broke"
+    #                             evidence — may back an acceptance criterion
+    #   implements -> implements  "this code is what the requirement is about"
+    #                             scope — never may
+    #
+    # quire-rs CR-061 stopped `verifies` binding production symbols precisely
+    # because a doc comment in `src/foo.rs` that merely *cites* `FR-053-AC-1`
+    # would otherwise count as evidence backing it. A shared list with a
+    # discriminator field would put ONE TYPO between scope and evidence, so
+    # there is no field to flip: two lists, two relation types, and
+    # complementary symbol kinds (`markers` bind only test/benchmark/fuzz
+    # symbols, `implements` only functions and containers). A mis-declared
+    # marker therefore binds NOTHING rather than the wrong thing.
+    #
+    # Why it exists: nothing linked a requirement to its production code, so
+    # mutation scoping (quoin FR-039) had no file set to mutate. Measured across
+    # quire-rs's 52 FRs, 38 had a mutable target and 14 had none — and the 14
+    # fail for one reason, that every symbol verifying them lives in `tests/`.
+    # Reach correlated with TEST PLACEMENT, not requirement quality (quire-rs
+    # CR-071).
+    #
+    # A comment form, not an attribute: `#[implements("…")]` would need a proc
+    # macro in every consuming crate, and the point is to annotate production
+    # code that already exists. `attached_source` spans the leading comment
+    # block, so a line above the item binds to it.
+    #
+    # The `Implements:` prefix is the prose guard. The legacy `*-comment-id`
+    # forms bind a bare id after `//`, which is why they need a
+    # trailing-delimiter rule; here the keyword carries that weight and a
+    # sentence naming a requirement matches nothing. Comma lists, same grammar
+    # as the `Trace:` forms, because authors already write them that way
+    # ([RAN] 98 lines / 205 ids across ~/dev).
+    #
+    # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`) — scoping
+    # truncates to the requirement trivially, whereas rejecting the shape would
+    # make a plausibly-authored marker silently bind nothing, which is the
+    # failure this whole program keeps finding.
+    implements:
+    - name: rust-implements-line
+      language: rust
+      pattern: '(?m)Implements:\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      template: '/// Implements: {ids}'
+    - name: python-implements-line
+      language: python
+      pattern: '(?m)Implements:\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      template: '# Implements: {ids}'
+    - name: typescript-implements-line
+      language: typescript
+      pattern: '(?m)Implements:\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      template: '// Implements: {ids}'
   status:
     column: Status
     complete: ["✅"]

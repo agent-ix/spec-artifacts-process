@@ -50,6 +50,7 @@ type: TestMatrix
 | FR-004 | FR-004-AC-7 | TC-034 | ✅ Complete |
 | FR-004 | FR-004-AC-8 | TC-035 | ✅ Complete |
 | FR-004 | FR-004-AC-9 | TC-036 | ✅ Complete |
+| FR-004 | FR-004-AC-10 | TC-066 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -131,6 +132,7 @@ type: TestMatrix
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
+| TC-066 | `trace_tags.implements` declares one templated form per language; every pattern requires the literal `Implements:` keyword and captures a comma-separated list; and prose naming a requirement matches none of them — the keyword is what the `*-comment-id` forms need a trailing delimiter for (CR-028) | Unit | P0 | FR-004-AC-10 | ✅ |
 | TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
 | TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |

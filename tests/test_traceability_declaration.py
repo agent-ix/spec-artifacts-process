@@ -296,3 +296,54 @@ def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
         assert value in vocab["test_type"], f"{value} is not a declared test type"
     for still_bindable in ("Static", "Benchmark", "Compile", "Unit"):
         assert still_bindable not in exempt
+
+
+def test_implements_forms_require_the_keyword(traceability: dict) -> None:
+    """TC-066 (FR-004-AC-10, CR-028): the `implements` forms bind PRODUCTION
+    code to the requirement it is about (quire-rs FR-062) — a separate list from
+    `markers`, because `markers` mint evidence and these mint scope.
+
+    The literal `Implements:` keyword is the prose guard. The legacy
+    `*-comment-id` forms bind a bare id after `//` and need a trailing-delimiter
+    rule to stop a sentence flowing through the id; here the keyword carries
+    that weight, so a line that merely names a requirement matches nothing.
+    """
+    forms = traceability["trace_tags"]["implements"]
+    by_language = {f["language"]: f for f in forms}
+
+    assert sorted(by_language) == sorted(LANGUAGES)
+    assert len(forms) == len(by_language), "one form per language"
+
+    listed = ["FR-001", "FR-002-AC-3"]
+    for form in forms:
+        assert form.get("template"), form["name"]
+        assert "{ids}" in form["template"], form["name"]
+        pattern = re.compile(form["pattern"])
+
+        match = pattern.search("/// Implements: " + ", ".join(listed))
+        assert match, f"{form['name']} does not match a keyword line"
+        ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
+        assert ids == listed, f"{form['name']} captured {ids}"
+
+        # Prose naming a requirement is not a declaration of scope. Without the
+        # keyword there is nothing to match, which is the whole reason these
+        # forms need no trailing delimiter.
+        assert not pattern.search(
+            "// FR-001 is the manifest activation requirement."
+        ), f"{form['name']} binds prose"
+
+
+def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
+    """TC-066 (FR-004-AC-10, CR-028): no name is shared between the two lists.
+
+    quire-rs CR-061 stopped `verifies` binding production symbols because a doc
+    comment citing `FR-053-AC-1` would otherwise count as evidence backing it.
+    Two lists is what keeps one typo from moving a form across that line.
+    """
+    tags = traceability["trace_tags"]
+    marker_names = {m["name"] for m in tags["markers"]} | {
+        legacy["name"] for legacy in tags["legacy"]
+    }
+    implements_names = {f["name"] for f in tags["implements"]}
+
+    assert not marker_names & implements_names, marker_names & implements_names
