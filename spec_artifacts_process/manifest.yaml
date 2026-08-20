@@ -1059,8 +1059,14 @@ verification_catalog:
   #                                classic wall a fuzzer cannot climb and a
   #                                solver clears in one step — and specs say this
   #                                outright.
-  #   structured-input             grammar-shaped input, where the parser is the
-  #                                barrier rather than the logic behind it.
+  #
+  # `structured-input` was here for one release and is NOT any more. It is what
+  # `grammar-based-fuzzing` is keyed on, so both methods were recommended on
+  # identical evidence and a reader had no basis to choose — while one of them
+  # is an escalation and the other is not. [RAN] over quire-rs: 17 of 18
+  # concolic recommendations came from it. A trigger shared with a cheaper
+  # method that answers the same question distinguishes nothing; the values
+  # below are the ones that separate the two.
   #   high-criticality             the standards-driven case. DO-178C Level A
   #                                wants MC/DC, ISO 26262 ASIL D and IEC 62304
   #                                Class C want equivalents, and hand-written
@@ -1106,7 +1112,7 @@ verification_catalog:
       it after cheaper search has stalled, not first.
     evidence_kind: Fuzz
     applicability:
-      characteristics: [magic-value-comparison, structured-input, high-criticality,
+      characteristics: [magic-value-comparison, high-criticality,
                         secret-dependent-branch, reference-equivalence,
                         fault-detection-unmeasured, fault-detection-failed]
     tooling: [CrossHair, KLEE, Kani, haybale]
