@@ -78,8 +78,12 @@ type: TestMatrix
 | TC-063 | `Finding.id_pattern` mints an id satisfying the archetype's own frontmatter schema — `Finding-001` failed `^[A-Z]{2,4}-[0-9]+$` for every id it produced — and does NOT fall in the `^FND-\d+$` namespace SpecReview's findings ROWS use (FR-008) | Unit | P0 | FR-008-AC-4 | ✅ |
 | TC-064 | `Finding` declares no `body_extraction`: nothing authors one — the two corpus documents typed Finding are mistyped analyses — and the review skills emit SpecReview by the 2026-06-20 decision (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
 | TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
+| TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
+| TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
+| FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
+| FR-007 | FR-007-AC-14 | TC-068 | ✅ Complete |
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |

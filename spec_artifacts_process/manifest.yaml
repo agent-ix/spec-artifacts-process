@@ -1004,7 +1004,14 @@ verification_catalog:
       suite detects them — a test of the tests, not of the code.
     evidence_kind: Static
     applicability:
-      characteristics: [high-criticality, suite-quality-unknown]
+      # `suite-quality-unknown` until 2026-08-19. "Quality" over-claimed — a
+      # suite can be slow, flaky or unreadable and none of that is what this
+      # measures — and "suite" named the wrong subject, since the fact is about
+      # THIS obligation's evidence and the same suite may have a measured score
+      # for one obligation and none for another. Renamed while it was still
+      # declared in one place and produced by nothing, which it will not be for
+      # long.
+      characteristics: [high-criticality, fault-detection-unmeasured]
     tooling: [cargo-mutants, mutmut, stryker]
   fuzzing:
     name: Fuzzing
@@ -1026,16 +1033,83 @@ verification_catalog:
     applicability:
       characteristics: [structured-input, grammar-declared]
     tooling: [cargo-fuzz + arbitrary, Nautilus]
+  # ── Concolic execution: an ESCALATION, not an up-front choice ──
+  #
+  # The name is `concrete` + `symbolic`. Run the code for real while recording
+  # the algebra of what must hold to reach each branch, then negate one of those
+  # constraints and ask a solver for an input satisfying the flipped version.
+  # `if x * 3 == 51` is a 1-in-4-billion coin flip for a fuzzer and a one-line
+  # answer for a solver.
+  #
+  # This entry was keyed on `path-sensitive` and `hard-to-reach-branch`, and
+  # nothing could ever produce either: both describe the IMPLEMENTATION's
+  # control flow, and a specification states what the system must do, never that
+  # a branch behind it is hard to reach. Measured across the installed catalog,
+  # it was the last of 33 methods no requirement could elicit
+  # (agent-ix/quoin#128).
+  #
+  # The re-key follows how the technique is actually reached in practice.
+  # Nobody starts here — it path-explodes and it is slow. The industrial pattern
+  # is HYBRID FUZZING: fuzz until the coverage curve flattens, hand the stuck
+  # branches to a solver, feed the solved inputs back as seeds (Driller 2016,
+  # then QSYM, SymCC, Fuzzolic). Four documented reasons people reach for it, and
+  # every one of them is observable:
+  #
+  #   magic-value-comparison       a checksum, CRC, HMAC or magic number. THE
+  #                                classic wall a fuzzer cannot climb and a
+  #                                solver clears in one step — and specs say this
+  #                                outright.
+  #   structured-input             grammar-shaped input, where the parser is the
+  #                                barrier rather than the logic behind it.
+  #   high-criticality             the standards-driven case. DO-178C Level A
+  #                                wants MC/DC, ISO 26262 ASIL D and IEC 62304
+  #                                Class C want equivalents, and hand-written
+  #                                tests do not get there.
+  #   secret-dependent-branch      constant-time code. `haybale-pitchfork` exists
+  #                                for exactly this.
+  #   reference-equivalence        proving two IMPLEMENTATIONS agree for every
+  #                                input. Distinct from `stable-output`, which
+  #                                compares against a RECORDED output.
+  #   fault-detection-unmeasured   the obligation is exercised by a bound run and
+  #                                nothing measures whether that exercise would
+  #                                catch a fault.
+  #   fault-detection-failed       something did measure it and the tests missed
+  #                                one. The evidence-side form of "the cheap
+  #                                search stalled".
+  #
+  # The last two are NOT named `surviving-mutants`. That would name mutation
+  # testing's artifact, and this method reads the same signal while producing no
+  # mutants — the same reason `evidence_kind` is method-class-shaped and never
+  # per-tool. They stay true whether the measurement came from mutation testing,
+  # fault injection, a sanitizer or a solver.
+  #
+  # Deliberately absent: a `fuzz-plateau` value, the literal Driller trigger.
+  # Nothing records coverage over time, and a proxy invented to fill the gap is
+  # the CR-014 failure — an open set whose membership had to be judged.
+  #
+  # `haybale` joins the tooling: symbolic execution of LLVM IR written in Rust,
+  # so it applies to anything rustc compiles. `Kani` is bounded model checking
+  # rather than concolic, and is listed because it answers the same question —
+  # find me the input that reaches this state.
+  #
+  # What this entry still CANNOT say is that it is an escalation of last resort.
+  # `advise` ranks by how many rules matched, so this outranks `unit-testing` on
+  # a statement matching two of the above, with nothing to mark the difference.
+  # Filed as agent-ix/quire-rs#190; the guidance lives in quoin's
+  # `spec-evidence-analysis` and `spec-fuzz` skills until it can live here.
   concolic-execution:
     name: Concolic / symbolic execution
     class: Analysis
     definition: >-
       Explore execution paths symbolically to find inputs that reach a state,
-      rather than sampling inputs and hoping one does.
+      rather than sampling inputs and hoping one does. An escalation: reach for
+      it after cheaper search has stalled, not first.
     evidence_kind: Fuzz
     applicability:
-      characteristics: [path-sensitive, hard-to-reach-branch]
-    tooling: [CrossHair, KLEE, Kani]
+      characteristics: [magic-value-comparison, structured-input, high-criticality,
+                        secret-dependent-branch, reference-equivalence,
+                        fault-detection-unmeasured, fault-detection-failed]
+    tooling: [CrossHair, KLEE, Kani, haybale]
   bdd-spec-by-example:
     name: Spec-by-example (BDD)
     class: Test
