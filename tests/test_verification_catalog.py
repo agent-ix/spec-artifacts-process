@@ -395,3 +395,67 @@ def test_tc065_a_declared_hazard_advises_fault_injection() -> None:
         for obj in method.get("applicability", {}).get("object_types", [])
     }
     assert advised == {"attack_surface", "threat", "hazard", "failure_mode"}, advised
+
+
+def test_no_method_is_keyed_on_the_implementations_control_flow() -> None:
+    """TC-067 (FR-007-AC-13, CR-029): the two retired values stay retired.
+
+    `concolic-execution` was keyed on `path-sensitive` and
+    `hard-to-reach-branch`, and nothing could ever produce either. Both name the
+    *implementation's* control flow, and a specification states what the system
+    must do — never that a branch behind it is hard to reach. Measured across
+    the installed catalog, it was the last of 33 methods no requirement could
+    elicit (agent-ix/quoin#128).
+
+    A denylist rather than a general rule, deliberately: "is this observable" is
+    a question about the consuming advisor's fact sources, which this module
+    cannot see. What it can do is refuse to reintroduce the specific mistake.
+    """
+    catalog = _catalog()
+    retired = {"path-sensitive", "hard-to-reach-branch"}
+
+    offenders = {
+        method_id: sorted(retired & set(entry["applicability"]["characteristics"]))
+        for method_id, entry in catalog.items()
+        if "characteristics" in entry.get("applicability", {})
+        and retired & set(entry["applicability"]["characteristics"])
+    }
+    assert not offenders, offenders
+
+
+def test_retired_characteristic_names_stay_retired() -> None:
+    """TC-068 (FR-007-AC-14, CR-029): the two rejected names cannot return.
+
+    The evidence-side pair is `fault-detection-unmeasured` /
+    `fault-detection-failed`. Two names were considered and rejected:
+
+      surviving-mutants      names mutation testing's ARTIFACT, and
+                             `concolic-execution` reads the same signal while
+                             producing no mutants. A per-tool name forces a
+                             second value meaning the same thing, which is how
+                             one signal becomes two vocabularies. CR-015's
+                             reasoning for `evidence_kind`, one axis over.
+      suite-quality-unknown  "quality" over-claimed — a suite can be slow,
+                             flaky or unreadable and none of that is what this
+                             measures — and "suite" named the wrong subject,
+                             since the fact is about THIS obligation's evidence.
+
+    A denylist, and deliberately not a general rule. Two general forms were
+    tried and both were worse than nothing: "does a declared tool name appear
+    inside the value" passes `surviving-mutants` cleanly, because no tool is
+    called "mutants"; and the reverse, "does a stem of the value appear inside a
+    tool name", fires on `cross` in `crosshair` and `fault` in
+    `fs-fault-injection`. Deciding whether a name is per-tool needs judgement,
+    which is the CR-014 failure this catalogue keeps citing. So the principle
+    lives in the CR note and in review, and this test guards the specific
+    mistakes rather than pretending to guard the class.
+    """
+    catalog = _catalog()
+    retired = {"surviving-mutants", "suite-quality-unknown"}
+
+    offenders = {
+        method_id: sorted(retired & set(entry["applicability"]["characteristics"]))
+        for method_id, entry in catalog.items()
+        if retired & set(entry.get("applicability", {}).get("characteristics", []))
+    }
+    assert not offenders, offenders

@@ -191,6 +191,62 @@ the third instance of the engine-before-module ordering gap in that program.
 | FR-007-AC-7 | The methods that mint no source symbol — inspection, demonstration, agent-behaviour evaluation — carry an evidence kind in the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie. | Test (TC-054) |
 | FR-007-AC-8 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR measurement table, and the configuration-dimensions table — so quire-rs FR-053 derives obligations rather than shipping inert. | Test (TC-055) |
 | FR-007-AC-12 | The configuration-matrix source declares `combinatorial`, so a `## Configuration Dimensions` table mints ONE obligation for the whole table rather than one per row (quire-rs FR-061). It declares an exclusions column, because a space with forbidden combinations and no way to state them demands coverage of combinations that cannot exist. | Test (TC-055) |
+| FR-007-AC-13 | No method declares `path-sensitive` or `hard-to-reach-branch`. Both name the implementation's control flow, which no specification states and no fact source can read, and a method keyed only on them can never be recommended. | Test (TC-067) |
+| FR-007-AC-14 | No method declares `surviving-mutants` or `suite-quality-unknown`. Both were considered and rejected — the first names one tool's artifact, the second over-claims and names the wrong subject — and the axis is method-class-shaped, as `evidence_kind` is (CR-015). | Test (TC-068) |
+
+> **CR-029 note (concolic execution becomes reachable — 2026-08-19):**
+> `concolic-execution` was keyed on `path-sensitive` and `hard-to-reach-branch`,
+> and **nothing could produce either**. Both describe the *implementation's*
+> control flow; a specification states what the system must do, never that a
+> branch behind it is hard to reach. Measured across this catalog, it was the
+> last of 33 methods no requirement could elicit (agent-ix/quoin#128).
+>
+> **The re-key follows how the technique is actually reached.** Nobody starts
+> there — it path-explodes and it is slow. The industrial pattern is *hybrid
+> fuzzing*: fuzz until the coverage curve flattens, hand the stuck branches to a
+> solver, feed the solved inputs back as seeds (Driller 2016, then QSYM, SymCC,
+> Fuzzolic). Four documented reasons people reach for it, and each is observable:
+>
+> | Reason | How it is observed |
+> |---|---|
+> | the fuzzer stopped finding branches | `fault-detection-unmeasured` / `fault-detection-failed`, from the evidence store |
+> | a safety standard mandates path coverage — DO-178C Level A MC/DC, ISO 26262 ASIL D, IEC 62304 Class C | `high-criticality`, from the obligation's own value |
+> | constant-time code, no secret-dependent branch | `secret-dependent-branch`, stated in the requirement |
+> | equivalence with a reference implementation over all inputs | `reference-equivalence`, stated in the requirement |
+>
+> plus `magic-value-comparison` — a checksum, CRC, HMAC or magic number, the
+> classic wall a fuzzer cannot climb — and `structured-input`.
+>
+> **The evidence pair is not called `surviving-mutants`.** That would name
+> mutation testing's artifact, and this method reads the same signal while
+> producing no mutants — the reasoning that made `evidence_kind`
+> method-class-shaped rather than per-tool (CR-015). `suite-quality-unknown` is
+> renamed to `fault-detection-unmeasured` for the same discipline: "quality"
+> over-claimed and "suite" named the wrong subject. It was declared once and
+> produced by nothing, so the rename was free; it will not be once it fires.
+>
+> **Deliberately absent: a `fuzz-plateau` value**, which is the literal Driller
+> trigger. Nothing records coverage over time, and inventing a proxy is the
+> CR-014 failure — an open set whose membership had to be judged rather than
+> read.
+>
+> **What the entry still cannot say** is that it is an escalation of last
+> resort. `advise` ranks by how many rules matched, so this now outranks
+> `unit-testing` on a statement matching two of the above with nothing marking
+> the difference. Filed as agent-ix/quire-rs#190; until it lands, the guidance
+> lives in quoin's `spec-evidence-analysis` and `spec-fuzz` skills — which is
+> the skill-local-prose arrangement ADR-0011 moved away from, recorded as a debt
+> rather than left to be rediscovered.
+>
+> **AC-13 and AC-14 are denylists, and that is a deliberate limit.** Two general
+> forms of AC-14 were written and both were worse than nothing. "Does a declared
+> tool name appear inside the value" passes `surviving-mutants` cleanly, because
+> no tool is called *mutants*. Reversed — "does a stem of the value appear inside
+> a tool name" — it fires on `cross` in `crosshair` and `fault` in
+> `fs-fault-injection`. Deciding whether a name is per-tool is a judgement, and a
+> check that needs judgement is the CR-014 failure this catalogue keeps citing.
+> So the principle is stated here and enforced in review; the tests guard the
+> specific mistakes rather than pretending to guard the class.
 | FR-007-AC-9 | The catalog carries a method for verifying a property at **compile time** (a violation does not build) and one for **dynamic analysis under an instrumented runtime** (sanitizers). Neither is expressible as static analysis, executable contracts or fuzzing, and the first corpus sweep found both in use with no catalog word for them. | Test (TC-056) |
 | FR-007-AC-10 | No catalog entry names a **tool**, a **class synonym** or a **cadence** as a method: a tool belongs in the entry's `tooling`, a class is already the `class` axis, and when a check runs belongs to the suite registry's schedule. | Test (TC-057) |
 | FR-007-AC-11 | The presence of a declared object type is an applicability signal: `attack_surface`/`threat` advise the security methods and `hazard`/`failure_mode` advise `fault-injection`. Every object type any entry advises on is one a `spec-objects-*` module actually declares — a typo is a rule that silently never fires. | Test (TC-065) |
