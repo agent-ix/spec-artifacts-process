@@ -486,6 +486,30 @@ lint_rules: []
 # coverage rollup how to read the same columns, so a contract and its coverage
 # computation cannot drift (CR-015 / CR-016).
 traceability:
+  # ── What is NOT traceable source ──
+  #
+  # Path globs under the **code** root naming fixture trees that hold no
+  # traceable source (quire-rs FR-050-AC-22, CR-085). A repository whose
+  # fixtures deliberately contain trace tags — the engine's own
+  # `coverage_baseline` fixture carries `#[trace("TC-999")]` on a test nothing
+  # declares, because *being unbacked is what it tests* — reported them as
+  # untracked symbols forever, and nothing on the authoring side could fix it.
+  #
+  # `tests/**` MUST NEVER APPEAR HERE, and this is the one comment in this file
+  # worth reading twice. `exclude:` on the trace targets below covers `tests/**`
+  # because that is where *documents* must not be read from. This key is the
+  # other root, and the majority of any repository's trace markers live under
+  # `tests/` — 194 of quire-rs's own ~458. A well-meaning "harmonisation" of the
+  # two lists would delete the evidence tree and read as an ecosystem-wide
+  # coverage collapse.
+  #
+  # The globs anchor at the fixture directory. `globset` anchors a pattern at
+  # the start unless it opens with `**/`, so `tests/fixtures/**` matches
+  # `tests/fixtures/a/b.rs` and cannot reach `src/tests/fixtures/x.rs`.
+  source_exclude:
+  - "tests/fixtures/**"
+  - "tests_integration/fixtures/**"
+  - "fixtures/**"
   # ── What mints trace ids ──
   #
   # The Test Matrix is bound by **archetype**, and the fixture problem is solved

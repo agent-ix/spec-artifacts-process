@@ -95,6 +95,33 @@ modules can version apart.
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
 | FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of rust, python and typescript; every pattern requires the literal `Implements:` before the id list and captures a comma-separated list; and a sentence naming a requirement in prose matches none of them. | Test (TC-066) |
 
+> **CR-032 note (2026-08-20):** this module now **declares**
+> `traceability.source_exclude` (quire-rs FR-050-AC-22 / CR-085,
+> `agent-ix/quire-rs#199`).
+>
+> Three globs, all anchored at a fixture directory:
+> `tests/fixtures/**`, `tests_integration/fixtures/**`, `fixtures/**`.
+>
+> **`tests/**` must never appear on this key**, and the distinction is the whole
+> reason it is a separate key from `exclude`. The `exclude:` globs on the trace
+> targets below *do* cover `tests/**`, because that is where **documents** must
+> not be read from. `source_exclude` is the other root, and the majority of any
+> repository's trace markers live under `tests/` — 194 of quire-rs's own ~458. A
+> well-meaning harmonisation of the two lists would delete the evidence tree and
+> read as an ecosystem-wide coverage collapse.
+>
+> **The release ordering is a hard edge, and it demonstrated itself.**
+> `TraceabilityModel` is `#[serde(deny_unknown_fields)]`, so an engine that does
+> not know the key does not ignore it — **module load fails**, for every command
+> that loads the module set. Declaring it against the previously-installed
+> toolchain turned 38 of this repository's 81 tests red with
+> `unknown field 'source_exclude'`. The chain is therefore engine → **every**
+> consumer → module, and it has four hops rather than the three the plan
+> assumed: `quire-rs` v0.41.0, then **both** `quire-cli` v0.28.0 (the binary
+> `subprocess` tests shell out to) and the `quire` **Python wheel** (which
+> `testmatrix_sweep.py` imports), then `spec-artifacts-iso` v0.18.0 for the
+> `additionalProperties: false` schema gate, and only then this module.
+
 > **CR-031 note (2026-08-20):** cross-reference only — the status **vocabulary
 > declared here is unchanged**. What changed is that FR-003's `column_patterns`
 > contract has stopped admitting `⚠️`, a marker this model never classed.
