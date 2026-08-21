@@ -158,11 +158,23 @@ def test_malformed_test_id_fails(fixture: str) -> None:
 
 
 def test_status_marker_permutation_validates() -> None:
-    """TC-008 (FR-003-AC-5, CR-016): the five markers, bare or carrying the note
-    that says why (`⚠️ scale evidence deferred`). Decorated statuses were the
-    single largest vocabulary failure in the sweep (6 repo families), and the
-    note carries information the bare marker cannot."""
+    """TC-008 (FR-003-AC-5, CR-016, CR-031): the four markers, bare or carrying
+    the note that says why (`🚧 scale evidence deferred`). Decorated statuses
+    were the single largest vocabulary failure in the sweep (6 repo families),
+    and the note carries information the bare marker cannot."""
     assert_valid("status-vocabulary.md")
+
+
+def test_retired_warning_marker_fails() -> None:
+    """TC-008 (FR-003-AC-5, CR-031): `⚠️` is retired and no longer admitted.
+
+    It was admitted by this pattern and classed by `traceability.status`
+    nowhere, so `class_of` returned Unknown, the coverage rollup asked only
+    `== Complete`, and every row carrying it was exempt from the status-lie check
+    by construction (quire-rs CR-083). `🚧` already means pending, and a second
+    form for one meaning enforces nothing.
+    """
+    assert_invalid("status-retired-marker.md", reason="assert", mentions="Status")
 
 
 def test_status_without_leading_marker_fails() -> None:
