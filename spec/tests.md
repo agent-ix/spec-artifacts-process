@@ -42,6 +42,7 @@ type: TestMatrix
 | FR-003 | FR-003-AC-10 | TC-010, TC-011, TC-025 | ✅ Complete |
 | FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | 🚧 Blocked |
 | FR-004 | FR-004-AC-1 | TC-028 | ✅ Complete |
+| FR-004 | FR-004-AC-1 | TC-070 | ✅ Complete |
 | FR-004 | FR-004-AC-2 | TC-029, TC-039 | ✅ Complete |
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
 | FR-004 | FR-004-AC-4 | TC-031 | ✅ Complete |
@@ -81,6 +82,7 @@ type: TestMatrix
 | TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
 | TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
 | TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
+| TC-070 | `traceability.source_exclude` is declared and loads: three fixture-anchored globs, none of them `tests/**`, and the manifest still validates against the FR-035 schema (CR-032) | Unit | P0 | FR-004-AC-1 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
