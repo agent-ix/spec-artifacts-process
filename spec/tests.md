@@ -127,7 +127,7 @@ type: TestMatrix
 | TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | 🚧 |
 | TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |
 | TC-026 | An `IT-` id validates; a prefix naming no declared archetype (`BENCH-001`) fails (CR-019) | Unit | P0 | FR-003-AC-4 | ✅ |
-| TC-027 | `analysis` enum admits both review families: the nine spec analyses plus `code-review` and `spec-correctness` | Unit | P1 | FR-002-AC-6 | ✅ |
+| TC-027 | `analysis` enum admits both review families: the ten spec analyses, including `architecture-evaluation`, plus `code-review` and `spec-correctness`; a representative architecture review validates through Quire | Unit | P1 | FR-002-AC-6 | ✅ |
 | TC-028 | Trace targets mint test-case ids from the Test Matrix and criterion ids from FR and NFR | Unit | P0 | FR-004-AC-1 | ✅ |
 | TC-029 | Every trace target and document reference binds by `archetype` and declares no `document` key; matrix entries bind `TestMatrix` and additionally exclude test data (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-030 | Exactly one templated canonical marker per language (rust, python, typescript) | Unit | P1 | FR-004-AC-3 | ✅ |
