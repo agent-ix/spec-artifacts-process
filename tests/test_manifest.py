@@ -101,6 +101,7 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
         "evidence",
         "risk-complexity",
         "scope-boundary",
+        "architecture-evaluation",
         "gap-analysis",
         "ears-conformance",
     ]
@@ -108,6 +109,66 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
 
     assert analysis == spec_analyses + implementation_reviews
     assert len(analysis) == len(set(analysis)), "enum values must be unique"
+
+    validator = Draft202012Validator(schema)
+    frontmatter = {
+        "id": "SR-901",
+        "title": "Architecture evaluation",
+        "type": "SpecReview",
+        "analysis": "architecture-evaluation",
+    }
+    assert not list(validator.iter_errors(frontmatter))
+    assert list(validator.iter_errors({**frontmatter, "analysis": "undeclared-review"}))
+
+
+def test_architecture_evaluation_review_validates_with_quire(
+    tmp_path: pathlib.Path,
+) -> None:
+    """TC-027 (FR-002-AC-6): architecture evaluation is a normal SpecReview.
+
+    The representative review carries scenario/trade-off findings through the
+    same body contract as every other analysis; the new vocabulary does not
+    create a competing review shape.
+    """
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for SpecReview validation")
+
+    review = tmp_path / "spec" / "reviews" / "architecture-evaluation.md"
+    review.parent.mkdir(parents=True)
+    review.write_text("""---
+id: SR-901
+title: Architecture evaluation of the evidence boundary
+type: SpecReview
+analysis: architecture-evaluation
+scope: spec/architecture/AD-001.md
+review_set: subset
+---
+
+## Summary
+
+The recovery scenario exposes a trade-off between isolation and diagnostic detail.
+
+## Findings
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-901 | medium | Recovery crosses an undeclared evidence boundary | AD-001 |
+""")
+    result = subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            str(review),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_manifest_validates_against_fr035_schema() -> None:
