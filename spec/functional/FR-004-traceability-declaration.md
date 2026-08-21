@@ -95,6 +95,17 @@ modules can version apart.
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
 | FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of rust, python and typescript; every pattern requires the literal `Implements:` before the id list and captures a comma-separated list; and a sentence naming a requirement in prose matches none of them. | Test (TC-066) |
 
+> **CR-031 note (2026-08-20):** cross-reference only — the status **vocabulary
+> declared here is unchanged**. What changed is that FR-003's `column_patterns`
+> contract has stopped admitting `⚠️`, a marker this model never classed.
+>
+> Recorded here because this file owns the `traceability:` block that was the
+> source of truth all along, and because the divergence ran in the direction
+> nothing checked: the contract admitted a superset. The guard in
+> `test_column_vocabularies_have_one_source` is now bidirectional, so a future
+> marker added to either side without the other fails at test time rather than
+> becoming invisible at rollup time.
+
 > **CR-028 note (2026-08-19):** the module declares `trace_tags.implements`
 > (quire-rs FR-062) — the marker forms that bind **production** code to the
 > requirement it is about.

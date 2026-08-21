@@ -34,13 +34,13 @@ type: TestMatrix
 | FR-003 | FR-003-AC-2 | TC-002, TC-016 | ✅ Complete |
 | FR-003 | FR-003-AC-3 | TC-004, TC-005 | ✅ Complete |
 | FR-003 | FR-003-AC-4 | TC-006, TC-007, TC-026 | ✅ Complete |
-| FR-003 | FR-003-AC-5 | TC-008, TC-009 | ✅ Complete |
+| FR-003 | FR-003-AC-5 | TC-008, TC-009, TC-069 | ✅ Complete |
 | FR-003 | FR-003-AC-6 | TC-012, TC-013, TC-018 | ✅ Complete |
 | FR-003 | FR-003-AC-7 | TC-014, TC-015 | ✅ Complete |
 | FR-003 | FR-003-AC-8 | TC-001 | ✅ Complete |
 | FR-003 | FR-003-AC-9 | TC-017 (+ Inspection) | ✅ Complete |
 | FR-003 | FR-003-AC-10 | TC-010, TC-011, TC-025 | ✅ Complete |
-| FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | ⚠️ Blocked |
+| FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | 🚧 Blocked |
 | FR-004 | FR-004-AC-1 | TC-028 | ✅ Complete |
 | FR-004 | FR-004-AC-2 | TC-029, TC-039 | ✅ Complete |
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
@@ -80,6 +80,7 @@ type: TestMatrix
 | TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
 | TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
 | TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
+| TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
@@ -105,7 +106,7 @@ type: TestMatrix
 | TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
 | TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
 | TC-007 | Malformed Test ID (`TC1`, `tc-001`, `TC-`, `TCX-001`) fails validation | Unit | P0 | FR-003-AC-4 | ✅ |
-| TC-008 | Status marker permutation: ✅, ⚠️, ❌, 🚧 each accepted bare | Unit | P1 | FR-003-AC-5 | ✅ |
+| TC-008 | Status marker permutation: ✅, ❌, 🚧, ⛔ each accepted bare, and a ⚠️-headed cell fails (CR-031) | Unit | P1 | FR-003-AC-5 | ✅ |
 | TC-009 | Status cell outside the marker vocabulary (`Done`, decorated `✅ Complete`) fails via `column_choices` | Unit | P0 | FR-003-AC-5 | ✅ |
 | TC-010 | Priority vocabulary permutation: P0, P1, P2, P3, P4 each accepted | Unit | P1 | FR-003-AC-10 | ✅ |
 | TC-011 | Priority cell outside the vocabulary (`P5`, `High`) fails via `column_choices` | Unit | P0 | FR-003-AC-10 | ✅ |
@@ -121,7 +122,7 @@ type: TestMatrix
 | TC-021 | Findings ID shapes: `FND-001` accepted; `FND-`, `fnd-1`, `F-001` fail the `id_pattern` | Unit | P1 | FR-002-AC-3 | 🚧 |
 | TC-022 | Bundled `skeletons/SpecReview.md` is itself a valid SpecReview and ships in the wheel | Unit | P2 | FR-002-AC-4 | 🚧 |
 | TC-023 | SpecReview registration leaves the freeform Review archetype unaltered (manifest diff assertion) | Unit | P2 | FR-002-AC-5 | 🚧 |
-| TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | ⚠️ |
+| TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | 🚧 |
 | TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |
 | TC-026 | An `IT-` id validates; a prefix naming no declared archetype (`BENCH-001`) fails (CR-019) | Unit | P0 | FR-003-AC-4 | ✅ |
 | TC-027 | `analysis` enum admits both review families: the nine spec analyses plus `code-review` and `spec-correctness` | Unit | P1 | FR-002-AC-6 | ✅ |
@@ -165,7 +166,7 @@ mixed combination in one conforming document.
 |-----------|------|----------|--------|-------------------|
 | TC-004 | Unit / Integration / E2E / Property | P1 (fixed) | 🚧 (fixed) | All four rows validate |
 | TC-010 | Unit (fixed) | P0 / P1 / P2 / P3 / P4 | 🚧 (fixed) | All five rows validate |
-| TC-008 | Unit (fixed) | P1 (fixed) | ✅ / ⚠️ / ❌ / 🚧 | All four rows validate |
+| TC-008 | Unit (fixed) | P1 (fixed) | ✅ / ❌ / 🚧 / ⛔ | All four rows validate; a ⚠️ row is rejected |
 | TC-001 | mixed | mixed | mixed | Conforming combination validates |
 | TC-005 | Manual | P1 | 🚧 | Fails (`assert`, Type) |
 | TC-011 | Unit | P5 | 🚧 | Fails (`assert`, Priority) |
@@ -198,4 +199,4 @@ mixed combination in one conforming document.
 | Gap ID | Description | Risk Level | Mitigation |
 |--------|-------------|------------|------------|
 | GAP-001 | Resolved 2026-08-04: FR-002 acceptance criteria now covered by planned TC-019..TC-023 | — | Closed via matrix expansion (SR-001 FND-002) |
-| GAP-002 | FR-003-AC-11 (Test ID uniqueness) is normative but not machine-enforceable: quire-rs exposes no uniqueness assert (verified in `LocatorAssert`/`assert_eval`, 2026-08-04) | Low | External quire-rs capability request (follow-on to FR-033); TC-024 stays ⚠️ blocked until it ships |
+| GAP-002 | FR-003-AC-11 (Test ID uniqueness) is normative but not machine-enforceable: quire-rs exposes no uniqueness assert (verified in `LocatorAssert`/`assert_eval`, 2026-08-04) | Low | External quire-rs capability request (follow-on to FR-033); TC-024 stays 🚧 blocked until it ships |

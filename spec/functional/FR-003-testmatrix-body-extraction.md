@@ -66,9 +66,10 @@ validation engine's cross-reference job and is out of scope here.
   P4 = nice-to-have/deferred (CR-018).
 - The `Status` column **SHALL** be constrained via `column_patterns` to a
   leading status marker followed by an optional note:
-  `^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$`. The marker carries the class and the note carries
-  why — `⚠️ scale evidence deferred` says something the bare marker cannot, and
+  `^(✅|❌|🚧|⛔)(\s+.*)?$`. The marker carries the class and the note carries
+  why — `🚧 scale evidence deferred` says something the bare marker cannot, and
   6 repo families already author decorated statuses. `⛔` marks a retired row.
+  `⚠️` was admitted here and classed nowhere until CR-031 retired it.
   The classes these markers map to are declared once, in the module's
   `traceability.status` block, which the coverage rollup reads
   ([FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) CR-015) — the
@@ -135,13 +136,55 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-2 | A doc missing the `Test Case Summary` table fails with reason `missing` | Test (TC-001) |
 | FR-003-AC-3 | A `Type` cell outside the core evidence vocabulary and the module's declared extensions fails via `column_choices` (reason `assert`); every core value and every declared extension passes | Test (TC-001) |
 | FR-003-AC-4 | A `Test ID` cell not matching `^(TC\|IT)(-[A-Za-z0-9]+)+$` with a numeric segment fails validation; the segmented ecosystem forms (`TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`) pass, as does an `IT-NNN` id (CR-019); a prefix naming no declared archetype (`BENCH-001`, `AUDIT-001`, `SB-001`, `TCX-001`) fails | Test (TC-001) |
-| FR-003-AC-5 | A `Status` cell not headed by one of `✅ ⚠️ ❌ 🚧 ⛔` fails via `column_patterns`; a marker followed by a note (`✅ Complete`, `⚠️ scale evidence deferred`) passes | Test (TC-001) |
+| FR-003-AC-5 | A `Status` cell not headed by one of `✅ ❌ 🚧 ⛔` fails via `column_patterns`; a marker followed by a note (`✅ Complete`, `🚧 scale evidence deferred`) passes. A `⚠️`-headed cell **fails**: the marker is retired, because `🚧` already carries that meaning and the contract had been admitting a value `traceability.status` classed as nothing (CR-031) | Test (TC-001, TC-008) |
 | FR-003-AC-6 | A `Traces To` cell that is not comma-separated `<KIND>-<N>` tokens (with an optional `-<SUBKIND>-<M>` sub-id, a same-prefix range, or a trailing parenthetical note) fails via `column_patterns`; the contract enumerates no kind names | Test (TC-001) |
 | FR-003-AC-7 | A doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Test (TC-001) |
 | FR-003-AC-8 | Test-case rows are extracted as one record per row (`multiple: true`) | Test (TC-001) |
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
+
+> **CR-031 note (2026-08-20):** `⚠️` is **retired** from the `Status`
+> vocabulary. agent-ix/spec-artifacts-process#52, agent-ix/quire-rs#192.
+>
+> The contract admitted `⚠️` at `column_patterns.Status` while
+> `traceability.status` classed it as **nothing**. The two declarations
+> disagreed, and the comment on the first even named the second as the source of
+> truth while admitting a value it does not define.
+>
+> The consequence is not cosmetic. `StatusClass::class_of` returned `Unknown`,
+> the coverage rollup's only consumer asked `== Complete`, and the row fell out
+> of the report: **not backed, not a lie, listed nowhere.** A `⚠️` row was exempt
+> from the status-lie check *by construction* — not because it was honest, but
+> because the engine formed an opinion and discarded it. That is how six FR-016
+> rows in `agent-ix/quire-cli` claimed evidence they did not have while
+> `status_lies` read zero.
+>
+> **Retired rather than classed**, per the rule that unifying means enforcing.
+> `🚧` already means pending, and every `⚠️` cell measured in the corpus reads
+> `⚠️ Partial: …` or `⚠️ Pending` — the same meaning in a second form. A
+> vocabulary that accepts every spelling enforces nothing.
+>
+> **What the number counts** — rows under `## Test Case Summary` in a
+> `type: TestMatrix` document, column `Status`, across the 239 `~/dev`
+> repositories `quire-rs/scripts/corpus.py` enumerates: **20 rows in 5
+> repositories**, of which 18 are `⚠️` and 2 are `🟡` (a glyph this contract never
+> admitted, already failing). Only **10 rows in 3 repositories** validate cleanly
+> today and therefore gate this change — `quire-cli` (6), `sync-github-service`
+> (3) and this module (1). The remaining ~270 `⚠️` cells ecosystem-wide sit in
+> `Coverage Status` columns and undeclared sections no `column_patterns` reaches;
+> migrating those is consistency work with no enforcement value, tracked
+> separately.
+>
+> FR-003-CON-1 gates the enforcing release on that sweep: **normalize before
+> enforce**, the sequence the FR-042 EARS rollout used.
+>
+> **The guard that should have caught this now does.**
+> `test_column_vocabularies_have_one_source` asserted only that every *classed*
+> marker appears in the pattern — one direction, and the wrong one. It now
+> asserts **set equality** both ways, and was confirmed to fail against the
+> pre-change manifest (`admitted but not classed: ['⚠️']`) before the manifest
+> was touched. A drift guard that cannot fail is the defect it exists to prevent.
 
 > **CR-020 note (2026-08-13):** `Eval` joins the `test_type` vocabulary.
 >

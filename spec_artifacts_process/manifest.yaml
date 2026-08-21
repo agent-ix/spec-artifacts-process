@@ -255,10 +255,14 @@ artifact_types:
               Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
               Priority: [P0, P1, P2, P3, P4]
             column_patterns:
-              # A leading status marker, optionally followed by the note that
-              # says why (`⚠️ scale evidence deferred`). Classes live in
-              # `traceability.status`.
-              Status: '^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$'
+              # A leading status marker, optionally followed by the note
+              # that says why (`🚧 scale evidence deferred`). Classes live in
+              # `traceability.status`, and CR-031 made `test_manifest.py`
+              # assert the two are the SAME SET rather than one containing the
+              # other — `⚠️` was admitted here and classed there by nothing, so
+              # every row carrying it was exempt from the status-lie check by
+              # construction (quire-rs CR-083).
+              Status: '^(✅|❌|🚧|⛔)(\s+.*)?$'
               # Comma-separated `<KIND>-<N>` tokens with an optional
               # `-<SUBKIND>-<M>` sub-id. The contract enumerates no kind names:
               # the legal set follows from the declared trace targets, and

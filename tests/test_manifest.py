@@ -193,7 +193,10 @@ def test_testmatrix_body_extraction_contract() -> None:
     # the cell and the note that says *why* follows it.
     assert "Status" not in choices
     patterns = cases["assert"]["column_patterns"]
-    assert patterns["Status"] == r"^(✅|⚠️|❌|🚧|⛔)(\s+.*)?$"
+    # CR-031 retired `⚠️`. The set this pattern admits is asserted against
+    # `traceability.status` in `test_column_vocabularies_have_one_source`; this
+    # line pins the exact literal so a widening is a deliberate two-file edit.
+    assert patterns["Status"] == r"^(✅|❌|🚧|⛔)(\s+.*)?$"
     assert "Traces To" in patterns
 
     # CR-017: the `Traces To` pattern admits two authoring shorthands the
@@ -280,10 +283,11 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
 
 
 def test_column_vocabularies_have_one_source() -> None:
-    """CR-015/CR-016: the traceability model owns the column vocabularies, and
-    the body_extraction contract must not drift from it. Until quire grows a
-    `from_vocabulary` reference, the contract restates the list and this test is
-    what keeps the two honest."""
+    """TC-069 (FR-003-AC-5, CR-015/CR-016/CR-031): the traceability model owns
+    the column vocabularies, and the body_extraction contract must not drift
+    from it. Until quire grows a `from_vocabulary` reference for a
+    `column_patterns` entry, the contract restates the list and this test is
+    what keeps the two honest — in **both** directions since CR-031."""
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     traceability = manifest["traceability"]
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
@@ -300,8 +304,32 @@ def test_column_vocabularies_have_one_source() -> None:
         status["complete"] + status["pending"] + status["failed"] + status["retired"]
     )
     pattern = cases["assert"]["column_patterns"]["Status"]
-    for marker in declared_markers:
-        assert marker in pattern, f"{marker} is classed but not admitted by the pattern"
+
+    # CR-031: this assertion used to run in ONE direction — every classed marker
+    # appears in the pattern — and that is exactly why `⚠️` survived for so long.
+    # It was admitted by the pattern and classed by nothing, so the contract and
+    # the model disagreed in the one direction nothing checked. `class_of`
+    # returned `Unknown`, the coverage rollup asked only `== Complete`, and the
+    # row was exempt from the status-lie check by construction.
+    #
+    # Set equality, both ways, is the fix. Parsing the leading alternation out of
+    # the pattern is ugly, and it is deliberately ugly: the restatement itself is
+    # the defect, and it stays only until `Status` can be expressed as a
+    # `from_vocabulary` reference the way `Type` is a `column_choices` list.
+    admitted = re.match(r"\^\(([^)]*)\)", pattern)
+    assert admitted, f"the Status pattern must open with an alternation: {pattern}"
+    admitted_markers = admitted.group(1).split("|")
+
+    unclassed = sorted(set(admitted_markers) - set(declared_markers))
+    unadmitted = sorted(set(declared_markers) - set(admitted_markers))
+    assert not unclassed and not unadmitted, (
+        "the Status pattern and `traceability.status` must admit exactly the "
+        "same markers.\n"
+        f"  admitted but not classed: {unclassed}\n"
+        f"  classed but not admitted: {unadmitted}\n"
+        "A marker the contract admits and the model does not class is invisible "
+        "to every coverage check (quire-rs CR-083)."
+    )
 
 
 def test_repo_test_matrix_self_validates() -> None:
