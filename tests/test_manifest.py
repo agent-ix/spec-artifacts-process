@@ -508,3 +508,87 @@ def test_tc064_finding_declares_no_body_contract() -> None:
     does not disturb.
     """
     assert "body_extraction" not in _artifact_type("Finding")
+
+
+# ── FR-004 / CR-032: the source_exclude contract (#56) ──────────────────────
+
+_SOURCE_EXCLUDE = [
+    "tests/fixtures/**",
+    "tests_integration/fixtures/**",
+    "fixtures/**",
+]
+
+
+def _source_exclude_violation(pattern: str) -> str | None:
+    """Why `pattern` must never appear in `traceability.source_exclude` — or
+    None when it is a legal, fixture-anchored subtraction.
+
+    The load-bearing invariant ("`tests/**` MUST NEVER APPEAR HERE",
+    manifest.yaml comment block) was prose-only until #56 (SR-006
+    FND-002/FND-005). The forbidden forms:
+
+    * `**` — excludes every source file; the symbol walk finds nothing and
+      every matrix row reads as unbacked.
+    * a leading wildcard (`*` or `?`) — globset compiles with
+      `literal_separator=false`, so `*/fixtures/**` matches at ANY depth:
+      exactly the unanchored failure mode start-anchoring otherwise rules out
+      (quire-rs tc944 pins the anchoring).
+    * any spelling that subtracts the whole `tests/` tree — the majority of a
+      repository's trace markers live there (194 of quire-rs's ~458), so
+      excluding it deletes the evidence tree and reads as a coverage collapse.
+      Mechanically: the first path segment is the literal `tests` and no later
+      segment contains a literal anchor. `tests/fixtures/**` anchors at
+      `fixtures` and stays legal; `tests`, `tests/**` and `tests/**/*.py` do
+      not and are rejected.
+    """
+    if pattern == "**":
+        return "`**` excludes every source file"
+    if pattern[0] in "*?":
+        return "leading wildcard matches at any depth (literal_separator=false)"
+    segments = pattern.split("/")
+    tail_has_literal_anchor = any(
+        seg and "*" not in seg and "?" not in seg for seg in segments[1:]
+    )
+    if segments[0] == "tests" and not tail_has_literal_anchor:
+        return "subtracts the whole tests/ evidence tree"
+    return None
+
+
+def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> None:
+    """TC-070 (FR-004-AC-1, CR-032): `traceability.source_exclude` is exactly
+    the three fixture-anchored globs, and none of them is a forbidden form.
+
+    The pin makes any change to the list a conscious diff of the `_SOURCE_EXCLUDE`
+    literal above. The guard makes the prose invariant mechanical: a future
+    `source_exclude: ["tests/**"]` or `["**"]` would load and validate cleanly
+    (the FR-035 schema constrains items to non-empty strings, nothing more) and
+    silently subtract the evidence tree from the symbol walk — excluded files'
+    trace tags never bind, and their rows read as unbacked, indistinguishable
+    from missing tests (#56, SR-006 FND-002).
+    """
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    patterns = manifest["traceability"]["source_exclude"]
+
+    assert patterns == _SOURCE_EXCLUDE
+
+    violations = {p: _source_exclude_violation(p) for p in patterns}
+    assert not any(violations.values()), violations
+
+    # The guard itself must be able to fail — a guard that rejects nothing is
+    # the defect it exists to prevent (SR-006 FND-001's red-test standard).
+    for bad in [
+        "**",  # excludes everything
+        "tests",  # the whole evidence tree, in its spellings…
+        "tests/",
+        "tests/**",
+        "tests/*",
+        "tests/**/*.py",  # …including wildcard-only anchors below `tests/`
+        "*/fixtures/**",  # FND-005: leading `*` matches at ANY depth
+        "**/fixtures/**",  # un-anchors the fixture glob the same way
+        "*",
+        "?ests/fixtures/**",  # `?` is a wildcard too
+    ]:
+        assert _source_exclude_violation(bad), f"guard must reject {bad!r}"
+
+    for good in [*_SOURCE_EXCLUDE, "src/tests/fixtures/**", "spec/fixtures/**"]:
+        assert _source_exclude_violation(good) is None, f"guard must admit {good!r}"
