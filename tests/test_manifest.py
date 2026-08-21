@@ -541,6 +541,8 @@ def _source_exclude_violation(pattern: str) -> str | None:
       `fixtures` and stays legal; `tests`, `tests/**` and `tests/**/*.py` do
       not and are rejected.
     """
+    if not pattern:
+        return "empty pattern (the FR-035 schema's minLength gate upstream)"
     if pattern == "**":
         return "`**` excludes every source file"
     if pattern[0] in "*?":
@@ -587,6 +589,7 @@ def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> N
         "**/fixtures/**",  # un-anchors the fixture glob the same way
         "*",
         "?ests/fixtures/**",  # `?` is a wildcard too
+        "",  # SR-007: the guard itself must not IndexError on the empty string
     ]:
         assert _source_exclude_violation(bad), f"guard must reject {bad!r}"
 
