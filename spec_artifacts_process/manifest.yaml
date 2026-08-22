@@ -725,9 +725,12 @@ traceability:
     # required: widening alone would hand the engine one id of `"A, B"`, and
     # splitting alone finds nothing to split.
     #
-    # `rust-test-name-id` is deliberately **not** widened — it declares
+    # `rust-test-name-id` is deliberately **not** list-widened — it declares
     # `id_format`, and `TC-{1}` renders over a function name, which cannot carry
     # a list. The engine leaves the template path unsplit for the same reason.
+    # That is a statement about **lists**, and it was read for two releases as
+    # though it forbade touching the form at all; the CR-034 separator fix below
+    # is a different axis and adds no capture group.
     #
     # The `*-comment-id` trailing delimiter still holds: it admits `,`, so a
     # greedy list consumes the separators and the delimiter falls through to the
@@ -776,7 +779,18 @@ traceability:
       rewrite_to: ts-trace-helper
     - name: rust-test-name-id
       language: rust
-      pattern: '\bfn (?i:tc)(\d+)_'
+      # `_?` is the separator, not a list. CR-034: the declared form had no
+      # separator between `tc` and the digits, so `fn tc_744_…` — 1,292 sites in
+      # `agent-ix/filament-ide-rs`, against 0 of the `fn tc744_…` spelling —
+      # bound nothing, and two thirds of what that repo's coverage reported as
+      # missing tests was the tool failing to read a tag that was present.
+      # `fn tc744_x` and `fn tc_744_x` are the same token under this convention:
+      # `tc`, the number, then the name. `(?i:tc)` already treats spelling
+      # variation of that token as equivalent; the separator is the same class
+      # of variation. Anchored on both sides — `fn ` before, digits and a
+      # trailing `_` after — so precision does not move, and no capture group is
+      # added. Orthogonal to the list widening described above.
+      pattern: '\bfn (?i:tc)_?(\d+)_'
       id_format: 'TC-{1}'
       rewrite_to: rust-trace-attribute
     # FR-051-AC-11's fourth form, "docstring bare id". Anchored to the *first*

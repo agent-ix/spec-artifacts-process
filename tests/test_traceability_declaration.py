@@ -142,9 +142,10 @@ def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> Non
     across 17 repos. The engine splits capture group 1 (quire-rs FR-051-AC-16);
     this asserts the declaration gives it something to split.
 
-    `rust-test-name-id` is deliberately excluded: `TC-{1}` renders over a
-    function name, which cannot carry a list, so the engine leaves the
-    `id_format` path unsplit and widening it here would be inert.
+    `rust-test-name-id` is deliberately excluded **from list widening**:
+    `TC-{1}` renders over a function name, which cannot carry a list, so the
+    engine leaves the `id_format` path unsplit and list-widening it here would
+    be inert. Its separator is a different axis — see TC-071.
     """
     legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
 
@@ -192,6 +193,51 @@ def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> Non
         match = re.search(comment, line)
         assert match, line
         assert [p.strip() for p in match.group(1).split(",") if p.strip()] == expected
+
+
+def test_test_name_form_binds_both_spellings_of_its_token(
+    traceability: dict,
+) -> None:
+    """TC-071 (FR-004-AC-11, CR-034): the declared form had no separator between
+    `tc` and the digits, so `fn tc_744_…` bound nothing — 1,292 sites in
+    `agent-ix/filament-ide-rs` against 0 of the `fn tc744_…` spelling, and two
+    thirds of what that repository's coverage reported as missing tests was the
+    tool failing to read a tag that was present.
+
+    Both spellings are the same token under this convention — `tc`, the number,
+    then the name — and `(?i:tc)` already admits four spellings of `tc`. The
+    separator is the same class of variation, so it must not buy recall by
+    giving up the anchors.
+    """
+    form = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}[
+        "rust-test-name-id"
+    ]
+    pattern = form["pattern"]
+    assert form["id_format"] == "TC-{1}"
+
+    # Both spellings bind, and to the same id.
+    for line in ("fn tc744_legacy()", "fn tc_744_legacy()"):
+        match = re.search(pattern, line)
+        assert match, f"{line!r} binds nothing"
+        assert form["id_format"].replace("{1}", match.group(1)) == "TC-744", line
+
+    # Case variation of the token is unchanged by the separator.
+    for line in ("fn TC_744_x()", "fn Tc744_x()", "fn tC_744_x()"):
+        match = re.search(pattern, line)
+        assert match and match.group(1) == "744", line
+
+    # One capture group, so the engine's template path stays single-id.
+    assert re.compile(pattern).groups == 1
+
+    # The anchors still hold on both sides: precision does not move.
+    for rejected in (
+        "fn tc_legacy()",  # no digits
+        "fn tc_744()",  # no trailing separator
+        "let tc_744_x = 1;",  # not a fn position
+        "// tc_744_x",  # not a fn position
+        "fn atc_744_x()",  # \b defeats the prefixed spelling
+    ):
+        assert not re.search(pattern, rejected), rejected
 
 
 def test_references_resolve_against_declared_targets(traceability: dict) -> None:

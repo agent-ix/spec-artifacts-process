@@ -94,6 +94,71 @@ modules can version apart.
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
 | FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of rust, python and typescript; every pattern requires the literal `Implements:` before the id list and captures a comma-separated list; and a sentence naming a requirement in prose matches none of them. | Test (TC-066) |
+| FR-004-AC-11 | `rust-test-name-id` binds both spellings of its token — `fn tc744_x` and `fn tc_744_x` render the same `TC-744` — while the separator stays optional, adds no capture group, and admits nothing new: a bare `fn tc_x`, an unanchored `tc_744_` outside a `fn` position, and a digit run with no trailing `_` all still match nothing. | Test (TC-071) |
+
+> **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
+> — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
+> (`agent-ix/spec-artifacts-process#59`, epic `agent-ix/quoin#197`).
+>
+> **What the number counts:** function-definition sites in
+> `agent-ix/filament-ide-rs` @ `3349cf8` (24 crates, ~143k LOC), counted by
+> spelling, under `quire 0.29.0` / engine `quire-rs v0.42.0` /
+> `spec-artifacts-process v0.23.0`. `fn tc_NNN_` (underscore): **1,292**.
+> `fn tcNNN_` (the declared spelling): **0**. Every tracking tag written in that
+> repository's dominant convention bound nothing.
+>
+> **Measured effect** of changing this one pattern in a copy of the module and
+> re-running `quire coverage --scope .` with `--module <copy>` — unit: Test
+> Matrix rows; population: 2,389 rows in that repository:
+>
+> | metric | declared | with separator | delta |
+> |---|---|---|---|
+> | backed | 555 | 1158 | **+603** |
+> | backed % | 23% | 48% | **+25pt** |
+> | unbacked rows | 1538 | 528 | **−1010 (−66%)** |
+> | status lies | 761 | 265 | **−496 (−65%)** |
+> | untracked symbols | 19 | 32 | +13 |
+>
+> **Bad rule, not bad corpus** — settled by opening documents, not by the delta.
+> **Sampled 10 flipped rows: 10 rule, 0 real.** Every one has a real test
+> carrying its id — TC-914 at
+> `crates/filament-backend/tests/reindex_code_postgres.rs:1081`, TC-1341 at
+> `crates/filament-backend-client/src/liveness.rs:360`, TC-216 at
+> `crates/filament-retrieval/src/fusion.rs:454`, TC-113 at
+> `crates/filament-shell/src/open.rs:366`, and six more bound through their doc
+> comment. The justification is independent of the count: **`fn tc744_x` and
+> `fn tc_744_x` are the same token under the declared convention** — `tc`, the
+> number, then the name — and `(?i:tc)` already admits four spellings of that
+> token, so the separator is the same class of variation.
+>
+> **Precision does not move.** `_?` is anchored on both sides, adds no capture
+> group and no list, and the `+13` untracked symbols are the confirmation rather
+> than the cost: all thirteen are real tests whose ids no matrix declares
+> (TC-1058, TC-1060…TC-1069 in the `filament-cli`/`filament-mcp` front-door
+> suites, TC-1484 ×2 in `embedding_worker.rs`). The widened form surfaces
+> genuine orphan tests; it binds no garbage.
+>
+> **The comment that appeared to forbid this** said `rust-test-name-id` is
+> "deliberately not widened". That is CR-024, and it is about **list support** —
+> the comma-separated-group widening applied to the `*-trace-line` and
+> `*-comment-id` forms, which cannot apply to a form rendering `TC-{1}` over a
+> function name. Orthogonal to the separator. Both notes now say which axis they
+> mean.
+>
+> **Deliberately not fixed here:** the same repository writes `/// Tracing:`
+> 643 times against a declared `rust-trace-line` keyword of `Trace:`. **That one
+> is bad corpus.** Measured, widening to `Trac(?:e|ing):` on top of this change
+> buys **+56 backed** while taking untracked symbols from **32 to 200** — those
+> lines are semicolon-separated and carry `Task-NNN` ids, so the comma form
+> reads ids that are not test-case declarations. Precision loss for marginal
+> recall; the corpus is swept onto the declared form instead
+> (`agent-ix/filament-ide-rs#460`).
+>
+> **Consequence for published reviews.** Three SpecReviews in filament-ide-rs
+> (SR-150, SR-151, SR-152) cite coverage figures computed under the broken
+> pattern; those figures measure marker-form mismatch, not coverage. SR-152's
+> FND-004 concludes "binding is on the `tc_NNNN_` function name" — the form that
+> bound nothing at all. FR-004-AC-11, TC-071.
 
 > **CR-032 note (2026-08-20):** this module now **declares**
 > `traceability.source_exclude` (quire-rs FR-050-AC-22 / CR-085,
@@ -251,10 +316,11 @@ modules can version apart.
 > FR-051-AC-16, shipped in v0.21.0); this declaration widens the group so there
 > is something to split.
 >
-> **`rust-test-name-id` is not widened.** It declares `id_format`, and `TC-{1}`
-> renders over a function name, which cannot carry a list. The engine leaves the
-> template path unsplit for the same reason, so widening it here would be a
-> declaration the engine ignores.
+> **`rust-test-name-id` is not list-widened.** It declares `id_format`, and
+> `TC-{1}` renders over a function name, which cannot carry a list. The engine
+> leaves the template path unsplit for the same reason, so list-widening it here
+> would be a declaration the engine ignores. This is a statement about **lists
+> only** — see CR-034, which changes the separator on a different axis.
 >
 > **The delimiter still holds.** The `*-comment-id` forms admit `,` as an id
 > terminator, so a greedy list consumes the separators and the delimiter falls
