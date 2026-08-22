@@ -252,7 +252,13 @@ artifact_types:
               # Core evidence vocabulary + this module's declared extensions.
               # The list mirrors `traceability.vocabularies.test_type`, which is
               # the single source; `test_manifest.py` asserts they agree.
-              Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
+              # CR-015's "one vocabulary, three uses", restated because
+              # `column_choices` takes a literal list and `from_vocabulary` is
+              # deferred (quire-rs#146). CR-035 extends all three copies
+              # together; TC-034/TC-042 are what keep them honest until the
+              # reference form lands.
+              Type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval,
+                     Inspection, Analysis, Demonstration]
               Priority: [P0, P1, P2, P3, P4]
             column_patterns:
               # A leading status marker, optionally followed by the note
@@ -277,7 +283,34 @@ artifact_types:
               # Both mean exactly what the expanded list means. Deliberately NOT
               # admitted: an empty cell or `—`. A test case that traces to
               # nothing is what a traceability matrix exists to catch.
-              Traces To: '^[A-Za-z]+-\d+(-[A-Za-z]+-\d+(/\d+)*)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, (-[A-Za-z]+-\d+(/\d+)*|[A-Za-z]+-\d+(-[A-Za-z]+-\d+(/\d+)*)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?)( \([^)]*\))?)*$'
+              # CR-036 (#61): a lone `-` is the explicit **no-trace** form. A retired row has no live requirement to
+              # trace to — withdrawing it is precisely the act of severing that
+              # edge — and the pattern admitted nothing valid to write.
+              #
+              # [RAN] `agent-ix/filament-ide-rs` @ fc5d644: 16 rows across 8
+              # module matrices carry `Traces To: -`, and **16 of 16 are
+              # retired** (`⛔`). Zero are live rows with a missing trace. The
+              # corpus wrote the conventional "not applicable" and the pattern
+              # rejected it, so a retired row could not be authored at all.
+              #
+              # NOT coupled to the `Status` cell, though #61 suggested it:
+              # `column_patterns` evaluates one cell in isolation and cannot see
+              # a sibling column, so a Status-conditional form is not expressible
+              # here. The looser rule is still strictly better than the corpus
+              # workaround it replaces — writing a plausible id into a retired
+              # row would fabricate an edge to pass a validator, and every review
+              # built on that matrix would then assert a trace that does not
+              # exist. A live row carrying `-` is a real gap this does not catch;
+              # it is caught one layer over, as an unbacked row.
+              #
+              # **Only the ASCII hyphen**, though #61 offered `—` and `n/a` too.
+              # All 16 measured rows write `-`, and `test_manifest.py` has
+              # pinned `—` as REJECTED since CR-017. Admitting a form no corpus
+              # authors, against a standing decision, to close a ticket is the
+              # widening this repository's CLAUDE.md forbids: the reason has to
+              # be true independent of the count, and for `—` there is no
+              # reason at all. If one appears, it is one line and a measurement.
+              Traces To: '^(-|[A-Za-z]+-\d+(-[A-Za-z]+-\d+(/\d+)*)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, (-[A-Za-z]+-\d+(/\d+)*|[A-Za-z]+-\d+(-[A-Za-z]+-\d+(/\d+)*)?(\.\.[A-Za-z]+-\d+(-[A-Za-z]+-\d+)?)?)( \([^)]*\))?)*)$'
         # Optional: the spec-matrix template emits these unconditionally, but a
         # bundle with no StR/US/NFR artifacts cannot truthfully populate them.
         # Absent is fine; present is asserted.
@@ -355,6 +388,8 @@ artifact_types:
               # referenced because `from_vocabulary` does not exist yet
               # (quire-rs#146); the FR-003 manifest test keeps the copies honest
               # until it does.
+              # Third copy of the same vocabulary — see the CR-015 note on
+              # the TestMatrix `Type` column. CR-035 extends it in step.
               Evidence Kind:
               - Unit
               - Integration
@@ -367,6 +402,9 @@ artifact_types:
               - Snapshot
               - Manual
               - Eval
+              - Inspection
+              - Analysis
+              - Demonstration
   allowed_links: []
   examples: []
   lint_rules_ref: []
@@ -572,6 +610,32 @@ traceability:
     - tests_integration/**
     - fixtures/**
     section: Suites
+    id_column: ID
+  # CR-037 (#63): StR validation criteria are a **minted id class** — a tag
+  # naming `StR-004-VC-1` reconciled against nothing and landed in
+  # `untracked_symbols` permanently, with no authoring-side fix available.
+  #
+  # `Analysis` and `Demonstration` (CR-035 above) are the methods these rows
+  # actually declare, which is why the two changes ship together: without the
+  # vocabulary the target would mint ids whose rows have no valid `Type`.
+  #
+  # **IT and US are deliberately absent, and the reason is an engine limit, not
+  # a decision.** `TraceTarget` mints from `section` + `id_column` — a table
+  # column under a heading. StR fits: `## Validation Criteria` is a table whose
+  # first column is the id. The other two are not tables:
+  #   - `IT-NNN-SC-NN` are **bullet items** under `## Test Procedure`
+  #     (`- IT-002-SC-01: lexical results are returned with no remote call.`);
+  #   - `US-NNN-EX-N` are **H3 headings** (`### [US-033-EX-1] Toggling …`).
+  # Declaring either would be a declaration the engine cannot honour. Filed as
+  # `agent-ix/quire-rs#244`; this entry lands the third of the three now rather
+  # than holding it behind the other two.
+  - name: stakeholder-validation-criterion
+    archetype: StR
+    exclude:
+    - tests/**
+    - tests_integration/**
+    - fixtures/**
+    section: Validation Criteria
     id_column: ID
   - name: inspection
     archetype: Inspections
@@ -798,17 +862,58 @@ traceability:
     # corpus (`"""TC-017 (FR-003-AC-9): the contract is additive."""`). An
     # unanchored form would bind every id a docstring merely mentions in prose,
     # and a test that names a requirement is not a test that verifies it.
+    # CR-038 (#64): the doc-comment forms gain the **trailing delimiter** the
+    # `*-comment-id` forms have always carried. The anchor above stops an id
+    # binding from the middle of a sentence; it never stopped a sentence that
+    # *begins* with one, and those were bound exactly as if they were tags.
+    #
+    # The dangerous shape is not the harmless one that exposed it. A doc comment
+    # opening `/// FR-069-AC-8 is not covered here; see …` marked that criterion
+    # **backed** — by a test saying in plain English that it does not verify it.
+    # Reproduced live: `/// TC-1059 used to assert that …` in
+    # `filament-ide-rs/crates/filament-cli/tests/container_binding.rs:20`, a note
+    # recording that TC-1059 was retired, read as a tag on the test below it.
+    #
+    # **[RAN] before changing it**, because #64 asked for that explicitly.
+    # Population: `///` id-leading lines in `tests/**` across `~/dev`, worktrees
+    # and `-task<N>` copies excluded — the tree where symbols actually bind, since
+    # only evidence symbols carry `verifies` (quire-rs CR-061).
+    #
+    #   | form                        | bindings | dropped |
+    #   |-----------------------------|----------|---------|
+    #   | current (no delimiter)      |      444 |       — |
+    #   | #64's proposed delimiter    |      386 |      58 |
+    #   | shipped (+ trailing period) |      390 |      54 |
+    #
+    # **Sampled the 57 unique dropped lines one at a time: ~55 rule, 2 corpus.**
+    # Nearly every one is narrative — `/// NFR-026 "no recreate, no close on
+    # move" guarantee is directly observable.`, `/// FR-098-AC-1 previously cited
+    # TC-1210 …`, `/// TC-988 and the two new verbs had nothing …`. Each of those
+    # is manufacturing a binding today.
+    #
+    # **The period is why the shipped form differs from #64's.** Four dropped
+    # lines were unambiguously authored tags — `/// NFR-035.`, `/// NFR-036.`,
+    # `/// FR-087-AC-5.`, `/// FR-068-AC-16.` — and `.` was not in the proposed
+    # delimiter class. It admits nothing new: a period only counts immediately
+    # after the id, so `/// FR-028-AC-9 applied to search filters.` still fails.
+    #
+    # **The one real convention loss, recorded rather than hidden:**
+    # `/// TC-892 regression (FR-049, CR-069): …` in quire-rs — id, then a
+    # lowercase word, then a delimiter. No pattern separates that from prose, so
+    # those two sites are swept onto `/// TC-892: regression (…)` in the
+    # consuming repo. Two sites against a silent false-backing hole is the trade,
+    # and it is the unify-means-enforce call: one form, flag the rest.
     - name: python-docstring-id
       language: python
-      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: pytest-trace-marker
     - name: rust-doc-comment-id
       language: rust
-      pattern: '(?m)^\s*///\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)^\s*///\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: rust-trace-attribute
     - name: typescript-doc-comment-id
       language: typescript
-      pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)^\s*\*\s*((?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: ts-trace-helper
     # ── implements: what code a requirement is ABOUT (quire-rs FR-062) ──
     #
@@ -925,7 +1030,30 @@ traceability:
       excludes_column: Excludes
       strength: 2
   vocabularies:
-    test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval]
+    # CR-035 (#60): the last three are the ISO 29148 **verification methods**,
+    # not harness kinds. Every other value names how a test is run; a
+    # 29148-aligned corpus also authors verification by inspection, by analysis
+    # and by demonstration, and had no declared value for any of them.
+    #
+    # [RAN] `agent-ix/filament-ide-rs` @ fc5d644: of 496 `[assert]` findings,
+    # 453 were rejected `Type` cells, and 128 of those were a means the
+    # vocabulary had no word for — `Inspection` 112, `Analysis` 11,
+    # `Demonstration` 5. Rows read rather than assumed: TC-085 "Inspect Core for
+    # domain behavior ownership drift", TC-323 "Inspect the packaged artifact
+    # for the pinned sidecar runtime". `Manual` is the nearest declared value
+    # and is wrong — those are automated scripts in a CI lane, not people.
+    #
+    # The remaining 325 are case variants and synonyms and are a **corpus**
+    # problem, swept in the consuming repo, not admitted here.
+    #
+    # The catalog already carries this distinction one level up:
+    # `verification_catalog` entries declare `class:`, and the classes in use
+    # are `Test` (21 methods) and `Analysis` (8). `test_type` enumerated only
+    # the `Test` class, so a row for an `Analysis`-class method had nothing
+    # valid to write. Same resolution as CR-005, which added two catalog entries
+    # rather than forcing the corpus onto a near-miss.
+    test_type: [Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile, Snapshot, Manual, Eval,
+                Inspection, Analysis, Demonstration]
     # CR-002: which column carries the value above, and which of those values
     # name a verification method that mints no source symbol (quire-rs
     # FR-050-AC-16).
@@ -940,7 +1068,20 @@ traceability:
     # usually asserted by real code — this repo's own static boundary audit is a
     # test — so exempting them would hide overclaims rather than explain them.
     test_type_column: Type
-    no_source_symbol: [Eval, Manual]
+    # CR-035 (#60): `Inspection` and `Analysis` join the exemption. An
+    # inspection is a CI lane running a script against a tree and an analysis is
+    # an argument; neither mints a symbol a trace tag attaches to. Until they
+    # were declared, such rows were typed as something that demands a symbol and
+    # coverage reported them as **status lies** — the whole substance of
+    # SR-152 FND-002 in filament-ide-rs, carried as an open question across
+    # three reviews (TC-441, TC-446, TC-447). Those rows were not lying; there
+    # was no declared type that said what they are.
+    #
+    # `Demonstration` deliberately stays OUT: a demonstration is observed
+    # running, so it can carry a symbol, and exempting it would hide an
+    # overclaim rather than explain one — the same line `Static`/`Benchmark`
+    # are held to above.
+    no_source_symbol: [Eval, Manual, Inspection, Analysis]
 
 # ── Verification-method catalog (quire-rs FR-054, #35) ────────────────────────
 # The 29119-4-shaped answer to "how should this requirement be verified".

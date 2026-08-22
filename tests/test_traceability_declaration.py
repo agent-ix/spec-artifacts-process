@@ -332,12 +332,19 @@ def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
     tag could attach to. `Static`, `Benchmark` and `Compile` are usually
     asserted by real code (this repo's own static boundary audit is a test), so
     exempting them would hide overclaims instead of explaining them.
+
+    CR-035 adds `Inspection` and `Analysis` on exactly that reasoning — a CI
+    lane running a script against a tree, and an argument — and deliberately
+    holds `Demonstration` to the `Static`/`Benchmark` line, because a
+    demonstration is observed running and can carry a symbol. TC-072 asserts
+    that split; this test keeps the list itself pinned so any further change is
+    a conscious diff.
     """
     vocab = traceability["vocabularies"]
     assert vocab["test_type_column"] == "Type"
 
     exempt = vocab["no_source_symbol"]
-    assert exempt == ["Eval", "Manual"], exempt
+    assert exempt == ["Eval", "Manual", "Inspection", "Analysis"], exempt
     for value in exempt:
         assert value in vocab["test_type"], f"{value} is not a declared test type"
     for still_bindable in ("Static", "Benchmark", "Compile", "Unit"):
@@ -393,3 +400,135 @@ def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
     implements_names = {f["name"] for f in tags["implements"]}
 
     assert not marker_names & implements_names, marker_names & implements_names
+
+
+def test_verification_methods_are_declared_test_types(traceability: dict) -> None:
+    """TC-072 (FR-004-AC-12, CR-035): every other `test_type` value names a
+    harness kind; a 29148-aligned corpus also authors verification by
+    inspection, analysis and demonstration, and had no declared value for any.
+
+    128 rows in one repository named a means the vocabulary had no word for
+    (`Inspection` 112, `Analysis` 11, `Demonstration` 5). Because they were
+    undeclared, those rows were typed as something that demands a source symbol
+    and coverage reported them as status lies.
+    """
+    vocab = traceability["vocabularies"]
+    types = vocab["test_type"]
+    for method in ("Inspection", "Analysis", "Demonstration"):
+        assert method in types, f"{method} is a 29148 verification method"
+
+    exempt = vocab["no_source_symbol"]
+    # An inspection is a CI lane running a script; an analysis is an argument.
+    assert "Inspection" in exempt
+    assert "Analysis" in exempt
+    # A demonstration is *observed running*, so it can carry a symbol —
+    # exempting it would hide an overclaim rather than explain one.
+    assert "Demonstration" not in exempt, exempt
+    # The pre-existing exemptions are untouched.
+    assert {"Eval", "Manual"} <= set(exempt)
+    # And the guard the module already holds: nothing that executes is exempt.
+    assert not ({"Static", "Benchmark", "Compile", "Unit"} & set(exempt))
+
+
+def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
+    """TC-073 (FR-004-AC-13, CR-036): a retired row has no live requirement to
+    trace to — withdrawing it is the act of severing that edge — and the
+    pattern admitted nothing valid to write. 16 of 16 rows carrying `-` in one
+    repository were retired; none was a live row with a missing trace.
+    """
+    matrix = _testmatrix_extraction()
+    pattern = matrix["column_patterns"]["Traces To"]
+
+    assert re.match(pattern, "-"), "the lone hyphen is the no-trace form"
+
+    # Live forms are unchanged.
+    for form in (
+        "FR-001-AC-1",
+        "TC-001, TC-002",
+        "FR-001-AC-1 (superseded)",
+        "FR-001..FR-003",
+    ):
+        assert re.match(pattern, form), form
+
+    # …and the loosening buys nothing else: prose, a bare word and a malformed
+    # id still fail, so a live row cannot smuggle a non-reference through.
+    # Deliberately NOT widened past the form the corpus writes: `—` has been
+    # pinned as rejected since CR-017 and no measured row uses it.
+    for form in ("see the other matrix", "none", "n/a", "—", "FR-", "-FR-001"):
+        assert not re.match(pattern, form), form
+
+
+def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) -> None:
+    """TC-074 (FR-004-AC-14, CR-037): `StR-NNN-VC-N` ids are minted and a tag
+    naming one reconciled against nothing.
+
+    IT and US are deliberately absent and the reason is an engine limit: a
+    `TraceTarget` mints from `section` + `id_column`, i.e. a table column.
+    `IT-NNN-SC-NN` are bullet items under `## Test Procedure` and
+    `US-NNN-EX-N` are H3 headings, so declaring either would be a declaration
+    the engine cannot honour (agent-ix/quire-rs#244).
+    """
+    targets = {t["name"]: t for t in traceability["trace_targets"]}
+    stakeholder = targets["stakeholder-validation-criterion"]
+    assert stakeholder["archetype"] == "StR"
+    assert stakeholder["section"] == "Validation Criteria"
+    assert stakeholder["id_column"] == "ID"
+    # Archetype-bound targets need scope exclusion, like every other one.
+    assert stakeholder["exclude"], stakeholder
+
+    declared = {t["archetype"] for t in traceability["trace_targets"]}
+    assert not ({"IT", "US"} & declared), (
+        "a section+id_column target cannot mint list items or headings; "
+        f"declared: {sorted(declared)}"
+    )
+
+
+def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> None:
+    """TC-075 (FR-004-AC-15, CR-038): the anchor stops an id binding from the
+    middle of a sentence and never stopped a sentence that *begins* with one.
+
+    `/// TC-1059 used to assert that …` — a note recording that TC-1059 was
+    retired — was read as a tag. The dangerous mirror image is
+    `/// FR-069-AC-8 is not covered here`, which marks a criterion backed by a
+    test that says it does not verify it.
+    """
+    legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
+    forms = {
+        "rust-doc-comment-id": "/// ",
+        "typescript-doc-comment-id": " * ",
+        "python-docstring-id": '    """',
+    }
+    for name, opener in forms.items():
+        pattern = legacy[name]["pattern"]
+
+        # Prose beginning with an id is not a tag.
+        for prose in (
+            "TC-1059 used to assert that the CLI and MCP each reached the rule",
+            "FR-069-AC-8 is not covered here; see the sibling suite",
+            "NFR-026 guarantee is directly observable",
+        ):
+            assert not re.search(pattern, opener + prose), f"{name}: {prose!r}"
+
+        # Every authored delimiter still binds — including the trailing period,
+        # which #64's proposal omitted and four real tags in the corpus use.
+        for tag, expected in (
+            ("TC-541 (FR-048-AC-1) — why", "TC-541"),
+            ("TC-480 / FR-025-AC-1: len == n", "TC-480"),
+            ("NFR-035.", "NFR-035"),
+            ("FR-087-AC-5", "FR-087-AC-5"),
+            ("TC-033, TC-034: why", "TC-033, TC-034"),
+        ):
+            match = re.search(pattern, opener + tag)
+            assert match, f"{name} lost an authored form: {tag!r}"
+            assert match.group(1) == expected, f"{name}: {tag!r} -> {match.group(1)!r}"
+
+
+def _testmatrix_extraction() -> dict:
+    """The TestMatrix `test_cases` assert block, from the shipped manifest."""
+    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    for entry in manifest["artifact_types"]:
+        if entry["name"] == "TestMatrix":
+            return entry["body_extraction"]["yield_pattern"]["match"]["test_cases"][
+                "assert"
+            ]
+    raise AssertionError("TestMatrix archetype not declared")

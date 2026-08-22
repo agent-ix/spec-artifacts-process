@@ -53,6 +53,10 @@ type: TestMatrix
 | FR-004 | FR-004-AC-9 | TC-036 | ✅ Complete |
 | FR-004 | FR-004-AC-10 | TC-066 | ✅ Complete |
 | FR-004 | FR-004-AC-11 | TC-071 | ✅ Complete |
+| FR-004 | FR-004-AC-12 | TC-072 | ✅ Complete |
+| FR-004 | FR-004-AC-13 | TC-073 | ✅ Complete |
+| FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
+| FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -138,6 +142,10 @@ type: TestMatrix
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 | TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
+| TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — 128 corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
+| TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — 16 of 16 corpus rows carrying `-` are retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
+| TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
+| TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-071 | `rust-test-name-id` binds `fn tc744_x` and `fn tc_744_x` to the same `TC-744`; the separator is optional, adds no capture group, and admits nothing new — bare `fn tc_x`, an unanchored `tc_744_`, and a digit run with no trailing `_` still match nothing (CR-034) | Unit | P0 | FR-004-AC-11 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |

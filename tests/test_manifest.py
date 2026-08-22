@@ -187,6 +187,14 @@ def test_testmatrix_body_extraction_contract() -> None:
         # this reason; `EV-` is the same case and needs this value to exist
         # before the rename is expressible.
         "Eval",
+        # CR-035: the three ISO 29148 verification methods. Every value above
+        # names a harness kind; a 29148-aligned corpus also verifies by
+        # inspection, analysis and demonstration, and had no word for any of
+        # them — 128 rows in one repository, reported as rejected `Type` cells
+        # and, for the `Inspection` ones, as status lies.
+        "Inspection",
+        "Analysis",
+        "Demonstration",
     ]
     assert choices["Priority"] == ["P0", "P1", "P2", "P3", "P4"]
     # CR-016: Status moved from an enum to a pattern, because the marker heads
