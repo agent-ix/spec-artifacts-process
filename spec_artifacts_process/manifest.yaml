@@ -196,6 +196,89 @@ artifact_types:
           from: section_body
           after_heading: Comment
           required: true
+# ── The index half of the matrix layer (CR-039, #62) ─────────────────────────
+# A repository past a certain size does not have one matrix; it has a tree. The
+# root document indexes the module matrices and the detailed coverage lives one
+# level down. `TestMatrix` modelled only the leaf, so the root was permanently
+# `[missing]` on both required tables:
+#
+#   spec/tests.md: [TestMatrix] required 'test_cases' … is missing [missing]
+#   spec/tests.md: [TestMatrix] required 'functional_coverage' … is missing [missing]
+#
+# and there was no way to clear that without inventing content. Copying the
+# 1,475 module test cases up into the root would give every TC two declaring
+# matrices — which a tracking tag then binds to neither (filament-ide-rs FR-075).
+#
+# **A separate archetype, not a `role:` discriminator on `TestMatrix`.** #62
+# offered both and preferred this one; it is also the only one that is
+# expressible. `body_extraction` carries a single `yield_pattern` per archetype
+# and cannot branch on a frontmatter value, so a discriminator would be a
+# declaration the engine could not honour — the same wall CR-037 hit.
+#
+# Splitting the archetype buys two things a variant would not:
+#   1. an index mints **no** test-case ids, because `trace_targets.test-case`
+#      binds `archetype: TestMatrix` and this is not one. Under the old typing
+#      the root was a minting document that minted nothing;
+#   2. the index's own structure is asserted for the first time. #62 records
+#      that this repository's root matrix had a subsystem row missing its
+#      `Local Matrix` cell — three columns where every other row had four — and
+#      no validator caught it. `columns:` catches exactly that.
+#
+# Adopting it is a one-line corpus change (`type: TestMatrix` →
+# `TestMatrixIndex` on the root document) and nothing else moves.
+- name: TestMatrixIndex
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/testmatrix-index-frontmatter.schema.json
+  defaults:
+    id_pattern: TestMatrix-{next:03d}
+  allowed_links:
+  - covers
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        # The index proper: one row per subsystem, naming where its detail
+        # lives. `Local Matrix` is a relative link and is what makes the tree
+        # navigable; asserting the column is what makes a dropped cell visible.
+        subsystem_index:
+          from: table_row
+          under_section: Requirements Traceability
+          required: true
+          multiple: true
+          assert:
+            columns: [Subsystem, Requirements, Local Matrix, Coverage Status]
+            min_rows: 1
+            column_patterns:
+              # Same status vocabulary as every other matrix surface, marker
+              # first and the note that says why after it (CR-016/CR-031).
+              Coverage Status: '^(✅|❌|🚧|⛔)(\s+.*)?$'
+        # Cross-module integration scenarios. Optional: a repository whose
+        # subsystems do not integrate has none, and requiring the table would
+        # force an empty one.
+        integration_matrix:
+          from: table_row
+          under_section: Integration Test Matrix
+          required: false
+          multiple: true
+          assert:
+            columns: [Integration ID, Purpose, Target, Type, Test Cases, Status]
+            id_column: Integration ID
+            id_pattern: '^INT-\d+$'
+            min_rows: 1
+        # The register of what is knowingly uncovered. Optional for the same
+        # reason: an absent register and an empty one are different claims, and
+        # only the second is authored.
+        coverage_gaps:
+          from: table_row
+          under_section: Coverage Gaps
+          required: false
+          multiple: true
+          assert:
+            id_column: ID
+            id_pattern: '^GAP-\d+$'
+            min_rows: 1
 - name: TestMatrix
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json

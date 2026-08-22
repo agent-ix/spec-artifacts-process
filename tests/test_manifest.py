@@ -276,12 +276,17 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
         # entry should cost a deliberate line here.
         "SuiteRegistry",
         "Inspections",
+        # CR-039 (#62) adds the index half of the matrix layer. The deliberate
+        # line this guard asks for: a repository past a certain size has a
+        # matrix tree, and modelling only the leaf left every root document
+        # permanently `[missing]` on two tables it cannot honestly carry.
+        "TestMatrixIndex",
     }, (
         "FR-003 adds the TestMatrix contract and FR-006 the two evidence-layer "
         "archetypes; Feedback and SpecReview keep the body_extraction they "
         "already had, and nothing else gains one. FR-008 deliberately does NOT "
         "appear here: it adds an optional column to SpecReview's existing "
-        "contract rather than giving Finding one"
+        "contract rather than giving Finding one; CR-039 adds TestMatrixIndex"
     )
 
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
@@ -603,3 +608,77 @@ def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> N
 
     for good in [*_SOURCE_EXCLUDE, "src/tests/fixtures/**", "spec/fixtures/**"]:
         assert _source_exclude_violation(good) is None, f"guard must admit {good!r}"
+
+
+def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
+    """TC-076 (FR-003-AC-12, CR-039): a repository past a certain size has a
+    matrix TREE, and the archetype modelled only the leaf.
+
+    `agent-ix/filament-ide-rs`'s root matrix indexes 12 module matrices and
+    declares no test case of its own, so it was permanently `[missing]` on both
+    required tables with no way to clear them without inventing content —
+    copying the 1,475 module rows up would give every TC two declaring
+    matrices, and a tracking tag then binds to neither.
+    """
+    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    types = {a["name"]: a for a in manifest["artifact_types"]}
+    index = types["TestMatrixIndex"]
+    leaf = types["TestMatrix"]
+
+    match = index["body_extraction"]["yield_pattern"]["match"]
+
+    # The index proper. `Local Matrix` is what makes the tree navigable, and
+    # asserting the column is what makes a dropped cell visible — the root
+    # matrix that motivated this had a row with three columns where every other
+    # row had four, and nothing caught it.
+    subsystems = match["subsystem_index"]
+    assert subsystems["required"] is True
+    assert subsystems["under_section"] == "Requirements Traceability"
+    assert subsystems["assert"]["columns"] == [
+        "Subsystem",
+        "Requirements",
+        "Local Matrix",
+        "Coverage Status",
+    ]
+    assert subsystems["assert"]["min_rows"] == 1
+
+    # An index requires NEITHER leaf table — that is the whole defect.
+    assert "test_cases" not in match
+    assert "functional_coverage" not in match
+    # …and the leaf still requires both, so this widened nothing.
+    leaf_match = leaf["body_extraction"]["yield_pattern"]["match"]
+    assert leaf_match["test_cases"]["required"] is True
+    assert leaf_match["functional_coverage"]["required"] is True
+
+    # Optional where the corpus genuinely is: a repository whose subsystems do
+    # not integrate has no INT- rows, and an absent gap register and an empty
+    # one are different claims. Requiring either would force an empty table —
+    # the CR-018 mistake.
+    for key, section, prefix in [
+        ("integration_matrix", "Integration Test Matrix", "INT"),
+        ("coverage_gaps", "Coverage Gaps", "GAP"),
+    ]:
+        entry = match[key]
+        assert entry["required"] is False, key
+        assert entry["under_section"] == section
+        assert entry["assert"]["id_pattern"] == rf"^{prefix}-\d+$"
+
+    # An index is NOT a minting document: `test-case` binds the leaf archetype
+    # only, so the root stops being a minting document that mints nothing.
+    targets = {t["name"]: t for t in manifest["traceability"]["trace_targets"]}
+    assert targets["test-case"]["archetype"] == "TestMatrix"
+    assert not any(
+        t["archetype"] == "TestMatrixIndex"
+        for t in manifest["traceability"]["trace_targets"]
+    )
+
+    # The two frontmatter schemas differ only in the type constant, so an index
+    # cannot validate as a leaf or the reverse.
+    index_schema = json.loads(
+        (pack.MANIFEST_PATH.parent / index["frontmatter_schema_ref"]).read_text()
+    )
+    leaf_schema = json.loads(
+        (pack.MANIFEST_PATH.parent / leaf["frontmatter_schema_ref"]).read_text()
+    )
+    assert index_schema["properties"]["type"]["const"] == "TestMatrixIndex"
+    assert leaf_schema["properties"]["type"]["const"] == "TestMatrix"

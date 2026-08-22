@@ -128,6 +128,52 @@ validation engine's cross-reference job and is out of scope here.
 |----|------------|------|------------|
 | FR-003-CON-1 | The module version enforcing this `body_extraction` SHALL NOT be published until existing ecosystem `tests.md` files are normalized to the required shape; a sweep producing per-repo diffs for user sign-off precedes enforcement | Process | Inspection |
 
+
+> **CR-039 note (2026-08-22):** the matrix layer gains its index half.
+> `agent-ix/spec-artifacts-process#62`, epic `agent-ix/quoin#197`.
+>
+> A repository past a certain size does not have one matrix; it has a **tree**.
+> `agent-ix/filament-ide-rs` states it outright in its own `CLAUDE.md` — *"root
+> test matrix (TM-001), indexes module matrices + INT-NNN rows"* — and in the
+> document's own Overview. Its root declares no test case and no
+> functional-coverage row because both live one level down, in 12 module
+> matrices. The archetype modelled only the leaf, so after bringing all 12
+> module matrices onto the contract the root was the only remaining `[missing]`:
+>
+> ```
+> spec/tests.md: [TestMatrix] required 'test_cases' (table_row(under Test Case Summary)) is missing [missing]
+> spec/tests.md: [TestMatrix] required 'functional_coverage' (…) is missing [missing]
+> ```
+>
+> **There was no way to clear those without inventing content.** Copying the
+> 1,475 module test cases up into the root would duplicate every row and give
+> the same TC two declaring matrices — which `check_artifact_ids.sh` rejects and
+> which makes a tracking tag bind to *neither*.
+>
+> **A separate archetype, not a `role:` discriminator.** #62 offered both and
+> preferred this one. It is also the only one expressible: `body_extraction`
+> carries a single `yield_pattern` per archetype and cannot branch on a
+> frontmatter value, so a discriminator would be a declaration the engine could
+> not honour — the same wall CR-037 hit, one archetype over.
+>
+> **Two things the split buys that a variant would not.** An index mints no
+> test-case ids, because `trace_targets.test-case` binds `archetype: TestMatrix`
+> and this is not one — under the old typing the root was a *minting document
+> that minted nothing*. And the index's own structure is asserted for the first
+> time: #62 records that this repository's root matrix carried a subsystem row
+> **missing its `Local Matrix` cell**, three columns where every other row had
+> four, and no validator caught it. A declared `columns:` catches precisely
+> that.
+>
+> **Optional where the corpus is genuinely optional.** The integration matrix
+> and the coverage-gap register are `required: false`: a repository whose
+> subsystems do not integrate has no `INT-` rows, and an absent gap register and
+> an empty one are different claims — only the second is authored. Requiring
+> either would force an empty table, which is the CR-018 mistake.
+>
+> Adoption is a one-line corpus change (`type: TestMatrix` →
+> `type: TestMatrixIndex` on the root document) and nothing else moves.
+
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
@@ -143,6 +189,7 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
+| FR-003-AC-12 | A `TestMatrixIndex` archetype models the **root index** of a matrix tree: it requires a `Requirements Traceability` table of `Subsystem \| Requirements \| Local Matrix \| Coverage Status` and optionally an `Integration Test Matrix` (`INT-NNN`) and a `Coverage Gaps` register (`GAP-NNN`). It requires neither `test_cases` nor `functional_coverage`, and it mints no test-case ids — `trace_targets.test-case` binds `TestMatrix` only, so an index is not a minting document. | Test (TC-076) |
 
 > **CR-031 note (2026-08-20):** `⚠️` is **retired** from the `Status`
 > vocabulary. agent-ix/spec-artifacts-process#52, agent-ix/quire-rs#192.
