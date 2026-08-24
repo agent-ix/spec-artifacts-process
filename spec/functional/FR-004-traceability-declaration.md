@@ -172,8 +172,8 @@ modules can version apart.
 > untracked symbols **155 → 34 (−121)**, **2,693** constraint rows gaining a
 > locus in `unbacked_rows`, `binding_census` **byte-identical** in all three
 > languages and status lies unchanged at **904**. An independent script counts
-> **3,225** `ID` rows in `FR`/`NFR` `## Constraints` tables and the engine mints
-> exactly 3,225 — instrument and script agree to the row.
+> **3,029** `ID` rows in `FR`/`NFR` `## Constraints` tables and the engine mints
+> exactly 3,029 — instrument and script agree to the row.
 >
 > **Why it does not ship yet.** Backing **26.51% → 23.64%** and unbacked rows
 > **13,889 → 16,582** are the denominator becoming honest and are not the
@@ -192,12 +192,21 @@ modules can version apart.
 > `FR-009.2-CON-1` as an **H4 heading** rather than a table row.
 >
 > **The controlled corpus caught it, which is what it is for.** Vendoring the two
-> entries into `agent-ix/qa-corpus` and running it: **19 of 75 cases fail, 34
+> entries into `agent-ix/qa-corpus` and running it: **25 of 75 cases fail, 40
 > mismatches, 100% of them `section-matches-nothing`.** Thirteen assert a silence
-> that is no longer true; six assert `diagnostic_paths` and receive the wrong
-> finding, because a reason token is not scoped to the declaration that raised it
-> — including `section-name-mismatch` and `section-and-id-column`, the flagship
-> `#270` pair. Neither is repairable without **lowering** those assertions, and
+> that is no longer true; six asserted `diagnostic_paths` and received the wrong
+> finding — including `section-name-mismatch` and `section-and-id-column`, the
+> flagship `#270` pair.
+>
+> **That second half was misdiagnosed here and is now fixed.** The note said a
+> reason token "is not scoped to the declaration that raised it", an engine
+> defect, and that neither half was "repairable without lowering those
+> assertions". The engine had *always* published `declaration` on every
+> diagnostic; the two corpus graders ignored it and took the first entry with a
+> matching `reason`. `agent-ix/quire-rs#331` closed that, and closing it
+> **raises** the assertion rather than lowering it — a fixture may now write
+> `declaration/reason` to scope its claim. So six of the nineteen were never an
+> engine problem. The remaining thirteen are, and
 > authoring a `## Constraints` table into 19 fixtures to dodge the finding is the
 > corpus-side workaround CR-036 refused on principle. Filed as
 > `agent-ix/quire-rs#327` — one key, `required: false`, mirroring the
