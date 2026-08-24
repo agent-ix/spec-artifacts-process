@@ -144,7 +144,10 @@ modules can version apart.
 > | untracked symbols | 1,086 | 1,196 | **+110** |
 >
 > Rust and Python being byte-identical is the half that says the change is the
-> one declared. **7 of 241 repositories move at all.** `filament-ide-rs` goes
+> one declared. **7 of 241 repositories change their backed-row count**, and **12** change on at least one
+> published metric — three of the six gaining untracked symbols gain no backed row. An
+> earlier draft said "move at all", which the `+110 untracked in 6 repositories` figure in
+> this same note refutes. `filament-ide-rs` goes
 > backed **1,354/2,540 (53%) → 1,529/2,540 (60%)**, typescript bound
 > **10/408 (2.5%) → 363/408 (89.0%)**, unbacked **468 → 182**, status lies
 > **209 → 55**, untracked symbols **25 → 25**.
@@ -174,10 +177,14 @@ modules can version apart.
 > named `describe` outright and reached `test.describe(` through its
 > `(?:\.\w+)?` window; measured, it matches **148 sites this form refuses — 110
 > suite headers and 38 suffixed or dashed sub-ids**. A suite header is not
-> evidence (quire-rs CR-119/#322) and **224 real corpus suite headers carry an
-> id**, so — `regex` having no lookaround — the modifier chain is an
+> evidence (quire-rs CR-119/#322) and **226 real corpus suite headers carry an
+> id** — 148 bare `describe(` and 78 `test.describe(`, matching this module's own
+> manifest census, which an earlier draft of this note contradicted with 224/146 inside
+> one change. The bare half is method-sensitive (a predicate over every `.ts`/`.tsx`
+> rather than test files gives 176); the 78 is stable, and the claim rests on the measured
+> zero below rather than on the count, so — `regex` having no lookaround — the modifier chain is an
 > **allowlist** and `describe`/`suite` are structurally unable to appear.
-> **[RAN]** those 224 headers verbatim into one scope with a matrix declaring
+> **[RAN]** those headers verbatim into one scope with a matrix declaring
 > all 188 ids: backed **0/189**, typescript bound **0/225**, while a
 > positive-control `it("tc-503: …")` in the same tree backs exactly 1 — the zero
 > is a measurement, not an absent harness. A second scope closes the
