@@ -142,10 +142,11 @@ def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> Non
     across 17 repos. The engine splits capture group 1 (quire-rs FR-051-AC-16);
     this asserts the declaration gives it something to split.
 
-    `rust-test-name-id` is deliberately excluded **from list widening**:
-    `TC-{1}` renders over a function name, which cannot carry a list, so the
-    engine leaves the `id_format` path unsplit and list-widening it here would
-    be inert. Its separator is a different axis — see TC-071.
+    The two **test-name** forms are excluded **from list widening**: `TC-{1}`
+    renders over a single captured token — a function name or a registered
+    title — which cannot carry a list, so the engine leaves the `id_format`
+    path unsplit and list-widening either would be inert. Their separators are
+    a different axis — see TC-071 and TC-077.
     """
     legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
 
@@ -161,7 +162,10 @@ def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> Non
         "rust-doc-comment-id": "/// TC-058, TC-198",
         "typescript-doc-comment-id": " * TC-058, TC-198",
     }
-    assert set(lines) | {"rust-test-name-id"} == set(legacy), set(legacy)
+    # The two `id_format` forms are excluded for the same reason and named
+    # together, so adding a third cannot pass by being forgotten.
+    templated = {"rust-test-name-id", "typescript-test-name-id"}
+    assert set(lines) | templated == set(legacy), set(legacy)
 
     for name, line in lines.items():
         form = legacy[name]
@@ -238,6 +242,103 @@ def test_test_name_form_binds_both_spellings_of_its_token(
         "fn atc_744_x()",  # \b defeats the prefixed spelling
     ):
         assert not re.search(pattern, rejected), rejected
+
+
+def test_typescript_test_name_form_reads_titles_and_never_suite_headers(
+    traceability: dict,
+) -> None:
+    """TC-077 (FR-004-AC-16, CR-040): TypeScript declared four trace forms and
+    none of them read a test's name, so an id written where this ecosystem
+    actually writes it — the registered title — bound nothing.
+
+    **860 test registrations across the 241-repo `~/dev` corpus carry an id at
+    the head of their title.** This asserts the three properties that make
+    reading them safe, because each one is a way the form could buy recall by
+    giving up precision:
+
+    1. **A suite header is not evidence.** quire-rs #322/CR-119 made
+       `describe(…)` and `test.describe(…)` both register a `Container`, which
+       `binds_trace_ids()` refuses. 224 real suite headers in the corpus carry
+       an id. A form matching the id alone would put them back on the evidence
+       channel one release after the engine took them off it, so the modifier
+       chain is an **allowlist** — `regex` has no lookaround, and a
+       `(?:\\.\\w+)?` window admits `test.describe(` as an ordinary modifier.
+    2. **Line-start anchoring**, mirroring `typescript.rs::registration`, which
+       reads a registration off a line's first token. It is what keeps
+       `SECRET_KEY_PATTERN.test("…")` from registering as a test.
+    3. **A trailing delimiter**, the analogue of `rust-test-name-id`'s trailing
+       `_`: the id is TERMINATED, never truncated. `ix-cli` declares `TC-092`
+       and `TC-280c` as separate rows and `filament-view-review` declares
+       `TC-008-LIST` with no bare `TC-008`, so a greedy `(\\d+)` would mark real
+       rows verified by tests that do not verify them.
+    """
+    form = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}[
+        "typescript-test-name-id"
+    ]
+    pattern = form["pattern"]
+    assert form["language"] == "typescript"
+    assert form["id_format"] == "TC-{1}"
+    # One capture group, so the engine's template path stays single-id — the
+    # same reason `rust-test-name-id` is not list-widened.
+    assert re.compile(pattern).groups == 1
+
+    # Every spelling the corpus writes, and the id it renders.
+    for line, expected in (
+        ('it("TC-001: every finding defaults to warning", () => {', "TC-001"),
+        ('  it("tc-503: launches and attaches", async () => {', "TC-503"),
+        ('  test("tc-1107: the configuration is visible", async () => {', "TC-1107"),
+        ('test("TC-951 a family with no working detector says so", () => {', "TC-951"),
+        ("  it('TC-137: single quotes are the other half', () => {", "TC-137"),
+        ("  it(`tc-13: a template literal registers too`, () => {", "TC-13"),
+        ('  it("TC-480 / FR-025-AC-1: the slash convention", () => {', "TC-480"),
+        ('  it("TC-137", () => {});', "TC-137"),
+        # `.modifier` chains, and the two-segment chain the corpus writes.
+        ('  it.skip("TC-402: a skipped test declares its id", () => {});', "TC-402"),
+        ('  it.only("tc-7: only", () => {});', "TC-7"),
+        ('  it.concurrent.skip("TC-9: a two-segment chain", () => {});', "TC-9"),
+        # `await` and whitespace, both of which the engine admits.
+        ('await it("tc-11: an awaited registration", async () => {});', "TC-11"),
+        ('test ("tc-12: whitespace before the argument list", () => {});', "TC-12"),
+        # A title wrapped onto the next line — how prettier formats a long one.
+        ('it(\n  "tc-503: a wrapped title",\n  async () => {},\n);', "TC-503"),
+    ):
+        match = re.search(pattern, line)
+        assert match, f"{line!r} binds nothing"
+        assert form["id_format"].replace("{1}", match.group(1)) == expected, line
+
+    # 1. A SUITE HEADER IS NOT EVIDENCE — in every spelling the corpus and the
+    #    engine's `SUITE_NAMES`/`chain_names_a_suite` know about.
+    for header in (
+        'describe("TC-001: a suite header", () => {',
+        '  test.describe("TC-001: playwright spells its suite this way", () => {',
+        '  it.describe("tc-2: and a harness may spell it this way", () => {',
+        '  test.describe.only("tc-3: the suite word may sit anywhere", () => {',
+        '  suite("TC-004: another harness\'s spelling", () => {',
+        '  describe("tc-503 native embedded agent smoke", () => {',
+    ):
+        assert not re.search(pattern, header), header
+
+    # 2. NOT A TEST REGISTRATION — a member call, an assertion, a string, prose.
+    for rejected in (
+        '  SECRET_KEY_PATTERN.test("tc-5: a regex probe, not a test")',
+        '  expect(name).toBe("tc-6: a string inside an assertion")',
+        '  const title = "tc-7: a variable holding a title";',
+        '  // TC-008 named in a comment about it("tc-9: something")',
+        '  it.each([1, 2])("tc-10: the curried title is out of reach", () => {});',
+        "  test.setTimeout(30000);",
+        '  iterate("tc-11: a longer identifier is not `it`")',
+        '  testHelper("tc-12: nor is a longer one `test`")',
+        '  it(makeName("tc-13"), () => {});',
+    ):
+        assert not re.search(pattern, rejected), rejected
+
+    # 3. THE ID IS TERMINATED, NEVER TRUNCATED. Both shapes bind nothing, which
+    #    is exactly what they bind today — no recall lost, no evidence invented.
+    for truncatable in (
+        '  it("TC-002b: a suffixed id is its own row in ix-cli", () => {});',
+        '  it("TC-008-LIST: a dashed sub-id is its own row", () => {});',
+    ):
+        assert not re.search(pattern, truncatable), truncatable
 
 
 def test_references_resolve_against_declared_targets(traceability: dict) -> None:

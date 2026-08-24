@@ -99,6 +99,101 @@ modules can version apart.
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
+| FR-004-AC-16 | `typescript-test-name-id` reads a trace id from a test registration's own title — `it`/`test` and their `.modifier` chains, in either quote or a template literal, with or without `await`, and on a wrapped title — and renders it through `id_format` with one capture group. It binds **no suite header** in any spelling (`describe(`, `suite(`, `test.describe(`, `it.describe(`, `test.describe.only(`), because the modifier chain is an allowlist rather than a `\w+` window; it binds nothing that is not a registration at the start of a line; and its trailing delimiter terminates the id rather than truncating it, so a suffixed id (`TC-092a`) and a dashed sub-id (`TC-008-LIST`) bind nothing rather than binding their base row. | Test (TC-077) |
+
+> **CR-040 note (2026-08-24):** TypeScript gains `typescript-test-name-id`, the
+> analogue of `rust-test-name-id` (`agent-ix/spec-artifacts-process#68`, EPIC
+> `agent-ix/quire-rs#264` Wave 3). TypeScript declared four trace forms and none
+> of them read a test's name.
+>
+> **What the numbers count.** Population: the **241** repositories
+> `quire-rs/scripts/corpus.py` enumerates under `~/dev` — non-hidden top-level
+> directories carrying `spec/`, minus `SKIP_DIRS`, `SUPERSEDED` and verified
+> `-task<N>` worktree siblings. Instrument: **one** `quire` binary built from
+> `quire-cli` at its pinned rev, engine `08e5ed4`, self-reported by all 482
+> payloads. Variable: the module path — two copies differing in exactly one file
+> and exactly one declared form.
+>
+> Registration census over `.ts`/`.tsx` in that corpus:
+>
+> | chain | sites | id at the head of the title |
+> |---|---|---|
+> | `it(` | 5,106 | 496 |
+> | `test(` | 1,167 | 363 |
+> | `describe(` | 1,512 | 77 |
+> | `test.describe(` | 120 | 33 |
+> | `it.each(` | 33 | 0 |
+>
+> **860 test registrations carry an id at the head of their title**, and all 860
+> spell the separator `-` — so `[-_]?` admits **zero** extra sites today and is
+> there for the reason CR-034's `_?` is: `tc-503` and `tc_503` are one token.
+>
+> **Measured effect** — same binary, only the declaration changed; unit: Test
+> Matrix rows and evidence symbols; population as above:
+>
+> | metric | declared | + one form | delta |
+> |---|---|---|---|
+> | rows minted | 20,028 | 20,028 | **0** |
+> | rows backed | 5,044 | 5,308 | **+264** |
+> | row backing | 25.18% | 26.50% | **+1.32pt** |
+> | unbacked rows | 14,403 | 13,889 | **−514** |
+> | status lies | 1,104 | 904 | **−200** |
+> | typescript bound | 1,043/6,199 | 1,685/6,199 | **+642** |
+> | rust bound | 2,804/6,307 | 2,804/6,307 | **0** |
+> | python bound | 2,050/12,741 | 2,050/12,741 | **0** |
+> | untracked symbols | 1,086 | 1,196 | **+110** |
+>
+> Rust and Python being byte-identical is the half that says the change is the
+> one declared. **7 of 241 repositories move at all.** `filament-ide-rs` goes
+> backed **1,354/2,540 (53%) → 1,529/2,540 (60%)**, typescript bound
+> **10/408 (2.5%) → 363/408 (89.0%)**, unbacked **468 → 182**, status lies
+> **209 → 55**, untracked symbols **25 → 25**.
+>
+> **The ticket's own baseline differs, and `agent-ix/quire-rs#322` is why.** #68
+> measured `ts 19/524 → 465/524` on an engine where `test.describe(` registered
+> a `TestFunction` — 116 suite headers in that denominator, ~102 of them binding
+> a header tag as evidence. #322 made them `Container`s. Both readings land on
+> 89%; the honest one is over the corrected pool.
+>
+> **The number that gets worse: untracked symbols +110**, in 6 repositories —
+> and it is settled by opening them. **Sampled 12 sites across all 6: 0 invented
+> bindings.** `ui-workflow-pane` `TC-048`…`TC-056` are real tests whose Test Case
+> Summary stops at `TC-047`; `ix-cli` `TC-421` and `filament-editor-gateway`
+> `TC-030` are named only in a *Functional Coverage* table; `ts-observability`
+> declares `TC-006`/`TC-007` under an id column spelled `` `ID` `` rather than
+> `Test ID`; `user-admin-ui` — 49 of the 110 — has **no `## Test Case Summary`
+> at all**. Every one is a real tag the binder previously could not read.
+>
+> **Bad rule or bad corpus, recall direction: sampled 12 of the 154
+> `filament-ide-rs` rows that stopped being status lies, 12 rule, 0 real** —
+> TC-974, TC-454, TC-1031, TC-1176, TC-1018, TC-844, TC-1351, TC-664, TC-657,
+> TC-1094, TC-965, TC-845, each with a real test whose title matches the row's
+> stated claim.
+>
+> **The anchors are the design, and they are not what #68 sketched.** That sketch
+> named `describe` outright and reached `test.describe(` through its
+> `(?:\.\w+)?` window; measured, it matches **148 sites this form refuses — 110
+> suite headers and 38 suffixed or dashed sub-ids**. A suite header is not
+> evidence (quire-rs CR-119/#322) and **224 real corpus suite headers carry an
+> id**, so — `regex` having no lookaround — the modifier chain is an
+> **allowlist** and `describe`/`suite` are structurally unable to appear.
+> **[RAN]** those 224 headers verbatim into one scope with a matrix declaring
+> all 188 ids: backed **0/189**, typescript bound **0/225**, while a
+> positive-control `it("tc-503: …")` in the same tree backs exactly 1 — the zero
+> is a measurement, not an absent harness. A second scope closes the
+> container-span route: `test.describe("tc-888: …")` wrapping
+> `test("tc-999: …")` backs `TC-999` and leaves `TC-888` unbacked.
+>
+> **The `id_format` hazard is inherited and stated, not discovered later.**
+> `TC-{1}` renders captured digits verbatim exactly as the Rust form does, so
+> `it("tc-1: …")` mints `TC-1` against a row declaring `TC-001` — that is
+> `agent-ix/quire-rs#307`, unchanged in either direction, and zero-padding is not
+> expressible in `id_format`. It produced **0** short ids in this sweep.
+>
+> **Deliberately out of reach:** the curried `it.each([…])("tc-503: …")` title
+> (**0 of 37 `.each` sites carry an id**), and the 61 ids in attached comments
+> and 45 in file-level docblocks #68 counts — those need
+> `agent-ix/quire-rs#273`'s symbol, not a title form.
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
