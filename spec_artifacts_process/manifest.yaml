@@ -940,6 +940,107 @@ traceability:
       pattern: '\bfn (?i:tc)_?(\d+)_'
       id_format: 'TC-{1}'
       rewrite_to: rust-trace-attribute
+    # CR-040 (#68): the TypeScript equivalent of the form above. TypeScript
+    # declared four trace forms and **none of them read a test's name**, so an
+    # id written where this ecosystem actually writes it — in the registered
+    # title — bound nothing at all.
+    #
+    # **[RAN]** over the 241 repositories `quire-rs/scripts/corpus.py`
+    # enumerates under `~/dev` (worktrees, `-task<N>` siblings and `SKIP_DIRS`
+    # excluded), `.ts`/`.tsx` only, counting registration lines by their call
+    # chain:
+    #
+    #   | chain            | sites | id at the head of the title |
+    #   |------------------|-------|-----------------------------|
+    #   | `it(`            |  5106 |                         496 |
+    #   | `test(`          |  1167 |                         363 |
+    #   | `describe(`      |  1512 |                          77 |
+    #   | `test.describe(` |   120 |                          33 |
+    #   | `it.each(`       |    33 |                           0 |
+    #   | `test.skip(`     |    10 |                           0 |
+    #   | `it.skip(`       |     2 |                           1 |
+    #
+    # **860 test registrations carry an id at the head of their title**, and all
+    # 860 spell the separator `-`. `[-_]?` therefore admits exactly **zero**
+    # extra sites today; it is here because `tc-503` and `tc_503` are the same
+    # token under this convention, which is the CR-034 argument one language
+    # over, and `(?i:tc)` already treats spelling variation of `tc` as
+    # equivalent.
+    #
+    # ── Why the chain is an ALLOWLIST and not `(?:\.\w+)?` ──
+    #
+    # This is the whole safety argument, and it is why the sketch in #68 is not
+    # what shipped. That sketch read
+    # `\b(?:it|test|describe)(?:\.\w+)?\(` — which names `describe` outright,
+    # and would ALSO match `test.describe(` through the `.\w+` window.
+    #
+    # A suite header is **not evidence**. quire-rs #322/CR-119 settled that:
+    # `describe(…)` and `test.describe(…)` both register a `Container`, which
+    # `binds_trace_ids()` refuses, precisely so a tag on a header cannot claim a
+    # test's coverage. **120 `test.describe(` headers exist across two corpus
+    # repositories and 78 carry an id in their title**; plain `describe(` adds
+    # 1,512 sites of which 148 carry one. A form that reached them would put all
+    # 226 back on the evidence channel by a second route, one release after the
+    # engine closed the first.
+    #
+    # `regex` has no lookaround, so "any modifier except a suite word" cannot be
+    # written as a negative. The allowlist states it positively instead: every
+    # entry is a real test-registration modifier of vitest, jest or playwright,
+    # and `describe`/`suite` are structurally unable to appear. `each`, `skip`,
+    # `skipIf` and `concurrent` are the four this corpus writes; the rest are
+    # the modifiers those harnesses document. It also excludes the non-
+    # registration members that share the namespace — `test.setTimeout(` (34
+    # sites), `test.info(`, `test.slow(`, `test.beforeAll(`.
+    #
+    # ── Anchors ──
+    #
+    # `^\s*` mirrors the engine, which reads a registration off a line's first
+    # token (`typescript.rs::registration`, `code.trim_start()`). It is what
+    # keeps `SECRET_KEY_PATTERN.test("…")` — a regex probe, 1 site in the corpus
+    # — from being read as a test registration by a `\b`-anchored form.
+    # `await ` is admitted because the engine admits it (2 sites).
+    #
+    # The **trailing delimiter** is the analogue of `rust-test-name-id`'s
+    # trailing `_`: the id must be TERMINATED, never truncated. Measured, this
+    # is not cosmetic — the corpus writes two id conventions that a greedy
+    # `(\d+)` would silently shorten into a **false** binding:
+    #
+    #   * suffixed ids — `it("TC-092a: …")`, `TC-280b`, `TC-406b` (23 sites).
+    #     `ix-cli/spec/tests.md` declares `TC-092` AND `TC-280c` as separate
+    #     rows, and `it("TC-092: …")` is a different test three lines up.
+    #     Truncating would mark TC-092 verified by a test about chart-local
+    #     secret contracts.
+    #   * dashed sub-ids — `it("TC-008-LIST: …")`, `TC-009-CREATE-409` (15
+    #     sites in `filament-view-review`, whose matrix declares exactly those
+    #     spellings and no bare `TC-008`).
+    #
+    # With the delimiter both shapes bind **nothing**, which is what they bind
+    # today: no recall lost, no manufactured evidence gained. The class is the
+    # one the `*-comment-id` forms already carry, plus the closing quote.
+    #
+    # ── The `id_format` hazard is INHERITED, not fixed (quire-rs#307) ──
+    #
+    # `TC-{1}` renders the captured digits **verbatim**, exactly as the Rust
+    # form does. `it("tc-1: …")` therefore mints `TC-1`, and a matrix row
+    # declaring `TC-001` stays unbacked while `TC-1` appears as an untracked
+    # symbol. That is #307 and this form does not change it in either
+    # direction; zero-padding is not something `id_format` can express. Said
+    # here rather than discovered later.
+    #
+    # ── Deliberately out of reach ──
+    #
+    # The curried parametrised form, `it.each([…])("tc-503: …")`, whose title
+    # sits in the SECOND call. The engine registers those symbols (CR-084) but
+    # this form stops at the first `(`. **0 of the 37 `.each` sites in the
+    # corpus carry an id**, so admitting them buys nothing measured and would
+    # cost the `\(\s*["'']` anchor. Likewise the 61 ids in attached comments and
+    # the 45 in file-level docblocks that #68 counts — those need
+    # `agent-ix/quire-rs#273`'s symbol, not a title form.
+    - name: typescript-test-name-id
+      language: typescript
+      pattern: '(?m)^\s*(?:await\s+)?(?:it|test)(?:\.(?:only|skip|skipIf|runIf|todo|fails|failing|fixme|concurrent|sequential|each|for|extend))*\s*\(\s*["''`](?i:tc)[-_]?(\d+)(?:["''`:,/()\[\]]|\s|\.|$)'
+      id_format: 'TC-{1}'
+      rewrite_to: ts-trace-helper
     # FR-051-AC-11's fourth form, "docstring bare id". Anchored to the *first*
     # token of the doc comment, which is the authored convention across the
     # corpus (`"""TC-017 (FR-003-AC-9): the contract is additive."""`). An
