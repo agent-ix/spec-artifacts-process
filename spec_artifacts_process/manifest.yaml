@@ -746,8 +746,8 @@ traceability:
   # against each repository's `spec/`: **102 are defined by an `ID` row in an
   # `## Constraints` table on an `FR` document**, 4 on an `NFR`, 1 under
   # `## Invariants`, 1 in a matrix section only, and 19 name no row anywhere.
-  # `## Constraints` tables on `FR`/`NFR` hold 3,225 `ID` rows corpus-wide and
-  # the engine mints exactly 3,225 when the target is declared — the script and
+  # `## Constraints` tables on `FR`/`NFR` hold 3,029 `ID` rows corpus-wide and
+  # the engine mints exactly 3,029 when the target is declared — the script and
   # the instrument agree to the row.
   #
   # **Bad rule or bad corpus**, settled by opening files rather than by the
@@ -840,12 +840,16 @@ traceability:
   # is not a module's to fix.
   #
   # **The controlled corpus caught it, which is what it is for.** Running
-  # `agent-ix/qa-corpus` with the two entries below vendored in: **19 of 75
-  # cases fail, 34 mismatches, and 100% of the 34 are `section-matches-nothing`**
+  # `agent-ix/qa-corpus` with the two entries below vendored in: **25 of 75
+  # cases fail, 40 mismatches, and 100% of them are `section-matches-nothing`**
   # raised by `constraint` against an FR document that has no constraints.
   # Thirteen assert a silence that is no longer true
   # (`id-column-mismatch`, `rows-across-many-headings` and its control,
-  # `declared-heading-and-column-control`, `clean-control`); six assert
+  # `declared-heading-and-column-control`, `clean-control`); six asserted `diagnostic_paths` and received the wrong finding — MISDIAGNOSED
+  # here as an engine defect, "a reason token is not scoped to the declaration".
+  # The engine always published `declaration`; the corpus graders ignored it, and
+  # agent-ix/quire-rs#331 fixed that side. Six of the nineteen were never an
+  # engine problem. Superseded text: six assert
   # `diagnostic_paths` and get the wrong finding, because a reason token is not
   # scoped to the declaration that raised it and `next(…)` takes the first
   # (`section-name-mismatch`, `section-and-id-column` — the flagship #270 pair).
@@ -883,7 +887,7 @@ traceability:
   # 2,693 constraint rows into `unbacked_rows` with their own id and line.
   #
   # It is the `verification` shape one section over, and for the same reason
-  # that entry gives: of the 3,225 `Constraints` rows only **367** carry a
+  # that entry gives: of the 3,029 `Constraints` rows only **367** carry a
   # `TC`/`IT` id at all — `Unit Test` 566, `Integration Test` 382, `Test` 349,
   # `Inspection` 329, `Code Review` 96 — and a row naming no id is still
   # answerable for its own `CON` id, which is what a tag on the test binds. It
