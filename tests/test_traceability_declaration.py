@@ -584,6 +584,52 @@ def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) 
     )
 
 
+def test_no_target_mints_from_an_undeclared_section(traceability: dict) -> None:
+    """TC-078 (FR-004-AC-17, CR-041): the negative half of #69's decision, and
+    the record that makes it a decision rather than an absence.
+
+    One rule settles four of the five id classes `#69` names: the traceability
+    model mints from sections the SHAPE CONTRACT declares, and does not invent
+    sections. `## Invariants` is declared by neither module — 129 rows across 15
+    repositories, one tag in the whole corpus — and the `NFR` archetype declares
+    no `Constraints` section at all (4 tagged ids). A target on either would
+    declare the corpus's mistake into the model.
+
+    The `FR` `Constraints` target is the mirror image and is NOT asserted here,
+    because it does not ship yet. It is measured, correct, and blocked on
+    `agent-ix/quire-rs#327`: `## Constraints` is optional in the FR contract and
+    a `TraceTarget` has no way to say so, so declaring it raises
+    `section-matches-nothing` on 1,160 FR documents that legitimately have none
+    — and, in `agent-ix/qa-corpus`, breaks 19 of 75 cases with 34 mismatches,
+    all of them that reason.
+
+    An absence is not a decision: it reads to an author exactly like a typo, and
+    `untracked_symbols` cannot tell them apart either
+    (`agent-ix/quire-rs#328`). So the manifest text is asserted too — a class
+    silently losing its recorded reason is the regression this guards.
+    """
+    for target in traceability["trace_targets"]:
+        section = target["section"]
+        sections = section if isinstance(section, list) else [section]
+        normalized = {s.strip().lower() for s in sections}
+        assert "invariants" not in normalized, (
+            f"{target['name']} mints from `Invariants`, which neither module "
+            "declares; the canonical spelling is `Constraints`"
+        )
+        assert not (target["archetype"] == "NFR" and "constraints" in normalized), (
+            "the NFR archetype declares no `Constraints` section — declare it "
+            "in spec-artifacts-iso first (4 tagged ids ecosystem-wide)"
+        )
+
+    manifest = pack.MANIFEST_PATH.read_text()
+    for ticket, why in (
+        ("agent-ix/quire-rs#244", "IT success criteria are list items"),
+        ("agent-ix/quire-rs#327", "the FR Constraints target is blocked"),
+        ("agent-ix/quire-rs#328", "a bare FR-nnn tag gets no actionable form"),
+    ):
+        assert ticket in manifest, f"{ticket} is unrecorded: {why}"
+
+
 def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> None:
     """TC-075 (FR-004-AC-15, CR-038): the anchor stops an id binding from the
     middle of a sentence and never stopped a sentence that *begins* with one.

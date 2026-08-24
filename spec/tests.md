@@ -59,6 +59,7 @@ type: TestMatrix
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
 | FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
 | FR-004 | FR-004-AC-16 | TC-077 | ✅ Complete |
+| FR-004 | FR-004-AC-17 | TC-078 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -151,6 +152,7 @@ type: TestMatrix
 | TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-071 | `rust-test-name-id` binds `fn tc744_x` and `fn tc_744_x` to the same `TC-744`; the separator is optional, adds no capture group, and admits nothing new — bare `fn tc_x`, an unanchored `tc_744_`, and a digit run with no trailing `_` still match nothing (CR-034) | Unit | P0 | FR-004-AC-11 | ✅ |
 | TC-077 | `typescript-test-name-id` reads an id from a test registration's own title in every spelling the corpus writes — `it`/`test`, `.skip`/`.only`/`.concurrent.skip`, both quotes and a template literal, `await`, a wrapped title — and binds **no suite header** in any spelling, nothing that is not a line-leading registration, and neither a suffixed id nor a dashed sub-id, whose base rows it would otherwise claim (CR-040) | Unit | P0 | FR-004-AC-16 | ✅ |
+| TC-078 | No trace target mints from a section no archetype's `body_extraction` declares — no `Invariants` entry in any spelling, no `NFR`-bound `Constraints` entry — and the manifest carries the written decision for each id class #69 names, each naming its owning ticket (quire-rs #244 for `SC`, #327 for the blocked `CON` target, #328 for the bare-`FR-nnn` diagnostic) (CR-041) | Unit | P0 | FR-004-AC-17 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
 | TC-066 | `trace_tags.implements` declares one templated form per language; every pattern requires the literal `Implements:` keyword and captures a comma-separated list; and prose naming a requirement matches none of them — the keyword is what the `*-comment-id` forms need a trailing delimiter for (CR-028) | Unit | P0 | FR-004-AC-10 | ✅ |
