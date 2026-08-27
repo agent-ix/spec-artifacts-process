@@ -585,8 +585,8 @@ def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) 
 
 
 def test_no_target_mints_from_an_undeclared_section(traceability: dict) -> None:
-    """TC-078 (FR-004-AC-17, CR-041): the negative half of #69's decision, and
-    the record that makes it a decision rather than an absence.
+    """TC-078 (FR-004-AC-17, CR-043): #69's id-class decisions are
+    executable declarations rather than unexplained absences.
 
     One rule settles four of the five id classes `#69` names: the traceability
     model mints from sections the SHAPE CONTRACT declares, and does not invent
@@ -595,19 +595,21 @@ def test_no_target_mints_from_an_undeclared_section(traceability: dict) -> None:
     no `Constraints` section at all (4 tagged ids). A target on either would
     declare the corpus's mistake into the model.
 
-    The `FR` `Constraints` target is the mirror image and is NOT asserted here,
-    because it does not ship yet. It is measured, correct, and blocked on
-    `agent-ix/quire-rs#327`: `## Constraints` is optional in the FR contract and
-    a `TraceTarget` has no way to say so, so declaring it raises
-    `section-matches-nothing` on 1,160 FR documents that legitimately have none
-    — and, in `agent-ix/qa-corpus`, breaks 19 of 75 cases with 34 mismatches,
-    all of them that reason.
+    `FR` `Constraints` is the mirror image: the shape contract declares it, so
+    it is minted. It is explicitly optional, so an absent section does not
+    create a false finding; a matching reference supplies row-level loci.
 
-    An absence is not a decision: it reads to an author exactly like a typo, and
-    `untracked_symbols` cannot tell them apart either
-    (`agent-ix/quire-rs#328`). So the manifest text is asserted too — a class
-    silently losing its recorded reason is the regression this guards.
+    Bare FR ids remain deliberately non-minting. The engine now explains them
+    with exact minted children (`agent-ix/quire-rs#328`).
     """
+    targets = {target["name"]: target for target in traceability["trace_targets"]}
+    constraint = targets["constraint"]
+    assert constraint["archetype"] == "FR"
+    assert constraint["section"] == "Constraints"
+    assert constraint["id_column"] == "ID"
+    assert constraint["required"] is False
+    assert constraint["exclude"]
+
     for target in traceability["trace_targets"]:
         section = target["section"]
         sections = section if isinstance(section, list) else [section]
@@ -621,11 +623,23 @@ def test_no_target_mints_from_an_undeclared_section(traceability: dict) -> None:
             "in spec-artifacts-iso first (4 tagged ids ecosystem-wide)"
         )
 
+    references = {
+        reference["name"]: reference
+        for reference in traceability["document_references"]
+    }
+    validation = references["constraint-validation"]
+    assert validation["archetype"] == "FR"
+    assert validation["section"] == "Constraints"
+    assert validation["column"] == "Validation"
+    assert validation["row_id_column"] == "ID"
+    assert validation["targets"] == ["test-case"]
+    assert validation["exclude"]
+
     manifest = pack.MANIFEST_PATH.read_text()
     for ticket, why in (
         ("agent-ix/quire-rs#244", "IT success criteria are list items"),
-        ("agent-ix/quire-rs#327", "the FR Constraints target is blocked"),
-        ("agent-ix/quire-rs#328", "a bare FR-nnn tag gets no actionable form"),
+        ("agent-ix/quire-rs#327", "the FR Constraints target is optional"),
+        ("agent-ix/quire-rs#328", "a bare FR-nnn tag gets an actionable form"),
     ):
         assert ticket in manifest, f"{ticket} is unrecorded: {why}"
 

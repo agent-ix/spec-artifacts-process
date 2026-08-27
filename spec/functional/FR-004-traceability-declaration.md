@@ -115,9 +115,14 @@ modules can version apart.
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
 | FR-004-AC-16 | `typescript-test-name-id` reads a trace id from a test registration's own title — `it`/`test` and their `.modifier` chains, in either quote or a template literal, with or without `await`, and on a wrapped title — and renders it through `id_format` with one capture group. It binds **no suite header** in any spelling (`describe(`, `suite(`, `test.describe(`, `it.describe(`, `test.describe.only(`), because the modifier chain is an allowlist rather than a `\w+` window; it binds nothing that is not a registration at the start of a line; and its trailing delimiter terminates the id rather than truncating it, so a suffixed id (`TC-092a`) and a dashed sub-id (`TC-008-LIST`) bind nothing rather than binding their base row. | Test (TC-077) |
-| FR-004-AC-17 | `trace_targets` declares no target minting from a section no archetype's `body_extraction` declares — no entry names `Invariants` in any spelling, and no `NFR`-bound entry names `Constraints` — and the manifest carries the written decision for each id class `#69` names, each naming the ticket that owns it: `agent-ix/quire-rs#244` for `SC`, `agent-ix/quire-rs#327` for the blocked `CON` target, `agent-ix/quire-rs#328` for the bare-`FR-nnn` diagnostic. | Test (TC-078) |
+| FR-004-AC-17 | `trace_targets` declares no target minting from a section no archetype's `body_extraction` declares — no entry names `Invariants` in any spelling, and no `NFR`-bound entry names `Constraints`. It mints the declared FR `Constraints` table through an explicitly optional target and reads its `Validation` references, while the manifest records the decision for every id class `#69` names: `agent-ix/quire-rs#244` for list-item `SC`, `agent-ix/quire-rs#327` for optional `CON`, and `agent-ix/quire-rs#328` for actionable bare-`FR-nnn` guidance. | Test (TC-078) |
 
-> **CR-041 note (2026-08-24):** the written decision for the five id classes
+> **CR-043 note (2026-08-26):** `constraint` and `constraint-validation` now
+> ship exactly as CR-041 measured them, with `required: false`; #327 removes
+> the false optional-section findings and #328 supplies exact-child guidance
+> for deliberately non-minting bare FR ids. TC-078 gates both declarations.
+>
+> **CR-041 historical measurement (2026-08-24):** the written decision for the five id classes
 > `agent-ix/spec-artifacts-process#69` names — `CON`, `INV`, `SC`, `VC` and bare
 > `FR-nnn` (EPIC `agent-ix/quire-rs#264` Wave 3). Four are settled here; the
 > fifth is settled as **mint** and blocked, and the blocker is measured rather

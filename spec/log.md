@@ -7,6 +7,15 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-08-26** — **FR-004 CR-043**: the measured `constraint` target and its
+  `constraint-validation` reference now ship (`agent-ix/spec-artifacts-process#69`,
+  `agent-ix/quire-rs#327/#328`). `required: false` preserves the FR contract's
+  optional `Constraints` section without false `section-matches-nothing`
+  findings; a present table still mints every `-CON-` row and carries its
+  row-level locus. Bare `FR-nnn` tags remain non-minting and now receive
+  model-grounded exact-child guidance. Activating the target also exposed and
+  corrected FR-008's malformed three-column Constraints table. TC-078.
+
 * **2026-08-26** — **FR-006 CR-042**: `suite` and `inspection` declare
   `evidence: reference-only` (`agent-ix/quire-rs#363`). Both registries exist so
   their stable ids can be referenced and checked for dangling links; neither

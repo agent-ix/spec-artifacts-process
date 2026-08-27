@@ -721,189 +721,21 @@ traceability:
     - fixtures/**
     section: Validation Criteria
     id_column: ID
-  # CR-041 (#69): the written decision for the five id classes `#69` names —
-  # `CON`, `INV`, `SC`, `VC` and bare `FR-nnn`. Four of the five are settled
-  # here; the fifth, `CON`, is settled as MINT and blocked on
-  # `agent-ix/quire-rs#327`, and the reason is at the end of this block.
+  # CR-043 (#69): mint ids only from sections declared by the archetype's shape
+  # contract. FR Constraints therefore mints; undeclared FR Invariants and NFR
+  # Constraints do not. IT success criteria remain an engine limitation owned
+  # by `agent-ix/quire-rs#244`, while StR validation criteria mint above.
   #
-  # FR **constraints** should be a minted id class. This is the one target where
-  # the two halves of the model already disagree with each other:
-  # `spec-artifacts-iso` declares the FR `Constraints` table in
-  # `body_extraction` — `id_column: ID`, `id_pattern: '^{id}-CON-\d+$'` — so the
-  # SHAPE contract validates `FR-001-CON-1` while the TRACEABILITY model minted
-  # nothing for it. A test carrying that id bound perfectly and joined to
-  # nothing.
-  #
-  # **What the numbers count.** Unit: entries in `coverage.untracked_symbols`,
-  # one per `verifies` relation whose id is neither declared, referenced by a
-  # cell, nor any row's own id (quire-rs `coverage.rs:1247-1254`) — NOT
-  # deduplicated by id, so three tests naming `FR-030-CON-1` are three entries.
-  # Population: the 241 repositories `quire-rs/scripts/corpus.py` enumerates
-  # under `~/dev`. Instrument: one `quire` binary built from `quire-cli` at its
-  # pinned rev, engine `e06f121`, release profile. Variable: the module path,
-  # two copies differing in exactly one declaration.
-  #
-  # 155 entries across 28 repositories name a `-CON-` id today. Resolved per id
-  # against each repository's `spec/`: **102 are defined by an `ID` row in an
-  # `## Constraints` table on an `FR` document**, 4 on an `NFR`, 1 under
-  # `## Invariants`, 1 in a matrix section only, and 19 name no row anywhere.
-  # `## Constraints` tables on `FR`/`NFR` hold 3,029 `ID` rows corpus-wide and
-  # the engine mints exactly 3,029 when the target is declared — the script and
-  # the instrument agree to the row.
-  #
-  # **Bad rule or bad corpus**, settled by opening files rather than by the
-  # delta: sampled 12 of the 202 `CON`-in-test-file sites, one per repository,
-  # across 12 of the 33 repositories — **12 of 12 are genuine authored tags**,
-  # each asserting exactly the constraint its id names
-  # (`filament-parser-lib/tests/filament/tier1/test_frontmatter_extraction.py:109`
-  # `"""FR-101-CON-3: missing data: treated as {}."""` over a test asserting
-  # `result.nodes[0].data == {}`). Not one is a prose citation.
-  #
-  # **The rule this entry adopts, applied to every class in #69: the
-  # traceability model mints from sections the SHAPE CONTRACT declares, and does
-  # not invent sections.** That is what settles the three siblings, and each is
-  # a decision here rather than an absence:
-  #
-  #   * `FR-nnn-INV-n` — NOT MINTED. `## Invariants` is declared by neither
-  #     module: not in the ISO `FR` skeleton, not in either manifest. 15
-  #     repositories author it anyway (129 rows) and its table is literally
-  #     `| ID | Constraint | Type | Rationale |` — the `Constraints` table under
-  #     a different heading. **One tag in the entire corpus names one of those
-  #     ids** (`identity/tests/test_tenant_auth_policy.py:195`, `FR-043-INV-1`).
-  #     Measured rather than assumed free: `section: [Constraints, Invariants]`
-  #     moves the ecosystem 23,059 rows / 5,452 backed -> 23,387 / 5,453. That
-  #     is 328 denominator rows to reach one tag, for a heading no archetype
-  #     admits. The site is fixed by renaming that section in `identity`.
-  #   * `NFR` `## Constraints` — NOT MINTED, same reason: the NFR archetype
-  #     declares `Statement`, `Measurement and Evaluation`, `Verification` and an
-  #     optional `Acceptance Criteria`, and no `Constraints` section at all. 4
-  #     tagged ids. Declaring the section upstream in `spec-artifacts-iso` is the
-  #     fix, and `nfr-constraint` follows it rather than leading it.
-  #   * `IT-nnn-SC-nn` — UNREACHABLE, and it is an engine limit, not a decision.
-  #     124 entries in 7 repositories. Those ids are **list items**: 1,356
-  #     occurrences across 28 repositories, 243 directly under
-  #     `## Test Procedure`, against 148 table occurrences — and all 148 are
-  #     *references* from a matrix, not a minting table. `agent-ix/quire-rs#244`
-  #     owns it; the note above this entry has recorded it since CR-037.
-  #   * `StR-nnn-VC-n` — ALREADY MINTED, since CR-037, and the class has **no
-  #     population at all**: 36 rows minted in `filament-ide-rs`, 22 in
-  #     `quire-rs`, 18 in `ix-cli`, backed 0 in every one, because there is not
-  #     one `StR-nnn-VC-n` tag anywhere in the corpus in any declared form.
-  #   * bare `FR-nnn` with no `-AC-n` — NOT MINTED, and this is the substantive
-  #     half of #69's second class: 212 entries across 30 repositories.
-  #     **Evidence binds at criterion granularity, deliberately.** A rule
-  #     joining `FR-006` to `FR-006-AC-1..7` would back every criterion of a
-  #     requirement from one test naming the requirement, which is the failure
-  #     the whole rollup exists to prevent. Not a #307 near miss either: that
-  #     ticket pairs ids differing by zero padding, case or separator, and these
-  #     differ by a whole id segment. The *diagnostic* that should say so —
-  #     "`FR-006` is not a trace target; use `FR-006-AC-n`" — is not something a
-  #     module can declare, and is filed as `agent-ix/quire-rs#328`.
-  #
-  # **THE NUMBER THAT GETS WORSE, and it is not the ratio.** Backing falls
-  # 26.51% -> 23.64% and unbacked rows rise 13,889 -> 16,582; both are the
-  # denominator becoming honest, and the 2,693 constraint rows now carrying a
-  # locus are obligations nothing was tracking. The real cost is
-  # **`section-matches-nothing` 512 -> 1,672 (+1,160)**, because `## Constraints`
-  # is OPTIONAL in the FR contract ("Constraints is optional (no filler rows)")
-  # and a `TraceTarget` has no way to say so. Sampled 11 of the 1,160 across 11
-  # repositories: **10 rule, 1 real** — ten are FR documents legitimately without
-  # the section and without any `CON` id
-  # (`quire-rs/spec/functional/FR-003-archetype-schema-surface.md`,
-  # `ix-cli/spec/functional/core/FR-023-ix-logout.md`,
-  # `cloud-manager/spec/functional/FR-006-observability.md`, and seven more), and
-  # the one real find is
-  # `platform-test-kit/spec/functional/FR-009_isolated_deployment.md`, which
-  # writes `FR-009.2-CON-1` as an H4 heading. The engine already holds this
-  # concept and hardcodes it per declaration kind — a *reference* passes
-  # `mints: None` because "its section is legitimately optional"
-  # (`coverage.rs:1096`) — so the ask is one key, filed as
-  # `agent-ix/quire-rs#327`. **Deliberately NOT worked around by widening the
-  # section name**, which would lower the count by making the rule mean less.
-  # `nfr-acceptance-criterion` has contributed to the 512 baseline for the same
-  # reason since it was declared.
-  #
-  # The binding census is byte-identical before and after in all three languages
-  # (rust 2804, python 2050, typescript 1684), which is the half that says this
-  # is a minting change and nothing else.
-  #
-  # ── SO WHY IS THE ENTRY NOT HERE? `agent-ix/quire-rs#327`. ──
-  #
-  # The declaration is written, measured and correct, and it does not ship yet,
-  # because the diagnostic it drags in is a false alarm at a scale that breaks
-  # the corpus's ability to assert on that diagnostic at all.
-  #
-  # `## Constraints` is OPTIONAL in the FR contract, and a `TraceTarget` has no
-  # way to say so. quire-rs states the opposite outright
-  # (`corpus/declared_tables.rs:69-73`): "A trace target's section is not
-  # optional: it is the whole of what the declaration selects the document for."
-  # That is right for `Acceptance Criteria` and wrong for `Constraints`, and it
-  # is not a module's to fix.
-  #
-  # **The controlled corpus caught it, which is what it is for.** Running
-  # `agent-ix/qa-corpus` with the two entries below vendored in: **25 of 75
-  # cases fail, 40 mismatches, and 100% of them are `section-matches-nothing`**
-  # raised by `constraint` against an FR document that has no constraints.
-  # Thirteen assert a silence that is no longer true
-  # (`id-column-mismatch`, `rows-across-many-headings` and its control,
-  # `declared-heading-and-column-control`, `clean-control`); six asserted `diagnostic_paths` and received the wrong finding — MISDIAGNOSED
-  # here as an engine defect, "a reason token is not scoped to the declaration".
-  # The engine always published `declaration`; the corpus graders ignored it, and
-  # agent-ix/quire-rs#331 fixed that side. Six of the nineteen were never an
-  # engine problem. Superseded text: six assert
-  # `diagnostic_paths` and get the wrong finding, because a reason token is not
-  # scoped to the declaration that raised it and `next(…)` takes the first
-  # (`section-name-mismatch`, `section-and-id-column` — the flagship #270 pair).
-  # Neither is repairable without LOWERING those assertions, and authoring a
-  # `## Constraints` table into 19 fixtures to dodge the finding is the
-  # corpus-side workaround CR-036 refused on principle.
-  #
-  # So the decision lands and the entries wait on the one key that makes them
-  # honest. Ship them unchanged the day #327 does:
-  #
-  #   - name: constraint
-  #     archetype: FR
-  #     exclude: [tests/**, tests_integration/**, fixtures/**]
-  #     section: Constraints
-  #     id_column: ID
-  #     # required: false   <- what #327 adds
-  #
-  #   - name: constraint-validation      (in document_references, below)
-  #     archetype: FR
-  #     exclude: [tests/**, tests_integration/**, fixtures/**]
-  #     section: Constraints
-  #     column: Validation
-  #     row_id_column: ID
-  #     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-  #     targets: [test-case]
-  #     expand_ranges: true
-  #     strip_annotations: false
-  #
-  # **The reference ships WITH the target, never after it.** `unbacked_rows` is
-  # built inside `for declaration in &model.document_references`
-  # (quire-rs `coverage.rs:1083`, pushed at `1171`), so a target with no
-  # reference reading its table contributes rows to `totals` and `groups` and
-  # can never name one in `unbacked_rows` — a denominator with no locus, which
-  # is the one thing worse than no denominator. Measured, the reference puts
-  # 2,693 constraint rows into `unbacked_rows` with their own id and line.
-  #
-  # It is the `verification` shape one section over, and for the same reason
-  # that entry gives: of the 3,029 `Constraints` rows only **367** carry a
-  # `TC`/`IT` id at all — `Unit Test` 566, `Integration Test` 382, `Test` 349,
-  # `Inspection` 329, `Code Review` 96 — and a row naming no id is still
-  # answerable for its own `CON` id, which is what a tag on the test binds. It
-  # also puts the `Inspection` and `Analysis` rows on the right side of the
-  # status-lie exemption for free, because that exemption reads the
-  # DECLARATION'S OWN column as the method (quire-rs #259).
-  #
-  # **Deliberately not bundled, and measured before deciding:** adding
-  # `constraint` to `traces-to.targets` below. 313 `Test Case Summary` rows
-  # across 18 repositories already write a `CON` id in `Traces To`
-  # (`config-service` `TC-017` -> `FR-003-AC-1, FR-003-CON-1`), so the
-  # population is real — but with that one list changed and nothing else, every
-  # field of the payload is identical across all 241 repositories: rows 23,059,
-  # backed 5,452, unbacked 16,582, untracked 1,073, `traces-to` unbacked rows
-  # 2,623. Zero movement, so it waits for a reason true independent of the count.
+  # Evidence binds at criterion granularity, so bare FR ids deliberately do not
+  # back every child. `agent-ix/quire-rs#328` reports the exact minted children
+  # authors can use. `agent-ix/quire-rs#327` makes this optional FR section
+  # honest: absence is healthy, while a present table still mints normally.
+  - name: constraint
+    archetype: FR
+    exclude: [tests/**, tests_integration/**, fixtures/**]
+    section: Constraints
+    id_column: ID
+    required: false
   - name: inspection
     archetype: Inspections
     exclude:
@@ -975,6 +807,16 @@ traceability:
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     column: Verification
+    row_id_column: ID
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case]
+    expand_ranges: true
+    strip_annotations: false
+  - name: constraint-validation
+    archetype: FR
+    exclude: [tests/**, tests_integration/**, fixtures/**]
+    section: Constraints
+    column: Validation
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
     targets: [test-case]

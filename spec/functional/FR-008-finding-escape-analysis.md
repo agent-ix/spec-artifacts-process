@@ -85,11 +85,11 @@ contract for a form nobody produces is the mistake this FR exists to avoid repea
 
 ## Constraints
 
-| ID | Constraint | Verification |
-|----|-----------|--------------|
-| FR-008-CON-1 | Escape cause is a **recorded human or agent judgment**, never computed. A cause that was inferred rather than decided is worth nothing as evidence about which layer leaks. | Inspection |
-| FR-008-CON-2 | `Escape Cause` SHALL NOT be merged into, or derived from, `Severity`. They classify different things — which layer leaked versus how urgently to look — and either can take any value independently of the other. | Inspection |
-| FR-008-CON-3 | The analysis skills SHALL keep emitting `SpecReview` documents. This FR adds a column; it does not move findings onto the `Review`/`Finding` path, which the 2026-06-20 decision deliberately left alone. | Inspection |
+| ID | Constraint | Type | Validation |
+|----|-----------|------|------------|
+| FR-008-CON-1 | Escape cause is a **recorded human or agent judgment**, never computed. A cause that was inferred rather than decided is worth nothing as evidence about which layer leaks. | Process | Inspection |
+| FR-008-CON-2 | `Escape Cause` SHALL NOT be merged into, or derived from, `Severity`. They classify different things — which layer leaked versus how urgently to look — and either can take any value independently of the other. | Quality | Inspection |
+| FR-008-CON-3 | The analysis skills SHALL keep emitting `SpecReview` documents. This FR adds a column; it does not move findings onto the `Review`/`Finding` path, which the 2026-06-20 decision deliberately left alone. | Process | Inspection |
 
 ## Dependencies
 
