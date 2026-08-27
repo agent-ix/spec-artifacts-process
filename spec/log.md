@@ -7,6 +7,16 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-08-26** — **FR-006 CR-042**: `suite` and `inspection` declare
+  `evidence: reference-only` (`agent-ix/quire-rs#363`). Both registries exist so
+  their stable ids can be referenced and checked for dangling links; neither
+  row is an obligation that a source test can back. The first invariant-complete
+  241-repository gap census exposed the conflation by routing `SUITE-001` to
+  `authoring-absent`, even though suite headers are deliberately containers and
+  not evidence. The posture preserves reference resolution while removing both
+  id classes from coverage groups, totals, minted-target records and the census
+  P3 denominator. TC-043.
+
 * **2026-08-21** — **FR-002 CR-033**: `SpecReview.analysis` admits
   `architecture-evaluation`. Architecture scenario walkthroughs, trade-offs, risks and
   actionable findings use the existing validated review contract rather than a new

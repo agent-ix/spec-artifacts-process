@@ -694,6 +694,7 @@ traceability:
     - fixtures/**
     section: Suites
     id_column: ID
+    evidence: reference-only
   # CR-037 (#63): StR validation criteria are a **minted id class** — a tag
   # naming `StR-004-VC-1` reconciled against nothing and landed in
   # `untracked_symbols` permanently, with no authoring-side fix available.
@@ -911,6 +912,7 @@ traceability:
     - fixtures/**
     section: Inspections
     id_column: ID
+    evidence: reference-only
   # Requirement documents stay archetype-bound — but archetype binding requires
   # scope exclusion, because fixtures are legitimately typed. A test fixture
   # that exercises the `FR` contract *is* `type: FR`; that is what makes it a

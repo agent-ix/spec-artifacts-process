@@ -84,7 +84,8 @@ other broken trace reference instead of recording an act against nothing.
 
 ## Outputs
 
-- Minted `SUITE-N` and `INSP-N` trace ids, referenceable by any declaration
+- Registered `SUITE-N` and `INSP-N` trace ids, referenceable by any declaration
+  but absent from source-evidence coverage totals
 - Validation failures on a malformed registry, at authoring time
 
 ## Behavior
@@ -100,9 +101,10 @@ other broken trace reference instead of recording an act against nothing.
   matching `^INSP-\d+$`, and `Verdict` one of `Pass | Fail | Waived`. That
   archetype **SHALL** mark `Note` optional, because a passing inspection often
   has nothing to add.
-- The traceability model **SHALL** declare both as trace targets, which is what
-  makes `SUITE-N` and `INSP-N` referenceable id classes and gives FR-049's
-  `dangling-trace-reference` coverage of them for free.
+- The traceability model **SHALL** declare both as `reference-only` trace
+  targets. That makes `SUITE-N` and `INSP-N` referenceable id classes and gives
+  FR-049's `dangling-trace-reference` coverage of them without falsely asking a
+  source test to back a registry row or an authored inspection act.
 - The `Obligation` column **SHALL** be a declared document reference resolving
   against the existing acceptance-criterion targets.
 - Both **SHALL** ship an authoring skeleton, so creation goes through the
@@ -117,7 +119,7 @@ other broken trace reference instead of recording an act against nothing.
 | FR-006-AC-1 | The manifest declares `SuiteRegistry` with a frontmatter schema and a `body_extraction` asserting the five required columns, `min_rows: 1`, and the `^SUITE-\d+$` id pattern. | Test (TC-040) |
 | FR-006-AC-2 | The manifest declares `Inspections` with the six columns, `Note` optional, the `^INSP-\d+$` id pattern, and the closed `Pass\|Fail\|Waived` verdict vocabulary. | Test (TC-041) |
 | FR-006-AC-3 | The `Evidence Kind` choices are exactly the declared `traceability.vocabularies.test_type` values, so the registry and the coverage rollup cannot disagree about what a kind means. | Test (TC-042) |
-| FR-006-AC-4 | The traceability model declares `suite` and `inspection` trace targets bound by archetype, so both id classes mint and are referenceable. | Test (TC-043) |
+| FR-006-AC-4 | The traceability model declares `suite` and `inspection` as archetype-bound `reference-only` trace targets, so both id classes resolve references but enter no source-evidence coverage denominator. | Test (TC-043) |
 | FR-006-AC-5 | A conformant suite registry validates, and copies mutating the id pattern, dropping a required column, or using an undeclared evidence kind each fail with a line-numbered diagnostic. | Test (TC-044) |
 | FR-006-AC-6 | A conformant inspection record validates, a copy with an undeclared verdict fails, and a copy omitting the optional `Note` column still passes. | Test (TC-045) |
 | FR-006-AC-7 | Both skeletons validate against their own archetypes as authored, so the shipped authoring path produces a conformant document. | Test (TC-046) |
