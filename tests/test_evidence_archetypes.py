@@ -11,6 +11,7 @@ manifest assertions — which is the half that would silently rot otherwise.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import shutil
 import subprocess
@@ -22,9 +23,10 @@ import spec_artifacts_process as pack
 
 MANIFEST_PATH = pack.MANIFEST_PATH
 FIXTURES = pathlib.Path(__file__).parent / "fixtures" / "evidence"
+QUIRE = os.environ.get("QUIRE_TEST_BINARY") or shutil.which("quire")
 
 needs_quire = pytest.mark.skipif(
-    shutil.which("quire") is None,
+    QUIRE is None,
     reason="the `quire` CLI is required to validate against the module manifest",
 )
 
@@ -48,7 +50,7 @@ def _assert_facet(archetype: str, key: str) -> dict:
 
 def validate(fixture: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["quire", "validate", "--module", str(pack.PACK_ROOT), str(FIXTURES / fixture)],
+        [QUIRE, "validate", "--module", str(pack.PACK_ROOT), str(FIXTURES / fixture)],
         capture_output=True,
         text=True,
         check=False,
@@ -200,7 +202,7 @@ def test_tc046_shipped_skeletons_validate() -> None:
         path = pack.PACK_ROOT / "skeletons" / skeleton
         assert path.is_file(), f"no skeleton shipped for {skeleton}"
         result = subprocess.run(
-            ["quire", "validate", "--module", str(pack.PACK_ROOT), str(path)],
+            [QUIRE, "validate", "--module", str(pack.PACK_ROOT), str(path)],
             capture_output=True,
             text=True,
             check=False,
@@ -225,7 +227,7 @@ def test_tc047_adoption_is_optional(tmp_path: pathlib.Path) -> None:
     )
     result = subprocess.run(
         [
-            "quire",
+            QUIRE,
             "coverage",
             "--scope",
             str(tmp_path),

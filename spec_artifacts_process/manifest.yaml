@@ -664,11 +664,18 @@ traceability:
   # Nine declarations collapse to three. `spec/matrix.md` and `spec/evals.md`
   # need no entry of their own: a matrix is reached by what it *is*, not by what
   # it is called.
+  #
+  # A test matrix may qualify its canonical heading by scope or phase. Match
+  # that heading family plus the separately-defined integration matrix, but do
+  # not admit the noncanonical `Test Cases` heading. The target and its
+  # `traces-to` reference must remain identical so every minted row is read.
   trace_targets:
   - name: test-case
     archetype: TestMatrix
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
-    section: Test Case Summary
+    section:
+    - "*Test Case Summary*"
+    - Integration Test Matrix
     id_column: Test ID
   - name: acceptance-criterion
     archetype: FR
@@ -835,7 +842,9 @@ traceability:
   - name: traces-to
     archetype: TestMatrix
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
-    section: Test Case Summary
+    section:
+    - "*Test Case Summary*"
+    - Integration Test Matrix
     column: Traces To
     row_id_column: Test ID
     pattern: '\b([A-Za-z]{2,4}-\d+(?:-[A-Za-z]+-\d+)?)\b'

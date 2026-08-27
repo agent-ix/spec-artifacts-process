@@ -10,6 +10,7 @@ declaration from silently regressing to that state.
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -22,6 +23,8 @@ import spec_artifacts_process as pack
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 LANGUAGES = ["rust", "python", "typescript"]
+TEST_CASE_SECTIONS = ["*Test Case Summary*", "Integration Test Matrix"]
+QUIRE = os.environ.get("QUIRE_TEST_BINARY") or shutil.which("quire")
 
 
 @pytest.fixture(scope="module")
@@ -33,15 +36,14 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     """TC-028 (FR-004-AC-1): the two id families the rollup reconciles."""
     targets = {t["name"]: t for t in traceability["trace_targets"]}
 
-    matrices = [t for t in targets.values() if t["section"] == "Test Case Summary"]
-    assert matrices, "no target mints test-case ids"
-    for target in matrices:
-        assert target["id_column"] == "Test ID"
+    test_cases = targets["test-case"]
+    assert test_cases["section"] == TEST_CASE_SECTIONS
+    assert test_cases["id_column"] == "Test ID"
 
     criteria = {
         t.get("archetype")
         for t in targets.values()
-        if t["section"] == "Acceptance Criteria"
+        if t.get("section") == "Acceptance Criteria"
     }
     assert criteria == {"FR", "NFR"}, criteria
 
@@ -71,14 +73,14 @@ def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
         )
         assert entry.get("archetype"), f"{entry['name']} declares no archetype"
 
-        if entry["section"] in ("Test Case Summary", "Functional Requirement Coverage"):
+        if entry["archetype"] == "TestMatrix":
             assert entry["archetype"] == "TestMatrix", entry["name"]
             excluded = entry.get("exclude") or []
             assert any(pattern.startswith("tests/") for pattern in excluded), (
                 f"{entry['name']} binds TestMatrix by archetype without excluding "
                 "test data — a fixture matrix would mint phantom ids"
             )
-        elif entry["section"] == "Acceptance Criteria":
+        elif entry.get("section") == "Acceptance Criteria":
             assert entry["archetype"] in ("FR", "NFR"), entry["name"]
 
 
@@ -92,15 +94,25 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     reached by what it *is*, not by what it is called.
     """
     entries = traceability["trace_targets"] + traceability["document_references"]
-    matrix_entries = [
-        e["name"]
-        for e in entries
-        if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
-    ]
     expected = ["functional-coverage", "test-case", "traces-to"]
+    matrix_entries = [e["name"] for e in entries if e["archetype"] == "TestMatrix"]
     assert (
         sorted(matrix_entries) == expected
     ), f"one entry per table kind, not per filename: {matrix_entries}"
+
+
+def test_test_case_target_and_reference_share_section_family(
+    traceability: dict,
+) -> None:
+    """TC-079 (FR-004-AC-18): mint and reference the same canonical rows."""
+    entries = {
+        entry["name"]: entry
+        for entry in traceability["trace_targets"] + traceability["document_references"]
+    }
+
+    assert entries["test-case"]["section"] == TEST_CASE_SECTIONS
+    assert entries["traces-to"]["section"] == TEST_CASE_SECTIONS
+    assert "Test Cases" not in TEST_CASE_SECTIONS
 
 
 def test_one_templated_marker_per_language(traceability: dict) -> None:
@@ -360,11 +372,11 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     failure this whole declaration exists to fix, and a row minted from
     `tests/fixtures/` is a phantom — those documents are deliberately malformed
     test data that reuse real test ids."""
-    if shutil.which("quire") is None:
+    if QUIRE is None:
         pytest.skip("the `quire` CLI is required for the rollup")
     result = subprocess.run(
         [
-            "quire",
+            QUIRE,
             "coverage",
             "--module",
             str(pack.PACK_ROOT),

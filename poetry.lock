@@ -1124,20 +1124,19 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "spec-artifacts-iso"
-version = "0.18.0"
+version = "0.18.0.post8.dev0+a6b1c70"
 description = "Filament Module: ISO-style spec artifacts (FR/NFR/StR/US/IT/TC/AC/CON) — unified-shape archetypes + authoring skeletons + frontmatter JSON Schemas + iso-spec-core grammar, validated by quire-rs (no render templates)"
 optional = false
 python-versions = ">=3.13,<3.14"
 groups = ["dev"]
-files = [
-    {file = "spec_artifacts_iso-0.18.0-py3-none-any.whl", hash = "sha256:155e38abf8b9c2a7d7db4f261ae2e579b107b6c74e490b687b261b932c42e324"},
-    {file = "spec_artifacts_iso-0.18.0.tar.gz", hash = "sha256:0dae3a4722a50ea71d3f02656a4049ed07b5dd475ab104542564996448497afb"},
-]
+files = []
+develop = false
 
 [package.source]
-type = "legacy"
-url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
-reference = "internal-pypi"
+type = "git"
+url = "https://github.com/agent-ix/spec-artifacts-iso"
+reference = "a6b1c70"
+resolved_reference = "a6b1c70be8c22e9f7cb432e4410b7a3a280d0217"
 
 [[package]]
 name = "tomlkit"
@@ -1154,4 +1153,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "3ea0859d220c1577ea03d9215d65bf7410a941cc66d74dfdf22b0df602aebc27"
+content-hash = "e48784cd06e99b58047190ddfcef64f2c2078e8da93d21b4c48d79f5f36357c1"

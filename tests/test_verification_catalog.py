@@ -9,6 +9,7 @@ declares it against an older engine loads with the block silently ignored.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 
@@ -18,6 +19,7 @@ import yaml
 import spec_artifacts_process as pack
 
 MANIFEST_PATH = pack.MANIFEST_PATH
+QUIRE = os.environ.get("QUIRE_TEST_BINARY") or shutil.which("quire")
 
 # ISO 29148 IADT. The engine treats `class` as a free string (quire-rs
 # FR-054-CON-1) so another module may classify differently — which makes this
@@ -137,7 +139,7 @@ def test_tc051_every_entry_is_selectable() -> None:
 
 
 @pytest.mark.skipif(
-    shutil.which("quire") is None,
+    QUIRE is None,
     reason="the `quire` CLI is required to load the manifest through the engine",
 )
 def test_tc052_engine_loads_the_catalog() -> None:
@@ -149,7 +151,7 @@ def test_tc052_engine_loads_the_catalog() -> None:
     manifest loads clean rather than assuming it.
     """
     result = subprocess.run(
-        ["quire", "schema", "--module", str(pack.PACK_ROOT)],
+        [QUIRE, "schema", "--module", str(pack.PACK_ROOT)],
         capture_output=True,
         text=True,
         check=False,

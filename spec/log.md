@@ -7,6 +7,15 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-08-26** — **FR-004 CR-044**: the `test-case` target and `traces-to`
+  reference now read the same canonical heading family: qualified
+  `*Test Case Summary*` headings plus the separately-defined `Integration Test
+  Matrix`. `Test Cases` remains excluded so a known authoring mismatch is
+  diagnosed rather than normalized. The paired declaration preserves the
+  invariant that every minted row's stated coverage is also read
+  (`agent-ix/spec-artifacts-process#70`, quire-rs CR-118). FR-004-AC-18,
+  TC-079.
+
 * **2026-08-26** — **FR-004 CR-043**: the measured `constraint` target and its
   `constraint-validation` reference now ship (`agent-ix/spec-artifacts-process#69`,
   `agent-ix/quire-rs#327/#328`). `required: false` preserves the FR contract's

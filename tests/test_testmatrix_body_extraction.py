@@ -10,6 +10,7 @@ absent, so a checkout without the toolchain still runs the rest of the suite.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import shutil
 import subprocess
@@ -19,9 +20,10 @@ import pytest
 import spec_artifacts_process as pack
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures" / "testmatrix"
+QUIRE = os.environ.get("QUIRE_TEST_BINARY") or shutil.which("quire")
 
 pytestmark = pytest.mark.skipif(
-    shutil.which("quire") is None,
+    QUIRE is None,
     reason="the `quire` CLI is required to validate against the module manifest",
 )
 
@@ -31,7 +33,7 @@ def validate(fixture: str) -> subprocess.CompletedProcess[str]:
     exit code 0 means the document satisfies the contract."""
     return subprocess.run(
         [
-            "quire",
+            QUIRE,
             "validate",
             "--module",
             str(pack.PACK_ROOT),

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -16,6 +17,7 @@ from spec_artifacts_iso import module_manifest_schema
 import spec_artifacts_process as pack
 
 MANIFEST_PATH = pack.MANIFEST_PATH
+QUIRE = os.environ.get("QUIRE_TEST_BINARY") or shutil.which("quire")
 
 
 def test_pack_exposes_manifest_path() -> None:
@@ -130,7 +132,7 @@ def test_architecture_evaluation_review_validates_with_quire(
     same body contract as every other analysis; the new vocabulary does not
     create a competing review shape.
     """
-    if shutil.which("quire") is None:
+    if QUIRE is None:
         pytest.skip("the `quire` CLI is required for SpecReview validation")
 
     review = tmp_path / "spec" / "reviews" / "architecture-evaluation.md"
@@ -156,7 +158,7 @@ The recovery scenario exposes a trade-off between isolation and diagnostic detai
 """)
     result = subprocess.run(
         [
-            "quire",
+            QUIRE,
             "validate",
             "--scope",
             str(tmp_path),
@@ -409,12 +411,12 @@ def test_column_vocabularies_have_one_source() -> None:
 def test_repo_test_matrix_self_validates() -> None:
     """Gate (contract green): this repo's own `spec/tests.md` satisfies the
     candidate contract — the module does not ship a shape it violates."""
-    if shutil.which("quire") is None:
+    if QUIRE is None:
         pytest.skip("the `quire` CLI is required for self-validation")
     repo_root = pathlib.Path(__file__).resolve().parent.parent
     result = subprocess.run(
         [
-            "quire",
+            QUIRE,
             "validate",
             "--module",
             str(pack.PACK_ROOT),
