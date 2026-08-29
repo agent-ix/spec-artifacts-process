@@ -688,6 +688,7 @@ traceability:
   # a suite that no longer exists is reported rather than silently orphaned.
   - name: suite
     archetype: SuiteRegistry
+    required: false
     exclude:
     - tests/**
     - tests_integration/**
@@ -722,6 +723,7 @@ traceability:
     id_column: ID
   - name: inspection
     archetype: Inspections
+    required: false
     exclude:
     - tests/**
     - tests_integration/**
@@ -821,6 +823,7 @@ traceability:
     section: Functional Requirement Coverage
     column: Test Cases
     row_id_column: Functional Req
+    status_column: Coverage Status
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
     targets: [test-case]
     expand_ranges: true

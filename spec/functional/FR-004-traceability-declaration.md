@@ -99,6 +99,7 @@ modules can version apart.
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
+| FR-004-AC-16 | The model-wide status column remains `Status` for Test Case Summary rows, while the `functional-coverage` document reference explicitly declares `status_column: Coverage Status`, matching the required Functional Requirement Coverage table header without changing or guessing the sibling contract. | Test (TC-077) |
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`

@@ -103,6 +103,19 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
+def test_reference_status_columns_follow_each_table_contract(
+    traceability: dict,
+) -> None:
+    """TC-077 (FR-004-AC-16): one status vocabulary can classify several
+    schema-owned table headers without making the engine guess between them.
+    """
+    references = {entry["name"]: entry for entry in traceability["document_references"]}
+
+    assert traceability["status"]["column"] == "Status"
+    assert "status_column" not in references["traces-to"]
+    assert references["functional-coverage"]["status_column"] == "Coverage Status"
+
+
 def test_one_templated_marker_per_language(traceability: dict) -> None:
     """TC-030 (FR-004-AC-3): a marker without a `template` yields no migration
     suggestion — FR-051 emits one only "where the equivalent marker is

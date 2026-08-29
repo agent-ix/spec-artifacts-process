@@ -58,6 +58,7 @@ type: TestMatrix
 | FR-004 | FR-004-AC-13 | TC-073 | ✅ Complete |
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
 | FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
+| FR-004 | FR-004-AC-16 | TC-077 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -144,6 +145,7 @@ type: TestMatrix
 | TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
+| TC-077 | The model-wide `Status` header remains the default for Test Case Summary, while `functional-coverage` explicitly selects the schema-required `Coverage Status` header; neither table contract is renamed or inferred (CR-040, quire-rs#341) | Unit | P0 | FR-004-AC-16 | ✅ |
 | TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — 128 corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
 | TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — 16 of 16 corpus rows carrying `-` are retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
@@ -156,7 +158,7 @@ type: TestMatrix
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
 | TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |
 | TC-042 | `Evidence Kind` is byte-equal to the declared `test_type` vocabulary AND to the Test Matrix `Type` choices — one vocabulary, three uses. This test is what keeps the copies honest until `from_vocabulary` lands (quire-rs#146) (FR-006) | Unit | P0 | FR-006-AC-3 | ✅ |
-| TC-043 | `suite` and `inspection` are archetype-bound trace targets and `inspection-obligation` is a declared reference, so both id classes mint and a bad obligation cell dangles rather than recording an act against nothing (FR-006) | Unit | P0 | FR-006-AC-4 | ✅ |
+| TC-043 | `suite` and `inspection` are optional archetype-bound trace targets (`required: false`) and `inspection-obligation` is a declared reference, so both id classes mint when present and a bad obligation cell dangles rather than recording an act against nothing (FR-006) | Unit | P0 | FR-006-AC-4 | ✅ |
 | TC-044 | A conformant suite registry validates; a kebab-slug id, a dropped required column, and an undeclared evidence kind (`SAST`) each fail (FR-006) | Unit | P0 | FR-006-AC-5 | ✅ |
 | TC-045 | A conformant inspection record validates, omitting the optional `Note` column still validates, and an undeclared verdict fails (FR-006) | Unit | P0 | FR-006-AC-6 | ✅ |
 | TC-046 | Both shipped skeletons validate against their own archetypes — a skeleton that does not sends every author who copies it into a failure (FR-006) | Unit | P1 | FR-006-AC-7 | ✅ |
