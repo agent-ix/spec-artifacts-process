@@ -13,6 +13,11 @@ include = [
     { path = "spec_artifacts_process/manifest.yaml", format = ["sdist", "wheel"] },
     { path = "spec_artifacts_process/schemas/**/*.json", format = ["sdist", "wheel"] },
     { path = "spec_artifacts_process/skeletons/**/*.md", format = ["sdist", "wheel"] },
+    { path = "spec_artifacts_process/mappings.yaml", format = ["sdist", "wheel"] },
+    { path = "spec_artifacts_process/mappings.schema.json", format = ["sdist", "wheel"] },
+    { path = "spec_artifacts_process/examples/**/*.json", format = ["sdist", "wheel"] },
+    { path = "spec_artifacts_process/semantic/main.tsp", format = ["sdist", "wheel"] },
+    { path = "spec_artifacts_process/semantic/generated/toolchain.json", format = ["sdist", "wheel"] },
 ]
 
 [tool.poetry.dependencies]
@@ -32,6 +37,7 @@ ruff = "^0.14.13"
 pytest-results = { version = "^0.2.0", python = ">=3.12" }
 spec-artifacts-iso = {version = "^0.18.0", source = "internal-pypi"}
 jsonschema = "^4.25.0"
+pyyaml = "^6.0.2"
 
 [tool.poetry.scripts]
 build-tools = "scripts.build_tools:main"
@@ -65,6 +71,10 @@ help = "Run integration tests (requires Kind cluster)"
 [tool.poe.tasks.lint]
 sequence = ["ruff-check", "black-check"]
 help = "Run all linters (ruff + black)"
+
+[tool.poe.tasks.dev-quire]
+shell = "pip install --index-url http://pypi.ix/root/dev/+simple/ --trusted-host pypi.ix 'quire>=0.46.0'"
+help = "Install the Quire wheel the semantic tests need (see agent-ix/quire-rs#392)"
 
 [tool.poe.tasks.ruff-check]
 cmd = "ruff check ."

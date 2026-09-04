@@ -1,6 +1,6 @@
 manifest_version: 1.0.0
 name: spec-artifacts-process
-version: 0.2.0
+version: 0.1.0
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
@@ -63,9 +63,6 @@ artifact_types:
 - name: ADR
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
-  data_schema:
-    schema: schemas/ADR.json
-    digest: sha256:386c6528594bf085e78e99a9ee410753dd9d8c263e8dc6b87a5709ba5b9df912
   defaults:
     id_pattern: ADR-{next:03d}
   allowed_links:
@@ -78,9 +75,6 @@ artifact_types:
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Plan.json
-    digest: sha256:8fa4bd5978eecf5e5d7673253ee5545b97ae35c6ab34b7e2e31c02c15b03093f
   defaults:
     id_pattern: Plan-{next:03d}
   allowed_links:
@@ -92,9 +86,6 @@ artifact_types:
 - name: Task
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/task-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Task.json
-    digest: sha256:1eaaa9444991794a1b8ee473052bd2beda58848ba0d4fcdc2722c48c268cab1a
   defaults:
     id_pattern: Task-{next:03d}
   allowed_links:
@@ -106,9 +97,6 @@ artifact_types:
 - name: Review
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/review-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Review.json
-    digest: sha256:90395342e688c3468b71b88d3449d53275103e7761e1b35ef94b981b1f3e4d74
   defaults:
     id_pattern: Review-{next:03d}
   allowed_links:
@@ -119,9 +107,6 @@ artifact_types:
 - name: SpecReview
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/spec-review-frontmatter.schema.json
-  data_schema:
-    schema: schemas/SpecReview.json
-    digest: sha256:c81973b6833d795a3eaf6e1561057e152b6979790402db2b8ec5078eb64c9034
   defaults:
     id_pattern: SR-{next:03d}
   allowed_links:
@@ -172,9 +157,6 @@ artifact_types:
 - name: Finding
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Finding.json
-    digest: sha256:2d7b0167be52850e472662309b16f2fff24e49148b8cbb2d2996746ebc7d83cb
   defaults:
     # FR-008: `FIND-`, not `Finding-`. The old pattern minted `Finding-001`,
     # which fails this archetype's own frontmatter schema (^[A-Z]{2,4}-[0-9]+$
@@ -200,9 +182,6 @@ artifact_types:
 - name: Feedback
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/feedback-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Feedback.json
-    digest: sha256:6d19e37cb7a9beb5fcca32dd2d03ff55f1388a793e1b38614540b7eac50bf504
   defaults:
     id_pattern: FB-{next:03d}
   allowed_links:
@@ -250,9 +229,6 @@ artifact_types:
 - name: TestMatrixIndex
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/testmatrix-index-frontmatter.schema.json
-  data_schema:
-    schema: schemas/TestMatrixIndex.json
-    digest: sha256:44def95664f34c686a635eaea34c2cb8a31bc8d23f66d4dff91069fd75b0b84f
   defaults:
     id_pattern: TestMatrix-{next:03d}
   allowed_links:
@@ -306,9 +282,6 @@ artifact_types:
 - name: TestMatrix
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json
-  data_schema:
-    schema: schemas/TestMatrix.json
-    digest: sha256:7f7e4ab528bd9c80014162fcc473fa1709b74846cd3f0bd0a8aab73ed8dcd23e
   defaults:
     id_pattern: TestMatrix-{next:03d}
   allowed_links:
@@ -448,43 +421,12 @@ artifact_types:
 - name: Standard
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Standard.json
-    digest: sha256:e5be57771e7ee901714c5db34093536d269bb543b8e27176a998f80aa72d41bd
   defaults:
     id_pattern: Standard-{next:03d}
   allowed_links:
   - references
   examples: []
   lint_rules_ref: []
-  # FR-012: the one artifact type in this module that carries a typed
-  # declaration. A Standard declares the properties a conforming artifact
-  # carries and the invariants conformance requires, so the quoin FR-071
-  # typed-Properties form and the FR-072 clause form both have a meaning here
-  # and have none on a Plan or an ADR.
-  #
-  # BOTH ARE `required: false`, and that is the whole compatibility story: every
-  # Standard document in every consuming repository validates today without
-  # either section, and still does. Introducing a required section on a type
-  # the ecosystem already authors would be a build break everywhere, which is
-  # exactly what NFR-001 forbids.
-  body_extraction:
-    yield_pattern:
-      match:
-        properties:
-          from: section_body
-          after_heading: Properties
-          required: false
-        # One `### <clauseId>` subsection per invariant, each holding exactly
-        # one ```ocl fence. The clause text is never parsed by this locator; it
-        # fills the record's `invariants` through the FR-011 `ocl-clause`
-        # mapping.
-        invariants:
-          from: code_block
-          language: ocl
-          under_section: Invariants
-          required: false
-          multiple: true
 # ── Evidence layer (agent-ix/spec-artifacts-process#34, ADR-0011) ─────────
 # The AUTHORED half of the evidence store. The machine-transcribed half —
 # bindings.json, baseline.json, runs/** — is typeless and corpus-invisible by
@@ -492,9 +434,6 @@ artifact_types:
 - name: SuiteRegistry
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/suite-registry-frontmatter.schema.json
-  data_schema:
-    schema: schemas/SuiteRegistry.json
-    digest: sha256:fb619491da63090c904d8f3ade6d335353a29084d8cdfd53ba661399585a3676
   defaults:
     id_pattern: SUR-{next:03d}
   # The suite is the atomic unit of evidence: one run file per (suite, commit),
@@ -555,9 +494,6 @@ artifact_types:
 - name: Inspections
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/inspections-frontmatter.schema.json
-  data_schema:
-    schema: schemas/Inspections.json
-    digest: sha256:f86ca3b824d68f525348bb25c34fe342350825889f08da481db8ee8016a7e942
   defaults:
     id_pattern: INS-{next:03d}
   # Inspection and Analysis evidence acts — the methods that produce no source
@@ -1701,49 +1637,3 @@ verification_catalog:
     applicability:
       characteristics: [agent-behaviour, non-deterministic-subject]
     tooling: [eval harness]
-
-# ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
-# `exports` names every artifact type carrying a `data_schema` reference; the
-# emitted schemas are bound by digest on the artifact types themselves.
-#
-# `object_types.standard` is deliberately NOT exported and keeps its inline
-# `data_schema`. It is a different declaration from the `Standard` artifact
-# type: a document is dispatched on frontmatter `type:`, so `type: Standard`
-# resolves to the artifact type and `Standard.json` is its record schema, while
-# the object type is reached only through `object: standard` and its inline
-# schema describes the frontmatter projection. Converting it to the reference
-# form would change how an existing declaration resolves for every consumer that
-# activates this module.
-semantic:
-  contract_version: 1.0.0
-  semantic_core: 0.1.0
-  package: agent-ix/spec-artifacts-process
-  exports:
-  - ADR
-  - Plan
-  - Task
-  - Review
-  - SpecReview
-  - Finding
-  - Feedback
-  - TestMatrixIndex
-  - TestMatrix
-  - Standard
-  - SuiteRegistry
-  - Inspections
-  imports: {}
-  targets:
-  - json-schema
-  - markdown
-  mappings:
-  - frontmatter
-  - section
-  - table
-  - typed-table
-  - sysml-fence
-  - ocl-clause
-  - list
-  - token
-  - provenance
-  compatibility_posture: additive
-  legacy_forms: warning

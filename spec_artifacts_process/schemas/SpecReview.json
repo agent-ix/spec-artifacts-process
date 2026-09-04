@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/SpecReview.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UpperDocId.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "SpecReview"
+    },
+    "analysis": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/AnalysisKind.json"
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+      },
+      "description": "The spec paths or ids reviewed, one entry per authored path."
+    },
+    "reviewSet": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ReviewSet.json"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ObjectTypeName.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
+      }
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
+    },
+    "summary": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Section.json"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FindingRow.json"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "relationships",
+    "provenance",
+    "summary",
+    "findings"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Validated per-analysis review record (archetype `SpecReview`). One document\nper analysis skill. The findings stay queryable from the review that raised\nthem and grounded in the artifacts they name (FR-013)."
+}

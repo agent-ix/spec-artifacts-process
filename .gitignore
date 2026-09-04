@@ -20,3 +20,6 @@ report.json
 
 # git worktrees created for ticket branches; never a sibling in ~/dev
 .worktrees/
+
+# TypeSpec emitter scratch (tspconfig default output dir); never a payload.
+spec_artifacts_process/semantic/.tsp-scratch/

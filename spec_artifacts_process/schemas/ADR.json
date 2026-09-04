@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ADR.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UpperDocId.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "ADR"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ObjectTypeName.json"
+    },
+    "state": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/AdrState.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
+      }
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
+    },
+    "body": {
+      "type": "string",
+      "description": "free text: the whole authored body; the archetype declares no `body_extraction`, so no section is asserted."
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "relationships",
+    "provenance",
+    "body"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run."
+}

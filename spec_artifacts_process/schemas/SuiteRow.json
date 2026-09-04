@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/SuiteRow.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/SuiteId.json"
+    },
+    "name": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the suite name."
+    },
+    "command": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the command that runs the suite, verbatim."
+    },
+    "tool": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the tool; an adapter-fed kind needs no vocabulary entry, because the kind column stays method-class-shaped."
+    },
+    "evidenceKind": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestType.json",
+      "description": "The same vocabulary as the TestMatrix `Type` column — one vocabulary, three uses."
+    },
+    "line": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "command",
+    "tool",
+    "evidenceKind",
+    "line"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "One `## Suites` row of a SuiteRegistry: the atomic unit of evidence."
+}
