@@ -77,19 +77,6 @@ type: TestMatrix
 | FR-007 | FR-007-AC-5 | TC-052 | ✅ Complete |
 | FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
 | FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
-| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
-| TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
-| TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
-| TC-060 | `Escape Cause` is the fifth findings column on SpecReview and is listed in `optional_columns`, so the 169 four-column SpecReview documents already in the corpus stay valid (FR-008) | Unit | P0 | FR-008-AC-1 | ✅ |
-| TC-061 | `Escape Cause` is exactly the four-way split of which layer let the defect through, and `Severity` keeps its own vocabulary — the two classify different things and neither derives from the other (FR-008) | Unit | P0 | FR-008-AC-2, FR-008-AC-3 | ✅ |
-| TC-062 | The SpecReview skeleton documents the column and all four causes, so an author never opens the manifest to find the options (FR-008) | Unit | P0 | FR-008-AC-6 | ✅ |
-| TC-063 | `Finding.id_pattern` mints an id satisfying the archetype's own frontmatter schema — `Finding-001` failed `^[A-Z]{2,4}-[0-9]+$` for every id it produced — and does NOT fall in the `^FND-\d+$` namespace SpecReview's findings ROWS use (FR-008) | Unit | P0 | FR-008-AC-4 | ✅ |
-| TC-064 | `Finding` declares no `body_extraction`: nothing authors one — the two corpus documents typed Finding are mistyped analyses — and the review skills emit SpecReview by the 2026-06-20 decision (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
-| TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
-| TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
-| TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
-| TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
-| TC-070 | `traceability.source_exclude` is pinned to the exact three fixture-anchored globs — any change is a conscious diff — and a guard rejects the forbidden forms: `**`, any spelling that subtracts the whole `tests/` evidence tree, and leading-wildcard patterns that match at any depth under `literal_separator=false` (CR-032, #56) | Unit | P0 | FR-004-AC-1 | ✅ |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
@@ -112,6 +99,10 @@ type: TestMatrix
 | FR-009 | FR-009-AC-7 | TC-086 | 🚧 Planned |
 | FR-009 | FR-009-AC-8 | TC-087 | 🚧 Planned |
 | FR-009 | FR-009-AC-9 | TC-088 | 🚧 Planned |
+| FR-009 | FR-009-AC-10 | TC-132 | 🚧 Planned |
+| FR-009 | FR-009-AC-11 | TC-133 | 🚧 Planned |
+| FR-009 | FR-009-AC-12 | TC-134 | 🚧 Planned |
+| FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | 🚧 Planned |
 | FR-010 | FR-010-AC-1 | TC-089 | 🚧 Planned |
 | FR-010 | FR-010-AC-2 | TC-090 | 🚧 Planned |
 | FR-010 | FR-010-AC-3 | TC-091 | 🚧 Planned |
@@ -120,6 +111,8 @@ type: TestMatrix
 | FR-010 | FR-010-AC-6 | TC-094 | 🚧 Planned |
 | FR-010 | FR-010-AC-7 | TC-095 | 🚧 Planned |
 | FR-010 | FR-010-AC-8 | TC-096 | 🚧 Planned |
+| FR-010 | FR-010-AC-9 | TC-135 | 🚧 Planned |
+| FR-010 | FR-010-AC-10 | TC-136 | 🚧 Planned |
 | FR-011 | FR-011-AC-1 | TC-097 | 🚧 Planned |
 | FR-011 | FR-011-AC-2 | TC-098 | 🚧 Planned |
 | FR-011 | FR-011-AC-3 | TC-099 | 🚧 Planned |
@@ -134,6 +127,10 @@ type: TestMatrix
 | FR-011 | FR-011-AC-12 | TC-108 | 🚧 Planned |
 | FR-011 | FR-011-AC-13 | TC-109 | 🚧 Planned |
 | FR-011 | FR-011-AC-14 | TC-110 | 🚧 Planned |
+| FR-011 | FR-011-AC-15 | TC-137 | 🚧 Planned |
+| FR-011 | FR-011-AC-16 | TC-138 | 🚧 Planned |
+| FR-011 | FR-011-AC-17 | TC-139 | 🚧 Planned |
+| FR-011 | FR-011-AC-18 | TC-140 | 🚧 Planned |
 | FR-012 | FR-012-AC-1 | TC-111 | 🚧 Planned |
 | FR-012 | FR-012-AC-2 | TC-112 | 🚧 Planned |
 | FR-012 | FR-012-AC-3 | TC-113 | 🚧 Planned |
@@ -143,15 +140,24 @@ type: TestMatrix
 | FR-012 | FR-012-AC-7 | TC-117 | 🚧 Planned |
 | FR-012 | FR-012-AC-8 | TC-118 | 🚧 Planned |
 | FR-012 | FR-012-AC-9 | TC-119 | 🚧 Planned |
+| FR-012 | FR-012-AC-10 | TC-141 | 🚧 Planned |
+| FR-012 | FR-012-AC-11 | TC-142 | 🚧 Planned |
 | FR-013 | FR-013-AC-1 | TC-120 | 🚧 Planned |
 | FR-013 | FR-013-AC-2 | TC-121 | 🚧 Planned |
 | FR-013 | FR-013-AC-3 | TC-122 | 🚧 Planned |
 | FR-013 | FR-013-AC-4 | TC-123 | 🚧 Planned |
 | FR-013 | FR-013-AC-5 | TC-124 | 🚧 Planned |
 | FR-013 | FR-013-AC-6 | TC-125 | 🚧 Planned |
-| FR-013 | FR-013-AC-7 | TC-126 | 🚧 Planned |
+| FR-013 | FR-013-AC-7 | Inspection (discharged by TC-091) | 🚧 Planned |
+| FR-013 | FR-013-AC-8 | TC-143 | 🚧 Planned |
 
 ### Non-Functional Requirement Coverage
+
+The `TestMatrix` archetype gives this table the columns
+`Non-Functional Req | Verification Method | Evidence/Test Cases | Status` and no criterion column,
+so it groups by method. Per-criterion coverage for NFR-001-AC-1..AC-5 is carried by the
+`Traces To` cells of TC-127..TC-131 in the Test Case Summary; this grouped table is not the whole
+claim (SR-008 FND-004).
 
 | Non-Functional Req | Verification Method | Evidence/Test Cases | Status |
 |--------------------|---------------------|---------------------|--------|
@@ -198,15 +204,8 @@ type: TestMatrix
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 | TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
-| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
-| TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — 128 corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
-| TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — 16 of 16 corpus rows carrying `-` are retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
-| TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
-| TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
-| TC-071 | `rust-test-name-id` binds `fn tc744_x` and `fn tc_744_x` to the same `TC-744`; the separator is optional, adds no capture group, and admits nothing new — bare `fn tc_x`, an unanchored `tc_744_`, and a digit run with no trailing `_` still match nothing (CR-034) | Unit | P0 | FR-004-AC-11 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
-| TC-066 | `trace_tags.implements` declares one templated form per language; every pattern requires the literal `Implements:` keyword and captures a comma-separated list; and prose naming a requirement matches none of them — the keyword is what the `*-comment-id` forms need a trailing delimiter for (CR-028) | Unit | P0 | FR-004-AC-10 | ✅ |
 | TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
 | TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |
@@ -223,6 +222,26 @@ type: TestMatrix
 | TC-052 | The engine loads the manifest with the catalog block present. `verification_catalog` is a quire-rs v0.29.0 key: against an older engine the top-level key is tolerated and silently ignored, so the module would look correct and contribute nothing (FR-007) | Unit | P0 | FR-007-AC-5 | ✅ |
 | TC-053 | `verification_class` is exactly the four IADT values and `verification_method` exactly the catalog keys, both derived by the engine — and neither is separately declared here, which is the duplication FR-054-CON-4 forbids (FR-007) | Unit | P0 | FR-007-AC-6 | ✅ |
 | TC-054 | Inspection, demonstration and agent-behaviour evaluation carry an evidence kind inside the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie — CR-041 applied to the catalog (FR-007) | Unit | P0 | FR-007-AC-7 | ✅ |
+| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
+| TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
+| TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
+| TC-060 | `Escape Cause` is the fifth findings column on SpecReview and is listed in `optional_columns`, so the 169 four-column SpecReview documents already in the corpus stay valid (FR-008) | Unit | P0 | FR-008-AC-1 | ✅ |
+| TC-061 | `Escape Cause` is exactly the four-way split of which layer let the defect through, and `Severity` keeps its own vocabulary — the two classify different things and neither derives from the other (FR-008) | Unit | P0 | FR-008-AC-2, FR-008-AC-3 | ✅ |
+| TC-062 | The SpecReview skeleton documents the column and all four causes, so an author never opens the manifest to find the options (FR-008) | Unit | P0 | FR-008-AC-6 | ✅ |
+| TC-063 | `Finding.id_pattern` mints an id satisfying the archetype's own frontmatter schema — `Finding-001` failed `^[A-Z]{2,4}-[0-9]+$` for every id it produced — and does NOT fall in the `^FND-\d+$` namespace SpecReview's findings ROWS use (FR-008) | Unit | P0 | FR-008-AC-4 | ✅ |
+| TC-064 | `Finding` declares no `body_extraction`: nothing authors one — the two corpus documents typed Finding are mistyped analyses — and the review skills emit SpecReview by the 2026-06-20 decision (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
+| TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
+| TC-066 | `trace_tags.implements` declares one templated form per language; every pattern requires the literal `Implements:` keyword and captures a comma-separated list; and prose naming a requirement matches none of them — the keyword is what the `*-comment-id` forms need a trailing delimiter for (CR-028) | Unit | P0 | FR-004-AC-10 | ✅ |
+| TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
+| TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
+| TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
+| TC-070 | `traceability.source_exclude` is pinned to the exact three fixture-anchored globs — any change is a conscious diff — and a guard rejects the forbidden forms: `**`, any spelling that subtracts the whole `tests/` evidence tree, and leading-wildcard patterns that match at any depth under `literal_separator=false` (CR-032, #56) | Unit | P0 | FR-004-AC-1 | ✅ |
+| TC-071 | `rust-test-name-id` binds `fn tc744_x` and `fn tc_744_x` to the same `TC-744`; the separator is optional, adds no capture group, and admits nothing new — bare `fn tc_x`, an unanchored `tc_744_`, and a digit run with no trailing `_` still match nothing (CR-034) | Unit | P0 | FR-004-AC-11 | ✅ |
+| TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — 128 corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
+| TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — 16 of 16 corpus rows carrying `-` are retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
+| TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
+| TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
+| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-080 | After `make schemas`, `schemas/` holds exactly the projections `toolchain.json` lists — one model per declared artifact type plus the support models — with compiler 1.15.0 and emitter 1.15.0 recorded | Unit | P0 | FR-009-AC-1, US-002 | 🚧 |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name, with the version segment read from the manifest rather than hard-coded | Unit | P0 | FR-009-AC-2, FR-009-CON-5 | 🚧 |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core 0.1.0 model; no other host or version appears | Unit | P0 | FR-009-AC-3 | 🚧 |
@@ -262,7 +281,7 @@ type: TestMatrix
 | TC-116 | The added `Standard` `properties` and `invariants` locators are both `required: false`, and a Standard carrying neither section still validates | Unit | P0 | FR-012-AC-6, FR-012-CON-2 | 🚧 |
 | TC-117 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and none passes | Unit | P0 | FR-012-AC-7 | 🚧 |
 | TC-118 | The negative set covers each of the eleven stated rejections, one fixture per rejection | Unit | P1 | FR-012-AC-8 | 🚧 |
-| TC-119 | No file under `tests/fixtures/` reaches the wheel, the sdist or the staged npm tree, and `quire coverage` mints no id from it | Unit | P0 | FR-012-AC-9, FR-012-CON-3 | 🚧 |
+| TC-119 | No file under `tests/fixtures/` reaches the wheel, the sdist or the staged npm tree, and `quire coverage` over this repository mints no id from it | Integration | P0 | FR-012-AC-9, FR-012-CON-3 | 🚧 |
 | TC-120 | Every exported model carries exactly one role, `definition` or `evidence-act`, matching the declared assignment | Unit | P0 | FR-013-AC-1, FR-013-CON-1 | 🚧 |
 | TC-121 | No emitted model declares a run identifier, run timestamp, duration, pass/fail count, log location or run artefact | Unit | P0 | FR-013-AC-2 | 🚧 |
 | TC-122 | `Plan` and `Task` declare no execution property; a Task record carries its authored `track`, dependencies and verification references only | Unit | P0 | FR-013-AC-3 | 🚧 |
@@ -275,6 +294,18 @@ type: TestMatrix
 | TC-129 | Every locator added at 0.2.0 is `required: false` | Unit | P0 | NFR-001-AC-3 | 🚧 |
 | TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | 🚧 |
 | TC-131 | `spec-objects-business` and `filament-core-data` each validate under 0.2.0 with no error finding they did not already report under 0.1.0 | Demonstration | P0 | NFR-001-AC-5 | 🚧 |
+| TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | 🚧 |
+| TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | 🚧 |
+| TC-134 | A tree whose schemas and digests agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | 🚧 |
+| TC-135 | The refusal of an unknown `semantic` key names the key and a mismatched digest names the path. STRICT EXPECTED FAILURE against quire 0.46.0: both refusals are silent (quire-rs#221, quire-rs#394). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | 🚧 |
+| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | 🚧 |
+| TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | 🚧 |
+| TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | 🚧 |
+| TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | 🚧 |
+| TC-140 | Every mapping kind named in `semantic.mappings` is used by at least one model property — no kind is declared aspirationally | Unit | P0 | FR-011-AC-18 | 🚧 |
+| TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | 🚧 |
+| TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | 🚧 |
+| TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | 🚧 |
 
 ## Option Permutation Matrix
 
@@ -318,6 +349,11 @@ mixed combination in one conforming document.
 | FR-012-CON-2 | No new required form | a Standard carrying neither added section | TC-116 | pass |
 | FR-012-CON-3 | Fixture packaging | `tests/fixtures/**` in the wheel/sdist/npm tree | TC-119 | absent |
 | FR-013-CON-1 | One model, one role | a model carrying two roles | TC-120 | Error (role assertion) |
+| FR-009-CON-1 | Official emitter only | a hand-edited file under `schemas/` | Inspection (no TC) | violation |
+| FR-009-CON-2 | No `.npmrc`, no `file:`/`link:` | a repo-local `.npmrc` | Inspection (no TC) | violation |
+| FR-009-CON-6 | Enumerate from source | a test carrying a hard-coded type list | Inspection (no TC) | violation |
+| FR-011-CON-3 | Oracle, not module code | a reference-mapping import from the shipped package | Inspection (no TC) | violation |
+| FR-013-CON-2 | No run-record schema | a schema for a run, binding or baseline | Inspection (no TC) | violation |
 | NFR-001 | Consumer regression | a finding under 0.2.0 absent under 0.1.0 | TC-131 | 0 such findings |
 
 ## Edge Cases

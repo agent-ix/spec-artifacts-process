@@ -62,6 +62,13 @@ exact meaning it has today.
 - The `Status` column pattern `^(✅|❌|🚧|⛔)(\s+.*)?$` SHALL keep exactly the four markers it
   admits today, and no vocabulary declared in this manifest SHALL be widened or narrowed by this
   change.
+- The engine SHALL dispatch a document on frontmatter `type:`, so `type: Standard` resolves to the
+  artifact type `Standard` with `Standard.json` as its record schema, while the object type
+  `standard` is reached only through `object: standard`.
+- This change SHALL NOT alter which of the two declarations a given document resolves to.
+- The `traceability.trace_targets` and `document_references` entries bind by archetype name, so
+  adding a `data_schema` key to an artifact type changes no binding; the manifest test SHALL
+  assert that the trace-target set is byte-identical to the 0.1.0 baseline.
 - The `object_types` entry `standard` SHALL keep its inline `data_schema`, because converting it
   to the reference form would change how the engine resolves a declaration a consumer already
   activates against, and the record shape it declares is the frontmatter projection rather than
@@ -93,14 +100,16 @@ exact meaning it has today.
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-010-AC-1 | The loaded `semantic` block equals the nine admitted keys with the values above, and `exports` equals the twelve declared artifact-type names. | Test (TC-089) |
+| FR-010-AC-1 | The loaded `semantic` block equals the nine admitted keys with the values above, and `exports` equals the set of `artifact_types[].name` — derived from the manifest, so the count in `spec.md` and the declared type list cannot drift apart. | Test (TC-089) |
 | FR-010-AC-2 | For every declared artifact type, `data_schema` is the reference form, the referenced file exists under `schemas/`, and its SHA-256 equals the recorded digest, with no artifact type carrying an inline `data_schema`. | Test (TC-090) |
 | FR-010-AC-3 | Every 0.1.0 declaration, compared against the checked-in 0.1.0 baseline of the manifest, is present unchanged apart from the added `data_schema` keys and the added `required: false` locators. | Test (TC-091) |
 | FR-010-AC-4 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline. | Test (TC-092) |
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
-| FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader naming `foo`, and a copy whose `data_schema.digest` is altered is refused naming the path. | Test (TC-094) |
+| FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader, and a copy whose `data_schema.digest` is altered is refused — the refusal happens in both cases. | Test (TC-094) |
 | FR-010-AC-7 | `make manifest-digests` on the committed tree rewrites no byte, and after one schema is regenerated it rewrites exactly that type's digest and nothing else. | Test (TC-095) |
-| FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0. | Test (TC-096) |
+| FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
+| FR-010-AC-9 | The refusal of an unknown `semantic` key names the key, and the refusal of a mismatched digest names the path. Measured against quire 0.46.0 both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221` and `agent-ix/quire-rs#394`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
+| FR-010-AC-10 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline. | Test (TC-136) |
 
 ## Dependencies
 

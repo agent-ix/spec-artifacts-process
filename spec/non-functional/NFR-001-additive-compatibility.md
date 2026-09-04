@@ -32,7 +32,13 @@ no error finding that 0.1.0 did not already report.
   edited.
 - Measured population: the 0.1.0 manifest baseline checked into `tests/fixtures/baseline-0.1.0/`,
   the twelve shipped skeletons, and the `spec/**/*.md` trees of the two named consumer
-  repositories at the commit recorded in the measurement.
+  repositories at the commit the measurement records.
+- **Residual risk, stated rather than implied.** `manifest.yaml` is consumed by roughly 239
+  repositories in `~/dev`. This NFR measures two. Two is the right cost point for one ticket and
+  is enormously better than zero, but "2 of 2 consumers validated" is not "the ecosystem
+  validated": a change that passes both can still break a third. The advisory-only posture and
+  the human promotion gate are what cover the remainder, and they are the reason this measurement
+  is a floor rather than a proof.
 
 ## Rationale
 
@@ -49,8 +55,8 @@ separates "validates locally" from "verified".
 | 0.1.0 archetype declarations changed | 0 | 0 | Test |
 | Declared vocabulary members added or removed | 0 | 0 | Test |
 | Locators added that are `required: true` | 0 | 0 | Test |
-| Consumer repositories re-validated against 0.2.0 | 2 | 2 | Demonstration |
-| New error findings in a consumer repository under 0.2.0 | 0 | 0 | Demonstration |
+| Consumer repositories re-validated against 0.2.0 | 2 | 2 | Paired `quire validate` run under 0.1.0 and 0.2.0, findings compared as sets |
+| Findings present under 0.2.0 and absent under 0.1.0, per consumer | 0 | 0 | Set difference over the paired run, at the recorded consumer commit |
 | Shipped skeletons with an error finding under 0.2.0 | 0 | 0 | Test |
 
 ## Verification
@@ -77,7 +83,7 @@ row is not coverage.
 | NFR-001-AC-2 | No declared vocabulary — `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind`, `Verdict`, `analysis`, `review_set` — gains or loses a member. | Test (TC-128) |
 | NFR-001-AC-3 | Every locator added at 0.2.0 is `required: false`. | Test (TC-129) |
 | NFR-001-AC-4 | Every shipped skeleton validates under 0.2.0 with zero error findings. | Test (TC-130) |
-| NFR-001-AC-5 | `spec-objects-business` and `filament-core-data` each validate under 0.2.0 with no error finding they did not already report under 0.1.0. | Demonstration (TC-131) |
+| NFR-001-AC-5 | For each of `spec-objects-business` and `filament-core-data`, the set difference (findings under 0.2.0) minus (findings under 0.1.0) is empty. The measurement records the consumer's commit SHA, so the run is reproducible and a later failure is attributable; a consumer that is already red for an unrelated reason contributes findings to both sides and therefore to neither side of the difference. | Demonstration (TC-131) |
 
 ## Dependencies
 

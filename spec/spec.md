@@ -43,13 +43,24 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 - Resolving a reference-form `data_schema` into a stored snapshot at activation: `agent-ix/filament-core-service#23`. Until it lands the service stores the reference verbatim.
 - Publishing the Quire wheel exposing the semantic surface to an index a repository may commit against: `agent-ix/quire-rs#392`. The wheel is provisioned by `make dev-quire` and the semantic tests fail rather than skip when it is absent, because a skipped row is not coverage.
 - Run records, binding records, baselines and freshness. FR-013 states which concepts this module models and names Engineering Assurance and quoin as the owners of the rest; nothing here schematises a verification run.
-- Resolving the `Standard` artifact type / `standard` object type duplication the issue notes. Both are activated by consumers today and unifying them changes how an existing declaration resolves, which is exactly the breaking change this specification refuses to make as a side effect of the migration.
+- Resolving the `Standard` artifact type / `standard` object type duplication the issue notes. Both are activated by consumers today and unifying them changes how an existing declaration resolves, which is exactly the breaking change this specification refuses to make as a side effect of the migration. What #78 does do is write the resolution down rather than leave it to first-wins: a document is dispatched on frontmatter `type:`, so `type: Standard` resolves to the **artifact type** and the emitted `Standard.json` describes it; the `standard` **object type** is reached only through `object: standard` and keeps the inline `data_schema` that describes its frontmatter projection. `quire validate` emits `DuplicateArchetype: 'standard' … first-wins` on every run of this repository because the two names collide case-insensitively in the archetype registry; that diagnostic is the duplication, and FR-010-AC-8 pins both declarations so the migration does not quietly change which one wins.
 
 ## System Overview
 
 ### System Description
 
-The Module packages process-artifact archetypes, a grammar, and artifact types into a manifest that filament-core-service activates. Activation registers the declared contributions in the database, after which authors and agent CLI generators can produce valid process artifacts.
+The Module packages process-artifact archetypes, a grammar, and artifact types into a manifest that
+filament-core-service activates. Activation registers the declared contributions in the database,
+after which authors and agent CLI generators can produce valid process artifacts.
+
+After #78 the module also publishes a machine-readable declaration of what a document of each type
+contains, consumed by engines rather than by generators. Two named artifacts carry that work and
+are components of this system for allocation purposes: the **schema generator**
+(`spec_artifacts_process/semantic/scripts/generate.mjs`), which projects the TypeSpec source into
+the shipped JSON Schemas, and the **record mapping** (`spec_artifacts_process/mappings.yaml`),
+which states how an authored document becomes a record. The mapping is data; the reference
+implementation that reads it lives in this module's test support and is a test oracle, never
+module code.
 
 ### Intended Users
 

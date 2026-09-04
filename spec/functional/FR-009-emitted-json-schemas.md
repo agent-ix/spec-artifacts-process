@@ -46,6 +46,13 @@ between the source and the shipped bytes fails the build.
 
 ## Behavior
 
+- If `node` is absent, is older than 20, or `spec_artifacts_process/semantic/node_modules` does not
+  hold the pinned compiler, emitter and `@agent-ix/semantic-core`, then the generator SHALL exit
+  non-zero naming the missing component and the command that installs it
+  (`make semantic-install`), rather than failing inside the compiler.
+- If the resolved `@agent-ix/semantic-core` version differs from the manifest's
+  `semantic.semantic_core`, then the generator SHALL exit non-zero naming both values, so the
+  declared grammar version and the compiled-against grammar version cannot diverge.
 - `make schemas` SHALL run the generator.
 - `make schemas-check` SHALL run the generator with `--check`.
 - The generator SHALL compile `spec_artifacts_process/semantic/` with `tsp compile` into a
@@ -80,6 +87,14 @@ between the source and the shipped bytes fails the build.
   and are referenced by `frontmatter_schema_ref`.
 - `make lint` SHALL run `make schemas-check`, so a `main.tsp` edit that was never regenerated
   fails before push rather than at review.
+- The repository SHALL run `make schemas-check` as a local pre-push gate only, never as a
+  GitHub-workflow gate, because `@agent-ix/semantic-core` resolves solely through a scope-routed
+  registry the workflow does not reach (`agent-ix/filament-core-data#11`). A CI job asserting it
+  would fail for a reason that is not a defect in this module, and the pre-push `make lint` is
+  where it holds.
+- If the schemas and the digests agree with each other but carry a version segment other than the
+  manifest's current `version`, then the check SHALL exit non-zero, so a half-completed version
+  bump cannot pass by being internally consistent.
 - The Python package SHALL include `spec_artifacts_process/schemas/*.json` in the wheel and sdist.
 - The repository SHALL mark every file `eol=lf` in `.gitattributes`, so a checkout with
   `autocrlf` cannot change the digested bytes.
@@ -95,6 +110,7 @@ between the source and the shipped bytes fails the build.
 | FR-009-CON-3 | Emission SHALL be deterministic: two runs over one source tree produce byte-identical files. | Integrity | Test |
 | FR-009-CON-4 | The `$id` base SHALL embed the manifest `version`, bumped as one atomic regeneration — source base, manifest version, schemas, `data_schema` digests and `toolchain.json` in one commit. | Compatibility | Test |
 | FR-009-CON-5 | Each test and fixture SHALL read the version segment of the `$id` base from the manifest `version` rather than hard-coding it. | Maintainability | Test |
+| FR-009-CON-6 | Every test asserting a property of "every" member of a set SHALL enumerate that set from the manifest or the emitted bundle, never from a list written into the test, so a type added later is covered without editing the test. | Maintainability | Inspection |
 
 ## Acceptance Criteria
 
@@ -109,6 +125,10 @@ between the source and the shipped bytes fails the build.
 | FR-009-AC-7 | The wheel built by `make build` contains `spec_artifacts_process/schemas/<Model>.json` for every exported model, and the tree `scripts/stage-npm.mjs` stages carries `manifest.yaml` with a sibling `schemas/` holding the same set. | Test (TC-086) |
 | FR-009-AC-8 | Running the generator twice over one tree produces byte-identical files and an identical `toolchain.json` digest. | Test (TC-087) |
 | FR-009-AC-9 | `generated/toolchain.json` records the resolved `@agent-ix/semantic-core` version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes rather than by a version string. | Test (TC-088) |
+| FR-009-AC-10 | With the toolchain uninstalled, the generator exits non-zero naming the missing component and `make semantic-install`, and does not fail inside the compiler. | Test (TC-132) |
+| FR-009-AC-11 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values. | Test (TC-133) |
+| FR-009-AC-12 | A tree whose schemas and digests agree with each other but were generated against a different manifest `version` fails `make schemas-check`. | Test (TC-134) |
+| FR-009-AC-13 | Every test in the suite that asserts a property of all declared types derives the type list from `manifest.yaml` or from the emitted bundle; none carries a hard-coded list. | Inspection |
 
 ## Dependencies
 

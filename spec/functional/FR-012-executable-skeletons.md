@@ -51,11 +51,17 @@ states, so that a skeleton is an executable fixture rather than an example nothi
   zero error findings.
 - The record the FR-011 mapping builds from every skeleton SHALL validate against that type's
   emitted schema.
-- The typed declaration form SHALL be shown on `Standard` and on no other type: a Standard
+- Exactly one skeleton — `Standard.md` — SHALL carry a `## Properties` section, and no other
+  skeleton SHALL carry one. The reason is that a Standard
   declares the properties a conforming artifact carries and the invariants conformance requires,
   and the other eleven types declare process content rather than a typed structure. Introducing a
   `## Properties` section on a type whose documents do not carry one would be a new required form
   for every consuming repository, which NFR-001 forbids.
+- The module SHALL author each golden record from its skeleton and validate it against its emitted
+  schema, never producing it by recording whatever the reference mapping happened to output. A
+  blessed output is a snapshot of the mapping's bugs, and the golden record exists precisely to
+  catch those; the record is authored, the mapping must reproduce it, and a disagreement is a
+  failure rather than a regeneration.
 - The `Standard.md` skeleton SHALL carry a `## Properties` section whose table headers are exactly
   `Field | Type | Multiplicity | Constraints` with at least one data row, and an `## Invariants`
   section carrying at least one `### <clauseId>` subsection holding exactly one ```` ```ocl ````
@@ -68,6 +74,10 @@ states, so that a skeleton is an executable fixture rather than an example nothi
   `required: false`, so every Standard document that validates today keeps validating.
 - Every negative fixture SHALL carry frontmatter `expect:` naming the rejection class and
   `because:` naming the rule, and SHALL fail exactly the check its `expect:` names.
+- The `expect:` and `because:` keys survive only because every frontmatter schema in this module
+  sets `additionalProperties: true`; a later tightening of any of those schemas invalidates the
+  whole negative corpus at once, and the module SHALL record that coupling in `mappings.yaml`
+  beside the dropped key sets.
 - The negative set SHALL cover, at minimum: a missing required section; a required table with zero
   data rows; a row id outside the declared `id_pattern`; a cell outside a declared
   `column_choices`; a `Status` cell outside the four-marker pattern; a `Traces To` cell the pattern
@@ -101,7 +111,9 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 | FR-012-AC-6 | The `Standard` archetype's added `properties` and `invariants` locators are both `required: false`, and a Standard document carrying neither section still validates. | Test (TC-116) |
 | FR-012-AC-7 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and no negative fixture passes. | Test (TC-117) |
 | FR-012-AC-8 | The negative set covers each of the eleven stated rejections, one fixture per rejection. | Test (TC-118) |
-| FR-012-AC-9 | No file under `tests/fixtures/` is in the wheel, the sdist, or the staged npm tree, and `quire coverage` mints no id from it. | Test (TC-119) |
+| FR-012-AC-9 | No file under `tests/fixtures/` is in the wheel, the sdist, or the staged npm tree, and `quire coverage` over this repository mints no id from it. | Integration (TC-119) |
+| FR-012-AC-10 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md`. | Test (TC-141) |
+| FR-012-AC-11 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than rewriting it. | Test (TC-142) |
 
 ## Dependencies
 

@@ -7,7 +7,9 @@ relationships:
     type: "implements"
   - target: "ix://agent-ix/spec-artifacts-process/FR-009"
     type: "depends_on"
-  - target: "ix://agent-ix/engineering-assurance/FR-001"
+  - target: "ix://agent-ix/engineering-assurance/FR-004"
+    type: "depends_on"
+  - target: "ix://agent-ix/engineering-assurance/FR-008"
     type: "depends_on"
 ---
 # FR-013: Authored process definitions are separated from execution occurrences
@@ -80,14 +82,15 @@ from the schema alone which concept a document owns.
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-013-AC-1 | Every exported model carries exactly one role, `definition` or `evidence-act`, and the assignment matches the list above. | Test (TC-120) |
-| FR-013-AC-2 | No emitted model declares a property whose name or documented meaning is a run identifier, run timestamp, duration, pass/fail count, log location or run artefact. | Test (TC-121) |
+| FR-013-AC-2 | No emitted model declares a property whose **name** matches the run-record lexicon (`run`, `runId`, `startedAt`, `finishedAt`, `duration`, `passed`, `failed`, `log`, `artifact`) as a whole word. | Test (TC-121) |
 | FR-013-AC-3 | `Plan` and `Task` declare no execution property; a Task record carries its authored `track`, dependencies and verification references only. | Test (TC-122) |
 | FR-013-AC-4 | `SpecReview` findings rows carry `id`, `severity`, `summary`, `refs` and an optional `escapeCause`, and a `Finding` document id matches `FIND-` while a row id matches `FND-`. | Test (TC-123) |
 | FR-013-AC-5 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, and a matrix record answers "which criteria does this row claim to cover" without re-parsing the cell. | Test (TC-124) |
 | FR-013-AC-6 | `mappings.yaml` records the run-record concepts this module does not model and names their owner. | Test (TC-125) |
-| FR-013-AC-7 | The archetype declarations are byte-identical to the 0.1.0 baseline apart from the additions FR-010 and FR-012 name. | Test (TC-126) |
+| FR-013-AC-7 | This requirement adds no manifest declaration of its own: the baseline comparison is [FR-010-AC-3](./FR-010-semantic-manifest-contract.md), which is the single normative statement of it, and this criterion is discharged by that test rather than by a second copy. | Inspection |
+| FR-013-AC-8 | A reviewer has read every emitted model's property documentation and recorded that none *means* a run outcome under a different name. A test can check names; only a reader can check meaning, and presenting that judgement as a test would be the fabrication this module's own escape-cause vocabulary exists to name. | Inspection (TC-143) |
 
 ## Dependencies
 
-- **Upstream**: [FR-006](./FR-006-evidence-layer-archetypes.md), [FR-007](./FR-007-verification-method-catalog.md), [FR-009](./FR-009-emitted-json-schemas.md)
+- **Upstream**: [FR-006](./FR-006-evidence-layer-archetypes.md), [FR-007](./FR-007-verification-method-catalog.md), [FR-009](./FR-009-emitted-json-schemas.md); engineering-assurance FR-004 and FR-008 (`ix://agent-ix/engineering-assurance/FR-004`, `ix://agent-ix/engineering-assurance/FR-008`), which own evidence state and the verification-semantics split this requirement defers to
 - **Downstream**: the Engineering Assurance reconciliation of run records, outside this module

@@ -53,6 +53,15 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
 
 - The mapping SHALL use exactly the nine kinds the manifest declares: `frontmatter`, `section`,
   `table`, `typed-table`, `sysml-fence`, `ocl-clause`, `list`, `token`, `provenance`.
+- Every declared mapping kind SHALL be used by at least one model property, so the manifest
+  declares no kind the module does not exercise: `list` fills `SpecReview.scope` and the `Plan`
+  and `Task` bullet sections, and `token` fills the trace-token lists of `TestMatrix` and
+  `TestMatrixIndex` and the `refs` of a findings row. The module SHALL remove from
+  `semantic.mappings` any kind no property uses, rather than declaring it aspirationally.
+- The mapping SHALL be strict: any reported error means no record is built for that document, and
+  every error found in one pass is reported. Reporting three errors and building no record is one
+  behaviour, not two — a partial record whose missing properties are indistinguishable from
+  absent ones is the failure this rule removes.
 - Every property of every emitted model SHALL be named by exactly one mapping entry, and every
   mapping entry SHALL name a property its model declares.
 - A `frontmatter` mapping SHALL name a frontmatter key path and the record property it fills.
@@ -110,9 +119,19 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
   such error of one document in one pass rather than stopping at the first.
 - If a table declares two data rows with the same id, then the mapping SHALL report
   `duplicate-row-id` naming both lines.
+- The mapping SHALL scope row-id uniqueness **per table**, not per document: a `TestMatrixIndex` carries
+  `INT-` and `GAP-` ids in different tables and a `TestMatrix` carries rows in five, and the id
+  namespaces are per table by construction. A document-scoped rule would reject conforming
+  documents.
+- The totality walk that checks the mapping against the emitted models (CON-2) SHALL be
+  cycle-safe: the models `$ref` each other and a naive recursive walk does not terminate.
 - The mapping SHALL treat `\|` inside a cell as a literal pipe rather than a column separator.
-- The mapping SHALL accept `CRLF` input by normalising line endings before slicing, so a Windows
-  checkout produces the same record and the same digest is computed over the bytes as read.
+- The mapping SHALL normalise `CRLF` to `LF` before slicing sections, so a Windows checkout
+  produces the same record as a Unix one.
+- The mapping SHALL compute `provenance.digest` over the **normalised** bytes rather than the
+  bytes as read, so one document has one digest whatever the checkout did to its line endings; the repository
+  pins `eol=lf` (FR-009) so the two are the same in practice, and this rule is what makes that a
+  guarantee rather than a coincidence.
 
 ## Constraints
 
@@ -140,6 +159,10 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
 | FR-011-AC-12 | An escaped pipe inside a cell is carried as a literal pipe and does not split the row. | Test (TC-108) |
 | FR-011-AC-13 | A CRLF copy of a skeleton produces the same record as its LF original. | Test (TC-109) |
 | FR-011-AC-14 | Every frontmatter key a model does not declare is listed in that model's dropped key set. | Test (TC-110) |
+| FR-011-AC-15 | For every key an emitted model and that type's `frontmatter_schema_ref` both describe, the two agree on type and pattern — the drift this ticket exists to end is not replaced by a new pair of drifting declarations. | Test (TC-137) |
+| FR-011-AC-16 | The totality walk terminates on the shipped models, which contain at least one reference cycle. | Test (TC-138) |
+| FR-011-AC-17 | Two rows sharing an id in **different** tables of one document are accepted; two in the same table are not. | Test (TC-139) |
+| FR-011-AC-18 | Every mapping kind named in `semantic.mappings` is used by at least one model property. | Test (TC-140) |
 
 ## Dependencies
 
