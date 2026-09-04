@@ -24,13 +24,14 @@
       "type": "array",
       "items": {
         "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
-      }
+      },
+      "description": "Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15)."
     },
     "provenance": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
     },
     "body": {
-      "type": "string",
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Section.json",
       "description": "free text: the whole authored body; the archetype declares no `body_extraction`."
     }
   },
@@ -38,7 +39,6 @@
     "id",
     "title",
     "type",
-    "relationships",
     "provenance",
     "body"
   ],

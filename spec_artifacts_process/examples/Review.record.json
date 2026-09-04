@@ -1,0 +1,20 @@
+{
+  "body": {
+    "endLine": 40,
+    "startLine": 10,
+    "text": "     with substantive content. Contract:\n     - Frontmatter: `type: Review`; `id` matches ^[A-Z]{2,4}-[0-9]+$.\n     - The archetype declares NO `body_extraction`, so no section is asserted.\n     - `allowed_links`: reviews | references.\n     - `composition.expected_artifacts` is `Finding`: a Review is the parent of\n       `Finding` DOCUMENTS, whose ids are minted `FIND-NNN`.\n     - Do NOT confuse a `Finding` document with a `FND-NNN` row inside a\n       `SpecReview`. They are different things with deliberately different id\n       namespaces; the analysis skills emit SpecReview documents with an inline\n       findings table, and nothing authors a Finding document today.\n     - For a per-analysis, machine-validated review, use `SpecReview` instead —\n       that is the archetype whose findings table is asserted. -->\n# RV-001: Review of the artifact import path\n\n## Scope\n\nThe import path from receipt to persistence, read at commit `a1b2c3d`.\n\n## Summary\n\nThe import path verifies the declared digest before persisting and names both\ndigests on mismatch. Two observations are recorded below; neither blocks.\n\n## Observations\n\n- The rejection message names the declared and computed digests, which is what\n  makes a failed import diagnosable rather than merely reported.\n- Re-verification on read is not performed. That is a deliberate scope\n  boundary rather than an omission, and it is recorded here so the next reader\n  does not raise it again."
+  },
+  "id": "RV-001",
+  "provenance": {
+    "digest": "sha256:c1dcf72894f2256bbc44b1068b3432e92196710c49325b1277246fdc62ba6a0f",
+    "path": "skeletons/Review.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/FR-001",
+      "type": "reviews"
+    }
+  ],
+  "title": "Review of the artifact import path",
+  "type": "Review"
+}

@@ -17,9 +17,11 @@
     "name": "issue-31-absolute-id",
     "version": "1.0.0",
     "issue": "https://github.com/agent-ix/filament-core-data/issues/31",
-    "applied": false,
-    "rewrittenFiles": [],
-    "note": "no-op: the emitter produced no relative $id"
+    "applied": true,
+    "rewrittenFiles": [
+      "CoverageGapRow.json",
+      "RecordString.json"
+    ]
   },
   "base": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/",
   "manifestVersion": "0.2.0",
@@ -90,6 +92,7 @@
     "Plan.json",
     "Priority.json",
     "Provenance.json",
+    "RecordString.json",
     "Relationship.json",
     "RelativeHref.json",
     "Review.json",
@@ -120,5 +123,5 @@
     "UserStoryCoverageRow.json",
     "Verdict.json"
   ],
-  "digest": "sha256:c8cec07936d6e084395d0e926926cbffa2df19d97a2042002f0c7e283d523e54"
+  "digest": "sha256:ed60db1a9a711edd975140ec29e0d80aee1f7e98ab4f449b4aa147bad7b32a65"
 }

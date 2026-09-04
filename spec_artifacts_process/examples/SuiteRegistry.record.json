@@ -1,0 +1,35 @@
+{
+  "id": "SUR-001",
+  "provenance": {
+    "digest": "sha256:d4964672a948995ab3e4ef6b9a3326c4c7002388e80295b03d1c003685cde10d",
+    "path": "skeletons/SuiteRegistry.md"
+  },
+  "suites": [
+    {
+      "command": "`make test`",
+      "evidenceKind": "Unit",
+      "id": "SUITE-001",
+      "line": 38,
+      "name": "Rust unit tests",
+      "tool": "cargo test"
+    },
+    {
+      "command": "`make audit-property`",
+      "evidenceKind": "Property",
+      "id": "SUITE-002",
+      "line": 39,
+      "name": "Property suite",
+      "tool": "proptest"
+    },
+    {
+      "command": "`make mutants`",
+      "evidenceKind": "Static",
+      "id": "SUITE-003",
+      "line": 40,
+      "name": "Mutation score",
+      "tool": "cargo-mutants"
+    }
+  ],
+  "title": "Suite registry",
+  "type": "SuiteRegistry"
+}

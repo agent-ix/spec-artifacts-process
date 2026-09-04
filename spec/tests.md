@@ -18,7 +18,7 @@ type: TestMatrix
 | User Story | Acceptance Criteria | Test Cases | Coverage Status |
 |------------|---------------------|------------|-----------------|
 | US-001 | US-001-EX-1, US-001-EX-2 (illustrative) | TC-001, TC-002, TC-005 | 🚧 Planned |
-| US-002 | US-002-EX-1, US-002-EX-2, US-002-EX-3 (illustrative) | TC-080, TC-100, TC-131 | 🚧 Planned |
+| US-002 | US-002-EX-1, US-002-EX-2, US-002-EX-3 (illustrative) | TC-080, TC-100, TC-131 | ✅ Complete |
 
 ### Functional Requirement Coverage
 
@@ -90,66 +90,66 @@ type: TestMatrix
 | FR-008 | FR-008-AC-4 | TC-063 | ✅ Complete |
 | FR-008 | FR-008-AC-5 | TC-064 | ✅ Complete |
 | FR-008 | FR-008-AC-6 | TC-062 | ✅ Complete |
-| FR-009 | FR-009-AC-1 | TC-080 | 🚧 Planned |
-| FR-009 | FR-009-AC-2 | TC-081 | 🚧 Planned |
-| FR-009 | FR-009-AC-3 | TC-082 | 🚧 Planned |
-| FR-009 | FR-009-AC-4 | TC-083 | 🚧 Planned |
-| FR-009 | FR-009-AC-5 | TC-084 | 🚧 Planned |
-| FR-009 | FR-009-AC-6 | TC-085 | 🚧 Planned |
-| FR-009 | FR-009-AC-7 | TC-086 | 🚧 Planned |
-| FR-009 | FR-009-AC-8 | TC-087 | 🚧 Planned |
-| FR-009 | FR-009-AC-9 | TC-088 | 🚧 Planned |
-| FR-009 | FR-009-AC-10 | TC-132 | 🚧 Planned |
-| FR-009 | FR-009-AC-11 | TC-133 | 🚧 Planned |
-| FR-009 | FR-009-AC-12 | TC-134 | 🚧 Planned |
-| FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | 🚧 Planned |
-| FR-010 | FR-010-AC-1 | TC-089 | 🚧 Planned |
-| FR-010 | FR-010-AC-2 | TC-090 | 🚧 Planned |
-| FR-010 | FR-010-AC-3 | TC-091 | 🚧 Planned |
-| FR-010 | FR-010-AC-4 | TC-092 | 🚧 Planned |
-| FR-010 | FR-010-AC-5 | TC-093 | 🚧 Planned |
-| FR-010 | FR-010-AC-6 | TC-094 | 🚧 Planned |
-| FR-010 | FR-010-AC-7 | TC-095 | 🚧 Planned |
-| FR-010 | FR-010-AC-8 | TC-096 | 🚧 Planned |
-| FR-010 | FR-010-AC-9 | TC-135 | 🚧 Planned |
-| FR-010 | FR-010-AC-10 | TC-136 | 🚧 Planned |
-| FR-011 | FR-011-AC-1 | TC-097 | 🚧 Planned |
-| FR-011 | FR-011-AC-2 | TC-098 | 🚧 Planned |
-| FR-011 | FR-011-AC-3 | TC-099 | 🚧 Planned |
-| FR-011 | FR-011-AC-4 | TC-100 | 🚧 Planned |
-| FR-011 | FR-011-AC-5 | TC-101 | 🚧 Planned |
-| FR-011 | FR-011-AC-6 | TC-102 | 🚧 Planned |
-| FR-011 | FR-011-AC-7 | TC-103 | 🚧 Planned |
-| FR-011 | FR-011-AC-8 | TC-104 | 🚧 Planned |
-| FR-011 | FR-011-AC-9 | TC-105 | 🚧 Planned |
-| FR-011 | FR-011-AC-10 | TC-106 | 🚧 Planned |
-| FR-011 | FR-011-AC-11 | TC-107 | 🚧 Planned |
-| FR-011 | FR-011-AC-12 | TC-108 | 🚧 Planned |
-| FR-011 | FR-011-AC-13 | TC-109 | 🚧 Planned |
-| FR-011 | FR-011-AC-14 | TC-110 | 🚧 Planned |
-| FR-011 | FR-011-AC-15 | TC-137 | 🚧 Planned |
-| FR-011 | FR-011-AC-16 | TC-138 | 🚧 Planned |
-| FR-011 | FR-011-AC-17 | TC-139 | 🚧 Planned |
-| FR-011 | FR-011-AC-18 | TC-140 | 🚧 Planned |
-| FR-012 | FR-012-AC-1 | TC-111 | 🚧 Planned |
-| FR-012 | FR-012-AC-2 | TC-112 | 🚧 Planned |
-| FR-012 | FR-012-AC-3 | TC-113 | 🚧 Planned |
-| FR-012 | FR-012-AC-4 | TC-114 | 🚧 Planned |
-| FR-012 | FR-012-AC-5 | TC-115 | 🚧 Planned |
-| FR-012 | FR-012-AC-6 | TC-116 | 🚧 Planned |
-| FR-012 | FR-012-AC-7 | TC-117 | 🚧 Planned |
-| FR-012 | FR-012-AC-8 | TC-118 | 🚧 Planned |
-| FR-012 | FR-012-AC-9 | TC-119 | 🚧 Planned |
-| FR-012 | FR-012-AC-10 | TC-141 | 🚧 Planned |
-| FR-012 | FR-012-AC-11 | TC-142 | 🚧 Planned |
-| FR-013 | FR-013-AC-1 | TC-120 | 🚧 Planned |
-| FR-013 | FR-013-AC-2 | TC-121 | 🚧 Planned |
-| FR-013 | FR-013-AC-3 | TC-122 | 🚧 Planned |
-| FR-013 | FR-013-AC-4 | TC-123 | 🚧 Planned |
-| FR-013 | FR-013-AC-5 | TC-124 | 🚧 Planned |
-| FR-013 | FR-013-AC-6 | TC-125 | 🚧 Planned |
-| FR-013 | FR-013-AC-7 | Inspection (discharged by TC-091) | 🚧 Planned |
-| FR-013 | FR-013-AC-8 | TC-143 | 🚧 Planned |
+| FR-009 | FR-009-AC-1 | TC-080 | ✅ Complete |
+| FR-009 | FR-009-AC-2 | TC-081 | ✅ Complete |
+| FR-009 | FR-009-AC-3 | TC-082 | ✅ Complete |
+| FR-009 | FR-009-AC-4 | TC-083 | ✅ Complete |
+| FR-009 | FR-009-AC-5 | TC-084 | ✅ Complete |
+| FR-009 | FR-009-AC-6 | TC-085 | ✅ Complete |
+| FR-009 | FR-009-AC-7 | TC-086 | ✅ Complete |
+| FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
+| FR-009 | FR-009-AC-9 | TC-088 | ✅ Complete |
+| FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
+| FR-009 | FR-009-AC-11 | TC-133 | ✅ Complete |
+| FR-009 | FR-009-AC-12 | TC-134 | ✅ Complete |
+| FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
+| FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
+| FR-010 | FR-010-AC-2 | TC-090 | ✅ Complete |
+| FR-010 | FR-010-AC-3 | TC-091 | ✅ Complete |
+| FR-010 | FR-010-AC-4 | TC-092 | ✅ Complete |
+| FR-010 | FR-010-AC-5 | TC-093 | ✅ Complete |
+| FR-010 | FR-010-AC-6 | TC-094 | ✅ Complete |
+| FR-010 | FR-010-AC-7 | TC-095 | ✅ Complete |
+| FR-010 | FR-010-AC-8 | TC-096 | ✅ Complete |
+| FR-010 | FR-010-AC-9 | TC-135 | ❌ blocked on quire-rs#221, quire-rs#394 |
+| FR-010 | FR-010-AC-10 | TC-136 | ✅ Complete |
+| FR-011 | FR-011-AC-1 | TC-097 | ✅ Complete |
+| FR-011 | FR-011-AC-2 | TC-098 | ✅ Complete |
+| FR-011 | FR-011-AC-3 | TC-099 | ✅ Complete |
+| FR-011 | FR-011-AC-4 | TC-100 | ✅ Complete |
+| FR-011 | FR-011-AC-5 | TC-101 | ✅ Complete |
+| FR-011 | FR-011-AC-6 | TC-102 | ✅ Complete |
+| FR-011 | FR-011-AC-7 | TC-103 | ✅ Complete |
+| FR-011 | FR-011-AC-8 | TC-104 | ✅ Complete |
+| FR-011 | FR-011-AC-9 | TC-105 | ✅ Complete |
+| FR-011 | FR-011-AC-10 | TC-106 | ✅ Complete |
+| FR-011 | FR-011-AC-11 | TC-107 | ✅ Complete |
+| FR-011 | FR-011-AC-12 | TC-108 | ✅ Complete |
+| FR-011 | FR-011-AC-13 | TC-109 | ✅ Complete |
+| FR-011 | FR-011-AC-14 | TC-110 | ✅ Complete |
+| FR-011 | FR-011-AC-15 | TC-137 | ✅ Complete |
+| FR-011 | FR-011-AC-16 | TC-138 | ✅ Complete |
+| FR-011 | FR-011-AC-17 | TC-139 | ✅ Complete |
+| FR-011 | FR-011-AC-18 | TC-140 | ✅ Complete |
+| FR-012 | FR-012-AC-1 | TC-111 | ✅ Complete |
+| FR-012 | FR-012-AC-2 | TC-112 | ✅ Complete |
+| FR-012 | FR-012-AC-3 | TC-113 | ✅ Complete |
+| FR-012 | FR-012-AC-4 | TC-114 | ✅ Complete |
+| FR-012 | FR-012-AC-5 | TC-115 | ✅ Complete |
+| FR-012 | FR-012-AC-6 | TC-116 | ✅ Complete |
+| FR-012 | FR-012-AC-7 | TC-117 | ✅ Complete |
+| FR-012 | FR-012-AC-8 | TC-118 | ✅ Complete |
+| FR-012 | FR-012-AC-9 | TC-119 | ✅ Complete |
+| FR-012 | FR-012-AC-10 | TC-141 | ✅ Complete |
+| FR-012 | FR-012-AC-11 | TC-142 | ✅ Complete |
+| FR-013 | FR-013-AC-1 | TC-120 | ✅ Complete |
+| FR-013 | FR-013-AC-2 | TC-121 | ✅ Complete |
+| FR-013 | FR-013-AC-3 | TC-122 | ✅ Complete |
+| FR-013 | FR-013-AC-4 | TC-123 | ✅ Complete |
+| FR-013 | FR-013-AC-5 | TC-124 | ✅ Complete |
+| FR-013 | FR-013-AC-6 | TC-125 | ✅ Complete |
+| FR-013 | FR-013-AC-7 | Inspection (discharged by TC-091) | ✅ Complete |
+| FR-013 | FR-013-AC-8 | TC-143 | ✅ Complete |
 
 ### Non-Functional Requirement Coverage
 
@@ -161,8 +161,8 @@ claim (SR-008 FND-004).
 
 | Non-Functional Req | Verification Method | Evidence/Test Cases | Status |
 |--------------------|---------------------|---------------------|--------|
-| NFR-001 | Test | TC-127, TC-128, TC-129, TC-130 | 🚧 Planned |
-| NFR-001 | Demonstration | TC-131 | 🚧 Planned |
+| NFR-001 | Test | TC-127, TC-128, TC-129, TC-130 | ✅ Complete |
+| NFR-001 | Demonstration | TC-131 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -242,70 +242,70 @@ claim (SR-008 FND-004).
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
 | TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
-| TC-080 | After `make schemas`, `schemas/` holds exactly the projections `toolchain.json` lists — one model per declared artifact type plus the support models — with compiler 1.15.0 and emitter 1.15.0 recorded | Unit | P0 | FR-009-AC-1, US-002 | 🚧 |
-| TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name, with the version segment read from the manifest rather than hard-coded | Unit | P0 | FR-009-AC-2, FR-009-CON-5 | 🚧 |
-| TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core 0.1.0 model; no other host or version appears | Unit | P0 | FR-009-AC-3 | 🚧 |
-| TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | 🚧 |
-| TC-084 | A `@jsonSchema` base whose version differs from the manifest `version` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-5, FR-009-CON-4 | 🚧 |
-| TC-085 | An extra `schemas/Stale.json` makes the check exit non-zero naming it, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed | Unit | P0 | FR-009-AC-6 | 🚧 |
-| TC-086 | The built wheel and the staged npm tree each carry `schemas/<Model>.json` for every exported model beside `manifest.yaml` | Unit | P1 | FR-009-AC-7 | 🚧 |
-| TC-087 | Two generator runs over one tree produce byte-identical files and an identical `toolchain.json` digest | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | 🚧 |
-| TC-088 | `toolchain.json` records the resolved semantic-core version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes | Unit | P1 | FR-009-AC-9 | 🚧 |
-| TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | 🚧 |
-| TC-090 | Every declared artifact type carries reference-form `data_schema`, the referenced file exists, and its SHA-256 equals the recorded digest; none carries an inline `data_schema` | Unit | P0 | FR-010-AC-2 | 🚧 |
-| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys and the two added `required: false` locators — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | 🚧 |
-| TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | 🚧 |
-| TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | 🚧 |
-| TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, and an altered `data_schema.digest` is refused naming the path (expected failure: quire-rs#221, quire-rs#394 make both refusals silent) | Unit | P0 | FR-010-AC-6 | 🚧 |
-| TC-095 | `make manifest-digests` rewrites no byte on the committed tree, and after one schema is regenerated rewrites exactly that type's digest and nothing else | Unit | P1 | FR-010-AC-7, FR-010-CON-4 | 🚧 |
-| TC-096 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0 | Unit | P1 | FR-010-AC-8 | 🚧 |
-| TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | 🚧 |
-| TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | 🚧 |
-| TC-099 | Every section and column `mappings.yaml` names is declared by that type's `body_extraction` | Unit | P0 | FR-011-AC-3, FR-011-CON-1 | 🚧 |
-| TC-100 | For each shipped skeleton the reference mapping builds a record that validates against its emitted schema and equals the shipped golden record byte for byte | Unit | P0 | FR-011-AC-4, US-002 | 🚧 |
-| TC-101 | A `Status` cell carrying a marker and a note splits into `marker` and `note`; a bare marker yields no `note` | Unit | P1 | FR-011-AC-5 | 🚧 |
-| TC-102 | The `Traces To` parse expands the elided-parent and slash shorthands, carries a parenthesised remainder as `note`, and maps a lone `-` to an empty list with `noTrace: true` | Unit | P0 | FR-011-AC-6 | 🚧 |
-| TC-103 | A table omitting a declared optional column yields rows without that key rather than a synthesised value | Unit | P1 | FR-011-AC-7 | 🚧 |
-| TC-104 | Prose under a clause section yields an empty clause list; orphan fence, second fence, unterminated fence and duplicate `clauseId` each report their named error and build no record | Unit | P0 | FR-011-AC-8 | 🚧 |
-| TC-105 | A document carrying both the typed table and the `sysml` fence under one section reports `both-forms` and builds no record | Unit | P0 | FR-011-AC-9 | 🚧 |
-| TC-106 | A document with three independent defects reports three errors in one pass, each naming the model, the property and the line | Unit | P0 | FR-011-AC-10 | 🚧 |
-| TC-107 | Two rows sharing an id report `duplicate-row-id` naming both lines | Unit | P1 | FR-011-AC-11 | 🚧 |
-| TC-108 | An escaped pipe inside a cell is carried as a literal pipe and does not split the row | Unit | P1 | FR-011-AC-12 | 🚧 |
-| TC-109 | A CRLF copy of a skeleton produces the same record as its LF original | Unit | P1 | FR-011-AC-13 | 🚧 |
-| TC-110 | Every frontmatter key a model does not declare is listed in that model's dropped key set | Unit | P1 | FR-011-AC-14 | 🚧 |
-| TC-111 | `skeletons/` holds exactly one `<Type>.md` per declared artifact type plus `Standard.sysml.md` | Unit | P0 | FR-012-AC-1 | 🚧 |
-| TC-112 | Every skeleton validates against its own archetype through Quire with zero error findings | Integration | P0 | FR-012-AC-2, FR-012-CON-1 | 🚧 |
-| TC-113 | For every skeleton the reference mapping builds a record that validates against its emitted schema | Unit | P0 | FR-012-AC-3 | 🚧 |
-| TC-114 | Every required section is present in its type's skeleton and every asserted table satisfies its locator's asserts | Unit | P0 | FR-012-AC-4 | 🚧 |
-| TC-115 | `Standard.md` carries the typed `## Properties` table and an `ocl` clause; `Standard.sysml.md` declares the same fields in one `sysml` fence, and the two records differ in no property | Unit | P0 | FR-012-AC-5 | 🚧 |
-| TC-116 | The added `Standard` `properties` and `invariants` locators are both `required: false`, and a Standard carrying neither section still validates | Unit | P0 | FR-012-AC-6, FR-012-CON-2 | 🚧 |
-| TC-117 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and none passes | Unit | P0 | FR-012-AC-7 | 🚧 |
-| TC-118 | The negative set covers each of the eleven stated rejections, one fixture per rejection | Unit | P1 | FR-012-AC-8 | 🚧 |
-| TC-119 | No file under `tests/fixtures/` reaches the wheel, the sdist or the staged npm tree, and `quire coverage` over this repository mints no id from it | Integration | P0 | FR-012-AC-9, FR-012-CON-3 | 🚧 |
-| TC-120 | Every exported model carries exactly one role, `definition` or `evidence-act`, matching the declared assignment | Unit | P0 | FR-013-AC-1, FR-013-CON-1 | 🚧 |
-| TC-121 | No emitted model declares a run identifier, run timestamp, duration, pass/fail count, log location or run artefact | Unit | P0 | FR-013-AC-2 | 🚧 |
-| TC-122 | `Plan` and `Task` declare no execution property; a Task record carries its authored `track`, dependencies and verification references only | Unit | P0 | FR-013-AC-3 | 🚧 |
-| TC-123 | `SpecReview` findings rows carry `id`, `severity`, `summary`, `refs` and optional `escapeCause`; a `Finding` document id matches `FIND-` while a row id matches `FND-` | Unit | P0 | FR-013-AC-4 | 🚧 |
-| TC-124 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, answering which criteria a row claims without re-parsing the cell | Unit | P0 | FR-013-AC-5 | 🚧 |
-| TC-125 | `mappings.yaml` records the run-record concepts this module does not model and names their owner | Unit | P1 | FR-013-AC-6 | 🚧 |
-| TC-126 | The archetype declarations are byte-identical to the 0.1.0 baseline apart from the additions FR-010 and FR-012 name | Unit | P0 | FR-013-AC-7 | 🚧 |
-| TC-127 | Every 0.1.0 archetype, artifact type, object type, grammar, doc kind, traceability declaration and verification-catalog entry survives to 0.2.0 with identical content apart from the named additions | Unit | P0 | NFR-001-AC-1 | 🚧 |
-| TC-128 | No declared vocabulary gains or loses a member between 0.1.0 and 0.2.0 | Unit | P0 | NFR-001-AC-2 | 🚧 |
-| TC-129 | Every locator added at 0.2.0 is `required: false` | Unit | P0 | NFR-001-AC-3 | 🚧 |
-| TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | 🚧 |
-| TC-131 | `spec-objects-business` and `filament-core-data` each validate under 0.2.0 with no error finding they did not already report under 0.1.0 | Demonstration | P0 | NFR-001-AC-5 | 🚧 |
-| TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | 🚧 |
-| TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | 🚧 |
-| TC-134 | A tree whose schemas and digests agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | 🚧 |
-| TC-135 | The refusal of an unknown `semantic` key names the key and a mismatched digest names the path. STRICT EXPECTED FAILURE against quire 0.46.0: both refusals are silent (quire-rs#221, quire-rs#394). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | 🚧 |
-| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | 🚧 |
-| TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | 🚧 |
-| TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | 🚧 |
-| TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | 🚧 |
-| TC-140 | Every mapping kind named in `semantic.mappings` is used by at least one model property — no kind is declared aspirationally | Unit | P0 | FR-011-AC-18 | 🚧 |
-| TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | 🚧 |
-| TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | 🚧 |
-| TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | 🚧 |
+| TC-080 | After `make schemas`, `schemas/` holds exactly the projections `toolchain.json` lists — one model per declared artifact type plus the support models — with compiler 1.15.0 and emitter 1.15.0 recorded | Unit | P0 | FR-009-AC-1, US-002 | ✅ |
+| TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name, with the version segment read from the manifest rather than hard-coded | Unit | P0 | FR-009-AC-2, FR-009-CON-5 | ✅ |
+| TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core 0.1.0 model; no other host or version appears | Unit | P0 | FR-009-AC-3 | ✅ |
+| TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | ✅ |
+| TC-084 | A `@jsonSchema` base whose version differs from the manifest `version` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-5, FR-009-CON-4 | ✅ |
+| TC-085 | An extra `schemas/Stale.json` makes the check exit non-zero naming it, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed | Unit | P0 | FR-009-AC-6 | ✅ |
+| TC-086 | The built wheel and the staged npm tree each carry `schemas/<Model>.json` for every exported model beside `manifest.yaml` | Unit | P1 | FR-009-AC-7 | ✅ |
+| TC-087 | Two generator runs over one tree produce byte-identical files and an identical `toolchain.json` digest | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | ✅ |
+| TC-088 | `toolchain.json` records the resolved semantic-core version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes | Unit | P1 | FR-009-AC-9 | ✅ |
+| TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
+| TC-090 | Every declared artifact type carries reference-form `data_schema`, the referenced file exists, and its SHA-256 equals the recorded digest; none carries an inline `data_schema` | Unit | P0 | FR-010-AC-2 | ✅ |
+| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys and the two added `required: false` locators — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
+| TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
+| TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
+| TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, and an altered `data_schema.digest` is refused naming the path (expected failure: quire-rs#221, quire-rs#394 make both refusals silent) | Unit | P0 | FR-010-AC-6 | ✅ |
+| TC-095 | `make manifest-digests` rewrites no byte on the committed tree, and after one schema is regenerated rewrites exactly that type's digest and nothing else | Unit | P1 | FR-010-AC-7, FR-010-CON-4 | ✅ |
+| TC-096 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0 | Unit | P1 | FR-010-AC-8 | ✅ |
+| TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | ✅ |
+| TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | ✅ |
+| TC-099 | Every section and column `mappings.yaml` names is declared by that type's `body_extraction` | Unit | P0 | FR-011-AC-3, FR-011-CON-1 | ✅ |
+| TC-100 | For each shipped skeleton the reference mapping builds a record that validates against its emitted schema and equals the shipped golden record byte for byte | Unit | P0 | FR-011-AC-4, US-002 | ✅ |
+| TC-101 | A `Status` cell carrying a marker and a note splits into `marker` and `note`; a bare marker yields no `note` | Unit | P1 | FR-011-AC-5 | ✅ |
+| TC-102 | The `Traces To` parse expands the elided-parent and slash shorthands, carries a parenthesised remainder as `note`, and maps a lone `-` to an empty list with `noTrace: true` | Unit | P0 | FR-011-AC-6 | ✅ |
+| TC-103 | A table omitting a declared optional column yields rows without that key rather than a synthesised value | Unit | P1 | FR-011-AC-7 | ✅ |
+| TC-104 | Prose under a clause section yields an empty clause list; orphan fence, second fence, unterminated fence and duplicate `clauseId` each report their named error and build no record | Unit | P0 | FR-011-AC-8 | ✅ |
+| TC-105 | A document carrying both the typed table and the `sysml` fence under one section reports `both-forms` and builds no record | Unit | P0 | FR-011-AC-9 | ✅ |
+| TC-106 | A document with three independent defects reports three errors in one pass, each naming the model, the property and the line | Unit | P0 | FR-011-AC-10 | ✅ |
+| TC-107 | Two rows sharing an id report `duplicate-row-id` naming both lines | Unit | P1 | FR-011-AC-11 | ✅ |
+| TC-108 | An escaped pipe inside a cell is carried as a literal pipe and does not split the row | Unit | P1 | FR-011-AC-12 | ✅ |
+| TC-109 | A CRLF copy of a skeleton produces the same record as its LF original | Unit | P1 | FR-011-AC-13 | ✅ |
+| TC-110 | Every frontmatter key a model does not declare is listed in that model's dropped key set | Unit | P1 | FR-011-AC-14 | ✅ |
+| TC-111 | `skeletons/` holds exactly one `<Type>.md` per declared artifact type plus `Standard.sysml.md` | Unit | P0 | FR-012-AC-1 | ✅ |
+| TC-112 | Every skeleton validates against its own archetype through Quire with zero error findings | Integration | P0 | FR-012-AC-2, FR-012-CON-1 | ✅ |
+| TC-113 | For every skeleton the reference mapping builds a record that validates against its emitted schema | Unit | P0 | FR-012-AC-3 | ✅ |
+| TC-114 | Every required section is present in its type's skeleton and every asserted table satisfies its locator's asserts | Unit | P0 | FR-012-AC-4 | ✅ |
+| TC-115 | `Standard.md` carries the typed `## Properties` table and an `ocl` clause; `Standard.sysml.md` declares the same fields in one `sysml` fence, and the two records differ in no property | Unit | P0 | FR-012-AC-5 | ✅ |
+| TC-116 | The added `Standard` `properties` and `invariants` locators are both `required: false`, and a Standard carrying neither section still validates | Unit | P0 | FR-012-AC-6, FR-012-CON-2 | ✅ |
+| TC-117 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and none passes | Unit | P0 | FR-012-AC-7 | ✅ |
+| TC-118 | The negative set covers each of the eleven stated rejections, one fixture per rejection | Unit | P1 | FR-012-AC-8 | ✅ |
+| TC-119 | No file under `tests/fixtures/` reaches the wheel, the sdist or the staged npm tree, and `quire coverage` over this repository mints no id from it | Integration | P0 | FR-012-AC-9, FR-012-CON-3 | ✅ |
+| TC-120 | Every exported model carries exactly one role, `definition` or `evidence-act`, matching the declared assignment | Unit | P0 | FR-013-AC-1, FR-013-CON-1 | ✅ |
+| TC-121 | No emitted model declares a run identifier, run timestamp, duration, pass/fail count, log location or run artefact | Unit | P0 | FR-013-AC-2 | ✅ |
+| TC-122 | `Plan` and `Task` declare no execution property; a Task record carries its authored `track`, dependencies and verification references only | Unit | P0 | FR-013-AC-3 | ✅ |
+| TC-123 | `SpecReview` findings rows carry `id`, `severity`, `summary`, `refs` and optional `escapeCause`; a `Finding` document id matches `FIND-` while a row id matches `FND-` | Unit | P0 | FR-013-AC-4 | ✅ |
+| TC-124 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, answering which criteria a row claims without re-parsing the cell | Unit | P0 | FR-013-AC-5 | ✅ |
+| TC-125 | `mappings.yaml` records the run-record concepts this module does not model and names their owner | Unit | P1 | FR-013-AC-6 | ✅ |
+| TC-126 | The archetype declarations are byte-identical to the 0.1.0 baseline apart from the additions FR-010 and FR-012 name | Unit | P0 | - | ⛔ retired: SR-013 FND-004 made FR-010-AC-3 the single normative baseline claim, so this row duplicated TC-091 |
+| TC-127 | Every 0.1.0 archetype, artifact type, object type, grammar, doc kind, traceability declaration and verification-catalog entry survives to 0.2.0 with identical content apart from the named additions | Unit | P0 | NFR-001-AC-1 | ✅ |
+| TC-128 | No declared vocabulary gains or loses a member between 0.1.0 and 0.2.0 | Unit | P0 | NFR-001-AC-2 | ✅ |
+| TC-129 | Every locator added at 0.2.0 is `required: false` | Unit | P0 | NFR-001-AC-3 | ✅ |
+| TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | ✅ |
+| TC-131 | `spec-objects-business` and `filament-core-data` each validate under 0.2.0 with no error finding they did not already report under 0.1.0 | Demonstration | P0 | NFR-001-AC-5 | ✅ |
+| TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | ✅ |
+| TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | ✅ |
+| TC-134 | A tree whose schemas and digests agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | ✅ |
+| TC-135 | The refusal of an unknown `semantic` key names the key and a mismatched digest names the path. STRICT EXPECTED FAILURE against quire 0.46.0: both refusals are silent (quire-rs#221, quire-rs#394). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221, quire-rs#394 |
+| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | ✅ |
+| TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | ✅ |
+| TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | ✅ |
+| TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | ✅ |
+| TC-140 | Every mapping kind named in `semantic.mappings` is used by at least one model property — no kind is declared aspirationally | Unit | P0 | FR-011-AC-18 | ✅ |
+| TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | ✅ |
+| TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
+| TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
 
 ## Option Permutation Matrix
 

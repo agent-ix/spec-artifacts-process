@@ -43,7 +43,9 @@ def rewrite(text: str) -> tuple[str, list[str]]:
         schema = match.group("schema")
         path = MODULE_ROOT / schema
         if not path.is_file():
-            raise SystemExit(f"manifest references {schema}, which does not exist at {path}")
+            raise SystemExit(
+                f"manifest references {schema}, which does not exist at {path}"
+            )
         current = digest_of(path)
         if current != match.group("digest"):
             changed.append(schema)

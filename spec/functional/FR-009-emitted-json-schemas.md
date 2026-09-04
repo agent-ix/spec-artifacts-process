@@ -64,9 +64,13 @@ between the source and the shipped bytes fails the build.
   `https://schemas.agent-ix.org/semantic-core/`.
 - If the emitter writes any entry that is not a top-level `*.json` file, then the generator SHALL
   exit non-zero naming that entry rather than bundling a subset.
-- If the emitter leaves any `$id` relative, then the generator SHALL rewrite that `$id` to
-  `<base><file>` and record the file in `toolchain.json`.
-- Where no `$id` is relative, the generator SHALL record the normalization as `applied: false`.
+- If the emitter leaves any `$id` or `$ref` relative, then the generator SHALL rewrite it to
+  `<base><file>` and record the file in `toolchain.json`. A relative `$ref` matters as much as a
+  relative `$id`: it resolves against whatever base the reader happens to have, so one bundle
+  means different things to two consumers, and a validator with no base fails to resolve it at
+  all.
+- Where no `$id` and no `$ref` is relative, the generator SHALL record the normalization as
+  `applied: false`.
 - If the `@jsonSchema` base in `main.tsp` differs from the manifest `version`, then the generator SHALL exit non-zero naming both values.
 - Every emitted schema SHALL declare `$schema: https://json-schema.org/draft/2020-12/schema` and
   `$id: https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<manifest version>/<Model>.json`

@@ -1,0 +1,20 @@
+{
+  "id": "INS-001",
+  "inspections": [
+    {
+      "commit": "abc123def456",
+      "id": "INSP-001",
+      "line": 35,
+      "note": "Read the generated output against the criterion",
+      "obligation": "FR-001-AC-1",
+      "verdict": "Pass",
+      "who": "@reviewer"
+    }
+  ],
+  "provenance": {
+    "digest": "sha256:15972a88c0d23b4b6f99ae3640a9e6535396176df661b74a18cc882aeda16c5b",
+    "path": "skeletons/Inspections.md"
+  },
+  "title": "Inspection and analysis record",
+  "type": "Inspections"
+}

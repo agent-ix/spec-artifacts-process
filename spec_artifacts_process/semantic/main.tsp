@@ -412,11 +412,16 @@ model IntegrationMatrixRow {
   line: LineNumber;
 }
 
-/** One `## Coverage Gaps` row: the register of what is knowingly uncovered. */
+/**
+ * One `## Coverage Gaps` row: the register of what is knowingly uncovered.
+ *
+ * The locator asserts an id column and no column list, so the header belongs to
+ * the author. `cells` carries every other authored cell by column name rather
+ * than dropping the columns this module has no contract to name.
+ */
 model CoverageGapRow {
   id: GapId;
-  /** free text: what is uncovered and why. */
-  description: NonEmptyText;
+  cells: Record<string>;
   line: LineNumber;
 }
 
@@ -493,10 +498,11 @@ model ADR {
   type: "ADR";
   object?: ObjectTypeName;
   state?: AdrState;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** free text: the whole authored body; the archetype declares no `body_extraction`, so no section is asserted. */
-  body: string;
+  body: Section;
 }
 
 /**
@@ -511,10 +517,11 @@ model Plan {
   object?: ObjectTypeName;
   /** free text: the authored lifecycle word (`active`, `done`); the archetype declares no vocabulary for it. */
   status?: NonEmptyText;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** free text: the whole authored body; the archetype declares no `body_extraction`. */
-  body: string;
+  body: Section;
 }
 
 /**
@@ -530,10 +537,11 @@ model Task {
   status?: NonEmptyText;
   /** The parallel-execution track label (FR-005). A property of a Task; a consumer needing a tree node synthesises one. */
   track?: NonEmptyText;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** free text: the whole authored body; the archetype declares no `body_extraction`. */
-  body: string;
+  body: Section;
 }
 
 /** Freeform review record (archetype `Review`), the parent of `Finding` documents. */
@@ -542,10 +550,11 @@ model Review {
   title: NonEmptyText;
   type: "Review";
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** free text: the whole authored body; the archetype declares no `body_extraction`. */
-  body: string;
+  body: Section;
 }
 
 /**
@@ -562,7 +571,8 @@ model SpecReview {
   scope?: NonEmptyText[];
   reviewSet?: ReviewSet;
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   summary: Section;
   @minItems(1) findings: FindingRow[];
@@ -578,10 +588,11 @@ model Finding {
   title: NonEmptyText;
   type: "Finding";
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** free text: the whole authored body; the archetype declares no `body_extraction`, because nothing authors one today. */
-  body: string;
+  body: Section;
 }
 
 /** Review-thread feedback record (archetype `Feedback`). */
@@ -595,7 +606,8 @@ model Feedback {
   decision?: FeedbackDecision;
   anchor: FeedbackAnchor;
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   comment: Section;
 }
@@ -611,7 +623,8 @@ model TestMatrixIndex {
   title: NonEmptyText;
   type: "TestMatrixIndex";
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   @minItems(1) subsystemIndex: SubsystemIndexRow[];
   /** Optional: a repository whose subsystems do not integrate has none, and requiring the table would force an empty one. */
@@ -631,7 +644,8 @@ model TestMatrix {
   title: NonEmptyText;
   type: "TestMatrix";
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   @minItems(1) functionalCoverage: FunctionalCoverageRow[];
   @minItems(1) testCases: TestCaseRow[];
@@ -664,7 +678,8 @@ model Standard {
   /** free text: the canonical URL; the frontmatter schema declares `format: uri` and no pattern. */
   link?: string;
   object?: ObjectTypeName;
-  relationships: Relationship[];
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
   provenance: Provenance;
   /** The typed `## Properties` declarations, authored as the table or as the `sysml` fence — one artifact carries one form. */
   @minItems(1) properties?: FieldDecl[];

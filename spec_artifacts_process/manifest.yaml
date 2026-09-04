@@ -65,7 +65,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
   data_schema:
     schema: schemas/ADR.json
-    digest: sha256:386c6528594bf085e78e99a9ee410753dd9d8c263e8dc6b87a5709ba5b9df912
+    digest: sha256:0c212af183137d60fdfe6553d1b3bd07405fd886c5cc27f9d53a101184b45098
   defaults:
     id_pattern: ADR-{next:03d}
   allowed_links:
@@ -80,7 +80,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
   data_schema:
     schema: schemas/Plan.json
-    digest: sha256:8fa4bd5978eecf5e5d7673253ee5545b97ae35c6ab34b7e2e31c02c15b03093f
+    digest: sha256:d578de71f45b2071d1a17af8763f61ecbf2a4e2bf023513ce6690baa651a200f
   defaults:
     id_pattern: Plan-{next:03d}
   allowed_links:
@@ -94,7 +94,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/task-frontmatter.schema.json
   data_schema:
     schema: schemas/Task.json
-    digest: sha256:1eaaa9444991794a1b8ee473052bd2beda58848ba0d4fcdc2722c48c268cab1a
+    digest: sha256:8c68a23faaffb258159b3f27cd0f410f5ced2ae409072dd530b526578072ab93
   defaults:
     id_pattern: Task-{next:03d}
   allowed_links:
@@ -108,7 +108,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/review-frontmatter.schema.json
   data_schema:
     schema: schemas/Review.json
-    digest: sha256:90395342e688c3468b71b88d3449d53275103e7761e1b35ef94b981b1f3e4d74
+    digest: sha256:e9f6b77dc5bfcf1967883e40d711f052cc4990da3917a740d234d87a9268cc50
   defaults:
     id_pattern: Review-{next:03d}
   allowed_links:
@@ -121,7 +121,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/spec-review-frontmatter.schema.json
   data_schema:
     schema: schemas/SpecReview.json
-    digest: sha256:c81973b6833d795a3eaf6e1561057e152b6979790402db2b8ec5078eb64c9034
+    digest: sha256:833806e1c144d9a8f7195626914209ddcbc187a4202e95284997d4d2db00f93d
   defaults:
     id_pattern: SR-{next:03d}
   allowed_links:
@@ -174,7 +174,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/finding-frontmatter.schema.json
   data_schema:
     schema: schemas/Finding.json
-    digest: sha256:2d7b0167be52850e472662309b16f2fff24e49148b8cbb2d2996746ebc7d83cb
+    digest: sha256:b7c554f3257699410b835f83875ff4b077c026d821e92bf3b691b777e48600f0
   defaults:
     # FR-008: `FIND-`, not `Finding-`. The old pattern minted `Finding-001`,
     # which fails this archetype's own frontmatter schema (^[A-Z]{2,4}-[0-9]+$
@@ -202,7 +202,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/feedback-frontmatter.schema.json
   data_schema:
     schema: schemas/Feedback.json
-    digest: sha256:6d19e37cb7a9beb5fcca32dd2d03ff55f1388a793e1b38614540b7eac50bf504
+    digest: sha256:53dd50fbdca38d93f521f9aa1b25e6363eaa5de8a902ae6cb5215cdba4eb7fb6
   defaults:
     id_pattern: FB-{next:03d}
   allowed_links:
@@ -252,7 +252,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/testmatrix-index-frontmatter.schema.json
   data_schema:
     schema: schemas/TestMatrixIndex.json
-    digest: sha256:44def95664f34c686a635eaea34c2cb8a31bc8d23f66d4dff91069fd75b0b84f
+    digest: sha256:9b4574566adf989a3c8b032f6c5ae6742e8e428cc5c9f0822423d0b04673b157
   defaults:
     id_pattern: TestMatrix-{next:03d}
   allowed_links:
@@ -308,7 +308,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/testmatrix-frontmatter.schema.json
   data_schema:
     schema: schemas/TestMatrix.json
-    digest: sha256:7f7e4ab528bd9c80014162fcc473fa1709b74846cd3f0bd0a8aab73ed8dcd23e
+    digest: sha256:1ed921373c5b106f72f533c0862ca1136ba18ac36aaf10f77e5c0d488783e2d3
   defaults:
     id_pattern: TestMatrix-{next:03d}
   allowed_links:
@@ -450,7 +450,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
   data_schema:
     schema: schemas/Standard.json
-    digest: sha256:e5be57771e7ee901714c5db34093536d269bb543b8e27176a998f80aa72d41bd
+    digest: sha256:b2952695f5165cd6c9bafcf533de86ada7b5b24a67686ff0a6020f66aaeafbf8
   defaults:
     id_pattern: Standard-{next:03d}
   allowed_links:

@@ -130,6 +130,11 @@ filterwarnings = ["error"]
 
 markers = [
     "integration: Integration tests (require Kind cluster)",
+    # The declared `pytest-trace-marker` form (traceability.trace_tags). It must
+    # be registered, because `filterwarnings = ["error"]` turns an unknown marker
+    # into a failure — and an unregistered marker that silently warns is a tag
+    # that binds nothing.
+    "trace: Traceability marker binding a test to the Test Matrix rows it discharges",
 ]
 
 [tool.ruff]

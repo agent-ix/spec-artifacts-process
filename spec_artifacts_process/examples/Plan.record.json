@@ -1,0 +1,21 @@
+{
+  "body": {
+    "endLine": 47,
+    "startLine": 11,
+    "text": "     substantive content. Contract:\n     - Frontmatter: `type: Plan`; `id` matches ^[A-Za-z]{2,4}-[0-9]+$\n       (Plan-001 — mixed case, which is why the pattern is not upper-only).\n     - The archetype declares NO `body_extraction`, so no section is asserted.\n       The sections below are the convention `spec-to-plan` emits.\n     - `allowed_links`: contains | depends_on | references.\n     - `composition.expected_artifacts` is `Task`: a plan is a bundle\n       (`plan/<Plan-id>-<slug>/`) holding this file, an index, a log and a\n       `tasks/` directory.\n     - A Plan is an authored DEFINITION. It records what is to be done, never\n       what a run of it produced: no start time, no outcome, no duration\n       (FR-013). -->\n# Implementation Plan: checksum verification on artifact import\n\n## Requirements Summary\n\n- [ ] **FR-001**: verify the SHA-256 of every imported artifact before persisting it.\n\n## Dependency Graph\n\n- `FR-001 (digest computation) -> FR-001 (rejection path)` — nothing can be\n  rejected for a mismatch until a digest is computed.\n\n## Quality Gates\n\n**Gate 1** — a mismatched digest is refused end to end before the happy path is\noptimised. A rejection that does not fire is the whole failure mode.\n\n## Execution Tracks\n\n- **Track A**: Task-001 (digest computation) → Task-002 (rejection path).\n\n## Test Plan\n\nThe Test Matrix in `spec/tests.md` is authoritative. This plan adds no test id;\neach task's frontmatter `verifies` edges name the rows it discharges."
+  },
+  "id": "Plan-001",
+  "provenance": {
+    "digest": "sha256:835778afb1266670c8de13681539965ed963a014c0df0f1ae8e1356ecde44370",
+    "path": "skeletons/Plan.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/FR-001",
+      "type": "references"
+    }
+  ],
+  "status": "active",
+  "title": "Example plan — checksum verification on artifact import",
+  "type": "Plan"
+}

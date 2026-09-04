@@ -1,0 +1,38 @@
+{
+  "anchor": {
+    "artifact": "spec/functional/FR-003-validate-spec-in-renderer.md",
+    "block": {
+      "blockIndex": 0,
+      "headingPath": [
+        "FR-003",
+        "Acceptance Criteria"
+      ],
+      "requirementId": "FR-003-AC-2"
+    },
+    "text": {
+      "prefix": "<a few characters before the selection>",
+      "quote": "<the exact selected text>",
+      "suffix": "<a few characters after the selection>"
+    }
+  },
+  "comment": {
+    "endLine": 42,
+    "startLine": 39,
+    "text": "<The reviewer's comment. For a triage decision (kind: triage) this is the\n\"how to fix\" guidance that tells the agent exactly what to do.>"
+  },
+  "id": "FB-001",
+  "kind": "comment",
+  "provenance": {
+    "digest": "sha256:5d0acb90da9f78aaa40388422a92f4b7ddeb050f9cb684909ff5c74249bd3916",
+    "path": "skeletons/Feedback.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/FR-003",
+      "type": "references"
+    }
+  ],
+  "status": "open",
+  "title": "<short summary of the feedback>",
+  "type": "Feedback"
+}

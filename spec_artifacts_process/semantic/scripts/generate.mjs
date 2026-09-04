@@ -131,15 +131,40 @@ function requireSemanticCoreAgreement(resolved) {
   return declared;
 }
 
+/**
+ * Absolutize every relative `$id` and `$ref` the emitter left behind
+ * (filament-core-data issue #31).
+ *
+ * `$ref` matters as much as `$id`: a schema whose `$ref` is a bare file name
+ * resolves against whatever base the *reader* happens to have, so the same
+ * bundle means different things to two consumers — and a validator with no base
+ * at all simply fails to resolve it. The emitter leaves both relative for a
+ * model it did not itself decorate (a `Record<string>`, for instance), so the
+ * two are one rewrite, not two.
+ */
 function normalize(files, base) {
-  const rewritten = [];
-  for (const [name, schema] of files) {
-    if (typeof schema.$id === "string" && !/^https?:\/\//.test(schema.$id)) {
-      schema.$id = `${base}${schema.$id}`;
-      rewritten.push(name);
+  const rewritten = new Set();
+  const absolutize = (value) =>
+    /^https?:\/\//.test(value) || value.startsWith("#") ? value : `${base}${value}`;
+  const walk = (node, name) => {
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item, name);
+      return;
     }
-  }
-  return rewritten;
+    if (node === null || typeof node !== "object") return;
+    for (const key of ["$id", "$ref"]) {
+      if (typeof node[key] === "string") {
+        const next = absolutize(node[key]);
+        if (next !== node[key]) {
+          node[key] = next;
+          rewritten.add(name);
+        }
+      }
+    }
+    for (const value of Object.values(node)) walk(value, name);
+  };
+  for (const [name, schema] of files) walk(schema, name);
+  return [...rewritten].sort();
 }
 
 function render(schema) {
@@ -191,11 +216,13 @@ function emit() {
         excluded.push(entry.name);
         continue;
       }
-      // A file whose `$id` names some *other* module's base is not ours to ship
-      // and is not semantic-core either. That can only happen if the compile
-      // picked up a source this package does not own, so it is a hard failure
-      // rather than a filter.
-      if (id !== "" && !id.startsWith(MODULE_BASE_PREFIX)) {
+      // A file whose ABSOLUTE `$id` names some other module's base is not ours
+      // to ship and is not semantic-core either. That can only happen if the
+      // compile read a source this package does not own, so it is a hard
+      // failure rather than a filter. A RELATIVE `$id` is not foreign — it is
+      // exactly what the issue-31 normalization below exists to absolutize, so
+      // it is left to that step.
+      if (/^https?:\/\//.test(id) && !id.startsWith(MODULE_BASE_PREFIX)) {
         throw new Error(
           `the emitter produced ${entry.name} with a foreign $id ${id}; the compile read a source this package does not own`,
         );

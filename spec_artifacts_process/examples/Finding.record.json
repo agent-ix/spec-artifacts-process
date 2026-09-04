@@ -1,0 +1,20 @@
+{
+  "body": {
+    "endLine": 46,
+    "startLine": 10,
+    "text": "     with substantive content. Contract:\n     - Frontmatter: `type: Finding`; `id` matches ^[A-Z]{2,4}-[0-9]+$ and is\n       minted `FIND-NNN`. NOT `Finding-NNN`: that old pattern produced ids the\n       archetype's own frontmatter schema rejects (seven letters is not two to\n       four), so every id it minted was invalid.\n     - `FIND-` is deliberately NOT `FND-`. `FND-NNN` is the id namespace of the\n       findings ROWS inside a SpecReview. A Finding is a DOCUMENT and a child of\n       `Review`; giving the two one prefix would read as unification and be a\n       conflation.\n     - The archetype declares NO `body_extraction`, so no section is asserted.\n       Nothing authors a Finding today — the corpus documents typed `Finding`\n       are mistyped analyses — and the review skills emit SpecReview documents\n       with an inline findings table. A contract here would be for a form\n       nobody produces.\n     - `allowed_links`: found_in | blocks | references. -->\n# FIND-001: Import re-verification is not performed on read\n\n## Summary\n\nArtifacts are verified once, at import. Nothing re-verifies the stored bytes on\nread, so corruption after persistence is not detected by this path.\n\n## Evidence\n\nRead at commit `a1b2c3d`: the digest comparison runs in the import handler and\nhas no counterpart in the read handler.\n\n## Impact\n\nA consumer receives bytes the system believes are intact on the strength of a\ncheck performed once, at a different time.\n\n## Recommendation\n\nEither re-verify on read, or state the single-verification boundary in the\nrequirement so a reader is not left to infer it."
+  },
+  "id": "FIND-001",
+  "provenance": {
+    "digest": "sha256:45439cf29d7faafca8819a7e6e503721bc6a0bafc778ff31757ea42b8a64f9fd",
+    "path": "skeletons/Finding.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/FR-001",
+      "type": "found_in"
+    }
+  ],
+  "title": "Import re-verification is not performed on read",
+  "type": "Finding"
+}
