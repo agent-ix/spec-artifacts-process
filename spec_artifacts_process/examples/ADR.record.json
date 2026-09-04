@@ -1,0 +1,20 @@
+{
+  "body": {
+    "endLine": 53,
+    "startLine": 10,
+    "text": "     substantive content. Contract:\n     - Frontmatter: `type: ADR`; `id` matches ^[A-Z]{2,4}-[0-9]+$ (ADR-001).\n     - The archetype declares NO `body_extraction`, so no section is asserted\n       by `quire validate`. The sections below are the convention this module\n       ships, not a validated contract: adding one to the manifest would make\n       every existing ADR in every consuming repository fail, which the\n       module's compatibility posture forbids.\n     - `allowed_links`: supersedes | superseded_by | relates_to | depends_on.\n     - The archetype's `composition.states` are proposed | accepted |\n       superseded | rejected; record the current one under `## Status`. -->\n# ADR-001: Bind emitted schemas by digest rather than by version\n\n## Status\n\nAccepted, 2026-09-04. Supersedes nothing.\n\n## Context\n\nA module manifest references the JSON Schema of each type it declares. A\nreference by version alone names whatever bytes that version currently holds,\nso two consumers resolving the same version string from two registries can read\ndifferent schemas and neither can tell.\n\n## Decision\n\nThe manifest SHALL reference each schema by path **and** SHA-256 digest, and the\nbuild SHALL refuse a tree where a recorded digest and the shipped bytes differ.\n\n## Consequences\n\nEvery schema regeneration rewrites the digests, so the schemas, the digests and\nthe manifest version move in one commit or the drift gate fails. A consumer that\nresolves the reference can prove it read the bytes the module published. The\ncost is that a version bump is no longer a one-line edit; that cost is accepted\nand is discharged by `make schemas && make manifest-digests`.\n\n## Alternatives Considered\n\n- **Version-only reference.** Cheaper to maintain and unable to detect the\n  failure it exists to prevent.\n- **Inline the schema in the manifest.** Removes the resolution problem and\n  makes the manifest unreadable; it also duplicates bytes the package already\n  ships."
+  },
+  "id": "ADR-001",
+  "provenance": {
+    "digest": "sha256:afbd078d598be5ed923de6813cd943bde935c15263d1da48d3db5b5e61d64743",
+    "path": "skeletons/ADR.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/ADR-000",
+      "type": "relates_to"
+    }
+  ],
+  "title": "Bind emitted schemas by digest rather than by version",
+  "type": "ADR"
+}

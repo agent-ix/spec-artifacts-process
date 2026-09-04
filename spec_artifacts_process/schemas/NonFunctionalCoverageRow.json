@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonFunctionalCoverageRow.json",
+  "type": "object",
+  "properties": {
+    "nonFunctionalReq": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the non-functional requirement cell."
+    },
+    "verificationMethod": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the verification method in the author's words; the closed catalog lives in `verification_catalog`, and this column is prose."
+    },
+    "evidence": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the evidence or test-case cell."
+    },
+    "status": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CoverageStatus.json"
+    },
+    "line": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+    }
+  },
+  "required": [
+    "nonFunctionalReq",
+    "verificationMethod",
+    "evidence",
+    "status",
+    "line"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "One `### Non-Functional Requirement Coverage` row."
+}

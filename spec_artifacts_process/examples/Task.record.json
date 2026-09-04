@@ -1,0 +1,26 @@
+{
+  "body": {
+    "endLine": 50,
+    "startLine": 15,
+    "text": "     substantive content. Contract:\n     - Frontmatter: `type: Task`; `id` matches ^[A-Za-z]{2,4}-[0-9]+$.\n     - `track` is an OPTIONAL free string with minLength 1 (FR-005). It is a\n       property of a Task, not a node: a consumer that needs a tree node\n       synthesizes one from this value. There is no `Track` archetype.\n     - The archetype declares NO `body_extraction`, so no section is asserted.\n     - `allowed_links`: depends_on | verifies | references. Author `verifies`\n       edges to the TC rows this task discharges — that is what makes a plan\n       traceable to the matrix.\n     - A Task is an authored DEFINITION. `status` is the authored lifecycle\n       word, not a record of an execution: no run id, no duration, no\n       outcome (FR-013). -->\n# Task-001: FR-001 — compute and compare the artifact digest on import\n\n## Scope\n\nThe digest half of FR-001: computing the SHA-256 of the imported bytes and\ncomparing it with the declared digest. The rejection path is Task-002; this task\nmust leave a comparison result the next task can act on.\n\n## Subtasks\n\n- [ ] Compute the SHA-256 of the artifact bytes as read, before any transform.\n- [ ] Compare it with the declared digest from the import manifest.\n- [ ] Surface the pair (declared, computed) on mismatch, so the rejection can name both.\n\n## Deliverables\n\nThe digest computation and its unit tests.\n\n## Notes\n\nThe digest is taken over the bytes as read. Computing it after a transform would\nverify the transform rather than the transfer, which is the opposite of what the\nrequirement asks."
+  },
+  "id": "Task-001",
+  "provenance": {
+    "digest": "sha256:42139110390eb3c4503c04a1f4f7e8555d0554b507f38f7dd6df07aa1fe0d670",
+    "path": "skeletons/Task.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/example/FR-001",
+      "type": "references"
+    },
+    {
+      "target": "ix://agent-ix/example/TC-001",
+      "type": "verifies"
+    }
+  ],
+  "status": "todo",
+  "title": "FR-001 — compute and compare the artifact digest on import",
+  "track": "A",
+  "type": "Task"
+}

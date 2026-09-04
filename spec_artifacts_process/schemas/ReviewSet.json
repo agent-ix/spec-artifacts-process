@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ReviewSet.json",
+  "type": "string",
+  "enum": [
+    "base",
+    "all",
+    "subset"
+  ],
+  "description": "How much of the spec a SpecReview covered."
+}

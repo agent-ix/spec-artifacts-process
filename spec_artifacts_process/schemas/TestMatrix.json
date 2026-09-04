@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestMatrix.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UpperDocId.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "TestMatrix"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ObjectTypeName.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
+      },
+      "description": "Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15)."
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
+    },
+    "functionalCoverage": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FunctionalCoverageRow.json"
+      },
+      "minItems": 1
+    },
+    "testCases": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestCaseRow.json"
+      },
+      "minItems": 1
+    },
+    "stakeholderCoverage": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/StakeholderCoverageRow.json"
+      },
+      "description": "Optional: a bundle with no StR artifacts cannot truthfully populate it."
+    },
+    "userStoryCoverage": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UserStoryCoverageRow.json"
+      },
+      "description": "Optional, for the same reason."
+    },
+    "nonFunctionalCoverage": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonFunctionalCoverageRow.json"
+      },
+      "description": "Optional, for the same reason."
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "provenance",
+    "functionalCoverage",
+    "testCases"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Leaf matrix record (archetype `TestMatrix`). Every `Status` marker is the\n**authored coverage claim**, never an execution result; whether the claim is\ntrue is decided by the coverage rollup against the evidence store, outside\nthis module (FR-013)."
+}

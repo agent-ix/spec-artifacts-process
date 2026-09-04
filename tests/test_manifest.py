@@ -122,12 +122,40 @@ def test_manifest_validates_against_fr035_schema() -> None:
     The schema is now package data on `spec-artifacts-iso` — one source for
     every module repository, imported rather than copied, so there is no second
     artifact to keep in sync and no branch on which this can quietly not run.
+
+    **The `semantic` block is checked separately, and that split is a defect
+    elsewhere rather than a concession here.** No published revision of the
+    FR-035 schema covers both this module's keys and the semantic block: the copy
+    `spec-artifacts-iso` ships is the authority for `traceability` and
+    `verification_catalog` and predates `semantic`, rejecting it under
+    `additionalProperties: false`; the revision that carries `semantic` does not
+    know `traceability` or `verification_catalog` at all. Filed as
+    agent-ix/filament-core-service#27. Removing `semantic` before this check and
+    validating it against the extracted sub-schema keeps BOTH halves checked,
+    where dropping either would leave one unchecked.
     """
     schema = module_manifest_schema()
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
-    errors = list(Draft202012Validator(schema).iter_errors(manifest))
+    assert "semantic" in manifest, "the semantic block must exist to be split out"
+    without_semantic = {k: v for k, v in manifest.items() if k != "semantic"}
+    errors = list(Draft202012Validator(schema).iter_errors(without_semantic))
     assert not errors, [
         f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors
+    ]
+
+    semantic_schema = json.loads(
+        (
+            pathlib.Path(__file__).parent
+            / "fixtures"
+            / "module-manifest-semantic.schema.json"
+        ).read_text()
+    )
+    semantic_errors = list(
+        Draft202012Validator(semantic_schema).iter_errors(manifest["semantic"])
+    )
+    assert not semantic_errors, [
+        f"semantic.{'.'.join(str(p) for p in e.absolute_path)}: {e.message}"
+        for e in semantic_errors
     ]
 
 
@@ -281,12 +309,29 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
         # matrix tree, and modelling only the leaf left every root document
         # permanently `[missing]` on two tables it cannot honestly carry.
         "TestMatrixIndex",
+        # Per FR-012 in #78 `Standard` gains the typed declaration sections. Both
+        # locators are `required: false`, which is the whole compatibility
+        # story: every Standard document in every consuming repository
+        # validates today without either section and still does. It is the one
+        # type in this module where the quoin FR-071 typed-Properties form and
+        # the FR-072 clause form have a meaning — a Standard declares the
+        # properties a conforming artifact carries and the invariants
+        # conformance requires — and on a Plan or an ADR they have none.
+        "Standard",
     }, (
         "FR-003 adds the TestMatrix contract and FR-006 the two evidence-layer "
         "archetypes; Feedback and SpecReview keep the body_extraction they "
         "already had, and nothing else gains one. FR-008 deliberately does NOT "
         "appear here: it adds an optional column to SpecReview's existing "
-        "contract rather than giving Finding one; CR-039 adds TestMatrixIndex"
+        "contract rather than giving Finding one; CR-039 adds TestMatrixIndex; "
+        "FR-012 adds Standard's two OPTIONAL locators"
+    )
+    standard = next(t for t in manifest["artifact_types"] if t["name"] == "Standard")
+    added = standard["body_extraction"]["yield_pattern"]["match"]
+    assert set(added) == {"properties", "invariants"}
+    assert all(locator["required"] is False for locator in added.values()), (
+        "a required locator on Standard would make every existing Standard "
+        "document in every consuming repository fail"
     )
 
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")

@@ -13,7 +13,12 @@ help:
 	@echo "Available targets (via poe):"
 	@echo "  make install        - Install dependencies"
 	@echo "  make test           - Run tests"
-	@echo "  make lint           - Run linters (ruff + black)"
+	@echo "  make lint           - Run linters (ruff + black + schema drift gate)"
+	@echo "  make dev-quire      - Install the Quire wheel the semantic tests need"
+	@echo "  make semantic-install - npm ci the TypeSpec package (spec_artifacts_process/semantic)"
+	@echo "  make schemas        - Regenerate the semantic JSON Schemas from TypeSpec (FR-009)"
+	@echo "  make schemas-check  - Fail if the committed schemas differ from a fresh projection"
+	@echo "  make manifest-digests - Rewrite manifest data_schema digests from the shipped bytes"
 	@echo "  make format         - Format code (black + ruff --fix)"
 	@echo "  make build          - Build distribution"
 	@echo "  make clean          - Clean build artifacts"
@@ -55,8 +60,50 @@ test-integrations test-it:
 	$(POE) test-integrations
 
 .PHONY: lint
-lint:
+lint: schemas-check
 	$(POE) lint
+
+# =============================================================================
+# Semantic data schemas (FR-009): TypeSpec -> JSON Schema projection
+# =============================================================================
+# The TypeSpec package lives in spec_artifacts_process/semantic/ (npm, lockfile
+# committed). `make schemas` regenerates spec_artifacts_process/schemas/<Model>.json
+# and semantic/generated/toolchain.json; `make schemas-check` fails on any byte
+# drift.
+#
+# `schemas-check` is a LOCAL gate, wired into `make lint`. It is deliberately not
+# a GitHub-workflow gate: `@agent-ix/semantic-core` resolves only through the
+# user-level npm config (agent-ix/filament-core-data#11), so a CI job asserting
+# it would fail for a reason that is not a defect in this module.
+
+SEMANTIC_DIR = spec_artifacts_process/semantic
+
+.PHONY: semantic-install
+semantic-install:
+	cd $(SEMANTIC_DIR) && npm ci
+
+.PHONY: schemas
+schemas:
+	cd $(SEMANTIC_DIR) && npm run --silent generate
+
+.PHONY: schemas-check
+schemas-check:
+	cd $(SEMANTIC_DIR) && npm run --silent check
+
+# FR-010: rewrite every `data_schema.digest` in manifest.yaml from the shipped
+# bytes of the file its `data_schema.schema` names. Run after `make schemas`.
+.PHONY: manifest-digests
+manifest-digests:
+	$(POETRY) run python scripts/manifest_digests.py
+
+# The semantic tests need a Quire wheel exposing the FR-072 extraction surface.
+# No index a repository may commit against carries one (agent-ix/quire-rs#392),
+# so it is provisioned here rather than declared in pyproject.toml. When it is
+# absent the semantic tests FAIL; they never skip, because a skipped row is not
+# coverage.
+.PHONY: dev-quire
+dev-quire:
+	$(POE) dev-quire
 
 .PHONY: format
 format:

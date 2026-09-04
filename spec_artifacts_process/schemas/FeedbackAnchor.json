@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FeedbackAnchor.json",
+  "type": "object",
+  "properties": {
+    "artifact": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: a repository-relative path or an `ix://` reference."
+    },
+    "text": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TextSelector.json"
+    },
+    "block": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/BlockSelector.json"
+    }
+  },
+  "required": [
+    "artifact"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Where a feedback thread attaches. Resolution is text-primary, block-fallback:\nprefer the quote; if it is gone fall back to the block; if that is gone the\nthread is orphaned and is never silently re-pointed."
+}

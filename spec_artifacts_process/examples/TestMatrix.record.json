@@ -1,0 +1,97 @@
+{
+  "functionalCoverage": [
+    {
+      "acceptanceCriteria": "FR-001-AC-1",
+      "functionalReq": "FR-001",
+      "line": 49,
+      "status": {
+        "marker": "✅",
+        "note": "Complete"
+      },
+      "testCases": "TC-001"
+    },
+    {
+      "acceptanceCriteria": "FR-001-AC-2",
+      "functionalReq": "FR-001",
+      "line": 50,
+      "status": {
+        "marker": "✅",
+        "note": "Complete"
+      },
+      "testCases": "TC-002"
+    }
+  ],
+  "id": "TM-001",
+  "provenance": {
+    "digest": "sha256:1d8f150b79ea9502bd22ca23da472e6916708799bddb8b578506d017abf5395f",
+    "path": "skeletons/TestMatrix.md"
+  },
+  "testCases": [
+    {
+      "id": "TC-001",
+      "line": 56,
+      "priority": "P0",
+      "status": {
+        "marker": "✅"
+      },
+      "title": "A matching digest persists the artifact",
+      "tracesTo": {
+        "noTrace": false,
+        "tokens": [
+          "FR-001-AC-1"
+        ]
+      },
+      "type": "Unit"
+    },
+    {
+      "id": "TC-002",
+      "line": 57,
+      "priority": "P0",
+      "status": {
+        "marker": "✅"
+      },
+      "title": "A mismatched digest rejects the import and names both digests",
+      "tracesTo": {
+        "noTrace": false,
+        "tokens": [
+          "FR-001-AC-2"
+        ]
+      },
+      "type": "Unit"
+    },
+    {
+      "id": "TC-003",
+      "line": 58,
+      "priority": "P2",
+      "status": {
+        "marker": "🚧",
+        "note": "not yet run at scale"
+      },
+      "title": "Import throughput holds at the declared threshold",
+      "tracesTo": {
+        "noTrace": false,
+        "tokens": [
+          "NFR-001-AC-1"
+        ]
+      },
+      "type": "Benchmark"
+    },
+    {
+      "id": "TC-004",
+      "line": 59,
+      "priority": "P1",
+      "status": {
+        "marker": "⛔",
+        "note": "superseded by TC-001"
+      },
+      "title": "Digest computed before any transform",
+      "tracesTo": {
+        "noTrace": true,
+        "tokens": []
+      },
+      "type": "Unit"
+    }
+  ],
+  "title": "Example module test matrix",
+  "type": "TestMatrix"
+}

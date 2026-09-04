@@ -15,3 +15,8 @@ description: "Index of artifacts in this directory."
 * [FR-006: Evidence-layer archetypes: the authored half of the evidence store](./FR-006-evidence-layer-archetypes.md)
 * [FR-007: Verification-method catalog: the 29119-4 method registry as module data](./FR-007-verification-method-catalog.md)
 * [FR-008: A Finding records which layer a defect escaped through](./FR-008-finding-escape-analysis.md)
+* [FR-009: Emit one JSON Schema per declared process artifact type from a TypeSpec source](./FR-009-emitted-json-schemas.md)
+* [FR-010: Declare the semantic-module contract in the manifest without altering an archetype](./FR-010-semantic-manifest-contract.md)
+* [FR-011: Markdown mapping and round-trip policy for the process artifact records](./FR-011-markdown-record-mapping.md)
+* [FR-012: Executable typed skeletons and negative counterparts for every declared artifact type](./FR-012-executable-skeletons.md)
+* [FR-013: Authored process definitions are separated from execution occurrences](./FR-013-definitions-not-occurrences.md)

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FunctionalCoverageRow.json",
+  "type": "object",
+  "properties": {
+    "functionalReq": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the requirement cell as authored."
+    },
+    "acceptanceCriteria": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the criteria cell; ranges and elisions are authored here and are not expanded."
+    },
+    "testCases": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the test-case cell."
+    },
+    "status": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CoverageStatus.json"
+    },
+    "line": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+    }
+  },
+  "required": [
+    "functionalReq",
+    "acceptanceCriteria",
+    "testCases",
+    "status",
+    "line"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Coverage Status`)."
+}

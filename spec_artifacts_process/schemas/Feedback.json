@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Feedback.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UpperDocId.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "Feedback"
+    },
+    "status": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FeedbackStatus.json"
+    },
+    "kind": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FeedbackKind.json"
+    },
+    "decision": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FeedbackDecision.json",
+      "description": "Meaningful only when `kind` is `triage`."
+    },
+    "anchor": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FeedbackAnchor.json"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ObjectTypeName.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
+      },
+      "description": "Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15)."
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
+    },
+    "comment": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Section.json"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "kind",
+    "anchor",
+    "provenance",
+    "comment"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Review-thread feedback record (archetype `Feedback`)."
+}

@@ -1,0 +1,100 @@
+{
+  "code": "iso-iec-ieee-29148",
+  "description": "Requirements engineering for systems and software: the processes and the content of requirement artifacts.",
+  "guide": "Apply to any specification bundle that declares stakeholder, user, functional and non-functional requirements. Conformance is judged on artifact structure and on requirement statements, not on tooling.",
+  "id": "Standard-001",
+  "invariants": [
+    {
+      "clauseId": "EveryRequirementIsUniquelyIdentified",
+      "language": "ocl"
+    },
+    {
+      "clauseId": "EveryRequirementIsVerifiable",
+      "language": "ocl"
+    }
+  ],
+  "link": "https://www.iso.org/standard/72089.html",
+  "properties": [
+    {
+      "constraints": [
+        {
+          "dialect": "ecma-262",
+          "keyword": "pattern",
+          "regex": "^[a-z0-9][a-z0-9.-]*$"
+        }
+      ],
+      "identity": true,
+      "name": "code",
+      "type": {
+        "multiplicity": {
+          "lower": 1,
+          "upper": 1
+        },
+        "target": "String"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "keyword": "minLength",
+          "value": 1
+        }
+      ],
+      "name": "title",
+      "type": {
+        "multiplicity": {
+          "lower": 1,
+          "upper": 1
+        },
+        "target": "String"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "keyword": "minLength",
+          "value": 1
+        }
+      ],
+      "name": "edition",
+      "type": {
+        "multiplicity": {
+          "lower": 0,
+          "upper": 1
+        },
+        "target": "String"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "keyword": "format",
+          "name": "ix:iri"
+        }
+      ],
+      "name": "link",
+      "type": {
+        "multiplicity": {
+          "lower": 0,
+          "upper": 1
+        },
+        "target": "String"
+      }
+    },
+    {
+      "name": "supersedes",
+      "type": {
+        "multiplicity": {
+          "lower": 0
+        },
+        "target": "String"
+      }
+    }
+  ],
+  "provenance": {
+    "digest": "sha256:7830ec0ca3bc2ed660f825121ad64696ae716d9c8af466bac385d9fa7b7631c2",
+    "path": "skeletons/Standard.md"
+  },
+  "title": "ISO/IEC/IEEE 29148 — Requirements engineering",
+  "type": "Standard"
+}

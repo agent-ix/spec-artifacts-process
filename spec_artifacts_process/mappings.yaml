@@ -1,0 +1,388 @@
+# Markdown record mapping for the spec-artifacts-process artifact types (FR-011).
+#
+# The Markdown is the sole AUTHORITY and the record is a DERIVED PROJECTION:
+# a record is rebuilt from the document, never the other way round, no property
+# is invented and no default is supplied. Two consumers reading one document
+# with this mapping build the same record.
+#
+# Every property of every model FR-009 emits is named here exactly once, and
+# every entry here names a property its model declares. The totality is checked
+# in both directions by the suite (FR-011-AC-2) with a cycle-safe walk, because
+# the emitted models `$ref` each other.
+#
+# The mapping is STRICT: any reported error means no record is built for that
+# document, and every error found in one pass is reported. A partial record
+# whose missing properties are indistinguishable from absent ones is the failure
+# this rule removes.
+#
+# Nothing in production builds a process record from Markdown today. This file
+# is shipped module DATA; the reference implementation that reads it lives in
+# this module's test support and is a test oracle, never module code
+# (FR-011-CON-3). The engine-side extractor is agent-ix/quire-rs#393.
+version: 1
+package: agent-ix/spec-artifacts-process
+authority: markdown
+round_trip: derived-projection
+
+notes:
+  - "Every section and column named below is declared by that type's `body_extraction` in manifest.yaml (FR-011-CON-1). This file names nothing the manifest does not assert."
+  - "`expect:` and `because:` on the negative fixtures survive only because every frontmatter schema in this module sets `additionalProperties: true`. Tightening any of those schemas invalidates the whole negative corpus at once (SR-012 FND-006)."
+  - "`provenance.digest` is computed over the LINE-ENDING-NORMALISED bytes, so one document has one digest whatever the checkout did to its line endings."
+  - "Row-id uniqueness is scoped per table, not per document: a TestMatrixIndex carries INT- and GAP- ids in different tables, and a TestMatrix carries rows in five."
+
+kinds:
+  - frontmatter
+  - section
+  - table
+  - typed-table
+  - sysml-fence
+  - ocl-clause
+  - list
+  - token
+  - provenance
+
+# FR-013-AC-6: what this module does NOT model, and who owns it. An absent
+# property reads as "owned elsewhere", never as "not yet written".
+not_modelled:
+  - concept: Verification run records (runs/**)
+    owner: agent-ix/engineering-assurance FR-004
+    reason: "A run is an occurrence. Every model here is an authored definition or an authored evidence act, and reusing one for a run is what FR-013 forbids."
+  - concept: Binding records (bindings.json)
+    owner: agent-ix/quoin
+    reason: "The machine-transcribed half of the evidence store is typeless and corpus-invisible by design."
+  - concept: Coverage baselines (baseline.json)
+    owner: agent-ix/quoin
+    reason: "A baseline is derived from runs, so it inherits the occurrence role this module does not carry."
+  - concept: Evidence freshness
+    owner: agent-ix/engineering-assurance FR-004
+    reason: "Freshness is a property of a run against a commit, not of an authored document."
+  - concept: Verification semantics reconciliation
+    owner: agent-ix/engineering-assurance FR-008
+    reason: "Which acts count as verification versus validation is an assurance decision this module consumes rather than declares."
+
+models:
+  ADR:
+    archetype: ADR
+    role: definition
+    notes:
+      - "The archetype declares no body_extraction, so no section is asserted and the whole authored body is carried as one slice. Adding a required section here would fail every ADR in every consuming repository."
+    dropped_frontmatter_keys: [status, date, deciders, tags]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      state: {kind: frontmatter, path: [state]}
+      body: {kind: section, whole_body: true, required: true}
+
+  Plan:
+    archetype: Plan
+    role: definition
+    notes:
+      - "`status` is the authored lifecycle word. A Plan records what is to be done, never what a run of it produced (FR-013)."
+    dropped_frontmatter_keys: [priority, owner, tags]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      status: {kind: frontmatter, path: [status]}
+      body: {kind: section, whole_body: true, required: true}
+
+  Task:
+    archetype: Task
+    role: definition
+    notes:
+      - "`track` is a property of a Task, not a node: a consumer needing a tree node synthesizes one from this value (FR-005). There is no Track archetype."
+    dropped_frontmatter_keys: [priority, owner, tags]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      status: {kind: frontmatter, path: [status]}
+      track: {kind: frontmatter, path: [track]}
+      body: {kind: section, whole_body: true, required: true}
+
+  Review:
+    archetype: Review
+    role: definition
+    dropped_frontmatter_keys: [status, reviewer, date]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      body: {kind: section, whole_body: true, required: true}
+
+  SpecReview:
+    archetype: SpecReview
+    role: definition
+    notes:
+      - "`scope` is authored as one comma-separated frontmatter string and is the module's `list` mapping: the record carries one entry per path reviewed."
+      - "A findings ROW id is FND-NNN. The Finding DOCUMENT namespace is FIND-NNN and they are deliberately different (FR-013-AC-4)."
+    dropped_frontmatter_keys: [date, reviewer, commit]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      analysis: {kind: frontmatter, path: [analysis]}
+      reviewSet: {kind: frontmatter, path: [review_set]}
+      scope: {kind: list, source: frontmatter, path: [scope], separator: ", "}
+      summary: {kind: section, heading: Summary, required: true}
+      findings:
+        kind: typed-table
+        heading: Findings
+        required: true
+        columns: [ID, Severity, Summary, Refs, Escape Cause]
+        optional_columns: [Escape Cause]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Severity: {property: severity, parse: enum}
+          Summary: {property: summary, parse: text}
+          Refs: {property: refs, parse: text}
+          Escape Cause: {property: escapeCause, parse: enum}
+
+  Finding:
+    archetype: Finding
+    role: definition
+    notes:
+      - "Nothing authors a Finding document today, so the archetype declares no body_extraction and the whole body is one slice."
+    dropped_frontmatter_keys: [severity, status, escape_cause]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      body: {kind: section, whole_body: true, required: true}
+
+  Feedback:
+    archetype: Feedback
+    role: definition
+    notes:
+      - "Anchor resolution is text-primary, block-fallback and is computed at load time; the record carries the authored selectors, never the resolution."
+    dropped_frontmatter_keys: [author, created, thread]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      status: {kind: frontmatter, path: [status], required: true}
+      kind: {kind: frontmatter, path: [kind], required: true}
+      decision: {kind: frontmatter, path: [decision]}
+      anchor: {kind: frontmatter, path: [anchor], required: true}
+      comment: {kind: section, heading: Comment, required: true}
+
+  TestMatrixIndex:
+    archetype: TestMatrixIndex
+    role: definition
+    notes:
+      - "An index mints NO test-case id, because trace_targets.test-case binds archetype TestMatrix and this is not one (CR-039)."
+      - "`Local Matrix` is the relative link that makes the tree navigable; asserting the column is what makes a dropped cell visible."
+    dropped_frontmatter_keys: [okf_version, description]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      subsystemIndex:
+        kind: typed-table
+        heading: Requirements Traceability
+        required: true
+        columns: [Subsystem, Requirements, Local Matrix, Coverage Status]
+        fields:
+          Subsystem: {property: subsystem, parse: text}
+          Requirements: {property: requirements, parse: text}
+          Local Matrix: {property: localMatrix, parse: text}
+          Coverage Status: {property: status, parse: status-marker}
+      integrationMatrix:
+        kind: typed-table
+        heading: Integration Test Matrix
+        columns: [Integration ID, Purpose, Target, Type, Test Cases, Status]
+        id_column: Integration ID
+        fields:
+          Integration ID: {property: id, parse: id}
+          Purpose: {property: purpose, parse: text}
+          Target: {property: target, parse: text}
+          Type: {property: type, parse: text}
+          Test Cases: {property: testCases, parse: text}
+          Status: {property: status, parse: status-marker}
+      # The `coverage_gaps` locator asserts an id column and NO column list, so
+      # the header belongs to the author. The row carries its id and every other
+      # authored cell by column name; naming a column list here would be the
+      # mapping asserting a contract the manifest does not (FR-011-CON-1).
+      coverageGaps:
+        kind: table
+        heading: Coverage Gaps
+        id_column: ID
+        open_columns: cells
+        fields:
+          ID: {property: id, parse: id}
+
+  TestMatrix:
+    archetype: TestMatrix
+    role: definition
+    notes:
+      - "Every Status marker is the AUTHORED coverage claim, never an execution result. Whether the claim is true is decided by the coverage rollup against the evidence store, outside this module (FR-013)."
+      - "The `Traces To` cell is the module's `token` mapping: the two authoring shorthands are expanded into the tokens they abbreviate, a parenthesised remainder is carried as `note`, and a lone `-` becomes an empty list with `noTrace: true`."
+    dropped_frontmatter_keys: [okf_version, description]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      functionalCoverage:
+        kind: typed-table
+        heading: Functional Requirement Coverage
+        required: true
+        columns: [Functional Req, Acceptance Criteria, Test Cases, Coverage Status]
+        fields:
+          Functional Req: {property: functionalReq, parse: text}
+          Acceptance Criteria: {property: acceptanceCriteria, parse: text}
+          Test Cases: {property: testCases, parse: text}
+          Coverage Status: {property: status, parse: status-marker}
+      testCases:
+        kind: typed-table
+        heading: Test Case Summary
+        required: true
+        columns: [Test ID, Title, Type, Priority, Traces To, Status]
+        optional_columns: [Priority]
+        id_column: Test ID
+        fields:
+          Test ID: {property: id, parse: id}
+          Title: {property: title, parse: text}
+          Type: {property: type, parse: enum}
+          Priority: {property: priority, parse: enum}
+          Traces To: {property: tracesTo, parse: trace-tokens}
+          Status: {property: status, parse: status-marker}
+      stakeholderCoverage:
+        kind: typed-table
+        heading: Stakeholder Requirement Coverage
+        columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Coverage Status]
+        fields:
+          Stakeholder Req: {property: stakeholderReq, parse: text}
+          Trace to US/FR: {property: traceToUsFr, parse: text}
+          Test/Validation: {property: testValidation, parse: text}
+          Coverage Status: {property: status, parse: status-marker}
+      userStoryCoverage:
+        kind: typed-table
+        heading: User Story Coverage
+        columns: [User Story, Acceptance Criteria, Test Cases, Coverage Status]
+        fields:
+          User Story: {property: userStory, parse: text}
+          Acceptance Criteria: {property: acceptanceCriteria, parse: text}
+          Test Cases: {property: testCases, parse: text}
+          Coverage Status: {property: status, parse: status-marker}
+      nonFunctionalCoverage:
+        kind: typed-table
+        heading: Non-Functional Requirement Coverage
+        columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
+        fields:
+          Non-Functional Req: {property: nonFunctionalReq, parse: text}
+          Verification Method: {property: verificationMethod, parse: text}
+          Evidence/Test Cases: {property: evidence, parse: text}
+          Status: {property: status, parse: status-marker}
+
+  Standard:
+    archetype: Standard
+    role: definition
+    notes:
+      - "The one type in this module carrying a typed declaration: a Standard declares the properties a conforming artifact carries and the invariants conformance requires."
+      - "Both sections are OPTIONAL in the manifest, so every Standard document that validates today keeps validating."
+      - "ONE ARTIFACT CARRIES ONE FORM. A document with both the typed table and the sysml fence under `## Properties` is rejected `both-forms` and no record is built."
+      - "`sourceSpan` is omitted from every ClauseRef, because semantic-core SourceLocus requires a sourceIdentity this surface does not supply."
+    dropped_frontmatter_keys: [edition, supersedes]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      code: {kind: frontmatter, path: [code], required: true}
+      description: {kind: frontmatter, path: [description]}
+      guide: {kind: frontmatter, path: [guide]}
+      link: {kind: frontmatter, path: [link]}
+      properties:
+        kind: typed-table
+        heading: Properties
+        columns: [Field, Type, Multiplicity, Constraints]
+        alternate: {kind: sysml-fence, heading: Properties}
+        fields:
+          Field: {property: name, parse: text}
+          Type: {property: type, parse: text}
+          Multiplicity: {property: multiplicity, parse: text}
+          Constraints: {property: constraints, parse: text}
+      invariants: {kind: ocl-clause, heading: Invariants, language: ocl}
+
+  SuiteRegistry:
+    archetype: SuiteRegistry
+    role: evidence-act
+    notes:
+      - "An evidence ACT, not a run: it declares which suites exist and what kind of evidence they produce, and declares nothing about any particular execution (FR-013)."
+      - "The archetype declares no allowed_links and its frontmatter schema no relationships, so the model carries none."
+    dropped_frontmatter_keys: [object, relationships, status]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      provenance: {kind: provenance, required: true}
+      suites:
+        kind: typed-table
+        heading: Suites
+        required: true
+        columns: [ID, Name, Command, Tool, Evidence Kind]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Name: {property: name, parse: text}
+          Command: {property: command, parse: text}
+          Tool: {property: tool, parse: text}
+          Evidence Kind: {property: evidenceKind, parse: enum}
+
+  Inspections:
+    archetype: Inspections
+    role: evidence-act
+    notes:
+      - "An evidence ACT for the methods that produce no source symbol. A human performed the act, and the record of who, when and against which commit IS the evidence — it is authored, never transcribed from a machine run (FR-013)."
+    dropped_frontmatter_keys: [object, relationships, status]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      provenance: {kind: provenance, required: true}
+      inspections:
+        kind: typed-table
+        heading: Inspections
+        required: true
+        columns: [ID, Obligation, Who, Commit, Verdict, Note]
+        optional_columns: [Note]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Obligation: {property: obligation, parse: text}
+          Who: {property: who, parse: text}
+          Commit: {property: commit, parse: text}
+          Verdict: {property: verdict, parse: enum}
+          Note: {property: note, parse: text}
+

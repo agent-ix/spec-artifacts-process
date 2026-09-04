@@ -1,0 +1,28 @@
+{
+  "analysis": "failure-domain",
+  "findings": [
+    {
+      "id": "FND-001",
+      "line": 45,
+      "refs": "FR-001",
+      "severity": "medium",
+      "summary": "<one-line finding>"
+    }
+  ],
+  "id": "SR-001",
+  "provenance": {
+    "digest": "sha256:5475abe90575e0640ff0809f31018c483e28a7203de4de1107c78aa92933361d",
+    "path": "skeletons/SpecReview.md"
+  },
+  "reviewSet": "subset",
+  "scope": [
+    "spec/spec.md"
+  ],
+  "summary": {
+    "endLine": 40,
+    "startLine": 38,
+    "text": "<!-- One or two sentences: what this analysis examined and what it found. -->"
+  },
+  "title": "<analysis> review of <scope>",
+  "type": "SpecReview"
+}

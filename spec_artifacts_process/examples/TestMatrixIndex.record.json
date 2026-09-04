@@ -1,0 +1,55 @@
+{
+  "coverageGaps": [
+    {
+      "cells": {
+        "Description": "Re-verification on read is unspecified, so no row can cover it",
+        "Mitigation": "Raised as FIND-001; a requirement is needed before a test",
+        "Risk Level": "Low"
+      },
+      "id": "GAP-001",
+      "line": 49
+    }
+  ],
+  "id": "TM-000",
+  "integrationMatrix": [
+    {
+      "id": "INT-001",
+      "line": 43,
+      "purpose": "Import writes through to the object store",
+      "status": {
+        "marker": "✅"
+      },
+      "target": "object-store",
+      "testCases": "IT-001",
+      "type": "service"
+    }
+  ],
+  "provenance": {
+    "digest": "sha256:00fe0b760ba7881012c4ad190874c35c4bc498965fa3e3dea423895f8269b32c",
+    "path": "skeletons/TestMatrixIndex.md"
+  },
+  "subsystemIndex": [
+    {
+      "line": 36,
+      "localMatrix": "[import](./import/tests.md)",
+      "requirements": "FR-001..FR-004",
+      "status": {
+        "marker": "✅",
+        "note": "Complete"
+      },
+      "subsystem": "Import"
+    },
+    {
+      "line": 37,
+      "localMatrix": "[storage](./storage/tests.md)",
+      "requirements": "FR-005..FR-009",
+      "status": {
+        "marker": "🚧",
+        "note": "two criteria unbacked"
+      },
+      "subsystem": "Storage"
+    }
+  ],
+  "title": "Example repository matrix index",
+  "type": "TestMatrixIndex"
+}

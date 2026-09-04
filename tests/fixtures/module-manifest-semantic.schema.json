@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/fixtures/module-manifest-semantic.schema.json",
+  "title": "The FR-035 `semantic` block, extracted",
+  "description": "The `semantic` sub-schema of the filament-core-service FR-035 module-manifest schema (quoin FR-070). It is extracted rather than vendored whole because NO single published copy of that schema covers both this module's keys and the semantic block: the copy `spec-artifacts-iso` ships (the pinned dependency, and the authority for `traceability` and `verification_catalog`) predates `semantic` and rejects it under `additionalProperties: false`, while the copy carrying `semantic` does not know `traceability` or `verification_catalog` at all. Filed as agent-ix/filament-core-service#27. Until one revision covers both, the manifest is checked against the shipped schema with `semantic` removed, and the block itself is checked here.",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "semantic_core",
+    "package"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic-module contract version; 1.0.0 for quoin FR-070."
+    },
+    "semantic_core": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Exact @agent-ix/semantic-core version the module compiles against."
+    },
+    "package": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*$",
+      "description": "IR packageIdentity (<org>/<repo>), never a URL or ix:// identity."
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Object-type names published as semantic types; each must be declared in object_types."
+    },
+    "imports": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      },
+      "description": "Imported semantic packages (<org>/<repo>) at exact versions."
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "json-schema",
+          "rust",
+          "typescript",
+          "python-pydantic-v2",
+          "python-dataclass",
+          "markdown",
+          "json",
+          "postgresql",
+          "protobuf",
+          "avro",
+          "arrow",
+          "parquet",
+          "csv",
+          "tsv"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Values from the filament-core-data declared target registry (generated targets and representation formats)."
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Named representation mappings (quoin FR-071..073)."
+    },
+    "compatibility_posture": {
+      "enum": [
+        "strict",
+        "additive",
+        "declared-lossy"
+      ],
+      "default": "additive"
+    },
+    "legacy_forms": {
+      "enum": [
+        "warning",
+        "error"
+      ],
+      "default": "warning",
+      "description": "Severity of legacy Properties forms (quoin FR-074); error requires sweep_report."
+    },
+    "sweep_report": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Module-relative path to the quoin semantic sweep report that justifies legacy_forms: error."
+    }
+  }
+}

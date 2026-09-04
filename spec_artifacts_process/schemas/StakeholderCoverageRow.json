@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/StakeholderCoverageRow.json",
+  "type": "object",
+  "properties": {
+    "stakeholderReq": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the stakeholder requirement cell."
+    },
+    "traceToUsFr": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the US/FR trace cell."
+    },
+    "testValidation": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "description": "free text: the test or validation cell."
+    },
+    "status": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CoverageStatus.json"
+    },
+    "line": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+    }
+  },
+  "required": [
+    "stakeholderReq",
+    "traceToUsFr",
+    "testValidation",
+    "status",
+    "line"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "One `### Stakeholder Requirement Coverage` row."
+}
