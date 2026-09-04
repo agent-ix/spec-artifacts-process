@@ -26,13 +26,24 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 ### In Scope
 
-- The Module manifest and the contributions it declares: 6 process archetypes (adr, plan, review, spec-review, test-matrix, standard), 1 grammar (process-artifacts), and 13 artifact types (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrix, Standard, SuiteRegistry, Inspections, and the two evidence-layer types FR-006 adds).
+- The Module manifest and the contributions it declares: 6 process archetypes (adr, plan, review, spec-review, test-matrix, standard), 1 grammar (process-artifacts), and the 12 artifact types the manifest declares (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrixIndex, TestMatrix, Standard, SuiteRegistry, Inspections).
 - The templates and schemas this module ships for agent CLI generators (minijinja-cli).
+- The semantic-module contract (issue #78): a TypeSpec source importing `@agent-ix/semantic-core` 0.1.0, one emitted JSON Schema per declared artifact type under `spec_artifacts_process/schemas/`, the manifest `semantic` block with reference-form `data_schema`, the published Markdown mapping, and the skeletons rewritten as executable fixtures with negative counterparts.
 
 ### Out of Scope
 
 - The filament-core-service activation machinery that registers the Module, referenced here only by relationship.
 - Deployment topology and infrastructure of the target cluster.
+- Changing the meaning of any archetype this module already publishes. This module owns the contracts every repository in the programme validates against, so tightening or loosening an existing pattern is a build break everywhere; NFR-001 measures that nothing moved. In particular `⚠️` stays out of the `Status` vocabulary — it was retired by CR-031 because a row carrying it was exempt from the status-lie check by construction (quire-rs CR-083). The `quoin:spec-matrix` skill still documents it as valid; the skill is the defect and is filed as `agent-ix/quoin#337`.
+- Editing any corpus repository. The advisory sweep and the corpus promotion are `agent-ix/quoin#291`; this specification's consumer measurement reads two repositories and writes to neither.
+- Generated-language fixtures (Rust, TypeScript, Python) for the process types: produced by the TypeSpec frontend and compiler core (`agent-ix/filament-core-data#21`, `#22`, `#23`) and published only behind the promotion gate (`agent-ix/quoin#290`); the semantic-core language packages are `agent-ix/filament-core-data#11`. None is produced or faked here.
+- An engine-side extractor that builds a process record from Markdown. `quire.validate_document` validates a *declaration* record on the `object:` axis and never reaches an artifact-type record; the FR-011 reference mapping is this module's test oracle, and the extractor is quire-rs work (`agent-ix/quire-rs#393`).
+- Naming what a module load refused: `agent-ix/quire-rs#221` (an unknown manifest key empties the model silently) and `agent-ix/quire-rs#394` (a `data_schema` digest mismatch drops the type with no diagnostic). FR-010-AC-6's "naming the key or the path" half is blocked on them and is carried as an explicit expected failure.
+- Record validation of a legacy-form artifact that declares `object:`: `agent-ix/quire-rs#391` (the engine validates an `unavailable` record as `{}`, so a legacy form errors even under `legacy_forms: warning`).
+- Resolving a reference-form `data_schema` into a stored snapshot at activation: `agent-ix/filament-core-service#23`. Until it lands the service stores the reference verbatim.
+- Publishing the Quire wheel exposing the semantic surface to an index a repository may commit against: `agent-ix/quire-rs#392`. The wheel is provisioned by `make dev-quire` and the semantic tests fail rather than skip when it is absent, because a skipped row is not coverage.
+- Run records, binding records, baselines and freshness. FR-013 states which concepts this module models and names Engineering Assurance and quoin as the owners of the rest; nothing here schematises a verification run.
+- Resolving the `Standard` artifact type / `standard` object type duplication the issue notes. Both are activated by consumers today and unifying them changes how an existing declaration resolves, which is exactly the breaking change this specification refuses to make as a side effect of the migration.
 
 ## System Overview
 
@@ -51,8 +62,19 @@ The requirement classes that make up this specification trace as follows:
 - `stakeholder/` — StR-XXX stakeholder requirements.
 - `usecase/` — US-XXX user stories.
 - `functional/` — FR-XXX functional requirements.
+- `non-functional/` — NFR-XXX non-functional requirements.
 - `integration/` — IT-XXX integration tests.
 - `tests.md` — test matrix linking FRs to integration tests.
+
+FR-001 activates the manifest against filament-core; FR-002 through FR-008 declare the archetypes,
+the traceability model, the evidence layer and the verification catalog. The semantic-module
+contract sits on top of those: FR-009 emits one JSON Schema per declared artifact type from a
+TypeSpec source, FR-010 declares the contract in the manifest without altering an archetype,
+FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
+negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
+NFR-001 bounds the whole change to additive compatibility and measures it against two consumer
+repositories, because a module every repository validates against is not verified by validating
+itself.
 
 ## References
 
