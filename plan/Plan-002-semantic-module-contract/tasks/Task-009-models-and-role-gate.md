@@ -2,7 +2,7 @@
 id: Task-009
 title: "FR-009 + FR-013 — one model per artifact type, with the definition/occurrence rule as an authoring gate"
 type: Task
-status: todo
+status: done
 track: A
 priority: P0
 relationships:

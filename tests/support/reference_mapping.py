@@ -343,6 +343,11 @@ class ReferenceMapper:
             out["sourceIdentity"] = doc.source_identity
         return out
 
+    # `model`, `prop` and `errors` are unused here and are part of the uniform
+    # per-kind signature `_one` dispatches on: a section either exists or does
+    # not, and its absence is reported by the caller against the entry's
+    # `required` flag rather than here. Dropping them would make the dispatcher
+    # branch on kind twice.
     def _section(self, model, prop, entry, doc, errors):
         if entry.get("whole_body"):
             text, start, end = doc.whole_body()

@@ -2,7 +2,7 @@
 id: Task-008
 title: "FR-009 — the projection generator, its preconditions and the drift gate"
 type: Task
-status: todo
+status: done
 track: A
 priority: P0
 relationships:

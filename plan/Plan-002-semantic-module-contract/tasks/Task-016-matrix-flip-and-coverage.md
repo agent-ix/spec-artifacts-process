@@ -2,7 +2,7 @@
 id: Task-016
 title: "Matrix status flip, coverage reconciliation, and the recorded inspections"
 type: Task
-status: todo
+status: done
 track: C
 priority: P1
 relationships:

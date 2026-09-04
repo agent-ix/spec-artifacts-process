@@ -2,7 +2,7 @@
 id: Task-012
 title: "FR-011 — the mapping for the remaining eleven types and their golden records"
 type: Task
-status: todo
+status: done
 track: A
 priority: P0
 relationships:

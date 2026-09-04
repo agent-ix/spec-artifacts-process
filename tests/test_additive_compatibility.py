@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -40,6 +41,14 @@ LOADER_NOISE = (
 
 INSTALLED_MODULES = Path.home() / ".ix" / "filament" / "modules"
 
+# `--summary` prints one line per run naming how many documents were graded.
+# Without it a run that read nothing looks exactly like a run that found
+# nothing, and the comparison of two empty sets reports success.
+GRADED = re.compile(r"^(?P<graded>\d+)/(?P<total>\d+) docs grammar-clean")
+
+# The other `--summary` rollup line. Not a finding, and identical on both sides.
+SUMMARY_ROLLUP = re.compile(r"^\d+/\d+ criteria property-extractable")
+
 
 def consumer_path(name: str) -> Path:
     return DEV_ROOT / name
@@ -59,7 +68,12 @@ def staged_modules(tmp_path: Path, manifest: Path, label: str) -> Path:
     for installed in sorted(INSTALLED_MODULES.iterdir()):
         if installed.name == "spec-artifacts-process":
             continue
-        (root / installed.name).symlink_to(installed)
+        # Copied, not symlinked. A symlinked module makes the loader emit
+        # `SymlinkLoop broken at …` once per module — nine lines that appear
+        # identically on both sides of the comparison and would satisfy the
+        # "did anything happen" guard below without a single document having
+        # been read.
+        shutil.copytree(installed, root / installed.name)
     module = root / "spec-artifacts-process"
     module.mkdir()
     shutil.copy(manifest, module / "manifest.yaml")
@@ -78,20 +92,27 @@ def findings(consumer: Path, modules: Path) -> set[str]:
     environment = dict(os.environ)
     environment["IX_FILAMENT_MODULES_PATH"] = str(modules)
     result = subprocess.run(
-        ["quire", "validate", "--scope", str(consumer), "spec/**/*.md"],
+        ["quire", "validate", "--scope", str(consumer), "--summary", "spec/**/*.md"],
         capture_output=True,
         text=True,
         env=environment,
     )
     out = set()
+    documents = 0
     for line in (result.stdout + result.stderr).split("\n"):
         text = line.strip()
         if not text or text.startswith("warning:"):
             continue
         if any(text.startswith(prefix) for prefix in LOADER_NOISE):
             continue
+        match = GRADED.match(text)
+        if match:
+            documents = int(match.group("total"))
+            continue
+        if SUMMARY_ROLLUP.match(text):
+            continue
         out.add(text.replace(str(consumer) + "/", ""))
-    return out
+    return documents, out
 
 
 @pytest.mark.integration
@@ -113,8 +134,10 @@ def test_a_consumer_gains_no_error_finding_under_0_2_0(tmp_path: Path, name: str
     ).stdout.strip()
     assert commit, f"{name} has no resolvable commit"
 
-    before = findings(consumer, staged_modules(tmp_path, BASELINE_MANIFEST, "v0_1_0"))
-    after = findings(
+    read_before, before = findings(
+        consumer, staged_modules(tmp_path, BASELINE_MANIFEST, "v0_1_0")
+    )
+    read_after, after = findings(
         consumer, staged_modules(tmp_path, PACKAGE_ROOT / "manifest.yaml", "v0_2_0")
     )
     regressions = sorted(after - before)
@@ -125,6 +148,7 @@ def test_a_consumer_gains_no_error_finding_under_0_2_0(tmp_path: Path, name: str
             {
                 "consumer": name,
                 "commit": commit,
+                "documents_graded": read_before,
                 "findings_under_0_1_0": len(before),
                 "findings_under_0_2_0": len(after),
                 "regressions": regressions,
@@ -132,12 +156,17 @@ def test_a_consumer_gains_no_error_finding_under_0_2_0(tmp_path: Path, name: str
             indent=2,
         )
     )
-    # The measurement must be able to fail. A run that produced no output on
-    # either side would compare empty to empty and report success, which is the
-    # vacuous green this whole file exists to avoid.
-    assert (
-        before or after
-    ), f"{name} produced no validator output on either side; nothing was measured"
+    # The measurement must have measured something. Comparing the findings of
+    # two runs that read no document is a comparison of two empty sets, and it
+    # reports success — the vacuous green this whole file exists to avoid.
+    assert read_before > 0 and read_after > 0, (
+        f"{name}: the validator graded {read_before} documents at 0.1.0 and "
+        f"{read_after} at 0.2.0; nothing was measured"
+    )
+    assert read_before == read_after, (
+        f"{name}: {read_before} documents graded at 0.1.0 and {read_after} at 0.2.0 — "
+        "the two runs did not see the same corpus, so the difference is not comparable"
+    )
     assert regressions == [], (
         f"{name} @ {commit} gains {len(regressions)} error finding(s) under "
         f"0.2.0 that 0.1.0 did not report:\n" + "\n".join(regressions)
@@ -165,8 +194,8 @@ def test_the_measurement_can_fail(tmp_path: Path):
     assert narrowed != source, "the Status pattern moved; this guard must be re-aimed"
     tightened.write_text(narrowed)
 
-    before = findings(consumer, staged_modules(tmp_path, BASELINE_MANIFEST, "base"))
-    after = findings(consumer, staged_modules(tmp_path, tightened, "narrowed"))
+    _, before = findings(consumer, staged_modules(tmp_path, BASELINE_MANIFEST, "base"))
+    _, after = findings(consumer, staged_modules(tmp_path, tightened, "narrowed"))
     regressions = after - before
     assert (
         regressions

@@ -2,7 +2,7 @@
 id: Task-013
 title: "FR-012 — twelve executable skeletons, the Standard sysml alternate, and the negative corpus"
 type: Task
-status: todo
+status: done
 track: A
 priority: P0
 relationships:

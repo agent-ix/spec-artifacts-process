@@ -55,7 +55,8 @@ separates "validates locally" from "verified".
 | 0.1.0 archetype declarations changed | 0 | 0 | Test |
 | Declared vocabulary members added or removed | 0 | 0 | Test |
 | Locators added that are `required: true` | 0 | 0 | Test |
-| Consumer repositories re-validated against 0.2.0 | 2 | 2 | Paired `quire validate` run under 0.1.0 and 0.2.0, findings compared as sets |
+| Consumer repositories re-validated against 0.2.0 | 2 | 2 | Paired `quire validate --summary` run under 0.1.0 and 0.2.0, findings compared as sets |
+| Documents graded per consumer, per side | equal and > 0 | equal and > 0 | The `docs grammar-clean` count of each run; a comparison of two runs that read nothing reports success |
 | Findings present under 0.2.0 and absent under 0.1.0, per consumer | 0 | 0 | Set difference over the paired run, at the recorded consumer commit |
 | Shipped skeletons with an error finding under 0.2.0 | 0 | 0 | Test |
 
@@ -83,7 +84,7 @@ row is not coverage.
 | NFR-001-AC-2 | No declared vocabulary — `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind`, `Verdict`, `analysis`, `review_set` — gains or loses a member. | Test (TC-128) |
 | NFR-001-AC-3 | Every locator added at 0.2.0 is `required: false`. | Test (TC-129) |
 | NFR-001-AC-4 | Every shipped skeleton validates under 0.2.0 with zero error findings. | Test (TC-130) |
-| NFR-001-AC-5 | For each of `spec-objects-business` and `filament-core-data`, the set difference (findings under 0.2.0) minus (findings under 0.1.0) is empty. The measurement records the consumer's commit SHA, so the run is reproducible and a later failure is attributable; a consumer that is already red for an unrelated reason contributes findings to both sides and therefore to neither side of the difference. | Demonstration (TC-131) |
+| NFR-001-AC-5 | For each of `spec-objects-business` and `filament-core-data`, the same non-zero number of documents is graded under both versions and the set difference (findings under 0.2.0) minus (findings under 0.1.0) is empty. The measurement records the consumer's commit SHA, so the run is reproducible and a later failure is attributable; a consumer that is already red for an unrelated reason contributes findings to both sides and therefore to neither side of the difference. | Demonstration (TC-131) |
 
 ## Dependencies
 

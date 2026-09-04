@@ -2,7 +2,7 @@
 id: Task-015
 title: "IT-002 — quoin module install accepts the semantic contract, and the prior state is restored"
 type: Task
-status: todo
+status: done
 track: C
 priority: P1
 relationships:
@@ -28,3 +28,16 @@ refuses would otherwise have shipped (SR-015 FND-001).
 ## Deliverables
 
 `tests/test_quoin_install_roundtrip.py`.
+
+## Outcome (2026-09-04)
+
+Done, and it found what it was written to find. Quoin refuses the manifest:
+`semantic.export-without-schema` on every export, because its FR-070 validator resolves
+`semantic.exports` against `object_types` only and this module's schemas are referenced from
+`artifact_types`. The already-merged `spec-artifacts-iso` is refused the same way with
+`semantic.unknown-export`, so this is an upstream gap rather than a defect in either module —
+`agent-ix/quoin#347`.
+
+The test is a **strict expected failure**, not a skip: the boundary runs on every opted-in
+invocation and the row turns green when Quoin resolves an artifact-type export. Step 5 was
+verified on the run — the operator's module store was byte-identical to a copy taken beforehand.

@@ -2,7 +2,7 @@
 id: Task-010
 title: "GATE — SpecReview end to end: model, mapping, skeleton, authored golden record, negative fixtures"
 type: Task
-status: todo
+status: done
 track: Gate
 priority: P0
 relationships:

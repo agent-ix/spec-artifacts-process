@@ -2,7 +2,7 @@
 id: Task-011
 title: "FR-010 — the semantic block, reference-form data_schema, and the 0.1.0 baseline fixture"
 type: Task
-status: todo
+status: done
 track: B
 priority: P0
 relationships:

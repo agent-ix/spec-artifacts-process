@@ -60,6 +60,23 @@ per-step success criterion holds. Because this repository's installed module ent
 other repository validates against, step 5 is not cleanup — a failed restore leaves the whole
 development environment validating against an uncommitted branch.
 
+## Notes
+
+**[RAN] 2026-09-04, and step 2 fails for a named upstream reason.** Quoin's FR-070 validator
+resolves `semantic.exports` against `object_types` only, so no **artifact** module installs at
+all. This module is refused with `semantic.export-without-schema` — the schemas exist and are
+referenced in the FR-073 form, on the `artifact_types` entries the validator does not read — and
+the already-merged `spec-artifacts-iso` is refused with `semantic.unknown-export`. Filed as
+`agent-ix/quoin#347`; the FR-035 wording that made the ambiguity possible is
+`agent-ix/filament-core-service#27`.
+
+This test is therefore a **strict expected failure**, not a skip: the boundary is exercised on
+every opted-in run and the row turns green the day Quoin resolves an artifact-type export.
+Finding it is precisely what this integration test was added for — a manifest Quire accepts and
+Quoin refuses had already shipped once.
+
+Step 5 was verified on that run: the module store was byte-identical to a copy taken beforehand.
+
 ## Dependencies
 
 - **Upstream**: [FR-010](../functional/FR-010-semantic-manifest-contract.md)

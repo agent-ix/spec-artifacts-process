@@ -2,7 +2,7 @@
 id: Task-007
 title: "Toolchain: pinned TypeSpec package, semantic-core resolution, engine wheel, LF pin"
 type: Task
-status: todo
+status: done
 track: A
 priority: P0
 relationships:

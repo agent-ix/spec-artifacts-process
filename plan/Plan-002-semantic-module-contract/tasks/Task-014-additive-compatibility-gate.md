@@ -2,7 +2,7 @@
 id: Task-014
 title: "GATE — NFR-001: the baseline diff and the two-consumer measurement"
 type: Task
-status: todo
+status: done
 track: C
 priority: P0
 relationships:

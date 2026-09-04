@@ -55,7 +55,7 @@ def by_name(entries):
 
 
 @pytest.mark.trace("TC-089")
-def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block, manifest):
+def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block):
     assert set(semantic_block) == ADMITTED_SEMANTIC_KEYS
     assert semantic_block["contract_version"] == "1.0.0"
     assert semantic_block["semantic_core"] == "0.1.0"
@@ -265,7 +265,7 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
 
 
 @pytest.mark.trace("TC-095")
-def test_the_digest_rewriter_touches_nothing_else(tmp_path):
+def test_the_digest_rewriter_touches_nothing_else():
     import subprocess
     import sys
 
