@@ -23,11 +23,14 @@ Explicit amendment for quire-rs#409 (2026-09-06): the additional permitted
 metadata difference is precisely `functional-coverage.status_column` with the
 value `Coverage Status`, as required by FR-004-AC-16. This is a new justified
 compatibility exception, not an inferred allowance of the earlier semantic
-ticket. The frozen 0.1.0 fixture remains byte-identical. Before removing this
-one field for historical comparison, controls SHALL require its presence,
-exact value and unique placement; missing, changed or other-reference overrides
-SHALL fail. An independent entire-manifest comparison to parent
-`ccc2bea19de857d9adb765b7c64065ae5efbb387` SHALL admit only this addition.
+ticket. The frozen 0.1.0 fixture remains byte-identical.
+
+The compatibility checker SHALL require the override's presence, exact value
+and unique placement before removing this field for historical comparison.
+If an override is missing, changed or placed on another reference, the
+compatibility checker SHALL reject the manifest.
+The compatibility checker SHALL compare the entire manifest to parent
+`ccc2bea19de857d9adb765b7c64065ae5efbb387` and admit only this addition.
 No FR-003-CON-1 header/vocabulary change or ecosystem migration is authorized.
 
 The module SHALL keep every specification document of the two measured consumer repositories —
