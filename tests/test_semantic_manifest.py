@@ -10,7 +10,6 @@ before any edit; a baseline you can regenerate is not a baseline.
 
 from __future__ import annotations
 
-import copy
 import shutil
 
 import pytest
@@ -22,6 +21,7 @@ from conftest import (
     artifact_type_names,
     sha256_of,
 )
+from support.status_column_compatibility import without_reference_status_metadata
 
 ADMITTED_SEMANTIC_KEYS = {
     "contract_version",
@@ -89,7 +89,10 @@ def test_every_artifact_type_binds_its_schema_by_path_and_digest(manifest):
 def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     """The single normative baseline assertion. FR-013-AC-7 defers to it rather
     than carrying a second copy."""
-    current = copy.deepcopy(manifest)
+    # #409 adds one explicit, separately approved metadata exception. This helper
+    # requires its exact value and unique placement before removing it; the
+    # historical baseline fixture and all other declaration comparisons stay intact.
+    current = without_reference_status_metadata(manifest)
     # The three additions this ticket is allowed to make, removed before the diff.
     for entry in current["artifact_types"]:
         entry.pop("data_schema", None)

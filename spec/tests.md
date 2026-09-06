@@ -24,6 +24,7 @@ type: TestMatrix
 
 | Functional Req | Acceptance Criteria | Test Cases | Coverage Status |
 |----------------|---------------------|------------|-----------------|
+| FR-004 | FR-004-AC-16 | TC-144, TC-145 | ✅ Local declaration controls; exact stack qualification pending |
 | FR-001 | FR-001-AC-1 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
 | FR-002 | FR-002-AC-1 | TC-019 | 🚧 Planned |
 | FR-002 | FR-002-AC-2 | TC-020 | 🚧 Planned |
@@ -168,6 +169,8 @@ claim (SR-008 FND-004).
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
+| TC-144 | Exactly functional-coverage selects Coverage Status and removing that one addition recovers the entire canonical parent manifest | Unit | P0 | FR-004-AC-16, NFR-001-AC-1 | ✅ |
+| TC-145 | The compatibility exception rejects missing, changed, misplaced and duplicate overrides while retaining the frozen baseline | Unit | P0 | FR-004-AC-16, NFR-001-AC-1 | ✅ |
 | TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
 | TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
 | TC-003 | Doc missing the Functional Requirement Coverage table fails with reason `missing` | Unit | P1 | FR-003, FR-003-AC-1 | ✅ |

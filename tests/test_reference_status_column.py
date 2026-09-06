@@ -16,7 +16,10 @@ def test_exact_override_is_the_only_manifest_delta(manifest):
     text = MANIFEST_PATH.read_text()
     addition = "    status_column: Coverage Status\n"
     assert text.count(addition) == 1
-    assert hashlib.sha256(text.replace(addition, "").encode()).hexdigest() == "a969423bd54710ca8acdf212c88652bff8b0b68b7e373de8555683132be4d206"
+    assert (
+        hashlib.sha256(text.replace(addition, "").encode()).hexdigest()
+        == "a969423bd54710ca8acdf212c88652bff8b0b68b7e373de8555683132be4d206"
+    )
 
 
 @pytest.mark.trace("TC-145")
@@ -31,7 +34,9 @@ def test_compatibility_exception_cannot_hide_another_change(manifest, mutation):
     elif mutation == "wrong":
         functional["status_column"] = "Status"
     elif mutation == "another":
-        next(entry for entry in refs if entry["name"] != "functional-coverage")["status_column"] = "Coverage Status"
+        next(entry for entry in refs if entry["name"] != "functional-coverage")[
+            "status_column"
+        ] = "Coverage Status"
     else:
         refs.append(copy.deepcopy(functional))
     with pytest.raises(AssertionError):
