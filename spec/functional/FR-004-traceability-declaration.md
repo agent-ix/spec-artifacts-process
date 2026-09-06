@@ -82,8 +82,16 @@ modules can version apart.
 
 ## Acceptance Criteria
 
+The quire-rs#409 amendment declares `status_column: Coverage Status` only on
+`functional-coverage`. This selects FR-003's existing normative header using
+the unchanged global status vocabulary; it does not rename a header, infer an
+alias or change vocabulary membership. Other references inherit the global
+`Status` column. Engines predating the optional field cannot load this new
+declaration, so exact engine/schema/declaration integration remains required.
+
 | ID | Criteria | Verification |
 |----|----------|--------------|
+| FR-004-AC-16 | Exactly the functional-coverage reference declares status_column with the exact value Coverage Status; removing that single addition recovers the entire parent manifest, with every header, vocabulary and other reference unchanged. | Test (TC-144, TC-145) |
 | FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR` and `NFR`, and loads without a validation error | Test (TC-028) |
 | FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`, `functional-coverage`), never one per matrix filename | Test (TC-029, TC-039) |
 | FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python and typescript, and each declares a `template` | Test (TC-030) |

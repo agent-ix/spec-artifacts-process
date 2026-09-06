@@ -19,6 +19,17 @@ The module SHALL keep every archetype declaration it published at manifest versi
 and byte-identical at 0.2.0, apart from the reference-form `data_schema` key FR-010 adds and the
 two `required: false` locators FR-012 adds.
 
+Explicit amendment for quire-rs#409 (2026-09-06): the additional permitted
+metadata difference is precisely `functional-coverage.status_column` with the
+value `Coverage Status`, as required by FR-004-AC-16. This is a new justified
+compatibility exception, not an inferred allowance of the earlier semantic
+ticket. The frozen 0.1.0 fixture remains byte-identical. Before removing this
+one field for historical comparison, controls SHALL require its presence,
+exact value and unique placement; missing, changed or other-reference overrides
+SHALL fail. An independent entire-manifest comparison to parent
+`ccc2bea19de857d9adb765b7c64065ae5efbb387` SHALL admit only this addition.
+No FR-003-CON-1 header/vocabulary change or ecosystem migration is authorized.
+
 The module SHALL keep every specification document of the two measured consumer repositories —
 `agent-ix/spec-objects-business` and `agent-ix/filament-core-data` — validating under 0.2.0 with
 no error finding that 0.1.0 did not already report.
@@ -65,7 +76,7 @@ separates "validates locally" from "verified".
 The 0.1.0 manifest is checked in as a baseline fixture and compared key by key against 0.2.0: the
 comparison is a structural diff, not a spot check, and the only differences it may report are the
 twelve `data_schema` keys, the two added `Standard` locators, and the top-level `version` and
-`semantic` keys.
+`semantic` keys, plus the explicitly amended FR-004-AC-16 reference metadata.
 
 The consumer measurement runs `quire validate` over each named consumer repository twice — once
 with this module at 0.1.0 and once at 0.2.0 — and compares the finding sets. A finding present
@@ -80,7 +91,7 @@ row is not coverage.
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| NFR-001-AC-1 | Every 0.1.0 archetype, artifact type, object type, grammar, doc kind, traceability declaration and verification-catalog entry is present at 0.2.0 with identical content apart from the additions FR-010 and FR-012 name. | Test (TC-127) |
+| NFR-001-AC-1 | Every 0.1.0 archetype, artifact type, object type, grammar, doc kind, traceability declaration and verification-catalog entry is present at 0.2.0 with identical content apart from the additions FR-010 and FR-012 name and the precisely bounded FR-004-AC-16 metadata amendment. | Test (TC-127, TC-144, TC-145) |
 | NFR-001-AC-2 | No declared vocabulary — `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind`, `Verdict`, `analysis`, `review_set` — gains or loses a member. | Test (TC-128) |
 | NFR-001-AC-3 | Every locator added at 0.2.0 is `required: false`. | Test (TC-129) |
 | NFR-001-AC-4 | Every shipped skeleton validates under 0.2.0 with zero error findings. | Test (TC-130) |
