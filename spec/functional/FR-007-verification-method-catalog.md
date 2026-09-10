@@ -28,7 +28,7 @@ could check that a chosen one was honoured.
 
 ### The seed set is the full sweep
 
-32 methods, covering every technique the ADR-0011 survey dispositioned as a
+34 methods, covering every technique the ADR-0011 survey dispositioned as a
 catalog entry plus the first production-qualification method found missing by a
 consumer — not a starter subset. A catalog that ships half the techniques
 teaches the advisor that the other half do not exist, which is worse than
@@ -38,7 +38,7 @@ yet written".
 | Class | Methods |
 |---|---|
 | **Test** (22) | unit, integration, e2e, property-based, metamorphic, differential, model-based generation, combinatorial t-way, mutation, fuzzing, grammar-based fuzzing, BDD/spec-by-example, contract testing, design-by-contract, runtime monitoring, deterministic simulation, fault injection, performance benchmarking, golden/approval, negative/abuse, DAST, IAST |
-| **Analysis** (7) | concolic/symbolic, SAST, SCA/SBOM, architecture conformance, static quality (5055), formal analysis (SMT), temporal model checking |
+| **Analysis** (9) | concolic/symbolic, SAST, SCA/SBOM, architecture conformance, compile-time check, dynamic analysis/sanitizer, static quality (5055), formal analysis (SMT), temporal model checking |
 | **Inspection** (1) | inspection |
 | **Demonstration** (2) | demonstration, agent-behaviour evaluation |
 
