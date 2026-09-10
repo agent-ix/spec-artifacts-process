@@ -28,15 +28,16 @@ could check that a chosen one was honoured.
 
 ### The seed set is the full sweep
 
-31 methods, covering every technique the ADR-0011 survey dispositioned as a
-catalog entry — not a starter subset. A catalog that ships half the techniques
+32 methods, covering every technique the ADR-0011 survey dispositioned as a
+catalog entry plus the first production-qualification method found missing by a
+consumer — not a starter subset. A catalog that ships half the techniques
 teaches the advisor that the other half do not exist, which is worse than
 shipping none: an absent entry reads as "not applicable" rather than as "not
 yet written".
 
 | Class | Methods |
 |---|---|
-| **Test** (21) | unit, integration, e2e, property-based, metamorphic, model-based generation, combinatorial t-way, mutation, fuzzing, grammar-based fuzzing, BDD/spec-by-example, contract testing, design-by-contract, runtime monitoring, deterministic simulation, fault injection, performance benchmarking, golden/approval, negative/abuse, DAST, IAST |
+| **Test** (22) | unit, integration, e2e, property-based, metamorphic, differential, model-based generation, combinatorial t-way, mutation, fuzzing, grammar-based fuzzing, BDD/spec-by-example, contract testing, design-by-contract, runtime monitoring, deterministic simulation, fault injection, performance benchmarking, golden/approval, negative/abuse, DAST, IAST |
 | **Analysis** (7) | concolic/symbolic, SAST, SCA/SBOM, architecture conformance, static quality (5055), formal analysis (SMT), temporal model checking |
 | **Inspection** (1) | inspection |
 | **Demonstration** (2) | demonstration, agent-behaviour evaluation |
@@ -87,6 +88,39 @@ object present suggests DAST, temporal phrasing suggests runtime monitoring or
 model checking, a reliability NFR suggests fault injection, and a concurrency
 property shape suggests deterministic simulation. None of those are reachable
 from `Verification: Test` defaulted by habit.
+
+### Differential testing compares implementations without manufacturing independence
+
+`differential-testing` executes the same exact input projection against two or
+more identified implementations or oracles and compares their structured
+observations through a declared relation. The method does not require an
+independently stated expected value for each case, but it does require a second
+implementation or oracle. Transforming one implementation's input and relating
+its own executions is `metamorphic-testing`; checking a generated input against
+a property is `property-based-testing`; exercising component boundaries without
+a comparison relation is `integration-testing`.
+
+The catalogue entry does not claim that either side is independent. Shared
+source, derived expected output, shared libraries, common fixtures and common
+specification defects can make agreement correlated. A consumer that needs
+independent-oracle evidence SHALL classify and retain that dependence outside
+the method catalogue. Agreement supports only the declared comparison relation;
+it SHALL NOT be promoted to general equivalence, correctness or qualification.
+
+The applicability characteristic is `reference-equivalence`, which Quoin can
+mint from an obligation that explicitly names a reference, previous, existing
+or legacy implementation. A new unobservable
+`multiple-comparable-implementations` characteristic would make the entry look
+precise while silently preventing the advisor from selecting it. The catalogue
+therefore records the observable reason and leaves exact candidate, oracle,
+input and relation identities to the consuming verification plan.
+
+The catalogue remains declarative YAML. The extension's executable acceptance
+path SHALL consist exclusively of Rust checks carrying bare compiler-checked
+`ix-trace-rs` trace attributes, with cross-tool execution delegated to
+Engineering Assurance's accepted typed Rust producer boundary and with no local
+process runner, stdout verdict scraper, evidence store or Python/JavaScript
+acceptance path.
 
 ## Inputs
 
@@ -193,6 +227,14 @@ the third instance of the engine-before-module ordering gap in that program.
 | FR-007-AC-12 | The configuration-matrix source declares `combinatorial`, so a `## Configuration Dimensions` table mints ONE obligation for the whole table rather than one per row (quire-rs FR-061). It declares an exclusions column, because a space with forbidden combinations and no way to state them demands coverage of combinations that cannot exist. | Test (TC-055) |
 | FR-007-AC-13 | No method declares `path-sensitive` or `hard-to-reach-branch`. Both name the implementation's control flow, which no specification states and no fact source can read, and a method keyed only on them can never be recommended. | Test (TC-067) |
 | FR-007-AC-14 | No method declares `surviving-mutants` or `suite-quality-unknown`. Both were considered and rejected — the first names one tool's artifact, the second over-claims and names the wrong subject — and the axis is method-class-shaped, as `evidence_kind` is (CR-015). | Test (TC-068) |
+| FR-007-AC-15 | The catalogue declares exactly one `differential-testing` method with class `Test`, evidence kind `Property`, applicability `characteristics: [reference-equivalence]`, and tooling `[proptest, cargo test]`. Its definition requires the same exact input projection, at least two identified implementations or oracles, structured observations and a declared comparison relation; it explicitly withholds independence, correctness, general-equivalence and qualification claims. | Test (TC-144) |
+| FR-007-AC-16 | Through the released Quoin advisor interface, an obligation explicitly requiring equivalence with a reference or previous implementation recommends `differential-testing` for the `reference-equivalence` reason and preserves its exact identity, class, evidence kind, applicability and tooling in catalogue JSON. Controlled property-only, metamorphic-only and integration-only obligations do not recommend it. | Integration (TC-145) |
+
+## Constraints
+
+| ID | Constraint | Type | Validation |
+| --- | --- | --- | --- |
+| FR-007-CON-1 | The extension's executable acceptance path SHALL consist exclusively of Rust checks with bare `ix-trace-rs` bindings, using the accepted Engineering Assurance producer boundary for cross-tool execution and containing no repository-local runner, stdout verdict scraper, evidence store or Python/JavaScript acceptance path. | Architecture | Test (TC-144, TC-145) |
 
 > **CR-029 note (concolic execution becomes reachable — 2026-08-19):**
 > `concolic-execution` was keyed on `path-sensitive` and `hard-to-reach-branch`,
@@ -253,5 +295,5 @@ the third instance of the engine-before-module ordering gap in that program.
 
 ## Dependencies
 
-- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary)
-- **Downstream**: agent-ix/quoin#89 (the test-plan advisor reads the merged catalog and matches its applicability rules), agent-ix/quoin#80 (method conformance is checked against it), agent-ix/quoin#91 (evidence adapters map tool output onto these kinds)
+- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary), Engineering Assurance #34 (bounded typed Rust producer execution for the cross-tool conformance case)
+- **Downstream**: agent-ix/quoin#89 (the test-plan advisor reads the merged catalog and matches its applicability rules), agent-ix/quoin#80 (method conformance is checked against it), agent-ix/quoin#91 (evidence adapters map tool output onto these kinds), agent-ix/quire-verification#21 (the first qualification-plan consumer)
