@@ -36,4 +36,3 @@ changing semantic decision.
 | Method confusion | Negative property, metamorphic and integration controls in TC-145. |
 | Correlated oracle evidence | Explicit claim ceiling and consumer-owned dependence classification. |
 | Local tooling growth | Rust-only constraint and Engineering Assurance execution dependency. |
-

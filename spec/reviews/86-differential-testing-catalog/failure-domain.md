@@ -36,4 +36,3 @@ boundaries are the module set, executable identity and two machine payloads.
 | Partial execution | Only completed, schema-valid catalogue and advice results can satisfy TC-145. |
 | False independence | Independence remains a consumer classification outside the catalogue. |
 | Silent blast radius | TC-146 compares all prior advice fields and ordering over a frozen corpus. |
-

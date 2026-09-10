@@ -32,4 +32,3 @@ outcomes for the catalogue, consumer claim ceiling and Rust acceptance path.
 | Method behavior | The catalogue entry is named as the subject and every required field is observable. |
 | Unwanted behavior | Claim inflation, ambient shadowing, malformed output and local-framework substitution are explicitly refused. |
 | Verification | AC-15 through AC-17 and CON-1 map to TC-144 through TC-146. |
-

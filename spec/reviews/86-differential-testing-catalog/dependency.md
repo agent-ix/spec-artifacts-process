@@ -36,4 +36,3 @@ quire-rs FR-054 catalogue shape + Quoin FR-031 reference-equivalence fact
   -> accepted catalogue revision
   -> quire-verification Task-028 consumption
 ```
-

@@ -37,4 +37,3 @@ end-to-end selection and whole-corpus regression.
 | FR-007-AC-15 | Test / Unit evidence | Exhaustive inspection of one finite manifest entry and discriminating field mutations. |
 | FR-007-AC-16 | Test / Integration evidence | Crosses the module-data, Quoin and typed producer boundaries. |
 | FR-007-AC-17 | Test / Integration evidence | Differential comparison of full structured advice results before and after one catalogue change. |
-

@@ -36,4 +36,3 @@ dependence, comparison semantics and evidence sufficiency.
 | Quoin | Observable facts, recommendation logic and catalogue/advice JSON. |
 | Engineering Assurance | Exact bounded producer execution and typed result states. |
 | quire-verification | Candidate/oracle/configuration identities, dependence, comparison relation and sufficiency. |
-
