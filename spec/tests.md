@@ -86,6 +86,7 @@ type: TestMatrix
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
 | FR-007 | FR-007-AC-15 | TC-144 | 🚧 Planned |
 | FR-007 | FR-007-AC-16 | TC-145 | 🚧 Blocked on engineering-assurance#34 |
+| FR-007 | FR-007-AC-17 | TC-146 | 🚧 Blocked on engineering-assurance#34 |
 | FR-008 | FR-008-AC-1 | TC-060 | ✅ Complete |
 | FR-008 | FR-008-AC-2 | TC-061 | ✅ Complete |
 | FR-008 | FR-008-AC-3 | TC-061 | ✅ Complete |
@@ -309,7 +310,8 @@ claim (SR-008 FND-004).
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
 | TC-144 | A Rust catalogue contract test with a bare `ix-trace-rs` binding loads the authoritative manifest and asserts the exact `differential-testing` identity, class, evidence kind, applicability, tooling and claim boundary; deleting or changing any field, replacing the second implementation with a transformed self-execution, or adding an independence/correctness/qualification claim fails | Unit | P0 | FR-007-AC-15, FR-007-CON-1 | 🚧 |
-| TC-145 | A Rust cross-tool conformance test with a bare `ix-trace-rs` binding uses the shared Engineering Assurance producer boundary to run exact pinned Quoin catalogue/advice requests: the reference-equivalence case recommends `differential-testing` for that reason with all metadata preserved, while property-only, metamorphic-only and integration-only controls do not | Integration | P0 | FR-007-AC-16, FR-007-CON-1 | 🚧 blocked on engineering-assurance#34 |
+| TC-145 | A Rust cross-tool conformance test with a bare `ix-trace-rs` binding uses the shared Engineering Assurance producer boundary to run an exact pinned Quoin executable against a closed module set: the reference-equivalence case recommends `differential-testing` for that reason with all metadata preserved, property-only, metamorphic-only and integration-only controls do not, and non-completed or malformed producer results fail without fabricating conformance | Integration | P0 | FR-007-AC-16, FR-007-CON-1 | 🚧 blocked on engineering-assurance#34 |
+| TC-146 | A Rust advice-delta test with a bare `ix-trace-rs` binding compares the same frozen obligation corpus before and after the catalogue addition: only obligations already carrying `reference-equivalence` gain `differential-testing`, and every prior recommendation, reason, relative order and advice state remains identical | Integration | P0 | FR-007-AC-17, FR-007-CON-1 | 🚧 blocked on engineering-assurance#34 |
 
 ## Option Permutation Matrix
 

@@ -115,6 +115,17 @@ precise while silently preventing the advisor from selecting it. The catalogue
 therefore records the observable reason and leaves exact candidate, oracle,
 input and relation identities to the consuming verification plan.
 
+`reference-equivalence` also remains an intentional input to
+`concolic-execution`: an advisor may recommend both methods, because comparison
+and path exploration answer different questions. Selection of
+`differential-testing` is therefore an inclusion claim with an exact reason,
+not an exclusive-ranking claim.
+
+`Property` is the evidence kind because a differential harness evaluates a
+relation over a case population and can consume cases from `spec-correctness`.
+It does not reclassify the catalogue method as property-based testing: input
+generation and cross-implementation comparison remain separate axes.
+
 The catalogue remains declarative YAML. The extension's executable acceptance
 path SHALL consist exclusively of Rust checks carrying bare compiler-checked
 `ix-trace-rs` trace attributes, with cross-tool execution delegated to
@@ -228,13 +239,14 @@ the third instance of the engine-before-module ordering gap in that program.
 | FR-007-AC-13 | No method declares `path-sensitive` or `hard-to-reach-branch`. Both name the implementation's control flow, which no specification states and no fact source can read, and a method keyed only on them can never be recommended. | Test (TC-067) |
 | FR-007-AC-14 | No method declares `surviving-mutants` or `suite-quality-unknown`. Both were considered and rejected — the first names one tool's artifact, the second over-claims and names the wrong subject — and the axis is method-class-shaped, as `evidence_kind` is (CR-015). | Test (TC-068) |
 | FR-007-AC-15 | The catalogue declares exactly one `differential-testing` method with class `Test`, evidence kind `Property`, applicability `characteristics: [reference-equivalence]`, and tooling `[proptest, cargo test]`. Its definition requires the same exact input projection, at least two identified implementations or oracles, structured observations and a declared comparison relation; it explicitly withholds independence, correctness, general-equivalence and qualification claims. | Test (TC-144) |
-| FR-007-AC-16 | Through the released Quoin advisor interface, an obligation explicitly requiring equivalence with a reference or previous implementation recommends `differential-testing` for the `reference-equivalence` reason and preserves its exact identity, class, evidence kind, applicability and tooling in catalogue JSON. Controlled property-only, metamorphic-only and integration-only obligations do not recommend it. | Integration (TC-145) |
+| FR-007-AC-16 | Through an exact pinned Quoin executable and closed module set, an obligation explicitly requiring equivalence with a reference or previous implementation recommends `differential-testing` for the `reference-equivalence` reason and preserves its exact identity, class, evidence kind, applicability and tooling in catalogue JSON. Controlled property-only, metamorphic-only and integration-only obligations do not recommend it. A non-completed producer result or malformed catalogue/advice payload cannot satisfy the criterion. | Test (TC-145) |
+| FR-007-AC-17 | Against a frozen obligation corpus, adding the method changes advice only by adding `differential-testing` to obligations whose pre-change facts already contain `reference-equivalence`; it changes no prior recommendation, reason, order within the prior recommendations, mismatch state, uncatalogued state or inconclusive state. | Test (TC-146) |
 
 ## Constraints
 
 | ID | Constraint | Type | Validation |
 | --- | --- | --- | --- |
-| FR-007-CON-1 | The extension's executable acceptance path SHALL consist exclusively of Rust checks with bare `ix-trace-rs` bindings, using the accepted Engineering Assurance producer boundary for cross-tool execution and containing no repository-local runner, stdout verdict scraper, evidence store or Python/JavaScript acceptance path. | Architecture | Test (TC-144, TC-145) |
+| FR-007-CON-1 | The extension's executable acceptance path SHALL consist exclusively of Rust checks with bare `ix-trace-rs` bindings, using the accepted Engineering Assurance producer boundary for cross-tool execution and containing no repository-local runner, stdout verdict scraper, evidence store or Python/JavaScript acceptance path. | Architecture | Test (TC-144, TC-145, TC-146) |
 
 > **CR-029 note (concolic execution becomes reachable — 2026-08-19):**
 > `concolic-execution` was keyed on `path-sensitive` and `hard-to-reach-branch`,
