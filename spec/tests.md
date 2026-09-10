@@ -78,12 +78,12 @@ type: TestMatrix
 | FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
 | FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
 | FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
-| FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
-| FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
-| FR-007 | FR-007-AC-14 | TC-068 | ✅ Complete |
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
+| FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
+| FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
+| FR-007 | FR-007-AC-14 | TC-068 | ✅ Complete |
 | FR-007 | FR-007-AC-15 | TC-144 | 🚧 Planned |
 | FR-007 | FR-007-AC-16 | TC-145 | 🚧 Blocked on engineering-assurance#34 |
 | FR-007 | FR-007-AC-17 | TC-146 | 🚧 Blocked on engineering-assurance#34 |
