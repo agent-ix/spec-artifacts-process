@@ -1305,6 +1305,18 @@ verification_catalog:
       property_shapes: [round-trip, idempotence, ordering]
       characteristics: [no-independent-oracle]
     tooling: [proptest, hypothesis]
+  differential-testing:
+    name: Differential testing
+    class: Test
+    definition: >-
+      Execute the same exact input projection against two or more identified
+      implementations or oracles, compare their structured observations through
+      a declared relation, and limit agreement to that relation without inferring
+      independence, correctness, general equivalence, or qualification.
+    evidence_kind: Property
+    applicability:
+      characteristics: [reference-equivalence]
+    tooling: [proptest, cargo test]
   model-based-test-generation:
     name: Model-based test generation
     class: Test
