@@ -5,7 +5,7 @@ type: SpecReview
 analysis: scope-boundary
 scope: "FR-007 ownership across shared catalogue, advisor, assurance and consumer repositories"
 review_set: all
-evaluated_revision: "e5035b1"
+evaluated_revision: "edf74a6"
 review_date: "2026-09-10"
 relationships:
   - { target: ix://agent-ix/spec-artifacts-process/FR-007, type: reviews }

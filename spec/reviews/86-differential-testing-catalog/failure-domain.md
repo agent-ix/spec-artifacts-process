@@ -5,7 +5,7 @@ type: SpecReview
 analysis: failure-domain
 scope: "FR-007-AC-15..17, FR-007-CON-1 and TC-144..TC-146"
 review_set: all
-evaluated_revision: "e5035b1"
+evaluated_revision: "edf74a6"
 review_date: "2026-09-10"
 relationships:
   - { target: ix://agent-ix/spec-artifacts-process/FR-007, type: reviews }

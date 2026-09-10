@@ -5,7 +5,7 @@ type: SpecReview
 analysis: risk-complexity
 scope: "FR-007 differential-testing method and advisor impact"
 review_set: all
-evaluated_revision: "e5035b1"
+evaluated_revision: "edf74a6"
 review_date: "2026-09-10"
 relationships:
   - { target: ix://agent-ix/spec-artifacts-process/FR-007, type: reviews }
