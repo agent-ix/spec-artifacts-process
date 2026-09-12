@@ -211,7 +211,7 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Functional Req",
         "Acceptance Criteria",
         "Test Cases",
-        "Coverage Status",
+        "Status",
     ]
     assert coverage["assert"]["min_rows"] == 1
 
@@ -701,7 +701,7 @@ def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
         "Subsystem",
         "Requirements",
         "Local Matrix",
-        "Coverage Status",
+        "Status",
     ]
     assert subsystems["assert"]["min_rows"] == 1
 

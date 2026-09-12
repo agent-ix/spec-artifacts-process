@@ -106,7 +106,7 @@ sub-id enumeration. Nothing else.
 ### Column headers — 87 mismatches, 40 repos. **No amendment. Corpus.**
 
 Only **4 documents fail on headers alone**, and only 5 mismatches are a
-one-word near-synonym (`Status` vs `Coverage Status`). The rest are genuinely
+one-word near-synonym (`Status` vs `Status`). The rest are genuinely
 different tables — `["US", "AC", "TC", "Type", "Priority"]`,
 `["StR", "Trace", "Validation", "Status"]` — mostly in the *optional* coverage
 sections. Admitting them would make the contract mean nothing.
