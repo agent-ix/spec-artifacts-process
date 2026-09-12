@@ -248,12 +248,12 @@ artifact_types:
           required: true
           multiple: true
           assert:
-            columns: [Subsystem, Requirements, Local Matrix, Coverage Status]
+            columns: [Subsystem, Requirements, Local Matrix, Status]
             min_rows: 1
             column_patterns:
               # Same status vocabulary as every other matrix surface, marker
               # first and the note that says why after it (CR-016/CR-031).
-              Coverage Status: '^(✅|❌|🚧|⛔)(\s+.*)?$'
+              Status: '^(✅|❌|🚧|⛔)(\s+.*)?$'
         # Cross-module integration scenarios. Optional: a repository whose
         # subsystems do not integrate has none, and requiring the table would
         # force an empty one.
@@ -301,7 +301,7 @@ artifact_types:
           required: true
           multiple: true
           assert:
-            columns: [Functional Req, Acceptance Criteria, Test Cases, Coverage Status]
+            columns: [Functional Req, Acceptance Criteria, Test Cases, Status]
             min_rows: 1
         test_cases:
           from: table_row
@@ -403,14 +403,14 @@ artifact_types:
           required: false
           multiple: true
           assert:
-            columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Coverage Status]
+            columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Status]
         user_story_coverage:
           from: table_row
           under_section: User Story Coverage
           required: false
           multiple: true
           assert:
-            columns: [User Story, Acceptance Criteria, Test Cases, Coverage Status]
+            columns: [User Story, Acceptance Criteria, Test Cases, Status]
         non_functional_coverage:
           from: table_row
           under_section: Non-Functional Requirement Coverage

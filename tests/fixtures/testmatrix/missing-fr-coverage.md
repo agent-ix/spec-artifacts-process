@@ -9,7 +9,7 @@ type: TestMatrix
 
 ### Stakeholder Requirement Coverage
 
-| Stakeholder Req | Trace to US/FR | Test/Validation | Coverage Status |
+| Stakeholder Req | Trace to US/FR | Test/Validation | Status |
 |-----------------|----------------|-----------------|-----------------|
 | StR-001 | US-001, FR-003 | Review | ✅ Complete |
 
