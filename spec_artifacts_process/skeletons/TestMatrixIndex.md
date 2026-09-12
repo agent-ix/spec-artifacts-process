@@ -17,7 +17,7 @@ type: TestMatrixIndex
 
      Contract (manifest body_extraction asserts):
      - REQUIRED: `Requirements Traceability` (columns exactly
-       Subsystem | Requirements | Local Matrix | Coverage Status), >= 1 row.
+       Subsystem | Requirements | Local Matrix | Status), >= 1 row.
        `Local Matrix` is a relative link and is what makes the tree navigable;
        asserting the column is what makes a dropped cell visible.
      - OPTIONAL: `Integration Test Matrix` (id column `Integration ID`,
@@ -25,13 +25,13 @@ type: TestMatrixIndex
        whose subsystems do not integrate has no INT rows, and an absent gap
        register and an empty one are different claims — requiring either would
        force an empty table.
-     - `Coverage Status` uses the same marker-first vocabulary as every other
+     - `Status` uses the same marker-first vocabulary as every other
        matrix surface: ✅ | ❌ | 🚧 | ⛔. `⚠️` is not valid here either. -->
 # TM-000: Example repository matrix index
 
 ## Requirements Traceability
 
-| Subsystem | Requirements | Local Matrix | Coverage Status |
+| Subsystem | Requirements | Local Matrix | Status |
 |-----------|--------------|--------------|-----------------|
 | Import | FR-001..FR-004 | [import](./import/tests.md) | ✅ Complete |
 | Storage | FR-005..FR-009 | [storage](./storage/tests.md) | 🚧 two criteria unbacked |

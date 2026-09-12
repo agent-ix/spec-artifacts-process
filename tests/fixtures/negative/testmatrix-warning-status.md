@@ -11,7 +11,7 @@ because: "⚠️ was retired by CR-031: traceability.status classed it as nothin
 
 ### Functional Requirement Coverage
 
-| Functional Req | Acceptance Criteria | Test Cases | Coverage Status |
+| Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
 | FR-001 | FR-001-AC-1 | TC-001 | ✅ |
 

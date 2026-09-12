@@ -207,12 +207,12 @@ models:
         kind: typed-table
         heading: Requirements Traceability
         required: true
-        columns: [Subsystem, Requirements, Local Matrix, Coverage Status]
+        columns: [Subsystem, Requirements, Local Matrix, Status]
         fields:
           Subsystem: {property: subsystem, parse: text}
           Requirements: {property: requirements, parse: text}
           Local Matrix: {property: localMatrix, parse: text}
-          Coverage Status: {property: status, parse: status-marker}
+          Status: {property: status, parse: status-marker}
       integrationMatrix:
         kind: typed-table
         heading: Integration Test Matrix
@@ -255,12 +255,12 @@ models:
         kind: typed-table
         heading: Functional Requirement Coverage
         required: true
-        columns: [Functional Req, Acceptance Criteria, Test Cases, Coverage Status]
+        columns: [Functional Req, Acceptance Criteria, Test Cases, Status]
         fields:
           Functional Req: {property: functionalReq, parse: text}
           Acceptance Criteria: {property: acceptanceCriteria, parse: text}
           Test Cases: {property: testCases, parse: text}
-          Coverage Status: {property: status, parse: status-marker}
+          Status: {property: status, parse: status-marker}
       testCases:
         kind: typed-table
         heading: Test Case Summary
@@ -278,21 +278,21 @@ models:
       stakeholderCoverage:
         kind: typed-table
         heading: Stakeholder Requirement Coverage
-        columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Coverage Status]
+        columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Status]
         fields:
           Stakeholder Req: {property: stakeholderReq, parse: text}
           Trace to US/FR: {property: traceToUsFr, parse: text}
           Test/Validation: {property: testValidation, parse: text}
-          Coverage Status: {property: status, parse: status-marker}
+          Status: {property: status, parse: status-marker}
       userStoryCoverage:
         kind: typed-table
         heading: User Story Coverage
-        columns: [User Story, Acceptance Criteria, Test Cases, Coverage Status]
+        columns: [User Story, Acceptance Criteria, Test Cases, Status]
         fields:
           User Story: {property: userStory, parse: text}
           Acceptance Criteria: {property: acceptanceCriteria, parse: text}
           Test Cases: {property: testCases, parse: text}
-          Coverage Status: {property: status, parse: status-marker}
+          Status: {property: status, parse: status-marker}
       nonFunctionalCoverage:
         kind: typed-table
         heading: Non-Functional Requirement Coverage

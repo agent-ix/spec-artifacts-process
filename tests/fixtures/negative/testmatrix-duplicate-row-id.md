@@ -11,7 +11,7 @@ because: "a duplicated Test ID makes record extraction by id ambiguous and a tra
 
 ### Functional Requirement Coverage
 
-| Functional Req | Acceptance Criteria | Test Cases | Coverage Status |
+| Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
 | FR-001 | FR-001-AC-1 | TC-001 | ✅ |
 

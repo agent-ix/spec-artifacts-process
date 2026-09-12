@@ -5,7 +5,7 @@
       "functionalReq": "FR-001",
       "line": 49,
       "status": {
-        "marker": "✅",
+        "marker": "\u2705",
         "note": "Complete"
       },
       "testCases": "TC-001"
@@ -15,7 +15,7 @@
       "functionalReq": "FR-001",
       "line": 50,
       "status": {
-        "marker": "✅",
+        "marker": "\u2705",
         "note": "Complete"
       },
       "testCases": "TC-002"
@@ -23,7 +23,7 @@
   ],
   "id": "TM-001",
   "provenance": {
-    "digest": "sha256:1d8f150b79ea9502bd22ca23da472e6916708799bddb8b578506d017abf5395f",
+    "digest": "sha256:a36b676b32944027a695ae1a167de336d427a57cdbd71efb8aec7d0acfac33a2",
     "path": "skeletons/TestMatrix.md"
   },
   "testCases": [
@@ -32,7 +32,7 @@
       "line": 56,
       "priority": "P0",
       "status": {
-        "marker": "✅"
+        "marker": "\u2705"
       },
       "title": "A matching digest persists the artifact",
       "tracesTo": {
@@ -48,7 +48,7 @@
       "line": 57,
       "priority": "P0",
       "status": {
-        "marker": "✅"
+        "marker": "\u2705"
       },
       "title": "A mismatched digest rejects the import and names both digests",
       "tracesTo": {
@@ -64,7 +64,7 @@
       "line": 58,
       "priority": "P2",
       "status": {
-        "marker": "🚧",
+        "marker": "\ud83d\udea7",
         "note": "not yet run at scale"
       },
       "title": "Import throughput holds at the declared threshold",
@@ -81,7 +81,7 @@
       "line": 59,
       "priority": "P1",
       "status": {
-        "marker": "⛔",
+        "marker": "\u26d4",
         "note": "superseded by TC-001"
       },
       "title": "Digest computed before any transform",
