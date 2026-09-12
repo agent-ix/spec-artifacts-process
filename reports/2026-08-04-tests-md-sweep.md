@@ -266,7 +266,7 @@ Of the 116 matrices with no `## Test Case Summary`:
 
 - **70** have no id-column table anywhere. They are coverage narratives —
   `Coverage Summary` (19), `Overview` (14), `Traceability` (11),
-  `Coverage Status` (10). No contract change reaches these; they need authoring.
+  `Status` (10). No contract change reaches these; they need authoring.
 - **44** do have an id-column table under another heading, but inspecting the
   column sets shows these are mostly **different artifacts**, not renamed
   summaries:

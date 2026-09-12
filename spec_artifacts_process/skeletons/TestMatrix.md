@@ -10,7 +10,7 @@ type: TestMatrix
 
      Contract (manifest body_extraction asserts, validated by `quire validate`):
      - REQUIRED: `Functional Requirement Coverage` (columns exactly
-       Functional Req | Acceptance Criteria | Test Cases | Coverage Status)
+       Functional Req | Acceptance Criteria | Test Cases | Status)
        and `Test Case Summary` (columns exactly
        Test ID | Title | Type | Priority | Traces To | Status), each with
        >= 1 data row.
@@ -44,7 +44,7 @@ type: TestMatrix
 
 ### Functional Requirement Coverage
 
-| Functional Req | Acceptance Criteria | Test Cases | Coverage Status |
+| Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
 | FR-001 | FR-001-AC-1 | TC-001 | ✅ Complete |
 | FR-001 | FR-001-AC-2 | TC-002 | ✅ Complete |

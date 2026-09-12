@@ -32,5 +32,5 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Coverage Status`)."
+  "description": "One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Status`)."
 }

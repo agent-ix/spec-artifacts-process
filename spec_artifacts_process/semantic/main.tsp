@@ -337,7 +337,7 @@ model TestCaseRow {
   line: LineNumber;
 }
 
-/** One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Coverage Status`). */
+/** One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Status`). */
 model FunctionalCoverageRow {
   /** free text: the requirement cell as authored. */
   functionalReq: NonEmptyText;

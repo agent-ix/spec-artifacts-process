@@ -9,13 +9,13 @@ type: TestMatrix
 
 ### User Story Coverage
 
-| User Story | Acceptance Criteria | Test Scenarios | Coverage Status |
+| User Story | Acceptance Criteria | Test Scenarios | Status |
 |------------|---------------------|----------------|-----------------|
 | US-001 | US-001-EX-1 | TC-001 | 🚧 Planned |
 
 ### Functional Requirement Coverage
 
-| Functional Req | Acceptance Criteria | Test Cases | Coverage Status |
+| Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
 | FR-003 | FR-003-AC-1 | TC-001 | 🚧 Planned |
 

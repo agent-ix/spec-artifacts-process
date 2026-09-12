@@ -35,7 +35,7 @@ validation engine's cross-reference job and is out of scope here.
 
 - `body_extraction` **SHALL** require a `Functional Requirement Coverage`
   `table_row` extraction with columns exactly
-  `Functional Req | Acceptance Criteria | Test Cases | Coverage Status` and at
+  `Functional Req | Acceptance Criteria | Test Cases | Status` and at
   least one row.
 - `body_extraction` **SHALL** require a `Test Case Summary` `table_row`
   extraction with columns exactly
@@ -107,9 +107,9 @@ validation engine's cross-reference job and is out of scope here.
   but not yet machine-enforceable — enforcement depends on a new quire-rs
   engine capability (see Dependencies).
 - The `Stakeholder Requirement Coverage`
-  (`Stakeholder Req | Trace to US/FR | Test/Validation | Coverage Status`),
+  (`Stakeholder Req | Trace to US/FR | Test/Validation | Status`),
   `User Story Coverage`
-  (`User Story | Acceptance Criteria | Test Cases | Coverage Status`), and
+  (`User Story | Acceptance Criteria | Test Cases | Status`), and
   `Non-Functional Requirement Coverage`
   (`Non-Functional Req | Verification Method | Evidence/Test Cases | Status`)
   tables **SHALL** be declared as optional (`required: false`) extractions
@@ -189,7 +189,7 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
-| FR-003-AC-12 | A `TestMatrixIndex` archetype models the **root index** of a matrix tree: it requires a `Requirements Traceability` table of `Subsystem \| Requirements \| Local Matrix \| Coverage Status` and optionally an `Integration Test Matrix` (`INT-NNN`) and a `Coverage Gaps` register (`GAP-NNN`). It requires neither `test_cases` nor `functional_coverage`, and it mints no test-case ids — `trace_targets.test-case` binds `TestMatrix` only, so an index is not a minting document. | Test (TC-076) |
+| FR-003-AC-12 | A `TestMatrixIndex` archetype models the **root index** of a matrix tree: it requires a `Requirements Traceability` table of `Subsystem \| Requirements \| Local Matrix \| Status` and optionally an `Integration Test Matrix` (`INT-NNN`) and a `Coverage Gaps` register (`GAP-NNN`). It requires neither `test_cases` nor `functional_coverage`, and it mints no test-case ids — `trace_targets.test-case` binds `TestMatrix` only, so an index is not a minting document. | Test (TC-076) |
 
 > **CR-031 note (2026-08-20):** `⚠️` is **retired** from the `Status`
 > vocabulary. agent-ix/spec-artifacts-process#52, agent-ix/quire-rs#192.
@@ -219,7 +219,7 @@ validation engine's cross-reference job and is out of scope here.
 > admitted, already failing). Only **10 rows in 3 repositories** validate cleanly
 > today and therefore gate this change — `quire-cli` (6), `sync-github-service`
 > (3) and this module (1). The remaining ~270 `⚠️` cells ecosystem-wide sit in
-> `Coverage Status` columns and undeclared sections no `column_patterns` reaches;
+> `Status` columns and undeclared sections no `column_patterns` reaches;
 > migrating those is consistency work with no enforcement value, tracked
 > separately.
 >
