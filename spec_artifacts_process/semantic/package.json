@@ -3,7 +3,7 @@
   "version": "0.0.0-managed",
   "private": true,
   "description": "TypeSpec source of the spec-artifacts-process semantic data models (FR-009). Emits spec_artifacts_process/schemas/<Model>.json; never published on its own.",
-  "license": "AGPL-3.0-only",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "tspMain": "main.tsp",
   "scripts": {
