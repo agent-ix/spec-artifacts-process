@@ -177,12 +177,14 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     for widened in ("inspection-obligation", "traces-to"):
         entry = current_refs[widened]
         assert "interface-acceptance-criterion" in entry["targets"], widened
-        assert "[A-Za-z][A-Za-z0-9]*_\\d+" in entry["pattern"], widened
+        assert "interface_\\d+" in entry["pattern"], widened
         entry["pattern"] = baseline_refs[widened]["pattern"]
         entry["targets"] = baseline_refs[widened]["targets"]
     baseline_tags_by_name = {}
     for group in ("markers", "legacy", "implements"):
-        baseline_tags_by_name.update(by_name(baseline["traceability"]["trace_tags"][group]))
+        baseline_tags_by_name.update(
+            by_name(baseline["traceability"]["trace_tags"][group])
+        )
     widened_forms = (
         "rust-trace-line",
         "python-trace-line",
@@ -209,15 +211,21 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     # instead of rejecting it outright.
     current_matrix = by_name(current["artifact_types"])["TestMatrix"]
     baseline_matrix = by_name(baseline["artifact_types"])["TestMatrix"]
-    current_traces_to_col = current_matrix["body_extraction"]["yield_pattern"][
-        "match"
-    ]["test_cases"]["assert"]["column_patterns"]["Traces To"]
-    assert "[A-Za-z][A-Za-z0-9]*_\\d+" in current_traces_to_col
-    current_matrix["body_extraction"]["yield_pattern"]["match"]["test_cases"][
+    current_traces_to_col = current_matrix["body_extraction"]["yield_pattern"]["match"][
+        "test_cases"
+    ]["assert"]["column_patterns"]["Traces To"]
+    assert "interface_\\d+" in current_traces_to_col
+    current_matrix["body_extraction"]["yield_pattern"]["match"]["test_cases"]["assert"][
+        "column_patterns"
+    ]["Traces To"] = baseline_matrix["body_extraction"]["yield_pattern"]["match"][
+        "test_cases"
+    ][
         "assert"
-    ]["column_patterns"]["Traces To"] = baseline_matrix["body_extraction"][
-        "yield_pattern"
-    ]["match"]["test_cases"]["assert"]["column_patterns"]["Traces To"]
+    ][
+        "column_patterns"
+    ][
+        "Traces To"
+    ]
     for key in DECLARATION_CLASSES:
         assert current.get(key) == baseline.get(
             key
@@ -247,7 +255,7 @@ def test_no_declared_vocabulary_moved(manifest, baseline):
     # underscore-object-id shape (`interface_004-AC-1`), asserted here and
     # reset to the baseline value before the wholesale compare below.
     now_traces_to = copy.deepcopy(now["test_cases"]["assert"])
-    assert "[A-Za-z][A-Za-z0-9]*_\\d+" in now_traces_to["column_patterns"]["Traces To"]
+    assert "interface_\\d+" in now_traces_to["column_patterns"]["Traces To"]
     now_traces_to["column_patterns"]["Traces To"] = was["test_cases"]["assert"][
         "column_patterns"
     ]["Traces To"]
@@ -460,7 +468,9 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
     trace_tags = copy.deepcopy(manifest["traceability"]["trace_tags"])
     baseline_tags_by_name = {}
     for group in ("markers", "legacy", "implements"):
-        baseline_tags_by_name.update(by_name(baseline["traceability"]["trace_tags"][group]))
+        baseline_tags_by_name.update(
+            by_name(baseline["traceability"]["trace_tags"][group])
+        )
     for group in ("legacy", "implements"):
         for entry in trace_tags[group]:
             if entry["name"] in baseline_tags_by_name:

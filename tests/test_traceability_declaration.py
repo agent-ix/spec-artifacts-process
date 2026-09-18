@@ -54,7 +54,7 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
 
 
 def test_interface_acceptance_criterion_is_not_required(traceability: dict) -> None:
-    """quire-rs#460 fix: the SOA `interface` template has no Acceptance
+    """TC-147 (FR-004-AC-19): the SOA `interface` template has no Acceptance
     Criteria section on most interface documents. `required:` defaults to
     `true` (quire-rs `traceability.rs`), so leaving it unset raised a false
     `section-matches-nothing` diagnostic on every ordinary interface doc —
@@ -226,6 +226,30 @@ def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> Non
         match = re.search(comment, line)
         assert match, line
         assert [p.strip() for p in match.group(1).split(",") if p.strip()] == expected
+
+    # quire-rs#460: the underscore-object-id shape (`interface_004`) binds
+    # through the same comment forms, same trailing delimiter.
+    accepted = re.search(comment, "// interface_004-AC-1: why")
+    assert accepted and accepted.group(1) == "interface_004-AC-1"
+
+    # CR-063 finding 3: closed to the literal KIND (`interface`), not a
+    # generic `\w+_\d+` — a malformed id, a missing KIND prefix, a leading
+    # digit, and the two ordinary identifiers that merely share the
+    # `word_number` shape all still bind nothing.
+    for rejected in (
+        "// interface_004-AC: why",
+        "// _004-AC-1: why",
+        "// 4_004-AC-1: why",
+        "// interface_004_AC_1: why",
+        "// sha_256: digest",
+        "# retry_3: backoff",
+    ):
+        opener_pattern = (
+            legacy["python-comment-id"]["pattern"]
+            if rejected.startswith("#")
+            else comment
+        )
+        assert not re.search(opener_pattern, rejected), rejected
 
 
 def test_test_name_form_binds_both_spellings_of_its_token(
@@ -418,6 +442,35 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
             "// FR-001 is the manifest activation requirement."
         ), f"{form['name']} binds prose"
 
+        # quire-rs#460: the underscore-object-id shape scopes the same way.
+        scoped = pattern.search("Implements: interface_004-AC-1")
+        assert scoped, f"{form['name']} does not scope interface_004-AC-1"
+        assert (
+            scoped.group(1) == "interface_004-AC-1"
+        ), f"{form['name']} captured {scoped.group(1)!r}"
+
+        # CR-063 finding 3: closed to the literal KIND. A malformed AC suffix
+        # truncates to the requirement id, exactly as an `FR-001-AC` already
+        # would — this form has no trailing-delimiter to enforce, so
+        # "scoping truncates to the requirement trivially" is documented,
+        # intentional behaviour, not a partial bind of the malformed tail.
+        for malformed, truncated in (
+            ("interface_004-AC", "interface_004"),
+            ("interface_004_AC_1", "interface_004"),
+        ):
+            trunc_match = pattern.search(f"Implements: {malformed}")
+            assert trunc_match, f"{form['name']} lost the base id in {malformed!r}"
+            assert (
+                trunc_match.group(1) == truncated
+            ), f"{form['name']}: {malformed!r} -> {trunc_match.group(1)!r}"
+
+        # No KIND prefix, a leading digit, and an ordinary identifier that
+        # merely shares the `word_number` shape still bind nothing.
+        for rejected in ("_004-AC-1", "4_004-AC-1", "sha_256", "retry_3"):
+            assert not pattern.search(
+                f"Implements: {rejected}"
+            ), f"{form['name']} binds {rejected!r}"
+
 
 def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
     """TC-066 (FR-004-AC-10, CR-028): no name is shared between the two lists.
@@ -490,6 +543,24 @@ def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
     for form in ("see the other matrix", "none", "n/a", "—", "FR-", "-FR-001"):
         assert not re.match(pattern, form), form
 
+    # quire-rs#460: the underscore-object-id shape (`interface_004`) traces
+    # the same way an `FR`/`NFR` acceptance criterion does.
+    assert re.match(pattern, "interface_004-AC-1"), "interface_004-AC-1"
+
+    # CR-063 finding 3: the BASE alternative names the literal KIND
+    # (`interface`), not a generic `\w+_\d+` — a malformed id, a missing
+    # KIND prefix, and a leading digit all still fail, and so do the two
+    # false positives an unclosed class would have read as trace tags.
+    for form in (
+        "interface_004-AC",  # AC suffix has no trailing number
+        "_004-AC-1",  # no KIND prefix
+        "4_004-AC-1",  # leading digit, not a word
+        "interface_004_AC_1",  # AC suffix uses underscores, not hyphens
+        "sha_256",  # ordinary code identifier, not a KIND
+        "retry_3",  # ordinary code identifier, not a KIND
+    ):
+        assert not re.match(pattern, form), form
+
 
 def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) -> None:
     """TC-074 (FR-004-AC-14, CR-037): `StR-NNN-VC-N` ids are minted and a tag
@@ -554,6 +625,25 @@ def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> N
             match = re.search(pattern, opener + tag)
             assert match, f"{name} lost an authored form: {tag!r}"
             assert match.group(1) == expected, f"{name}: {tag!r} -> {match.group(1)!r}"
+
+        # quire-rs#460: the underscore-object-id shape binds through the same
+        # trailing-delimiter rule as the hyphenated shape.
+        match = re.search(pattern, opener + "interface_004-AC-1: why")
+        assert match, f"{name} does not bind interface_004-AC-1"
+        assert match.group(1) == "interface_004-AC-1", f"{name}: {match.group(1)!r}"
+
+        # CR-063 finding 3: closed to the literal KIND, so a malformed id, a
+        # missing KIND prefix, a leading digit, and an ordinary identifier
+        # that merely shares the `word_number` shape all still bind nothing.
+        for rejected in (
+            "interface_004-AC: why",
+            "_004-AC-1: why",
+            "4_004-AC-1: why",
+            "interface_004_AC_1: why",
+            "sha_256: digest",
+            "retry_3: backoff",
+        ):
+            assert not re.search(pattern, opener + rejected), f"{name}: {rejected!r}"
 
 
 def _testmatrix_extraction() -> dict:

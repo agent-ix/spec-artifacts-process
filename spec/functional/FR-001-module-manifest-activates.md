@@ -36,6 +36,10 @@ The manifest **SHALL** validate against `module-manifest.schema.json` v1.0.0. Re
 | FR-001-AC-3 | Re-activation returns no-op (same content hash) | Integration Test |
 | FR-001-AC-4 | Each declared archetype/object_type/artifact_type appears in the corresponding filament-core table after activation | Integration Test |
 
+## Notes
+
+- **FR-001-AC-1 known contract lag**: the Schema Test (`test_manifest_validates_against_fr035_schema`) strips `required` from every `traceability.trace_targets` entry before validating, because quire-rs `traceability.rs` has typed `TraceTarget.required` since #327 but the published FR-035 schema this repo imports predates it. Tracked upstream at `agent-ix/spec-artifacts-iso#32` (CR-013), open, not yet merged. Remove the strip once #32 ships a schema revision that types `required`.
+
 ## Dependencies
 
 - **Upstream**: filament-core-service [FR-035](ix://agent-ix/filament-core-service/FR-035), FR-026, FR-034

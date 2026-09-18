@@ -420,7 +420,13 @@ artifact_types:
               # widening this repository's CLAUDE.md forbids: the reason has to
               # be true independent of the count, and for `—` there is no
               # reason at all. If one appears, it is one line and a measurement.
-              Traces To: '^(-|(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, (-[A-Za-z]+-\d+(/\d+)*|(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(-[A-Za-z]+-\d+)?)?)( \([^)]*\))?)*)$'
+              #
+              # quire-rs#460: the BASE alternative is `interface_\d+`, not a
+              # generic `\w+_\d+` — closed to the one underscore-object KIND
+              # actually minted (`interface_004`), same reasoning as
+              # `inspection-obligation` above; a generic word_number class
+              # read `sha_256`/`retry_3` in ordinary prose as trace ids.
+              Traces To: '^(-|(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, (-[A-Za-z]+-\d+(/\d+)*|(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+)?)?)( \([^)]*\))?)*)$'
         # Optional: the spec-matrix template emits these unconditionally, but a
         # bundle with no StR/US/NFR artifacts cannot truthfully populate them.
         # Absent is fine; present is asserted.
@@ -876,7 +882,17 @@ traceability:
     # widening applied to `traces-to` and the TestMatrix `Traces To` column
     # check below — otherwise `interface_004-AC-1` matched only its trailing
     # `AC-1`, a wrong partial bind.
-    pattern: "\\b((?:[A-Za-z]{2,4}-\\d+|[A-Za-z][A-Za-z0-9]*_\\d+)(?:-[A-Za-z]+-\\d+)?)\\b"
+    #
+    # Closed to the literal KIND, not a generic `\w+_\d+`: the first cut
+    # admitted any identifier of that shape, so ordinary code comments —
+    # `// sha_256: digest`, `# retry_3: backoff`, `Implements: sha_256` — read
+    # as trace tags. `interface_NNN` is the only underscore object-id this
+    # module's spec or any consuming repo (QSpec, tl-syntax, quire-analyze,
+    # contract-runtime, contract-codegen) actually mints today, so the
+    # alternative names that KIND, the same way `TC|IT|FR|NFR|StR|US` below
+    # names the hyphenated ones. Add the next KIND here, measured, when one
+    # of the other `spec-objects-*` archetypes actually mints an id.
+    pattern: "\\b((?:[A-Za-z]{2,4}-\\d+|interface_\\d+)(?:-[A-Za-z]+-\\d+)?)\\b"
     targets:
     - acceptance-criterion
     - nfr-acceptance-criterion
@@ -928,7 +944,7 @@ traceability:
     column: Traces To
     row_id_column: Test ID
     # quire-rs#460: same BASE widening as `inspection-obligation` above.
-    pattern: '\b((?:[A-Za-z]{2,4}-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)\b'
+    pattern: '\b((?:[A-Za-z]{2,4}-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)\b'
     targets: [acceptance-criterion, nfr-acceptance-criterion, interface-acceptance-criterion]
     expand_ranges: true
     strip_annotations: true
@@ -1006,15 +1022,15 @@ traceability:
     legacy:
     - name: rust-trace-line
       language: rust
-      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?)*)'
+      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?)*)'
       rewrite_to: rust-trace-attribute
     - name: python-trace-line
       language: python
-      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?)*)'
+      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?)*)'
       rewrite_to: pytest-trace-marker
     - name: typescript-trace-line
       language: typescript
-      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-(?:[A-Za-z]+-\d+|[A-Za-z][A-Za-z0-9]*_\d+))?)*)'
+      pattern: 'Trace:\s*((?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?(?:\s*,\s*(?:[A-Za-z]+-\d+|interface_\d+)(?:-(?:[A-Za-z]+-\d+|interface_\d+))?)*)'
       rewrite_to: ts-trace-helper
     # The line-comment form requires the id to be **followed by punctuation** —
     # `:`, `/`, `(`, `,`, a dash, or end of line. That is what separates a tag
@@ -1031,15 +1047,15 @@ traceability:
     # in the corpus and rejects a sentence that flows through the id.
     - name: rust-comment-id
       language: rust
-      pattern: '(?m)//\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)//\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: rust-trace-attribute
     - name: python-comment-id
       language: python
-      pattern: '(?m)#\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)#\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: pytest-trace-marker
     - name: typescript-comment-id
       language: typescript
-      pattern: '(?m)//\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
+      pattern: '(?m)//\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|$)'
       rewrite_to: ts-trace-helper
     - name: rust-test-name-id
       language: rust
@@ -1105,15 +1121,15 @@ traceability:
     # and it is the unify-means-enforce call: one form, flag the rest.
     - name: python-docstring-id
       language: python
-      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
+      pattern: '(?m)^\s*(?:[rbfu]{1,2})?"""\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: pytest-trace-marker
     - name: rust-doc-comment-id
       language: rust
-      pattern: '(?m)^\s*///\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
+      pattern: '(?m)^\s*///\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: rust-trace-attribute
     - name: typescript-doc-comment-id
       language: typescript
-      pattern: '(?m)^\s*\*\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
+      pattern: '(?m)^\s*\*\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)\s*(?:[:,/()\[\]]|[-–—]\s|\.(?:\s|$)|$)'
       rewrite_to: ts-trace-helper
     # ── implements: what code a requirement is ABOUT (quire-rs FR-062) ──
     #
@@ -1159,15 +1175,15 @@ traceability:
     implements:
     - name: rust-implements-line
       language: rust
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
       template: '/// Implements: {ids}'
     - name: python-implements-line
       language: python
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
       template: '# Implements: {ids}'
     - name: typescript-implements-line
       language: typescript
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|[A-Za-z][A-Za-z0-9]*_\d+)(?:-[A-Za-z]+-\d+)?)*)'
+      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
       template: '// Implements: {ids}'
   status:
     column: Status
