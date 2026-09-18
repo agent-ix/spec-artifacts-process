@@ -744,6 +744,23 @@ traceability:
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
     id_column: ID
+  # quire-rs#460: `interface` is an `object_types` archetype — declared in
+  # spec-objects-architecture's manifest, not this one — whose own id joins
+  # KIND and NUMBER with an underscore (`interface_004`) rather than the
+  # requirement archetypes' hyphen. Cross-module `archetype:` reference is
+  # sound: quire-rs resolves a document's `concept_type()` against the FULL
+  # merged registry (`artifact_types` + `object_types` of every loaded
+  # module, `src/loader/manifest.rs`), not just this module's own types, so
+  # this target's rows come from a different module than the one that types
+  # them — exactly like `suite`/`inspection` above bind by archetype without
+  # authoring their own type. Excluded the same as the requirement archetypes
+  # for the same reason (CR-060): a fixture legitimately typed `interface`
+  # would otherwise mint phantom ids.
+  - name: interface-acceptance-criterion
+    archetype: interface
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Acceptance Criteria
+    id_column: ID
   # ── Evidence layer (#34) ──
   #
   # Declaring the suite registry as a trace target is what makes `SUITE-N` a
@@ -1135,6 +1152,14 @@ traceability:
     method_column: Verification
   - name: nfr-acceptance-criterion
     target: nfr-acceptance-criterion
+    statement_column: Criteria
+    method_column: Verification
+  # quire-rs#460: same 3-column `| ID | Criteria | Verification |` shape as
+  # the two obligations above — the real `interface_004-checked-package.md`
+  # in `agent-ix/quire-specification` carries no fourth (criticality) column,
+  # so this entry declares none either.
+  - name: interface-acceptance-criterion
+    target: interface-acceptance-criterion
     statement_column: Criteria
     method_column: Verification
   # The second source, and not an afterthought: an NFR `Measurement and

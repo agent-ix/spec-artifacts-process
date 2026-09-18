@@ -236,6 +236,7 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert set(sources) == {
         "acceptance-criterion",
         "nfr-acceptance-criterion",
+        "interface-acceptance-criterion",
         "nfr-metric",
         "configuration-matrix",
     }

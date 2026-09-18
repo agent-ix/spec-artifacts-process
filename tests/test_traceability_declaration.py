@@ -43,7 +43,11 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
         for t in targets.values()
         if t["section"] == "Acceptance Criteria"
     }
-    assert criteria == {"FR", "NFR"}, criteria
+    # quire-rs#460: `interface` joins FR/NFR as a third Acceptance Criteria
+    # source — an `object_types` archetype declared in a different module
+    # (spec-objects-architecture), bound here the same way `suite` and
+    # `inspection` already bind archetypes they don't declare themselves.
+    assert criteria == {"FR", "NFR", "interface"}, criteria
 
 
 def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
@@ -79,7 +83,7 @@ def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
                 "test data — a fixture matrix would mint phantom ids"
             )
         elif entry["section"] == "Acceptance Criteria":
-            assert entry["archetype"] in ("FR", "NFR"), entry["name"]
+            assert entry["archetype"] in ("FR", "NFR", "interface"), entry["name"]
 
 
 def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> None:

@@ -104,6 +104,48 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
         "invariants",
     }, "Standard gained an unexpected locator"
     standard.pop("body_extraction", None)
+    # quire-rs#460: the fourth addition, removed the same way. `interface` is
+    # an Acceptance Criteria source bound by archetype to a type this module
+    # doesn't itself declare (spec-objects-architecture's `object_types:
+    # [{name: interface}]`) — asserted to be exactly this pair of entries and
+    # nothing else before it's excluded from the byte diff.
+    interface_target = [
+        t
+        for t in current["traceability"]["trace_targets"]
+        if t["name"] == "interface-acceptance-criterion"
+    ]
+    assert interface_target == [
+        {
+            "name": "interface-acceptance-criterion",
+            "archetype": "interface",
+            "exclude": ["tests/**", "tests_integration/**", "fixtures/**"],
+            "section": "Acceptance Criteria",
+            "id_column": "ID",
+        }
+    ], "unexpected interface trace_targets entry"
+    current["traceability"]["trace_targets"] = [
+        t
+        for t in current["traceability"]["trace_targets"]
+        if t["name"] != "interface-acceptance-criterion"
+    ]
+    interface_obligation = [
+        o
+        for o in current["traceability"]["obligations"]
+        if o["name"] == "interface-acceptance-criterion"
+    ]
+    assert interface_obligation == [
+        {
+            "name": "interface-acceptance-criterion",
+            "target": "interface-acceptance-criterion",
+            "statement_column": "Criteria",
+            "method_column": "Verification",
+        }
+    ], "unexpected interface obligations entry"
+    current["traceability"]["obligations"] = [
+        o
+        for o in current["traceability"]["obligations"]
+        if o["name"] != "interface-acceptance-criterion"
+    ]
     for key in DECLARATION_CLASSES:
         assert current.get(key) == baseline.get(
             key
@@ -304,6 +346,13 @@ def test_the_standard_object_type_keeps_its_inline_schema(manifest, baseline):
 def test_the_trace_targets_are_byte_identical(manifest, baseline):
     """Trace targets bind by archetype name, so adding a `data_schema` key
     changes no binding — asserted rather than assumed."""
+    # quire-rs#460: the one deliberate exception, same as TC-091's — removed
+    # before the diff rather than widening it silently.
+    trace_targets = [
+        t
+        for t in manifest["traceability"]["trace_targets"]
+        if t["name"] != "interface-acceptance-criterion"
+    ]
     for key in (
         "trace_targets",
         "document_references",
@@ -311,7 +360,10 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
         "status",
         "source_exclude",
     ):
-        assert manifest["traceability"][key] == baseline["traceability"][key], key
+        current = (
+            trace_targets if key == "trace_targets" else manifest["traceability"][key]
+        )
+        assert current == baseline["traceability"][key], key
 
 
 @pytest.mark.trace("TC-127")
