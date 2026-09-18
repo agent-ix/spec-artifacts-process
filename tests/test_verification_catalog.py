@@ -236,6 +236,7 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert set(sources) == {
         "acceptance-criterion",
         "nfr-acceptance-criterion",
+        "interface-acceptance-criterion",
         "nfr-metric",
         "configuration-matrix",
     }
@@ -254,9 +255,14 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert "target" not in matrix, "no trace target mints a configuration table"
     assert matrix["archetype"] == "FR"
 
-    # The two AC sources inherit from a declared trace target, so an obligation
-    # id is by construction the id the rollup and every trace tag already use.
-    for name in ("acceptance-criterion", "nfr-acceptance-criterion"):
+    # The three AC sources (quire-rs#460 added the third, `interface-`) each
+    # inherit from a declared trace target, so an obligation id is by
+    # construction the id the rollup and every trace tag already use.
+    for name in (
+        "acceptance-criterion",
+        "nfr-acceptance-criterion",
+        "interface-acceptance-criterion",
+    ):
         src = sources[name]
         assert src["target"] == name
         assert "archetype" not in src, "target and archetype are mutually exclusive"

@@ -42,7 +42,11 @@ modules can version apart.
 ## Behavior
 
 - `trace_targets` **SHALL** mint test-case ids from the Test Matrix and
-  acceptance-criterion ids from `FR` and `NFR` documents.
+  acceptance-criterion ids from `FR`, `NFR` and `interface` documents. An
+  acceptance-criterion target bound to an archetype whose template does not
+  guarantee the minting section on every document **SHALL** declare
+  `required: false`, so an ordinary document of that archetype without the
+  section is healthy rather than a false `section-matches-nothing`.
 - **Every** target and reference **SHALL** be bound by `archetype`, the Test
   Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
   deleted that form (CR-062) and rejects the key outright.
@@ -84,7 +88,7 @@ modules can version apart.
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR` and `NFR`, and loads without a validation error | Test (TC-028) |
+| FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR`, `NFR` and `interface`, and loads without a validation error | Test (TC-028) |
 | FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`, `functional-coverage`), never one per matrix filename | Test (TC-029, TC-039) |
 | FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python and typescript, and each declares a `template` | Test (TC-030) |
 | FR-004-AC-4 | Every `legacy` form declares a `language`, and its `rewrite_to` names a marker of that same language | Test (TC-031) |
@@ -99,6 +103,7 @@ modules can version apart.
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
+| FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so an `interface` document with no Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
@@ -358,6 +363,70 @@ modules can version apart.
 > `ColumnVocabularies` is `deny_unknown_fields`, so declaring the keys against an
 > older engine fails module load outright and took 31 of this repo's own tests
 > with it.
+
+> **CR-063 note (2026-09-18):** `interface-acceptance-criterion` (quire-rs#460)
+> shipped in one PR and this follow-up review round closes it out in the same
+> PR, rather than a second one, per the finding rather than the plan.
+>
+> **`required: false`, BLOCKING.** `required` defaults to `true`
+> (quire-rs `traceability.rs`), and the SOA `interface` template has no
+> Acceptance Criteria section on most interface documents — so the declared
+> (implicit) default raised a false `section-matches-nothing` on every
+> ordinary interface doc. **[RAN] before/after** with `required: false`
+> against QSpec, tl-syntax, quire-analyze, contract-runtime and
+> contract-codegen:
+>
+> | repo | diagnostics before | after | tl-syntax hit rate |
+> |---|---|---|---|
+> | QSpec | +20 | +0 | — |
+> | tl-syntax | +9 | +0 | 24/24 → 24/33 → 24/24 |
+> | quire-analyze | +1 | +0 | — |
+> | contract-runtime | +1 | +0 | — |
+> | contract-codegen | +1 | +0 | — |
+>
+> The two `interface_004-AC-*` ids kept minting throughout — `required` gates
+> the section-absent diagnostic, not the target itself.
+>
+> **The comment above the target cited the wrong mechanism and the wrong
+> precedent**, corrected in place rather than left to mislead the next reader:
+> the archetype match is a raw frontmatter `type:` string compare
+> (quire-rs `src/corpus/declared_tables.rs::scan`), not a merged-registry
+> lookup, and the real cross-module precedent is `FR`/`NFR`/`StR` — declared by
+> `spec-artifacts-iso`, a different module — not `suite`/`inspection`, which
+> this module declares itself and so binds same-module.
+>
+> **The underscore-object-id shape (`interface_004-AC-1`) now works everywhere
+> an `FR`/`NFR` acceptance-criterion id already does**, proven with
+> `quire coverage --module <scratch copy>` over a throwaway fixture rather than
+> ~/.ix/filament/modules:
+>
+> - `inspection-obligation` and `traces-to` matched only the trailing `AC-1`
+>   before — a wrong partial bind — because their KIND class admitted only
+>   2–4 letters followed by a hyphen. Both now alternate that BASE token with
+>   a generic underscore-object shape and add
+>   `interface-acceptance-criterion` to `targets`.
+> - The TestMatrix `Traces To` `column_patterns` check rejected
+>   `interface_004-AC-1` outright (anchored, hyphen-only KIND); widened the
+>   same way.
+> - The `legacy`/`implements` comment, docstring and `Implements:` forms admit
+>   it too — the open forms (`*-trace-line`) by the same BASE alternation, the
+>   closed-enum forms (`*-comment-id`, `*-docstring-id`, `*-doc-comment-id`,
+>   `*-implements-line`) by adding the same alternative alongside their
+>   `TC|IT|FR|NFR|StR|US` enum, since those forms already bind `FR` ids today.
+> - `interface-verification` is new, mirroring `verification`/
+>   `nfr-verification`, so a stale `TC` id in an interface document's
+>   `Verification` cell is reported rather than silently unchecked.
+>
+> **The PR's own "unbacked" claim was wrong.** QSpec already tags
+> `tests/checked_package_v2.rs:5642` with `#[trace("TC-233",
+> "interface-004-AC-1")]` — hyphenated, not the declared underscore shape —
+> which the engine's near-miss diagnostic (`untracked-id-near-miss`) flags as
+> the same id written twice, differing only in separator. It does not bind:
+> `backed_trace_ids()` is an exact string match, and `interface-004-AC-1` !=
+> `interface_004-AC-1`. QSpec#110 retags it to the underscore spelling, which
+> then binds by exact match.
+>
+> FR-004-AC-19, TC-147.
 
 ## Dependencies
 
