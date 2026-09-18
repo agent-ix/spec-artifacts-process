@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import pathlib
 import re
@@ -138,6 +139,15 @@ def test_manifest_validates_against_fr035_schema() -> None:
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     assert "semantic" in manifest, "the semantic block must exist to be split out"
     without_semantic = {k: v for k, v in manifest.items() if k != "semantic"}
+    # quire-rs#460 (interface-acceptance-criterion, required: false): quire-rs
+    # `traceability.rs` has typed `TraceTarget.required` since #327, but the
+    # published FR-035 schema this repo imports predates it — the schema gains
+    # it in agent-ix/spec-artifacts-iso#32 (CR-013), open, not yet merged.
+    # Stripped here the same way `semantic` is stripped above: a known,
+    # tracked, external contract lag, not a defect in this manifest.
+    without_semantic = copy.deepcopy(without_semantic)
+    for target in without_semantic["traceability"]["trace_targets"]:
+        target.pop("required", None)
     errors = list(Draft202012Validator(schema).iter_errors(without_semantic))
     assert not errors, [
         f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors

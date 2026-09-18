@@ -121,6 +121,7 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
             "exclude": ["tests/**", "tests_integration/**", "fixtures/**"],
             "section": "Acceptance Criteria",
             "id_column": "ID",
+            "required": False,
         }
     ], "unexpected interface trace_targets entry"
     current["traceability"]["trace_targets"] = [
@@ -146,6 +147,77 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
         for o in current["traceability"]["obligations"]
         if o["name"] != "interface-acceptance-criterion"
     ]
+    # CR-063 (quire-rs#460 review fix): the review round that followed the
+    # interface-acceptance-criterion addition above. It touches no new
+    # declaration class, only widens/adds entries inside `traceability` that
+    # already existed — each pinned to its exact new value here, then reset
+    # to the frozen baseline's own value so the wholesale diff below still
+    # covers everything this round did not touch.
+    baseline_refs = by_name(baseline["traceability"]["document_references"])
+    current_refs = by_name(current["traceability"]["document_references"])
+    interface_verification = current_refs.pop("interface-verification", None)
+    assert interface_verification == {
+        "name": "interface-verification",
+        "archetype": "interface",
+        "exclude": ["tests/**", "tests_integration/**", "fixtures/**"],
+        "section": "Acceptance Criteria",
+        "column": "Verification",
+        "row_id_column": "ID",
+        "pattern": r"\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b",
+        "targets": ["test-case"],
+        "expand_ranges": True,
+        "strip_annotations": False,
+    }, "unexpected interface-verification document_references entry"
+    current["traceability"]["document_references"] = [
+        r
+        for r in current["traceability"]["document_references"]
+        if r["name"] != "interface-verification"
+    ]
+    current_refs = by_name(current["traceability"]["document_references"])
+    for widened in ("inspection-obligation", "traces-to"):
+        entry = current_refs[widened]
+        assert "interface-acceptance-criterion" in entry["targets"], widened
+        assert "[A-Za-z][A-Za-z0-9]*_\\d+" in entry["pattern"], widened
+        entry["pattern"] = baseline_refs[widened]["pattern"]
+        entry["targets"] = baseline_refs[widened]["targets"]
+    baseline_tags_by_name = {}
+    for group in ("markers", "legacy", "implements"):
+        baseline_tags_by_name.update(by_name(baseline["traceability"]["trace_tags"][group]))
+    widened_forms = (
+        "rust-trace-line",
+        "python-trace-line",
+        "typescript-trace-line",
+        "rust-comment-id",
+        "python-comment-id",
+        "typescript-comment-id",
+        "python-docstring-id",
+        "rust-doc-comment-id",
+        "typescript-doc-comment-id",
+        "rust-implements-line",
+        "python-implements-line",
+        "typescript-implements-line",
+    )
+    for group in ("legacy", "implements"):
+        for entry in current["traceability"]["trace_tags"][group]:
+            if entry["name"] not in widened_forms:
+                continue
+            assert "_\\d+" in entry["pattern"], entry["name"]
+            entry["pattern"] = baseline_tags_by_name[entry["name"]]["pattern"]
+    # CR-063 also widened the TestMatrix `Traces To` column_patterns check
+    # (an `artifact_types` entry, a separate declaration class from
+    # `traceability`) the same way, so it accepts `interface_004-AC-1`
+    # instead of rejecting it outright.
+    current_matrix = by_name(current["artifact_types"])["TestMatrix"]
+    baseline_matrix = by_name(baseline["artifact_types"])["TestMatrix"]
+    current_traces_to_col = current_matrix["body_extraction"]["yield_pattern"][
+        "match"
+    ]["test_cases"]["assert"]["column_patterns"]["Traces To"]
+    assert "[A-Za-z][A-Za-z0-9]*_\\d+" in current_traces_to_col
+    current_matrix["body_extraction"]["yield_pattern"]["match"]["test_cases"][
+        "assert"
+    ]["column_patterns"]["Traces To"] = baseline_matrix["body_extraction"][
+        "yield_pattern"
+    ]["match"]["test_cases"]["assert"]["column_patterns"]["Traces To"]
     for key in DECLARATION_CLASSES:
         assert current.get(key) == baseline.get(
             key
@@ -171,8 +243,18 @@ def test_no_declared_vocabulary_moved(manifest, baseline):
         ]["match"]
 
     now, was = matrix(manifest), matrix(baseline)
-    for table in ("test_cases", "functional_coverage"):
-        assert now[table]["assert"] == was[table]["assert"], f"{table} asserts changed"
+    # CR-063 (quire-rs#460 review fix): `Traces To` widened to admit the
+    # underscore-object-id shape (`interface_004-AC-1`), asserted here and
+    # reset to the baseline value before the wholesale compare below.
+    now_traces_to = copy.deepcopy(now["test_cases"]["assert"])
+    assert "[A-Za-z][A-Za-z0-9]*_\\d+" in now_traces_to["column_patterns"]["Traces To"]
+    now_traces_to["column_patterns"]["Traces To"] = was["test_cases"]["assert"][
+        "column_patterns"
+    ]["Traces To"]
+    assert now_traces_to == was["test_cases"]["assert"], "test_cases asserts changed"
+    assert (
+        now["functional_coverage"]["assert"] == was["functional_coverage"]["assert"]
+    ), "functional_coverage asserts changed"
     status = now["test_cases"]["assert"]["column_patterns"]["Status"]
     assert status == r"^(✅|❌|🚧|⛔)(\s+.*)?$"
     assert "⚠️" not in status
@@ -345,14 +427,44 @@ def test_the_standard_object_type_keeps_its_inline_schema(manifest, baseline):
 @pytest.mark.trace("TC-136")
 def test_the_trace_targets_are_byte_identical(manifest, baseline):
     """Trace targets bind by archetype name, so adding a `data_schema` key
-    changes no binding — asserted rather than assumed."""
-    # quire-rs#460: the one deliberate exception, same as TC-091's — removed
-    # before the diff rather than widening it silently.
+    changes no binding — asserted rather than assumed.
+
+    Not literally byte-identical: two deliberate deltas are named here and
+    removed before the diff, the same way #78's additions were (TC-091 pins
+    each delta's exact shape; this test only needs to exclude it
+    consistently).
+
+    - `interface-acceptance-criterion` (quire-rs#460): a trace_targets entry
+      binding a type this module doesn't declare.
+    - CR-063 (the quire-rs#460 review-fix round): `document_references`
+      gained `interface-verification`, and widened `inspection-obligation`
+      and `traces-to`'s patterns/targets; `trace_tags` widened 12 legacy
+      comment/docstring/implements/trace-line forms — all so an
+      underscore-object id (`interface_004-AC-1`) works everywhere an
+      `FR`/`NFR` acceptance-criterion id already does.
+    """
     trace_targets = [
         t
         for t in manifest["traceability"]["trace_targets"]
         if t["name"] != "interface-acceptance-criterion"
     ]
+    document_references = copy.deepcopy(manifest["traceability"]["document_references"])
+    document_references = [
+        r for r in document_references if r["name"] != "interface-verification"
+    ]
+    baseline_refs = by_name(baseline["traceability"]["document_references"])
+    for ref in document_references:
+        if ref["name"] in ("inspection-obligation", "traces-to"):
+            ref["pattern"] = baseline_refs[ref["name"]]["pattern"]
+            ref["targets"] = baseline_refs[ref["name"]]["targets"]
+    trace_tags = copy.deepcopy(manifest["traceability"]["trace_tags"])
+    baseline_tags_by_name = {}
+    for group in ("markers", "legacy", "implements"):
+        baseline_tags_by_name.update(by_name(baseline["traceability"]["trace_tags"][group]))
+    for group in ("legacy", "implements"):
+        for entry in trace_tags[group]:
+            if entry["name"] in baseline_tags_by_name:
+                entry["pattern"] = baseline_tags_by_name[entry["name"]]["pattern"]
     for key in (
         "trace_targets",
         "document_references",
@@ -360,9 +472,11 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
         "status",
         "source_exclude",
     ):
-        current = (
-            trace_targets if key == "trace_targets" else manifest["traceability"][key]
-        )
+        current = {
+            "trace_targets": trace_targets,
+            "document_references": document_references,
+            "trace_tags": trace_tags,
+        }.get(key, manifest["traceability"][key])
         assert current == baseline["traceability"][key], key
 
 

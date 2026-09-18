@@ -160,6 +160,7 @@ def test_tc043_suite_and_inspection_are_trace_targets() -> None:
     assert set(obligation["targets"]) == {
         "acceptance-criterion",
         "nfr-acceptance-criterion",
+        "interface-acceptance-criterion",
     }
 
 

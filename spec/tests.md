@@ -59,6 +59,7 @@ type: TestMatrix
 | FR-004 | FR-004-AC-13 | TC-073 | ✅ Complete |
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
 | FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
+| FR-004 | FR-004-AC-19 | TC-147 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -222,7 +223,7 @@ claim (SR-008 FND-004).
 | TC-052 | The engine loads the manifest with the catalog block present. `verification_catalog` is a quire-rs v0.29.0 key: against an older engine the top-level key is tolerated and silently ignored, so the module would look correct and contribute nothing (FR-007) | Unit | P0 | FR-007-AC-5 | ✅ |
 | TC-053 | `verification_class` is exactly the four IADT values and `verification_method` exactly the catalog keys, both derived by the engine — and neither is separately declared here, which is the duplication FR-054-CON-4 forbids (FR-007) | Unit | P0 | FR-007-AC-6 | ✅ |
 | TC-054 | Inspection, demonstration and agent-behaviour evaluation carry an evidence kind inside the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie — CR-041 applied to the catalog (FR-007) | Unit | P0 | FR-007-AC-7 | ✅ |
-| TC-055 | The traceability model declares the ecosystem's obligation sources — the two acceptance-criterion targets, the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
+| TC-055 | The traceability model declares the ecosystem's obligation sources — the three acceptance-criterion targets (`FR`, `NFR`, `interface`), the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
 | TC-056 | The catalog carries `compile-time-check` and `dynamic-analysis-sanitizer` — the two means the first corpus sweep found in use with no catalog word for them — and neither collapses into the neighbour it was nearly filed under | Unit | P0 | FR-007-AC-9 | ✅ |
 | TC-057 | No catalog id names a tool, a cadence, or a class that has methods under it; every tool named anywhere appears only in `tooling` (`inspection`/`demonstration` are exempt — for those two IADT classes the class and the method genuinely coincide) | Unit | P1 | FR-007-AC-10 | ✅ |
 | TC-060 | `Escape Cause` is the fifth findings column on SpecReview and is listed in `optional_columns`, so the 169 four-column SpecReview documents already in the corpus stay valid (FR-008) | Unit | P0 | FR-008-AC-1 | ✅ |
@@ -253,7 +254,7 @@ claim (SR-008 FND-004).
 | TC-088 | `toolchain.json` records the resolved semantic-core version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes | Unit | P1 | FR-009-AC-9 | ✅ |
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
 | TC-090 | Every declared artifact type carries reference-form `data_schema`, the referenced file exists, and its SHA-256 equals the recorded digest; none carries an inline `data_schema` | Unit | P0 | FR-010-AC-2 | ✅ |
-| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys and the two added `required: false` locators — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
+| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), and CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
 | TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
 | TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
 | TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, and an altered `data_schema.digest` is refused naming the path (expected failure: quire-rs#221, quire-rs#394 make both refusals silent) | Unit | P0 | FR-010-AC-6 | ✅ |
@@ -298,7 +299,7 @@ claim (SR-008 FND-004).
 | TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | ✅ |
 | TC-134 | A tree whose schemas and digests agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | ✅ |
 | TC-135 | The refusal of an unknown `semantic` key names the key and a mismatched digest names the path. STRICT EXPECTED FAILURE against quire 0.46.0: both refusals are silent (quire-rs#221, quire-rs#394). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221, quire-rs#394 |
-| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | ✅ |
+| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of `inspection-obligation` and `traces-to` and their `targets` lists, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | ✅ |
 | TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | ✅ |
 | TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | ✅ |
 | TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | ✅ |
@@ -306,6 +307,7 @@ claim (SR-008 FND-004).
 | TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | ✅ |
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
+| TC-147 | `interface-acceptance-criterion` declares `required: false`, so an `interface` document with no Acceptance Criteria section raises no `section-matches-nothing`, while a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the `legacy`/`implements` comment and `Implements:` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
 
 ## Option Permutation Matrix
 

@@ -45,9 +45,38 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     }
     # quire-rs#460: `interface` joins FR/NFR as a third Acceptance Criteria
     # source — an `object_types` archetype declared in a different module
-    # (spec-objects-architecture), bound here the same way `suite` and
-    # `inspection` already bind archetypes they don't declare themselves.
+    # (spec-objects-architecture). The real cross-module precedent is
+    # `FR`/`NFR`/`StR` above, declared by spec-artifacts-iso, not this
+    # module — not `suite`/`inspection`, which this module declares itself,
+    # so binding them is same-module and proves nothing about binding across
+    # a module boundary.
     assert criteria == {"FR", "NFR", "interface"}, criteria
+
+
+def test_interface_acceptance_criterion_is_not_required(traceability: dict) -> None:
+    """quire-rs#460 fix: the SOA `interface` template has no Acceptance
+    Criteria section on most interface documents. `required:` defaults to
+    `true` (quire-rs `traceability.rs`), so leaving it unset raised a false
+    `section-matches-nothing` diagnostic on every ordinary interface doc —
+    measured across QSpec (+20 diagnostics) and tl-syntax (+9, hit rate 24/24
+    to 24/33), plus one each on quire-analyze, contract-runtime and
+    contract-codegen. Pinned so it cannot regress back to the default.
+    """
+    targets = {t["name"]: t for t in traceability["trace_targets"]}
+    assert targets["interface-acceptance-criterion"]["required"] is False
+
+
+def test_interface_archetype_string_is_exact(traceability: dict) -> None:
+    """quire-rs#460: the archetype match is a raw frontmatter `type:` string
+    compare (quire-rs `src/corpus/declared_tables.rs::scan`), not a
+    registry lookup — a typo here silently mints nothing rather than
+    failing loudly, so pin the exact string.
+    """
+    targets = {t["name"]: t for t in traceability["trace_targets"]}
+    assert targets["interface-acceptance-criterion"]["archetype"] == "interface"
+
+    refs = {r["name"]: r for r in traceability["document_references"]}
+    assert refs["interface-verification"]["archetype"] == "interface"
 
 
 def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
