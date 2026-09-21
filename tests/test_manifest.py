@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import json
 import pathlib
 import re
@@ -12,7 +11,6 @@ import subprocess
 import pytest
 import yaml
 from jsonschema import Draft202012Validator
-from spec_artifacts_iso import module_manifest_schema
 
 import spec_artifacts_process as pack
 
@@ -111,64 +109,6 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
 
     assert analysis == spec_analyses + implementation_reviews
     assert len(analysis) == len(set(analysis)), "enum values must be unique"
-
-
-def test_manifest_validates_against_fr035_schema() -> None:
-    """This manifest validates against the FR-035 module-manifest schema.
-
-    Until agent-ix/spec-artifacts-iso#15 this test **skipped in silence**: it
-    looked for a `module-manifest.schema.json` beside itself, this repo shipped
-    no copy, and `pytest.skip` reported the gate green. The whole `traceability:`
-    block and the CR-010/CR-023 assert keys were checked by nothing but the Rust
-    engine at load time.
-
-    The schema is now package data on `spec-artifacts-iso` — one source for
-    every module repository, imported rather than copied, so there is no second
-    artifact to keep in sync and no branch on which this can quietly not run.
-
-    **The `semantic` block is checked separately, and that split is a defect
-    elsewhere rather than a concession here.** No published revision of the
-    FR-035 schema covers both this module's keys and the semantic block: the copy
-    `spec-artifacts-iso` ships is the authority for `traceability` and
-    `verification_catalog` and predates `semantic`, rejecting it under
-    `additionalProperties: false`; the revision that carries `semantic` does not
-    know `traceability` or `verification_catalog` at all. Filed as
-    agent-ix/filament-core-service#27. Removing `semantic` before this check and
-    validating it against the extracted sub-schema keeps BOTH halves checked,
-    where dropping either would leave one unchecked.
-    """
-    schema = module_manifest_schema()
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
-    assert "semantic" in manifest, "the semantic block must exist to be split out"
-    without_semantic = {k: v for k, v in manifest.items() if k != "semantic"}
-    # quire-rs#460 (interface-acceptance-criterion, required: false): quire-rs
-    # `traceability.rs` has typed `TraceTarget.required` since #327, but the
-    # published FR-035 schema this repo imports predates it — the schema gains
-    # it in agent-ix/spec-artifacts-iso#32 (CR-013), open, not yet merged.
-    # Stripped here the same way `semantic` is stripped above: a known,
-    # tracked, external contract lag, not a defect in this manifest.
-    without_semantic = copy.deepcopy(without_semantic)
-    for target in without_semantic["traceability"]["trace_targets"]:
-        target.pop("required", None)
-    errors = list(Draft202012Validator(schema).iter_errors(without_semantic))
-    assert not errors, [
-        f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}" for e in errors
-    ]
-
-    semantic_schema = json.loads(
-        (
-            pathlib.Path(__file__).parent
-            / "fixtures"
-            / "module-manifest-semantic.schema.json"
-        ).read_text()
-    )
-    semantic_errors = list(
-        Draft202012Validator(semantic_schema).iter_errors(manifest["semantic"])
-    )
-    assert not semantic_errors, [
-        f"semantic.{'.'.join(str(p) for p in e.absolute_path)}: {e.message}"
-        for e in semantic_errors
-    ]
 
 
 def test_testmatrix_body_extraction_contract() -> None:

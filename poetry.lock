@@ -1123,23 +1123,6 @@ test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.18.*)", "pytest-mypy"]
 
 [[package]]
-name = "spec-artifacts-iso"
-version = "0.18.0"
-description = "Filament Module: ISO-style spec artifacts (FR/NFR/StR/US/IT/TC/AC/CON) — unified-shape archetypes + authoring skeletons + frontmatter JSON Schemas + iso-spec-core grammar, validated by quire-rs (no render templates)"
-optional = false
-python-versions = ">=3.13,<3.14"
-groups = ["dev"]
-files = [
-    {file = "spec_artifacts_iso-0.18.0-py3-none-any.whl", hash = "sha256:155e38abf8b9c2a7d7db4f261ae2e579b107b6c74e490b687b261b932c42e324"},
-    {file = "spec_artifacts_iso-0.18.0.tar.gz", hash = "sha256:0dae3a4722a50ea71d3f02656a4049ed07b5dd475ab104542564996448497afb"},
-]
-
-[package.source]
-type = "legacy"
-url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
-reference = "internal-pypi"
-
-[[package]]
 name = "tomlkit"
 version = "0.15.0"
 description = "Style preserving TOML library"
@@ -1154,4 +1137,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "2fd2e28e2c742ab64acb065b1d4d961db39f7c66aeb8278648b558de9bbee5af"
+content-hash = "9b508237a01031a842872a2a32cc9d3aae6e31e59fc695957f4a2d1340b20b30"

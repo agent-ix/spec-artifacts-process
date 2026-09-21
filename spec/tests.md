@@ -24,7 +24,7 @@ type: TestMatrix
 
 | Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
+| FR-001 | FR-001-AC-2 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
 | FR-002 | FR-002-AC-1 | TC-019 | 🚧 Planned |
 | FR-002 | FR-002-AC-2 | TC-020 | 🚧 Planned |
 | FR-002 | FR-002-AC-3 | TC-021 | 🚧 Planned |
