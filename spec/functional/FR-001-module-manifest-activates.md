@@ -18,9 +18,12 @@ The system **SHALL** publish a Filament Module manifest (`spec_artifacts_process
 - `manifest.yaml` (this repo's package)
 - Activation endpoint: `POST /api/v1/modules/activate`
 - The FR-035 module-manifest schema, owned by `filament-core-service` and applied
-  by it at activation. This repository holds no copy of that schema and depends
-  on no package that redistributes one (PLAT-902), so it states no criterion over
-  the schema as a document.
+  by it at activation. This repository holds no copy of that schema and depends on
+  no package that redistributes it as a document this repository validates against
+  (PLAT-902), so it states no criterion over the schema as a document. The engines
+  do carry copies of their own and apply them when they read this manifest
+  (FR-010 Inputs); that is the carriers' business, not a source this repository
+  validates against.
 
 ## Outputs
 
@@ -30,11 +33,20 @@ The system **SHALL** publish a Filament Module manifest (`spec_artifacts_process
 ## Behavior
 
 The manifest **SHALL** conform to the FR-035 module-manifest schema
-`filament-core-service` applies at activation. Conformance is observed where that
-schema is applied — at `POST /api/v1/modules/activate` (FR-001-AC-2) — and, for
-the keys the engines read, at Quire's registry loader (FR-010-AC-6, TC-093,
-TC-094). Re-activation **SHALL** be a no-op (idempotent by content hash per
-FR-026-AC-1).
+`filament-core-service` applies at activation, and re-activation **SHALL** be a
+no-op (idempotent by content hash per FR-026-AC-1).
+
+**Conformance to that schema is verified nowhere in this repository today**, and
+this requirement claims no otherwise. It is verified where the schema is applied,
+at `POST /api/v1/modules/activate` — FR-001-AC-2 through AC-4, whose IT-001 has
+no implementing test (`spec/tests.md` carries FR-001 as `🚧 Specified`). What
+*is* executed here is narrower and is not a substitute: `quire.Registry.load_from`
+over this module loads every declared archetype against the 0.1.0 baseline
+(FR-010-AC-5, TC-093), and a `semantic` block gaining an unknown key is refused
+at load (FR-010-AC-6, TC-094 — whose digest half pins measured engine inertness,
+`agent-ix/quire-rs#400`, and whose "names the offender" half is a strict expected
+failure, GAP-004). A manifest edit that breaks FR-035 conformance without
+breaking the loader ships green.
 
 ## Acceptance Criteria
 

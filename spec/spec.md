@@ -43,10 +43,14 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 - Resolving a reference-form `data_schema` into a stored snapshot at activation: `agent-ix/filament-core-service#23`. Until it lands the service stores the reference verbatim.
 - Applying `filament-core-service`'s FR-035 module-manifest schema to this
   manifest as a document. That schema is `filament-core-service`'s; this
-  repository holds no copy of it and depends on no package that redistributes one
-  (PLAT-902). Conformance is observed where the schema is applied: at activation
-  (FR-001-AC-2), and at the engines that read the manifest — Quire's registry
-  loader (FR-010-AC-6, TC-093, TC-094) and `quoin module install` (IT-002).
+  repository holds no copy of it and depends on no package that redistributes it
+  as a document this repository validates against (PLAT-902). It is verified
+  where it is applied, at activation — and **that is not verified here today**:
+  IT-001 has no implementing test and IT-002 is a strict expected failure
+  (GAP-003, `agent-ix/quoin#347`). The executed, copy-free checks are narrower
+  and do not substitute for it: the module loads with its full archetype set
+  (FR-010-AC-5, TC-093) and an unknown `semantic` key is refused at load
+  (FR-010-AC-6, TC-094).
 - Making Quoin install an artifact-type semantic module: `agent-ix/quoin#347`. Quoin's FR-070 validator resolves `semantic.exports` against `object_types` only, so neither this module nor the already-merged `spec-artifacts-iso` can be installed. IT-002 exercises the boundary and is carried as a strict expected failure rather than a skip; the FR-035 wording that made the ambiguity possible is `agent-ix/filament-core-service#27`.
 - Publishing the Quire wheel exposing the semantic surface to an index a repository may commit against: `agent-ix/quire-rs#392`. The wheel is provisioned by `make dev-quire` and the semantic tests fail rather than skip when it is absent, because a skipped row is not coverage.
 - Run records, binding records, baselines and freshness. FR-013 states which concepts this module models and names Engineering Assurance and quoin as the owners of the rest; nothing here schematises a verification run.
