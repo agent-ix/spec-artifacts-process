@@ -104,6 +104,8 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
         "scope-boundary",
         "gap-analysis",
         "ears-conformance",
+        "architecture-evaluation",
+        "criterion-strength",
     ]
     implementation_reviews = ["code-review", "spec-correctness"]
 

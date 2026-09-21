@@ -12,6 +12,8 @@
     "scope-boundary",
     "gap-analysis",
     "ears-conformance",
+    "architecture-evaluation",
+    "criterion-strength",
     "code-review",
     "spec-correctness"
   ],
