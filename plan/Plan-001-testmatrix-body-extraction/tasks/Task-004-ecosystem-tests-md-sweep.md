@@ -52,10 +52,8 @@ this task**.
 
 ## Sweep record (2026-08-04) — read-only, no repository modified
 
-Artifacts: `reports/2026-08-04-tests-md-sweep.md` (report) and
-`reports/2026-08-04-tests-md-sweep.json` (per-repo diagnostics). They live
-outside `plan/**` because a sweep report is gate evidence, not a typed spec
-artifact.
+Artifact: `reports/2026-08-04-tests-md-sweep.md` (report). It lives outside
+`plan/**` because a sweep report is gate evidence, not a typed spec artifact.
 
 **Result: 189 `spec/tests.md` files; 12 are not `type: TestMatrix`; of the 177
 that are, 6 pass and 171 fail the candidate contract.** Publishing today would
