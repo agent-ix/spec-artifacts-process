@@ -169,6 +169,8 @@ enum AnalysisKind {
   scopeBoundary: "scope-boundary",
   gapAnalysis: "gap-analysis",
   earsConformance: "ears-conformance",
+  architectureEvaluation: "architecture-evaluation",
+  criterionStrength: "criterion-strength",
   codeReview: "code-review",
   specCorrectness: "spec-correctness",
 }
