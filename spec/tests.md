@@ -24,7 +24,7 @@ type: TestMatrix
 
 | Functional Req | Acceptance Criteria | Test Cases | Status |
 |----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
+| FR-001 | FR-001-AC-2 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
 | FR-002 | FR-002-AC-1 | TC-019 | 🚧 Planned |
 | FR-002 | FR-002-AC-2 | TC-020 | 🚧 Planned |
 | FR-002 | FR-002-AC-3 | TC-021 | 🚧 Planned |
@@ -380,4 +380,5 @@ mixed combination in one conforming document.
 | GAP-002 | FR-003-AC-11 (Test ID uniqueness) is normative but not machine-enforceable: quire-rs exposes no uniqueness assert (verified in `LocatorAssert`/`assert_eval`, 2026-08-04) | Low | External quire-rs capability request (follow-on to FR-033); TC-024 stays 🚧 blocked until it ships |
 | GAP-003 | IT-002 (Quoin install) is RED, not unverified: Quoin's FR-070 validator resolves `semantic.exports` against `object_types` only, so no artifact module installs — this one and the already-merged `spec-artifacts-iso` are both refused (measured 2026-09-04) | Medium | `agent-ix/quoin#347`; carried as a strict expected failure so the row turns green when the engine changes, never as a skip |
 | GAP-004 | FR-010-AC-9 cannot pass: quire 0.46.0 refuses an unknown `semantic` key and a mismatched digest silently, and does not verify a reference-form `data_schema.digest` at all | Medium | `agent-ix/quire-rs#221`, `#394`, `#400`; TC-135 is a strict expected failure and TC-094 pins the measured inertness with the line to delete when it changes |
+| GAP-006 | FR-001 has no executing verification. FR-001-AC-1 is retired with its vendored-copy gate (PLAT-902), and AC-2..AC-4 are IT-001, which has no implementing test — so a manifest edit that breaks FR-035 conformance without breaking `Registry.load_from` ships with every gate green | Medium | Only `filament-core-service` can settle FR-035 conformance, at activation; `quire.validate_manifest` takes a caller-supplied schema path and so cannot verify it without re-creating a copy. Recorded rather than closed |
 | GAP-005 | The `acceptance-criterion` trace channel is 1/125 backed. This repository tags TC ids, not AC ids, and criteria are reached through the matrix row; the convention predates #78 (0/65 on `origin/main`) and is not changed by it | Low | Recorded rather than closed: changing the tagging convention is an ecosystem decision, not a side effect of this ticket |
