@@ -20,7 +20,7 @@ description: "Chronological log of changes to the Plan-001 bundle."
 * **2026-08-04** — Task-004 (Track S) completed, read-only: swept 189 ecosystem
   `spec/tests.md` files against the candidate contract — 6 pass, 171 fail, 12
   are not TestMatrix documents. Report + per-repo diagnostics in
-  `reports/2026-08-04-tests-md-sweep.{md,json}`. The sweep surfaced contract
+  `reports/2026-08-04-tests-md-sweep.md`. The sweep surfaced contract
   questions (Type/Status/Traces To vocabularies vs. real corpus usage) that the
   Task-005 gate must settle before any normalization. No repository was
   modified; nothing published.
