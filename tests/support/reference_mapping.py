@@ -578,6 +578,22 @@ class ReferenceMapper:
         multiplicity: dict[str, Any] = {"lower": int(lower)}
         if upper and upper != "*":
             multiplicity["upper"] = int(upper)
+        # semantic-core 0.3.0 requires `ordered` and `unique` on every emitted
+        # Multiplicity. A singular field (upper absent means unbounded, so this
+        # is "at most one" only when upper is present and <= 1) is clamped to
+        # `false`/`false` per the semantic-core producer rule (owner ruling
+        # 2026-09-19T15:39:32Z on FCD #199) — no functionality lost, since a
+        # single value has no order or duplicate to speak of.
+        #
+        # A real collection is not clamped: it is reasoned per field. Today the
+        # only collection this module emits is `Standard.supersedes` (0..*, a
+        # list of predecessor Standard codes) — order carries no meaning and a
+        # code repeated in the list is nonsensical, so `ordered: false,
+        # unique: true`. A future collection field must have its own semantics
+        # reasoned here rather than silently inheriting this default.
+        singular = "upper" in multiplicity and multiplicity["upper"] <= 1
+        multiplicity["ordered"] = False
+        multiplicity["unique"] = False if singular else True
         raw = [
             c.strip() for c in (row.get("constraints") or "").split(",") if c.strip()
         ]
