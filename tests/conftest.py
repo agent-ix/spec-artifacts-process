@@ -2,12 +2,10 @@
 
 Two policies are enforced here and nowhere else:
 
-* **The engine is a hard dependency of the semantic rows.** ``quire`` is not
-  declared in ``pyproject.toml`` — no index a repository may commit against
-  carries a build with the FR-072 extraction surface — so the wheel is
-  provisioned by ``make dev-quire`` and ``agent-ix/quire-rs#392`` is the blocking
-  issue. When it is absent the semantic tests **fail**; they never skip, because
-  a skipped row is not coverage.
+* **The engine is a hard dependency of the semantic rows.** ``quire`` is a dev
+  dependency resolved from ``internal-pypi`` (``poetry install``). When it is
+  absent the semantic tests **fail**; they never skip, because a skipped row is
+  not coverage.
 * **The emitted schemas are read from the committed tree**, and every ``$ref``
   resolves locally — module models from ``spec_artifacts_process/schemas/`` and
   grammar models from the ``@agent-ix/semantic-core`` the pinned toolchain
@@ -53,9 +51,9 @@ SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.3.0/"
 
 QUIRE_MISSING = (
     "the Quire wheel exposing the semantic surface is not installed in this "
-    "environment. Run `make dev-quire` (agent-ix/quire-rs#392 tracks publishing it "
-    "to an index this repository may depend on). The semantic tests fail rather "
-    "than skip, because a skipped row is not coverage."
+    "environment. Run `poetry install` (quire is a dev dependency from "
+    "internal-pypi). The semantic tests fail rather than skip, because a "
+    "skipped row is not coverage."
 )
 
 sys.path.insert(0, str(REPO_ROOT / "tests"))

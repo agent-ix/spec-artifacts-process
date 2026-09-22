@@ -14,7 +14,6 @@ help:
 	@echo "  make install        - Install dependencies"
 	@echo "  make test           - Run tests"
 	@echo "  make lint           - Run linters (ruff + black + schema drift gate)"
-	@echo "  make dev-quire      - Install the Quire wheel the semantic tests need"
 	@echo "  make semantic-install - npm ci the TypeSpec package (spec_artifacts_process/semantic)"
 	@echo "  make schemas        - Regenerate the semantic JSON Schemas from TypeSpec (FR-009)"
 	@echo "  make schemas-check  - Fail if the committed schemas differ from a fresh projection"
@@ -95,15 +94,6 @@ schemas-check:
 .PHONY: manifest-digests
 manifest-digests:
 	$(POETRY) run python scripts/manifest_digests.py
-
-# The semantic tests need a Quire wheel exposing the FR-072 extraction surface.
-# No index a repository may commit against carries one (agent-ix/quire-rs#392),
-# so it is provisioned here rather than declared in pyproject.toml. When it is
-# absent the semantic tests FAIL; they never skip, because a skipped row is not
-# coverage.
-.PHONY: dev-quire
-dev-quire:
-	$(POE) dev-quire
 
 .PHONY: format
 format:

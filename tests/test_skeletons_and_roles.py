@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import zipfile
 from pathlib import Path
@@ -155,6 +156,8 @@ def test_the_added_standard_locators_are_optional_and_omittable(quire_engine, ma
 def test_no_fixture_reaches_the_payload_or_mints_an_id():
     """`quire coverage` is an engine behaviour over the whole repository, so this
     is an integration row rather than a unit one."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for `quire coverage`")
     subprocess.run(
         ["make", "build"], cwd=str(REPO_ROOT), check=True, capture_output=True
     )
