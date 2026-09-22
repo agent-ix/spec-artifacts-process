@@ -31,7 +31,7 @@ from conftest import (
     module_base,
 )
 
-SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.1.0/"
+SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.3.0/"
 
 
 def toolchain() -> dict:
@@ -238,7 +238,7 @@ def test_a_semantic_core_version_disagreement_names_both(sandbox: Path):
     )
     result = run_generator([], cwd=sandbox)
     assert result.returncode != 0
-    assert "9.9.9" in result.stderr and "0.1.0" in result.stderr
+    assert "9.9.9" in result.stderr and "0.3.0" in result.stderr
 
 
 @pytest.mark.trace("TC-134")

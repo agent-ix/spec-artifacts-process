@@ -456,7 +456,7 @@ artifact_types:
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
   data_schema:
     schema: schemas/Standard.json
-    digest: sha256:b2952695f5165cd6c9bafcf533de86ada7b5b24a67686ff0a6020f66aaeafbf8
+    digest: sha256:d468153c8e16e8ded3da9c9af4a9ce9bf89138346ff1856d099ad5c5718cf331
   defaults:
     id_pattern: Standard-{next:03d}
   allowed_links:
@@ -1793,7 +1793,7 @@ verification_catalog:
 # activates this module.
 semantic:
   contract_version: 1.0.0
-  semantic_core: 0.1.0
+  semantic_core: 0.3.0
   package: agent-ix/spec-artifacts-process
   exports:
   - ADR

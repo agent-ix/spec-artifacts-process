@@ -28,6 +28,8 @@
       "type": {
         "multiplicity": {
           "lower": 1,
+          "ordered": false,
+          "unique": false,
           "upper": 1
         },
         "target": "String"
@@ -44,6 +46,8 @@
       "type": {
         "multiplicity": {
           "lower": 1,
+          "ordered": false,
+          "unique": false,
           "upper": 1
         },
         "target": "String"
@@ -60,6 +64,8 @@
       "type": {
         "multiplicity": {
           "lower": 0,
+          "ordered": false,
+          "unique": false,
           "upper": 1
         },
         "target": "String"
@@ -76,6 +82,8 @@
       "type": {
         "multiplicity": {
           "lower": 0,
+          "ordered": false,
+          "unique": false,
           "upper": 1
         },
         "target": "String"
@@ -85,7 +93,9 @@
       "name": "supersedes",
       "type": {
         "multiplicity": {
-          "lower": 0
+          "lower": 0,
+          "ordered": false,
+          "unique": true
         },
         "target": "String"
       }
