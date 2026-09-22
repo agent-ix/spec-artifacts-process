@@ -19,10 +19,7 @@ The module SHALL keep every archetype declaration it published at manifest versi
 and byte-identical at 0.2.0, apart from the reference-form `data_schema` key FR-010 adds and the
 two `required: false` locators FR-012 adds.
 
-NFR-001-AC-5 (the two-consumer measurement against `agent-ix/spec-objects-business` and
-`agent-ix/filament-core-data`, TC-131) is removed: it validated other repositories from `~/dev`
-through the `quire` CLI, and the owner ruled that prerelease software carries no backward-compat
-test.
+NFR-001-AC-5 (TC-131) is removed.
 
 ## Scope
 

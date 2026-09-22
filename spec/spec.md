@@ -93,9 +93,9 @@ contract sits on top of those: FR-009 emits one JSON Schema per declared artifac
 TypeSpec source, FR-010 declares the contract in the manifest without altering an archetype,
 FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
-NFR-001 bounds the whole change to additive compatibility and measures it against two consumer
-repositories, because a module every repository validates against is not verified by validating
-itself.
+NFR-001 bounds the whole change to additive compatibility, measured by a structural diff of every
+0.1.0 archetype declaration and vocabulary against the checked-in 0.1.0 baseline and by every
+shipped skeleton validating with zero error findings (AC-1..4).
 
 ## References
 
