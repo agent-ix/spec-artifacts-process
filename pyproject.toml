@@ -5,7 +5,7 @@ license = "AGPL-3.0-or-later"
 
 [tool.poetry]
 name = "spec_artifacts_process"
-version = "0.24.0+20260920.225303.cc6561d.6c4d8ec2"  # Placeholder, dynamically replaced
+version = "0.1.0"  # Placeholder, dynamically replaced
 description = "Filament Module: process-artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates and archetypes"
 authors = ["Agent IX <agents@agent-ix.dev>"]
 packages = [{ include = "spec_artifacts_process" }]
@@ -158,7 +158,7 @@ url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple/"
 priority = "supplemental"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 style = "pep440"
 
 [build-system]
