@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import zipfile
 from pathlib import Path
@@ -150,17 +151,43 @@ def test_the_added_standard_locators_are_optional_and_omittable(quire_engine, ma
     ]
 
 
+def _assert_no_fixtures_packaged(names: list[str]) -> None:
+    assert not [n for n in names if "tests/fixtures" in n]
+
+
 @pytest.mark.integration
 @pytest.mark.trace("TC-119")
-def test_no_fixture_reaches_the_payload_or_mints_an_id():
-    """`quire coverage` is an engine behaviour over the whole repository, so this
-    is an integration row rather than a unit one."""
+def test_no_fixture_reaches_the_wheel():
+    """No file under `tests/fixtures/` is packaged into the built wheel. Needs
+    no engine — `make build` is Poetry, so this half runs with no `quire` CLI
+    on PATH."""
     subprocess.run(
         ["make", "build"], cwd=str(REPO_ROOT), check=True, capture_output=True
     )
     wheel = sorted((REPO_ROOT / "dist").glob("*.whl"))[-1]
     with zipfile.ZipFile(wheel) as archive:
-        assert not [n for n in archive.namelist() if "tests/fixtures" in n]
+        _assert_no_fixtures_packaged(archive.namelist())
+
+
+def test_the_wheel_fixture_check_can_fail():
+    """Proves `test_no_fixture_reaches_the_wheel` is not vacuous: a namelist
+    carrying a `tests/fixtures/...` entry must fail the same assertion."""
+    with pytest.raises(AssertionError):
+        _assert_no_fixtures_packaged(
+            [
+                "spec_artifacts_process/manifest.yaml",
+                "tests/fixtures/negative/some-fixture.md",
+            ]
+        )
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-119")
+def test_no_fixture_mints_an_id():
+    """`quire coverage` is an engine behaviour over the whole repository, so this
+    is an integration row rather than a unit one."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for `quire coverage`")
     coverage = subprocess.run(
         ["quire", "coverage", "--scope", str(REPO_ROOT)],
         capture_output=True,

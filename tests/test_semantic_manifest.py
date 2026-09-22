@@ -372,7 +372,7 @@ def test_an_unknown_key_and_a_bad_digest_are_both_refused(quire_engine, tmp_path
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "FR-010-AC-9. quire 0.46.0 refuses an unknown `semantic` key and a mismatched "
+        "FR-010-AC-9. quire 0.47.1 refuses an unknown `semantic` key and a mismatched "
         "digest SILENTLY: no diagnostic names the key, the path or the digest "
         "(agent-ix/quire-rs#221, agent-ix/quire-rs#394). This row is red by design and "
         "turns green the day the engine names them. It is never skipped, because a "

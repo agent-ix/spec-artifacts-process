@@ -52,7 +52,6 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
   (FR-010-AC-5, TC-093) and an unknown `semantic` key is refused at load
   (FR-010-AC-6, TC-094).
 - Making Quoin install an artifact-type semantic module: `agent-ix/quoin#347`. Quoin's FR-070 validator resolves `semantic.exports` against `object_types` only, so neither this module nor the already-merged `spec-artifacts-iso` can be installed. IT-002 exercises the boundary and is carried as a strict expected failure rather than a skip; the FR-035 wording that made the ambiguity possible is `agent-ix/filament-core-service#27`.
-- Publishing the Quire wheel exposing the semantic surface to an index a repository may commit against: `agent-ix/quire-rs#392`. The wheel is provisioned by `make dev-quire` and the semantic tests fail rather than skip when it is absent, because a skipped row is not coverage.
 - Run records, binding records, baselines and freshness. FR-013 states which concepts this module models and names Engineering Assurance and quoin as the owners of the rest; nothing here schematises a verification run.
 - Resolving the `Standard` artifact type / `standard` object type duplication the issue notes. Both are activated by consumers today and unifying them changes how an existing declaration resolves, which is exactly the breaking change this specification refuses to make as a side effect of the migration. What #78 does do is write the resolution down rather than leave it to first-wins: a document is dispatched on frontmatter `type:`, so `type: Standard` resolves to the **artifact type** and the emitted `Standard.json` describes it; the `standard` **object type** is reached only through `object: standard` and keeps the inline `data_schema` that describes its frontmatter projection. `quire validate` emits `DuplicateArchetype: 'standard' … first-wins` on every run of this repository because the two names collide case-insensitively in the archetype registry; that diagnostic is the duplication, and FR-010-AC-8 pins both declarations so the migration does not quietly change which one wins.
 
@@ -94,9 +93,9 @@ contract sits on top of those: FR-009 emits one JSON Schema per declared artifac
 TypeSpec source, FR-010 declares the contract in the manifest without altering an archetype,
 FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
-NFR-001 bounds the whole change to additive compatibility and measures it against two consumer
-repositories, because a module every repository validates against is not verified by validating
-itself.
+NFR-001 bounds the whole change to additive compatibility, measured by a structural diff of every
+0.1.0 archetype declaration and vocabulary against the checked-in 0.1.0 baseline and by every
+shipped skeleton validating with zero error findings (AC-1..4).
 
 ## References
 

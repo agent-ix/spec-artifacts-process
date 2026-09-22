@@ -5,7 +5,7 @@ license = "AGPL-3.0-or-later"
 
 [tool.poetry]
 name = "spec_artifacts_process"
-version = "0.24.0+20260920.225303.cc6561d.6c4d8ec2"  # Placeholder, dynamically replaced
+version = "0.1.0"  # Placeholder, dynamically replaced
 description = "Filament Module: process-artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) — Jinja .md.j2 templates and archetypes"
 authors = ["Agent IX <agents@agent-ix.dev>"]
 packages = [{ include = "spec_artifacts_process" }]
@@ -37,6 +37,7 @@ ruff = "^0.14.13"
 pytest-results = { version = "^0.2.0", python = ">=3.12" }
 jsonschema = "^4.25.0"
 pyyaml = "^6.0.2"
+quire = { version = "^0.47.1", source = "internal-pypi" }
 
 [tool.poetry.scripts]
 build-tools = "scripts.build_tools:main"
@@ -70,10 +71,6 @@ help = "Run integration tests (requires Kind cluster)"
 [tool.poe.tasks.lint]
 sequence = ["ruff-check", "black-check"]
 help = "Run all linters (ruff + black)"
-
-[tool.poe.tasks.dev-quire]
-shell = "pip install --index-url http://pypi.ix/root/dev/+simple/ --trusted-host pypi.ix 'quire>=0.46.0'"
-help = "Install the Quire wheel the semantic tests need (see agent-ix/quire-rs#392)"
 
 [tool.poe.tasks.ruff-check]
 cmd = "ruff check ."
@@ -160,13 +157,8 @@ name = "internal-pypi"
 url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple/"
 priority = "supplemental"
 
-[[tool.poetry.source]]
-name = "local-pypi"
-url = "http://pypi.ix/root/dev/+simple/"
-priority = "explicit"
-
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 style = "pep440"
 
 [build-system]

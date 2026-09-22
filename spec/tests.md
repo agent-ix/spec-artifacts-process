@@ -18,7 +18,7 @@ type: TestMatrix
 | User Story | Acceptance Criteria | Test Cases | Status |
 |------------|---------------------|------------|-----------------|
 | US-001 | US-001-EX-1, US-001-EX-2 (illustrative) | TC-001, TC-002, TC-005 | 🚧 Planned |
-| US-002 | US-002-EX-1, US-002-EX-2, US-002-EX-3 (illustrative) | TC-080, TC-100, TC-131 | ✅ Complete |
+| US-002 | US-002-EX-1, US-002-EX-2, US-002-EX-3 (illustrative) | TC-080, TC-100 | ✅ Complete |
 
 ### Functional Requirement Coverage
 
@@ -156,14 +156,13 @@ type: TestMatrix
 
 The `TestMatrix` archetype gives this table the columns
 `Non-Functional Req | Verification Method | Evidence/Test Cases | Status` and no criterion column,
-so it groups by method. Per-criterion coverage for NFR-001-AC-1..AC-5 is carried by the
-`Traces To` cells of TC-127..TC-131 in the Test Case Summary; this grouped table is not the whole
+so it groups by method. Per-criterion coverage for NFR-001-AC-1..AC-4 is carried by the
+`Traces To` cells of TC-127..TC-130 in the Test Case Summary; this grouped table is not the whole
 claim (SR-008 FND-004).
 
 | Non-Functional Req | Verification Method | Evidence/Test Cases | Status |
 |--------------------|---------------------|---------------------|--------|
 | NFR-001 | Test | TC-127, TC-128, TC-129, TC-130 | ✅ Complete |
-| NFR-001 | Demonstration | TC-131 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -294,7 +293,6 @@ claim (SR-008 FND-004).
 | TC-128 | No declared vocabulary gains or loses a member between 0.1.0 and 0.2.0 | Unit | P0 | NFR-001-AC-2 | ✅ |
 | TC-129 | Every locator added at 0.2.0 is `required: false` | Unit | P0 | NFR-001-AC-3 | ✅ |
 | TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | ✅ |
-| TC-131 | `spec-objects-business` and `filament-core-data` each validate under 0.2.0 with no error finding they did not already report under 0.1.0 | Demonstration | P0 | NFR-001-AC-5 | ✅ |
 | TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | ✅ |
 | TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | ✅ |
 | TC-134 | A tree whose schemas and digests agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | ✅ |
@@ -356,7 +354,6 @@ mixed combination in one conforming document.
 | FR-009-CON-6 | Enumerate from source | a test carrying a hard-coded type list | Inspection (no TC) | violation |
 | FR-011-CON-3 | Oracle, not module code | a reference-mapping import from the shipped package | Inspection (no TC) | violation |
 | FR-013-CON-2 | No run-record schema | a schema for a run, binding or baseline | Inspection (no TC) | violation |
-| NFR-001 | Consumer regression | a finding under 0.2.0 absent under 0.1.0 | TC-131 | 0 such findings |
 
 ## Edge Cases
 
