@@ -14,6 +14,7 @@ jobs:
   # enforcing module version behind a sign-off gate: asking for a test run
   # would have shipped the thing the gate exists to hold back.
   publish-to-pypi:
+    needs: ci
     if: inputs.publish
     runs-on: ubuntu-latest
 
