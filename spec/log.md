@@ -7,6 +7,30 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-09-27** — **PLAT-1079 fix round 2** (SR-018 disposition pass 1,
+  comment 28db75b3): three new findings on the round-1 fix. FND-007 (MED):
+  the lint rule's `allowed` set was the four IADT classes only, which warns
+  on an author following FR-007's own CR-005 guidance to write a precise
+  catalog method (`property-based-testing`) instead of the class — the same
+  cell is the `acceptance-criterion` obligation's `method_column`, and
+  quire-rs FR-054-AC-11 already accepts either there. `allowed` is now
+  classes ∪ `verification_catalog` keys, derived from the manifest with a new
+  AC/TC (FR-004-AC-22/TC-151) asserting the two cannot drift; `Eval`/`Manual`
+  stay excluded (`test_type` values, not catalog keys). FND-008 (MED):
+  `spec-artifacts-iso` already declares a conflicting `ac-verification-method`
+  lint rule over the same cell, admitting a `TC-\d+` annotation this rule
+  rejects — `lint_rules` merge across every loaded module, so a released
+  default module set would carry both contracts at once. FR-004 now states
+  this module owns the correction (it already owns the catalog and the
+  obligation sources reading the cell) and that **PLAT-1085**
+  (`spec-artifacts-iso`) removes `iso`'s rule and the `TC-…` annotation from
+  its StR sibling rule, shipping together with this module's release. FND-009
+  (LOW): named the two deferred tickets — **PLAT-1081** (sweep clearing the
+  ~156 existing violations) and **PLAT-1082** (warning→error promotion) — in
+  place of "the epic's own sweep ticket." `reviews/` copies of SR-018 and
+  SR-019 replaced verbatim with the reviewer's round-1 (post-disposition)
+  versions.
+
 * **2026-09-27** — **PLAT-1079 fix round** (SR-018, SR-019, `reviews/`):
   AC-21's `targets: []` mechanism is dropped entirely — quire-rs rejects an
   empty `document_references.targets` at module load (`traceability.rs:1014`,

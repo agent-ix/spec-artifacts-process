@@ -38,3 +38,11 @@ this epic builds.
 | FND-001 | high | FR-007-AC-15 is appended to a headerless table that sits directly after a blockquote (FR-007:255-258). That table is not in `## Acceptance Criteria` (FR-007:186-200), and the extractor does not read it. Measured: `quire coverage --json` has no FR-007-AC-15 in `minted_targets` or `obligations`, and `quire validate` gains exactly one warning over main, `'FR-007-AC-15' (row 'TC-150') … resolves to no … target`. The same defect already orphans FR-007-AC-9/10/11 on main (dangling from TC-056/057/065). Move all four rows into the AC table. | spec/functional/FR-007-verification-method-catalog.md:255-258; spec/tests.md:90, :314 |
 | FND-002 | medium | FR-010-AC-3 / TC-091 is a structural diff against the 0.1.0 baseline that enumerates every allowed change. The PR adds three manifest changes that list does not name: a new `constraint` trace target, emptied (or otherwise changed) `verification`/`nfr-verification` targets, and a new `constraint` obligation source. It also implies widened `traces-to`/`inspection-obligation` targets (SR-018 FND-004). FR-010-AC-3 is not updated, so the implementation stage fails TC-091, or FR-010 goes stale. | spec/functional/FR-010-semantic-manifest-contract.md:105; spec/tests.md:259 |
 | FND-003 | low | Obligation-source counts disagree within FR-007. The prose says PLAT-1079 "adds a sixth" source (FR-007:72), while the CR-006 note calls it "a fourth row shape" (FR-007:268) and says user stories are "not added as a fourth obligation source" (FR-007:270). The manifest has five sources today, so constraint is the sixth. | spec/functional/FR-007-verification-method-catalog.md:72, :268, :270 |
+
+## Dispositions
+
+| FND | Outcome | sha/reason |
+| --- | --- | --- |
+| FND-001 | fixed | 50350b6 — FR-007-AC-9/10/11/15 are moved into the AC table (FR-007:201-204). Measured: all four are now in `minted_targets` and `obligations` of `quire coverage --json`, and the four dangling warnings are gone (73 warnings, down from 77) |
+| FND-002 | fixed | 50350b6 — FR-010-AC-3 (FR-010:105) now lists the constraint target, the obligation source, the widened `traces-to`/`inspection-obligation` targets and the `lint_rules` entry |
+| FND-003 | fixed | 50350b6 — FR-007 now says "applied to the sixth declared source" (:281) and "a seventh obligation source" (:284) |

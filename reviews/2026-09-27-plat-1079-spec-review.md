@@ -52,3 +52,24 @@ repo with about 156 new warnings the spec never planned for.
 | FND-004 | medium | FR-004-AC-20 asserts that every `-CON-` `Traces To` reference resolves, but it only declares the target. Resolution also requires adding `constraint` to `traces-to`'s `targets` (manifest.yaml:948), and to `inspection-obligation` (manifest.yaml:896-899) so an Inspection-validated constraint can be discharged by an `Inspections` record. Neither change is stated, so the declared change alone fails TC-148. | spec/functional/FR-004-traceability-declaration.md:50-54, :122; spec/tests.md:312 |
 | FND-005 | medium | FR-004 says `interface-verification` is "unaffected in shape — same pattern, same empty `targets`". The manifest has `targets: [test-case]` (manifest.yaml:937), and AC-21 names only `verification`/`nfr-verification`. Whether a `TC-` id in an `interface` Verification cell is reported or still silently resolves is therefore contradictory. Under the epic-wide TC retirement it should be reported like the other two. | spec/functional/FR-004-traceability-declaration.md:62-64 |
 | FND-006 | low | Minting `constraint` as an evidence-bearing target adds every `-CON-` row to the coverage denominator. About half of this repo's constraints are `Inspection` (FR-008-CON-1..3, FR-009-CON-1/2, FR-011-CON-3, FR-013-CON-2, FR-003-CON-1), and no test tag can back them. AC-20 does not say whether the target is `evidence: reference_only` or how the unbacked count is expected to move. The manifest note at manifest.yaml:1041-1045 also records that prose-bound CON tags were harmless only because CON was never minted. | spec/functional/FR-004-traceability-declaration.md:50-54, :122 |
+
+## New findings (disposition pass 1)
+
+Reviewed at 50350b611cba63ae51cc43032601c1762ed13fbe. `quire validate --okf --scope .` exits 0 with 73 warnings. None of them names a `-CON-` id, or FR-004-AC-20/21 or FR-007-AC-9/10/11/15.
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | medium | The lint rule's allowed list (`Test`/`Inspection`/`Analysis`/`Demonstration`) equals the catalog's `class` set, but not the catalog's 33 method ids. The same `Verification` cell is the `method_column` of the `acceptance-criterion` obligation, and quire-rs FR-054-AC-11 accepts a catalog method id **or** a class there. FR-007 CR-005 steers authors to the precise method (`property-based-testing`, `fuzzing`, `agent-behaviour-eval`). Failure scenario: an author follows FR-007 and writes `property-based-testing`; the obligation resolves to a catalog method, and the new rule still warns. `Eval`/`Manual` are `test_type` values, not catalog entries, so their absence is correct. Allow the classes plus the catalog keys, derived from the manifest and asserted equal by the test. | spec/functional/FR-004-traceability-declaration.md:67-68, :154; spec/tests.md:313 |
+| FND-008 | medium | The new rule duplicates and contradicts `spec-artifacts-iso`'s existing `ac-verification-method` rule (spec-artifacts-iso manifest.yaml:795-803 @c654673). Both have the same archetypes, section, column and allowed set, but iso admits a `(TC-\d+(, TC-\d+)*)` annotation. The registry merges `lint_rules` from every loaded module, so `Test (TC-035)` passes iso's rule and fails this one. That leaves two modules declaring opposite contracts for a column iso owns. Either change iso's rule (drop `annotation_pattern`) or have FR-004 record the override and the iso change it requires. | spec/functional/FR-004-traceability-declaration.md:66-81, :154 |
+| FND-009 | low | FR-004 defers clearing the ~156 existing cells and the warning-to-error promotion to "the epic's own sweep ticket" without naming it. The leader's ruling names PLAT-1082 for the promotion. Name the owning ticket or tickets so the deferral can be checked. | spec/functional/FR-004-traceability-declaration.md:83-88; spec/log.md:19 |
+
+## Dispositions
+
+| FND | Outcome | sha/reason |
+| --- | --- | --- |
+| FND-001 | fixed | 50350b6 — `targets: []` dropped; the three verification references are unchanged and the rule is now a `lint_rules` `table_column_values` entry (FR-004:66-81, :154) |
+| FND-002 | fixed | 50350b6 — `severity: warning` stated in FR-004:83 and AC-21; validate exit code stated as unaffected |
+| FND-003 | deferred | Leader ruling 2026-09-27: the epic's sweep clears existing cells and the rule ships at warning. This PR's own three rows are fixed in 50350b6 (bare `Test`, FR-004:153-154, FR-007:204); the remaining ~153 cells are still present |
+| FND-004 | fixed | 50350b6 — `constraint` added to `traces-to` and `inspection-obligation` targets (FR-004:61-65, AC-20 :153) |
+| FND-005 | fixed | 50350b6 — all three verification references are left unchanged, and the lint rule is scoped to FR/NFR/interface uniformly (FR-004:76-81) |
+| FND-006 | fixed | 50350b6 — the target is evidence-bearing (`source`), with Inspection rows reported under `method-without-symbol` (FR-004:54-60, AC-20) |

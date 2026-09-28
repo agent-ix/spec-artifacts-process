@@ -64,28 +64,41 @@ modules can version apart.
   reference in a `Traces To` cell and discharges no constraint through an
   `Inspections` record, so both reference declarations widen alongside it.
 - A `Verification` cell in an `FR`, `NFR` or `interface` Acceptance Criteria
-  table **SHALL** name a method only (`Test`, `Inspection`, `Analysis`,
-  `Demonstration`), with no `TC-…`/`IT-…` id. TC ids are retired
-  ecosystem-wide (epic PLAT-1076): a criterion is now bound to its evidence
-  directly by trace tag, so a lingering test-case id in that cell is stale
-  data. This is enforced as a declarative `lint_rules` entry (quire-rs FR-036,
-  `table_column_values`), not a `document_references`/`trace_targets` change —
-  quire-rs rejects a `document_references` entry that declares an empty
-  `targets` at module load (`traceability.rs:1014`; confirmed against the
-  pinned engine, so an earlier draft of this requirement that emptied
+  table **SHALL** name a method only, with no `TC-…`/`IT-…` id. TC ids are
+  retired ecosystem-wide (epic PLAT-1076): a criterion is now bound to its
+  evidence directly by trace tag, so a lingering test-case id in that cell is
+  stale data. This is enforced as a declarative `lint_rules` entry (quire-rs
+  FR-036, `table_column_values`), not a `document_references`/`trace_targets`
+  change — quire-rs rejects a `document_references` entry that declares an
+  empty `targets` at module load (`traceability.rs:1014`; confirmed against
+  the pinned engine, so an earlier draft of this requirement that emptied
   `verification`/`nfr-verification`'s `targets` would have failed module load
   for every consumer). The existing `verification`, `nfr-verification` and
   `interface-verification` document references are **unchanged** by this
   requirement — they stay `targets: [test-case]` and keep resolving a `TC-…`
   id exactly as before, and are retired later, with the Test Matrix itself,
   not by this ticket.
+  - The rule's `allowed` set **SHALL** be the four IADT classes
+    (`Test`/`Inspection`/`Analysis`/`Demonstration`) **union** every method id
+    the manifest's `verification_catalog` declares — `unit-testing`,
+    `property-based-testing`, `fuzzing`, `agent-behaviour-eval`, and the rest
+    of the 31 catalog keys — derived from the manifest, not hand-maintained
+    as a second list. A `Verification` cell is also the `acceptance-criterion`
+    obligation's `method_column`, and quire-rs FR-054-AC-11 accepts either a
+    class or a catalog method id there; restricting the lint rule to the four
+    classes alone would warn on an author who follows FR-007's own CR-005
+    guidance and writes the precise method (`property-based-testing`) instead
+    of the class (`Test`). `Eval` and `Manual` **SHALL NOT** be added: they
+    are `traceability.vocabularies.test_type` (Test Matrix) values, not
+    catalog method ids, and this column is never populated from that
+    vocabulary.
   - The lint rule **SHALL** declare `severity: warning`. This SHALL is
     already violated by roughly 156 existing `Test (TC-…)`/`Inspection
     (TC-…)` cells across this repository's own FR/NFR Acceptance Criteria
     tables (measured, SR-018 FND-003) — an error-severity rule would fail
-    every one of them the moment it shipped. Clearing that population is the
-    epic's own sweep ticket; promoting the rule from `warning` to `error`
-    once the sweep clears is that ticket's job, not this one's.
+    every one of them the moment it shipped. **PLAT-1081** sweeps and clears
+    that existing population; **PLAT-1082** promotes the rule from `warning`
+    to `error` once the sweep clears it. Neither is this ticket's job.
   - This requirement's own new rows — FR-004-AC-20, FR-004-AC-21 and
     [FR-007-AC-15](./FR-007-verification-method-catalog.md) — **SHALL** name a
     bare method in their own `Verification` cell (no `TC-148`/`TC-149`/`TC-150`
@@ -93,6 +106,18 @@ modules can version apart.
     violate it. `spec/tests.md` still traces each to its TC row through the
     Functional Requirement Coverage table, which is a different column and
     is not affected.
+  - **This module owns the `FR`/`NFR`/`interface` `Verification`-column
+    contract**, because it already owns the `verification_catalog` (FR-007)
+    and the obligation sources that read the cell (FR-007-AC-8/AC-15) — the
+    lint rule is a third thing reading a cell this module already governs
+    two ways, not a new cross-module reach. `spec-artifacts-iso` declares a
+    duplicate, conflicting rule today (`ac-verification-method`,
+    `manifest.yaml:795-803`) that admits a `TC-\d+` annotation the rule above
+    rejects; since `lint_rules` merge across every loaded module, the two
+    contradict for the same column. **PLAT-1085** removes `iso`'s rule and
+    drops the `TC-…` annotation from its StR sibling rule. PLAT-1085 and this
+    module's release **SHALL** ship together — a released default module set
+    **SHALL NOT** carry both contracts at once.
 - **Every** target and reference **SHALL** be bound by `archetype`, the Test
   Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
   deleted that form (CR-062) and rejects the key outright.
@@ -151,7 +176,8 @@ modules can version apart.
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
 | FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so an `interface` document with no Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
 | FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set and evidence posture (`source`, not `reference_only`) as `acceptance-criterion`. `constraint` is added to the `targets` of `traces-to` and `inspection-obligation`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows among `minted_targets`, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test |
-| FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of `Test`/`Inspection`/`Analysis`/`Demonstration`, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare method raises nothing; `quire validate --okf` exit code is unaffected either way (lint is advisory, never a validation gate). The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
+| FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of the four IADT classes (`Test`/`Inspection`/`Analysis`/`Demonstration`) or a `verification_catalog` method id, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare class or a bare catalog method id (e.g. `property-based-testing`) raises nothing; `quire validate --okf` exit code is unaffected either way (lint is advisory, never a validation gate). The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
+| FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
@@ -197,6 +223,35 @@ modules can version apart.
 > special-casing one of the three. FND-006 (LOW) is answered in AC-20's own
 > wording: `constraint` is evidence-bearing (`source`), not
 > `reference_only`.
+
+> **CR-066 note (fix round 2, PLAT-1079, 2026-09-27):** SR-018's disposition
+> pass 1 (50350b6) found the fixed rule's `allowed` list still wrong.
+> Restricting it to the four IADT classes contradicts FR-007's own CR-005
+> guidance to write the precise catalog method (`property-based-testing`,
+> `fuzzing`) rather than the class, and quire-rs FR-054-AC-11 already accepts
+> either in this same cell for the `acceptance-criterion` obligation's
+> `method_column` — an author following FR-007 would have been warned by
+> FR-004 for doing exactly what FR-007 asked (FND-007). AC-21/AC-22 above fix
+> it: `allowed` is classes ∪ catalog keys, asserted equal by a test rather than
+> re-typed as a second list, and `Eval`/`Manual` stay out because they are
+> `test_type` values, not catalog method ids.
+>
+> **FND-008: this was never only this module's rule to add.**
+> `spec-artifacts-iso` already declares `ac-verification-method` over the same
+> archetypes, section and column, with an admitted `TC-\d+` annotation the
+> rule above rejects — `lint_rules` merge across every loaded module, so a
+> released default module set carrying both contracts is not two opinions, it
+> is one column two modules disagree about. This module owns the correction
+> because it already owns the two other things reading that cell — the
+> `verification_catalog` (FR-007) and the obligation sources over it
+> (FR-007-AC-8/AC-15) — so the lint rule is a third read of a cell this module
+> already governs, not new territory. **PLAT-1085** removes `iso`'s rule and
+> the `TC-…` annotation from its StR sibling rule; PLAT-1085 and this module's
+> release ship together, so no released default module set ever carries both.
+>
+> **FND-009 (LOW):** the sweep and the promotion now have names —
+> **PLAT-1081** (sweep) and **PLAT-1082** (promotion) — in place of "the
+> epic's own sweep ticket."
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
@@ -529,6 +584,9 @@ modules can version apart.
   [FR-051](ix://agent-ix/quire-rs/spec/functional/FR-051) (source symbol
   extraction + trace tags) and quire-rs FR-036 (declarative `lint_rules`,
   `table_column_values`) for AC-21
+- **Ships with (PLAT-1085, spec-artifacts-iso)**: removal of `iso`'s
+  conflicting `ac-verification-method` lint rule and the `TC-…` annotation on
+  its StR sibling rule. Neither module releases this contract alone.
 - **Downstream**: the quoin `gap-analysis` wiring, which reads the rollup rather
   than grepping for tags
 
