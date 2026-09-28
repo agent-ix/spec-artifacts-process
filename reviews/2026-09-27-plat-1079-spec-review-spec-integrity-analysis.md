@@ -48,3 +48,5 @@ this epic builds.
 | FND-003 | fixed | 50350b6 — FR-007 now says "applied to the sixth declared source" (:281) and "a seventh obligation source" (:284) |
 
 Disposition pass 2 (e34aba7): every SR-019 finding was already `fixed` in round 1, so there are no rows to add. I re-checked for regressions: FR-007-AC-9/10/11/15 are still minted, and the FR-010-AC-3 list and the FR-007 source-count wording are unchanged by e34aba7.
+
+Disposition pass 3 (852f992): no rows to add. The round-3 diff does not touch FR-007, FR-010 or tests.md, and the regression check is clean.

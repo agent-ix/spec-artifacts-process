@@ -76,6 +76,7 @@ Reviewed at 50350b611cba63ae51cc43032601c1762ed13fbe. `quire validate --okf --sc
 | FND-007 | fixed | e34aba7 — `allowed` is the classes plus the `verification_catalog` keys, derived from the manifest, with an equality test (FR-004:81-94, AC-21/AC-22 :179-180, TC-151); `Eval`/`Manual` are excluded |
 | FND-008 | fixed | e34aba7 — FR-004:109-120 states this module owns the column contract; PLAT-1085 (exists, Backlog) removes iso's `ac-verification-method` and the StR TC annotation, and ships together under a SHALL; Dependencies records "Ships with" |
 | FND-009 | fixed | e34aba7 — FR-004:99-101 names PLAT-1081 (sweep) and PLAT-1082 (promotion); both tickets exist in Linear |
+| FND-010 | fixed | 852f992 — the count is dropped; FR-004:84-85 now reads "and every other catalog key — derived from the manifest". Round-3 re-check: validate exits 0 with 73 warnings, and the diff touches only FR-004:84-85, the log and the verbatim `reviews/` copies, with no regression |
 
 ## New findings (disposition pass 2)
 
