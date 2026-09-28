@@ -72,3 +72,29 @@ No mocks. Every behavioural test drives the real `quire` CLI. The tests are modu
 functions and follow the repository's idiom. Trace binding uses the repo's `python-docstring-id`
 form (`"""TC-148 (FR-004-AC-20): …`), which matches the existing tests in the same files. There
 are no TODO, FIXME or stub bodies.
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | low | The fix for FND-003 correctly removed the vacuous `quire validate --okf` exit-code assertion from the TC-149 behavioural test. However, FR-004-AC-21 and the TC-149 matrix row still claim "`quire validate --okf` exit code is unaffected either way", and no test now backs that clause. The clause is true only because `validate` never evaluates `lint_rules`. Resolve it by rewording the TC-149 row and the AC clause, for example to "lint is advisory; `validate` does not evaluate `lint_rules`", or by accepting it as-is. This is non-blocking. | spec/tests.md:314, spec/functional/FR-004-traceability-declaration.md:179 |
+
+## Dispositions
+
+Round 1, reviewed at `828819c33b95486ab8054ced04a8fbb2c956ac18`. Fix commit `828819c`. CI run 36369416368 succeeded on this sha (verified with `gh run view`). All mutations were re-run on a scratch copy of the tree:
+
+- A stray `stakeholder-validation-criterion` added to `traces-to` is now killed by TC-091 and TC-136.
+- Reordering the `traces-to` targets is killed by the same two tests.
+- Dropping `Analysis` from `allowed` is killed by TC-091 and TC-151.
+- `severity: error` is killed by TC-149 (structural and behavioural) and by TC-091.
+- Retargeting the `constraint` obligation is killed by TC-055, TC-150 and TC-091.
+- The origin/main manifest fails 12 of the 12 targeted tests.
+
+| FND | Outcome | sha/reason |
+| --- | --- | --- |
+| FND-001 | fixed | 828819c |
+| FND-002 | fixed | 828819c |
+| FND-003 | fixed | 828819c |
+| FND-004 | fixed | 828819c |
+| FND-005 | fixed | 828819c |
+| FND-006 | deferred | PLAT-1087 (CI workflow change, owner approval) |

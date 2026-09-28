@@ -43,3 +43,12 @@ manifest. The findings are about the precision of the matrix text and the oracle
 | --- | --- | --- | --- |
 | FND-001 | low | The `spec/tests.md` TC-091 description still lists only the pre-PLAT-1079 deltas. FR-010-AC-3, the requirement it traces, now also names the `constraint` target, the obligation source, the widened `targets` and the new `lint_rules` entry. The matrix row therefore understates what TC-091 checks, and the test itself does carry the PLAT-1079 exclusions. | spec/tests.md:260 |
 | FND-002 | low | The TC-148 row names `evidence: source` as "declared", but the manifest omits the key, relying on the default `source` posture exactly as `acceptance-criterion` does. The test asserts the key is absent from both. The behaviour matches the spec, but the wording "declared" is loose. | spec/tests.md:313, spec_artifacts_process/manifest.yaml:884-889 |
+
+## Dispositions
+
+Round 1, reviewed at `828819c33b95486ab8054ced04a8fbb2c956ac18`.
+
+| FND | Outcome | sha/reason |
+| --- | --- | --- |
+| FND-001 | fixed | 828819c |
+| FND-002 | fixed | 828819c |
