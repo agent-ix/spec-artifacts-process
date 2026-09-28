@@ -52,3 +52,5 @@ Round 1, reviewed at `828819c33b95486ab8054ced04a8fbb2c956ac18`.
 | --- | --- | --- |
 | FND-001 | fixed | 828819c |
 | FND-002 | fixed | 828819c |
+
+Round 2, reviewed at `ca80d881bf88b3b7e3a6de426a35e1c12cb4bd5e`. No finding was open at round 2 and no new finding was added, so there are no rows to add.

@@ -98,3 +98,9 @@ Round 1, reviewed at `828819c33b95486ab8054ced04a8fbb2c956ac18`. Fix commit `828
 | FND-004 | fixed | 828819c |
 | FND-005 | fixed | 828819c |
 | FND-006 | deferred | PLAT-1087 (CI workflow change, owner approval) |
+
+Round 2, reviewed at `ca80d881bf88b3b7e3a6de426a35e1c12cb4bd5e`. The round-2 diff has two spec lines and the SR copies. CI run 36369806618 succeeded on this sha. `quire validate --okf` exits 0. No regressions were found, and the round-2 diff adds no new findings.
+
+| FND | Outcome | sha/reason |
+| --- | --- | --- |
+| FND-007 | fixed | ca80d88 |
