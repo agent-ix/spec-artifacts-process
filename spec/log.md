@@ -19,17 +19,19 @@ description: "Chronological log of structural changes to this bundle."
   premise rather than trusting it**: PLAT-1079 stated constraints were
   "already a trace target"; `grep`/`quire validate --okf` found none declared
   and 13 dangling `-CON-` references in this repo's own `spec/tests.md` (of 76
-  warnings total) — recorded in FR-004's CR-064 note. The other two asks —
-  `-M-` ids as a trace target, `US` acceptance criteria as a target and
-  obligation source — are **not** declared: both are blocked on a capability
-  this module cannot supply alone (a quire-rs `TraceTarget` synthetic-id mode
-  for the first; a `spec-artifacts-iso` normative `US` acceptance-criteria
-  table for the second, since today's `## Acceptance Examples (Illustrative)`
-  is explicitly documented, by that archetype and by this repo's own
-  `US-001`/`US-002`, as not verification criteria). Recorded as GAP-007/
-  GAP-008 in `spec/tests.md` rather than declared against a column or table
-  that does not exist. `TC-148`/`TC-149`/`TC-150` added 🚧 Planned, pending
-  the manifest change this ticket's implementation stage makes.
+  warnings total) — recorded in FR-004's CR-064 note. The other two asks are
+  **ruled resolved without a new declaration**, per the team leader
+  (2026-09-27): `-M-` ids need no trace target — quire-rs's computed
+  CoverageMatrix (FR-050-AC-47, `agent-ix/quire-rs#494`) reconciles binders
+  against the full derived obligation set, and `nfr-metric` is already an
+  obligation source, so no `TraceTarget` capability is requested. `US`
+  acceptance criteria get no target and no obligation source **by design**,
+  not as a gap: the archetype's only structured section is illustrative
+  examples, explicitly disclaimed by that archetype and by this repo's own
+  `US-001`/`US-002` as not verification criteria — recorded in FR-004's Known
+  Limits as a design fact, with no upstream ticket requested.
+  `TC-148`/`TC-149`/`TC-150` added 🚧 Planned, pending the manifest change
+  this ticket's implementation stage makes.
 
 * **2026-09-22** — **PLAT-974**: CI off the dev-only mirrors. `quire` is now a dev dependency pinned to `internal-pypi` (`^0.47.1`), the `local-pypi`/`pypi.ix` poetry source and the `dev-quire` poe task and Makefile target are deleted, and `.github/workflows/ci.yml`'s `ci:` job calls `semantic-module-ci.yml` (adds `REGISTRY_TOKEN` for `@agent-ix/semantic-core` from GitHub Packages) in place of `lib-ci.yml`; `tests/conftest.py`'s `QUIRE_MISSING` message now names `poetry install` rather than `dev-quire`/quire-rs#392 (the `schema_registry` message already named `make semantic-install`). `package-lock.json` already resolved `@agent-ix/semantic-core` from `npm.pkg.github.com`. NFR-001-AC-5 (TC-131) is removed: the owner ruled that prerelease software carries no backward-compat test; NFR-001-AC-1..4 are unaffected and still compare against the checked-in `tests/fixtures/baseline-0.1.0/` baseline. `tests/test_skeletons_and_roles.py`'s TC-119 test is split in two: `test_no_fixture_reaches_the_wheel` (the `make build`/wheel-packaging half, which needs no engine and always runs, with a mutation check proving it can fail) and `test_no_fixture_mints_an_id` (the `quire coverage` half, which keeps the CLI skip guard) — real CI never installs a `quire` CLI binary, only the Python package and the npm toolchain, and the original single test's guard was skipping the packaging half for no reason. `pyproject.toml` also had a committed `poetry-dynamic-versioning` leftover predating this PR — `version = "0.24.0+20260920.225303.cc6561d.6c4d8ec2"` and `[tool.poetry-dynamic-versioning] enable = false` — which would have shipped every publish at that frozen version instead of one derived from the tag; restored to `version = "0.1.0"  # Placeholder, dynamically replaced` and `enable = true`, matching every other repo's `main`.
 

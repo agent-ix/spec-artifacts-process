@@ -268,15 +268,21 @@ the third instance of the engine-before-module ordering gap in that program.
 > a fourth row shape for one FR-053 already defines. Matrix: TC-150.
 >
 > **User-story acceptance criteria are not added as a fourth obligation
-> source here.** [FR-004](./FR-004-traceability-declaration.md)'s Known
-> Limits records why: `US` carries no normative acceptance-criteria table
-> today, only illustrative examples its own archetype disclaims as
+> source here, by design, ruled 2026-09-27.** [FR-004](./FR-004-traceability-declaration.md)'s
+> Known Limits records why: `US` carries no normative acceptance-criteria
+> table, only illustrative examples its own archetype disclaims as
 > non-verification, so there is no `target` to declare an obligation against
-> and no `statement_column`/`method_column` pair to read. Blocked on the same
-> `spec-artifacts-iso` dependency FR-004 names.
+> and no `statement_column`/`method_column` pair to read. This is a design
+> fact about the `US` archetype, not a gap this module is waiting on an
+> upstream change to close.
+>
+> **Nor is `-M-` given a second obligation source or a trace target.** It
+> already has one (`nfr-metric`), and quire-rs's computed CoverageMatrix
+> (FR-050-AC-47, `agent-ix/quire-rs#494`) reconciles binders against the full
+> derived obligation set, not only against declared trace targets — so a test
+> tagging `NFR-012-M-1` binds through the obligation already declared here.
 
 ## Dependencies
 
-- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary), [FR-004](./FR-004-traceability-declaration.md) (the `constraint` trace target AC-15's obligation source targets)
-- **Blocked on (PLAT-1079, not yet filed as of this spec)**: the same `spec-artifacts-iso` US acceptance-criteria table FR-004 depends on, before a `user-story-acceptance-criterion` obligation source can be declared.
+- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary), [FR-004](./FR-004-traceability-declaration.md) (the `constraint` trace target AC-20's obligation source targets), quire-rs FR-050-AC-47 (computed CoverageMatrix, `agent-ix/quire-rs#494`, reconciles obligations as well as trace targets)
 - **Downstream**: agent-ix/quoin#89 (the test-plan advisor reads the merged catalog and matches its applicability rules), agent-ix/quoin#80 (method conformance is checked against it), agent-ix/quoin#91 (evidence adapters map tool output onto these kinds)
