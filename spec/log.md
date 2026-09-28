@@ -7,6 +7,14 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-09-27** — **PLAT-1079 fix round 3** (SR-018 disposition pass 2,
+  comment 39618dfa): FND-010 (LOW) — FR-004 said "the rest of the 31 catalog
+  keys", but `verification_catalog` declares 33. Dropped the number entirely
+  rather than correcting it: the `allowed` set is derived from the manifest
+  (FR-004-AC-22), so a hard-coded count in the prose can only drift from it
+  again. `reviews/` copies of SR-018 and SR-019 replaced verbatim with the
+  reviewer's round-2 versions.
+
 * **2026-09-27** — **PLAT-1079 fix round 2** (SR-018 disposition pass 1,
   comment 28db75b3): three new findings on the round-1 fix. FND-007 (MED):
   the lint rule's `allowed` set was the four IADT classes only, which warns

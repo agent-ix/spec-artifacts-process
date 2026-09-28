@@ -73,3 +73,14 @@ Reviewed at 50350b611cba63ae51cc43032601c1762ed13fbe. `quire validate --okf --sc
 | FND-004 | fixed | 50350b6 — `constraint` added to `traces-to` and `inspection-obligation` targets (FR-004:61-65, AC-20 :153) |
 | FND-005 | fixed | 50350b6 — all three verification references are left unchanged, and the lint rule is scoped to FR/NFR/interface uniformly (FR-004:76-81) |
 | FND-006 | fixed | 50350b6 — the target is evidence-bearing (`source`), with Inspection rows reported under `method-without-symbol` (FR-004:54-60, AC-20) |
+| FND-007 | fixed | e34aba7 — `allowed` is the classes plus the `verification_catalog` keys, derived from the manifest, with an equality test (FR-004:81-94, AC-21/AC-22 :179-180, TC-151); `Eval`/`Manual` are excluded |
+| FND-008 | fixed | e34aba7 — FR-004:109-120 states this module owns the column contract; PLAT-1085 (exists, Backlog) removes iso's `ac-verification-method` and the StR TC annotation, and ships together under a SHALL; Dependencies records "Ships with" |
+| FND-009 | fixed | e34aba7 — FR-004:99-101 names PLAT-1081 (sweep) and PLAT-1082 (promotion); both tickets exist in Linear |
+
+## New findings (disposition pass 2)
+
+Reviewed at e34aba759c60530a30610fc5830d6f46054ee90b. `quire validate --okf --scope .` exits 0 with 73 warnings, unchanged from round 1. FR-004-AC-22 is minted. The 13 `-CON-` dangling warnings remain, as expected: this is a spec-only PR, and the manifest change lands in the implementation stage. I found no regression.
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-010 | low | FR-004 says "the rest of the 31 catalog keys", but `verification_catalog` declares **33** keys (measured; 31 was the 2026-08-17 seed count before CR-005 added `compile-time-check` and `dynamic-analysis-sanitizer`). The derived-set test in AC-22 is unaffected, but the normative prose states a wrong count. Drop the number or correct it to 33. | spec/functional/FR-004-traceability-declaration.md:85 |

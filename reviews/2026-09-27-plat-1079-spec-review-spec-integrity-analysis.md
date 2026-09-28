@@ -46,3 +46,5 @@ this epic builds.
 | FND-001 | fixed | 50350b6 — FR-007-AC-9/10/11/15 are moved into the AC table (FR-007:201-204). Measured: all four are now in `minted_targets` and `obligations` of `quire coverage --json`, and the four dangling warnings are gone (73 warnings, down from 77) |
 | FND-002 | fixed | 50350b6 — FR-010-AC-3 (FR-010:105) now lists the constraint target, the obligation source, the widened `traces-to`/`inspection-obligation` targets and the `lint_rules` entry |
 | FND-003 | fixed | 50350b6 — FR-007 now says "applied to the sixth declared source" (:281) and "a seventh obligation source" (:284) |
+
+Disposition pass 2 (e34aba7): every SR-019 finding was already `fixed` in round 1, so there are no rows to add. I re-checked for regressions: FR-007-AC-9/10/11/15 are still minted, and the FR-010-AC-3 list and the FR-007 source-count wording are unchanged by e34aba7.

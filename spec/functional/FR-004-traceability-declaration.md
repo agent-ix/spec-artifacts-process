@@ -81,8 +81,8 @@ modules can version apart.
   - The rule's `allowed` set **SHALL** be the four IADT classes
     (`Test`/`Inspection`/`Analysis`/`Demonstration`) **union** every method id
     the manifest's `verification_catalog` declares — `unit-testing`,
-    `property-based-testing`, `fuzzing`, `agent-behaviour-eval`, and the rest
-    of the 31 catalog keys — derived from the manifest, not hand-maintained
+    `property-based-testing`, `fuzzing`, `agent-behaviour-eval`, and every
+    other catalog key — derived from the manifest, not hand-maintained
     as a second list. A `Verification` cell is also the `acceptance-criterion`
     obligation's `method_column`, and quire-rs FR-054-AC-11 accepts either a
     class or a catalog method id there; restricting the lint rule to the four
