@@ -178,6 +178,9 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
         entry = current_refs[widened]
         assert "interface-acceptance-criterion" in entry["targets"], widened
         assert "interface_\\d+" in entry["pattern"], widened
+        # PLAT-1079: `constraint` also joined `targets` — asserted here,
+        # before the reset below discards both additions in one step.
+        assert "constraint" in entry["targets"], widened
         entry["pattern"] = baseline_refs[widened]["pattern"]
         entry["targets"] = baseline_refs[widened]["targets"]
     baseline_tags_by_name = {}
@@ -226,6 +229,53 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     ][
         "Traces To"
     ]
+    # PLAT-1079: the fifth addition, removed the same way. A `constraint`
+    # trace target, `constraint` widening `inspection-obligation`'s and
+    # `traces-to`'s `targets`, a `constraint` obligation source, and one new
+    # top-level `lint_rules` entry — pinned to their exact shape here, then
+    # excluded so the wholesale diff below still covers everything else.
+    constraint_target = [
+        t for t in current["traceability"]["trace_targets"] if t["name"] == "constraint"
+    ]
+    assert constraint_target == [
+        {
+            "name": "constraint",
+            "archetype": "FR",
+            "exclude": ["tests/**", "tests_integration/**", "fixtures/**"],
+            "section": "Constraints",
+            "id_column": "ID",
+            "required": False,
+        }
+    ], "unexpected constraint trace_targets entry"
+    current["traceability"]["trace_targets"] = [
+        t for t in current["traceability"]["trace_targets"] if t["name"] != "constraint"
+    ]
+    constraint_obligation = [
+        o for o in current["traceability"]["obligations"] if o["name"] == "constraint"
+    ]
+    assert constraint_obligation == [
+        {
+            "name": "constraint",
+            "target": "constraint",
+            "statement_column": "Constraint",
+            "method_column": "Validation",
+        }
+    ], "unexpected constraint obligations entry"
+    current["traceability"]["obligations"] = [
+        o for o in current["traceability"]["obligations"] if o["name"] != "constraint"
+    ]
+    assert current["lint_rules"] == [
+        {
+            "type": "table_column_values",
+            "id": "acceptance-criterion-verification-method",
+            "archetypes": ["FR", "NFR", "interface"],
+            "section": "Acceptance Criteria",
+            "column": "Verification",
+            "allowed": current["lint_rules"][0]["allowed"],
+            "severity": "warning",
+        }
+    ], "unexpected lint_rules entry"
+    current["lint_rules"] = []
     for key in DECLARATION_CLASSES:
         assert current.get(key) == baseline.get(
             key
@@ -450,11 +500,13 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
       comment/docstring/implements/trace-line forms — all so an
       underscore-object id (`interface_004-AC-1`) works everywhere an
       `FR`/`NFR` acceptance-criterion id already does.
+    - PLAT-1079: a `constraint` trace_targets entry, and `constraint` joining
+      `inspection-obligation`'s and `traces-to`'s `targets` (TC-091 pins both).
     """
     trace_targets = [
         t
         for t in manifest["traceability"]["trace_targets"]
-        if t["name"] != "interface-acceptance-criterion"
+        if t["name"] not in ("interface-acceptance-criterion", "constraint")
     ]
     document_references = copy.deepcopy(manifest["traceability"]["document_references"])
     document_references = [
