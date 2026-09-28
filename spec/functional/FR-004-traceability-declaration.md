@@ -51,17 +51,48 @@ modules can version apart.
   Constraints` section's `ID` column, the same archetype-bound, `exclude`-scoped
   shape as `acceptance-criterion` — a `-CON-` id is minted by the same
   mechanism a criterion id already is, because the section is a table with an
-  `ID` column exactly like `## Acceptance Criteria` (PLAT-1079).
-- The `verification` and `nfr-verification` document references' captured
-  `TC-…` ids **SHALL** resolve against no declared target, so a `Verification`
-  cell in an `FR`/`NFR` Acceptance Criteria table that still names a test-case
-  id is reported `dangling-trace-reference` (quire-rs FR-049) rather than
-  resolved. TC ids are retired ecosystem-wide (epic PLAT-1076): a criterion is
-  now bound to its evidence directly by trace tag, so a `Verification` cell
-  **SHALL** name a method only, and a lingering `TC-…` reference is stale data
-  to be reported, not a resolvable cross-reference to keep honouring. The
-  `interface-verification` reference is unaffected in shape — same pattern,
-  same empty `targets` — for the same reason (PLAT-1079).
+  `ID` column exactly like `## Acceptance Criteria` (PLAT-1079). The `constraint`
+  target **SHALL** declare no `evidence: reference_only`: a constraint is a
+  criterion, and it enters the same evidence-bearing denominator
+  `acceptance-criterion` does. An `Inspection`-verified `-CON-` row is handled
+  by its declared method, not by excluding the row — the computed matrix
+  reports it under `method-without-symbol` the same way an `Inspection`-verified
+  acceptance criterion already is, never as an unbacked test-case claim.
+  `constraint` **SHALL** be added to the `targets` of both `traces-to`
+  (`manifest.yaml:948`) and `inspection-obligation` (`manifest.yaml:896-899`):
+  declaring the target alone mints the id but resolves no existing `-CON-`
+  reference in a `Traces To` cell and discharges no constraint through an
+  `Inspections` record, so both reference declarations widen alongside it.
+- A `Verification` cell in an `FR`, `NFR` or `interface` Acceptance Criteria
+  table **SHALL** name a method only (`Test`, `Inspection`, `Analysis`,
+  `Demonstration`), with no `TC-…`/`IT-…` id. TC ids are retired
+  ecosystem-wide (epic PLAT-1076): a criterion is now bound to its evidence
+  directly by trace tag, so a lingering test-case id in that cell is stale
+  data. This is enforced as a declarative `lint_rules` entry (quire-rs FR-036,
+  `table_column_values`), not a `document_references`/`trace_targets` change —
+  quire-rs rejects a `document_references` entry that declares an empty
+  `targets` at module load (`traceability.rs:1014`; confirmed against the
+  pinned engine, so an earlier draft of this requirement that emptied
+  `verification`/`nfr-verification`'s `targets` would have failed module load
+  for every consumer). The existing `verification`, `nfr-verification` and
+  `interface-verification` document references are **unchanged** by this
+  requirement — they stay `targets: [test-case]` and keep resolving a `TC-…`
+  id exactly as before, and are retired later, with the Test Matrix itself,
+  not by this ticket.
+  - The lint rule **SHALL** declare `severity: warning`. This SHALL is
+    already violated by roughly 156 existing `Test (TC-…)`/`Inspection
+    (TC-…)` cells across this repository's own FR/NFR Acceptance Criteria
+    tables (measured, SR-018 FND-003) — an error-severity rule would fail
+    every one of them the moment it shipped. Clearing that population is the
+    epic's own sweep ticket; promoting the rule from `warning` to `error`
+    once the sweep clears is that ticket's job, not this one's.
+  - This requirement's own new rows — FR-004-AC-20, FR-004-AC-21 and
+    [FR-007-AC-15](./FR-007-verification-method-catalog.md) — **SHALL** name a
+    bare method in their own `Verification` cell (no `TC-148`/`TC-149`/`TC-150`
+    in the cell), so the criteria that mint this rule do not themselves
+    violate it. `spec/tests.md` still traces each to its TC row through the
+    Functional Requirement Coverage table, which is a different column and
+    is not affected.
 - **Every** target and reference **SHALL** be bound by `archetype`, the Test
   Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
   deleted that form (CR-062) and rejects the key outright.
@@ -119,8 +150,8 @@ modules can version apart.
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
 | FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so an `interface` document with no Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
-| FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set as `acceptance-criterion`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test (TC-148) |
-| FR-004-AC-21 | The `verification` and `nfr-verification` document references declare `targets: []`, so a captured `TC-…` id in an `FR`/`NFR` Acceptance Criteria `Verification` cell resolves to no target and `quire validate --okf` reports it `dangling-trace-reference`; a cell naming a bare method (`Test`, `Inspection`, …) with no `TC-…` id raises nothing. | Test (TC-149) |
+| FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set and evidence posture (`source`, not `reference_only`) as `acceptance-criterion`. `constraint` is added to the `targets` of `traces-to` and `inspection-obligation`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows among `minted_targets`, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test |
+| FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of `Test`/`Inspection`/`Analysis`/`Demonstration`, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare method raises nothing; `quire validate --okf` exit code is unaffected either way (lint is advisory, never a validation gate). The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
@@ -148,6 +179,24 @@ modules can version apart.
 > only structured section illustrative, not verification criteria, so there
 > is nothing normative to mint — a design fact recorded in Known Limits, not
 > a gap awaiting an upstream change.
+
+> **CR-065 note (fix round, PLAT-1079, 2026-09-27):** SR-018 and SR-019
+> reviewed 96080f2 and found AC-21 as originally drafted unshippable — a
+> `document_references` entry with `targets: []` fails module load
+> (`traceability.rs:1014`, confirmed against the pinned engine) rather than
+> reporting a dangling reference (SR-018 FND-001). The mechanism above
+> replaces it: a `lint_rules` `table_column_values` entry, advisory by
+> construction, which is also how the severity SR-018 FND-002 asked for is
+> stated directly rather than inherited from `dangling-trace-reference`'s
+> fixed warning tier. FND-003's 156-violation count is why the rule ships at
+> `warning`, not `error` (see Behavior above); FND-004 is why `constraint`
+> is now named explicitly in `traces-to`/`inspection-obligation`'s `targets`,
+> not left implied; FND-005's contradiction over `interface-verification` is
+> resolved by leaving all three verification references untouched and scoping
+> the new lint rule to `FR`/`NFR`/`interface` uniformly, rather than
+> special-casing one of the three. FND-006 (LOW) is answered in AC-20's own
+> wording: `constraint` is evidence-bearing (`source`), not
+> `reference_only`.
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
@@ -476,9 +525,10 @@ modules can version apart.
 
 - **Upstream**: [FR-001](./FR-001-module-manifest-activates.md),
   [FR-003](./FR-003-testmatrix-body-extraction.md), quire-rs
-  [FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) (coverage rollup) and
+  [FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) (coverage rollup),
   [FR-051](ix://agent-ix/quire-rs/spec/functional/FR-051) (source symbol
-  extraction + trace tags)
+  extraction + trace tags) and quire-rs FR-036 (declarative `lint_rules`,
+  `table_column_values`) for AC-21
 - **Downstream**: the quoin `gap-analysis` wiring, which reads the rollup rather
   than grepping for tags
 

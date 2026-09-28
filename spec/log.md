@@ -7,6 +7,34 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-09-27** — **PLAT-1079 fix round** (SR-018, SR-019, `reviews/`):
+  AC-21's `targets: []` mechanism is dropped entirely — quire-rs rejects an
+  empty `document_references.targets` at module load (`traceability.rs:1014`,
+  SR-018 FND-001) — and replaced with a `lint_rules` `table_column_values`
+  entry (quire-rs FR-036), `severity: warning`, scoped to `FR`/`NFR`/`interface`,
+  checking the `Verification` column for a bare method with no `TC-…`/`IT-…`
+  id. The `verification`/`nfr-verification`/`interface-verification` document
+  references are untouched (FND-005's contradiction resolves by leaving all
+  three alone). `warning`, not `error`, because ~156 existing cells already
+  violate the rule (FND-003); promotion to `error` after the epic's own sweep
+  clears them is that ticket's job. AC-20 now states `constraint` joins
+  `traces-to`'s and `inspection-obligation`'s `targets` (FND-004) and that the
+  target is evidence-bearing, `source` not `reference_only` (FND-006). AC-20,
+  AC-21 and FR-007-AC-15's own `Verification` cells now name a bare method,
+  not their own TC id, so the new rule they mint does not itself violate the
+  rule it states. FR-007-AC-9/10/11 and the new AC-15 move into the real
+  `## Acceptance Criteria` table — all four previously sat in a second,
+  headerless row block below the CR-029 blockquote, invisible to
+  `declared_tables` and to `quire coverage --json` (SR-019 FND-001); AC-9/10/11
+  were broken before this PR, not introduced by it, but were fixed alongside
+  the new row rather than left broken next to it. FR-010-AC-3 / TC-091's
+  allowed-change list now names the new target, the new obligation source, the
+  two widened reference `targets` and the new `lint_rules` entry (SR-019
+  FND-002). "sixth"/"fourth" source-count wording in FR-007 made consistent
+  (SR-019 FND-003, LOW). `reviews/2026-09-27-plat-1079-spec-review.md`
+  (SR-018) and `reviews/2026-09-27-plat-1079-spec-review-spec-integrity-analysis.md`
+  (SR-019) added verbatim.
+
 * **2026-09-27** — **PLAT-1079** (spec only, epic PLAT-1076): mint every
   criterion kind the module can mint today. FR-004 gains a `constraint` trace
   target (`FR-004-AC-20`, mirrors `acceptance-criterion` over the `##
