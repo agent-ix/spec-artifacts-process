@@ -65,9 +65,14 @@ already read.
 ### The obligation sources ship here too
 
 quire-rs FR-053 derives obligations from rows a **module** declares. Without a
-declaration the machinery is inert: it ships, runs, and derives nothing. Three
-sources are declared — the FR and NFR acceptance-criterion targets, and the NFR
-`Measurement and Evaluation` table, whose rows carry no id of their own.
+declaration the machinery is inert: it ships, runs, and derives nothing.
+Sources declared today: the `FR`, `NFR` and `interface` acceptance-criterion
+targets, the NFR `Measurement and Evaluation` table (whose rows carry no id of
+their own), and the `FR` `## Configuration Dimensions` table (one obligation
+per table, not per row). PLAT-1079 adds a sixth — the `FR` `## Constraints`
+table, whose rows are a trace target ([FR-004](./FR-004-traceability-declaration.md)
+AC-20) but, until now, stated no obligation: a `-CON-` row never entered the
+obligation set, so the evidence store had nothing to discharge it against.
 
 > **Found end-to-end, not by inspection.** `quoin evidence record` against a
 > real repository bound **nothing** and reported every trace id as unmatched,
@@ -250,8 +255,28 @@ the third instance of the engine-before-module ordering gap in that program.
 | FR-007-AC-9 | The catalog carries a method for verifying a property at **compile time** (a violation does not build) and one for **dynamic analysis under an instrumented runtime** (sanitizers). Neither is expressible as static analysis, executable contracts or fuzzing, and the first corpus sweep found both in use with no catalog word for them. | Test (TC-056) |
 | FR-007-AC-10 | No catalog entry names a **tool**, a **class synonym** or a **cadence** as a method: a tool belongs in the entry's `tooling`, a class is already the `class` axis, and when a check runs belongs to the suite registry's schedule. | Test (TC-057) |
 | FR-007-AC-11 | The presence of a declared object type is an applicability signal: `attack_surface`/`threat` advise the security methods and `hazard`/`failure_mode` advise `fault-injection`. Every object type any entry advises on is one a `spec-objects-*` module actually declares — a typo is a rule that silently never fires. | Test (TC-065) |
+| FR-007-AC-15 | A `constraint` obligation source is declared: `target: constraint` (the [FR-004](./FR-004-traceability-declaration.md) AC-20 trace target), `statement_column: Constraint`, `method_column: Validation` — the exact `ID \| Constraint \| Type \| Validation` shape this repository's own `## Constraints` tables already carry. `quoin evidence record` (or `quire coverage --json`'s obligation listing) over this repository lists `FR-NNN-CON-N` obligations where none existed before. | Test (TC-150) |
+
+> **CR-006 note (PLAT-1079, 2026-09-27):** a `-CON-` row is a normative
+> constraint, not documentation, and it was silently excluded from the
+> obligation set FR-053 derives — the same "declared but not wired" gap
+> AC-8's `[RAN]` finding already measured for acceptance criteria, found again
+> for constraints because nobody had asked the question of this table
+> specifically. `statement_column`/`method_column` name the same two columns
+> `acceptance-criterion` already reads under different headers (`Criteria`/
+> `Verification` there, `Constraint`/`Validation` here) — no new mechanism,
+> a fourth row shape for one FR-053 already defines. Matrix: TC-150.
+>
+> **User-story acceptance criteria are not added as a fourth obligation
+> source here.** [FR-004](./FR-004-traceability-declaration.md)'s Known
+> Limits records why: `US` carries no normative acceptance-criteria table
+> today, only illustrative examples its own archetype disclaims as
+> non-verification, so there is no `target` to declare an obligation against
+> and no `statement_column`/`method_column` pair to read. Blocked on the same
+> `spec-artifacts-iso` dependency FR-004 names.
 
 ## Dependencies
 
-- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary)
+- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary), [FR-004](./FR-004-traceability-declaration.md) (the `constraint` trace target AC-15's obligation source targets)
+- **Blocked on (PLAT-1079, not yet filed as of this spec)**: the same `spec-artifacts-iso` US acceptance-criteria table FR-004 depends on, before a `user-story-acceptance-criterion` obligation source can be declared.
 - **Downstream**: agent-ix/quoin#89 (the test-plan advisor reads the merged catalog and matches its applicability rules), agent-ix/quoin#80 (method conformance is checked against it), agent-ix/quoin#91 (evidence adapters map tool output onto these kinds)

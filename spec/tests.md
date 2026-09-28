@@ -60,6 +60,8 @@ type: TestMatrix
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
 | FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
 | FR-004 | FR-004-AC-19 | TC-147 | ✅ Complete |
+| FR-004 | FR-004-AC-20 | TC-148 | 🚧 Planned |
+| FR-004 | FR-004-AC-21 | TC-149 | 🚧 Planned |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -85,6 +87,7 @@ type: TestMatrix
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
+| FR-007 | FR-007-AC-15 | TC-150 | 🚧 Planned |
 | FR-008 | FR-008-AC-1 | TC-060 | ✅ Complete |
 | FR-008 | FR-008-AC-2 | TC-061 | ✅ Complete |
 | FR-008 | FR-008-AC-3 | TC-061 | ✅ Complete |
@@ -306,6 +309,9 @@ claim (SR-008 FND-004).
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
 | TC-147 | `interface-acceptance-criterion` declares `required: false`, so an `interface` document with no Acceptance Criteria section raises no `section-matches-nothing`, while a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the `legacy`/`implements` comment and `Implements:` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
+| TC-148 | A `constraint` trace target is declared (archetype `FR`, section `Constraints`, `id_column: ID`, same `exclude` as `acceptance-criterion`); `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows and `quire validate --okf` reports zero `dangling-trace-reference` warnings naming a `-CON-` id, down from the measured baseline of 13 (PLAT-1079) | Integration | P0 | FR-004-AC-20 | 🚧 |
+| TC-149 | `verification` and `nfr-verification` declare `targets: []`; a fixture `FR`/`NFR` document with a `Verification` cell reading `Test (TC-999)` reports `dangling-trace-reference` naming `TC-999` under `quire validate --okf`, while a cell reading a bare method raises nothing | Unit | P0 | FR-004-AC-21 | 🚧 |
+| TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | 🚧 |
 
 ## Option Permutation Matrix
 
@@ -379,3 +385,5 @@ mixed combination in one conforming document.
 | GAP-004 | FR-010-AC-9 cannot pass: quire 0.46.0 refuses an unknown `semantic` key and a mismatched digest silently, and does not verify a reference-form `data_schema.digest` at all | Medium | `agent-ix/quire-rs#221`, `#394`, `#400`; TC-135 is a strict expected failure and TC-094 pins the measured inertness with the line to delete when it changes |
 | GAP-006 | FR-001 has no executing verification. FR-001-AC-1 is retired with its vendored-copy gate (PLAT-902), and AC-2..AC-4 are IT-001, which has no implementing test — so a manifest edit that breaks FR-035 conformance without breaking `Registry.load_from` ships with every gate green | Medium | Only `filament-core-service` can settle FR-035 conformance, at activation; `quire.validate_manifest` takes a caller-supplied schema path and so cannot verify it without re-creating a copy. Recorded rather than closed |
 | GAP-005 | The `acceptance-criterion` trace channel is 1/125 backed. This repository tags TC ids, not AC ids, and criteria are reached through the matrix row; the convention predates #78 (0/65 on `origin/main`) and is not changed by it | Low | Recorded rather than closed: changing the tagging convention is an ecosystem decision, not a side effect of this ticket |
+| GAP-007 | PLAT-1079: `-M-` ids (`nfr-metric` obligation source) cannot become a trace target — `TraceTarget` has no `id_format`/synthetic-id mechanism, only `id_column` over a real table column, and the `## Measurement and Evaluation` table has none (verified against pinned quire-rs v0.47.1's `traceability.rs`) | Medium | External quire-rs capability request: extend `TraceTarget` with an `id_format` mode mirroring `ObligationSource`. No entry can be declared here until it ships |
+| GAP-008 | PLAT-1079: `US` acceptance criteria cannot become a trace target or obligation source — the `US` archetype (`spec-artifacts-iso`) carries only `## Acceptance Examples (Illustrative)`, prose headings its own template and this repo's own `US-001`/`US-002` document as "not test cases and not verification criteria," not a normative table | Medium | Cross-repo dependency: `spec-artifacts-iso` needs a normative `## Acceptance Criteria` table on `US`, distinct from the illustrative examples, before this module can mirror the `interface-acceptance-criterion` pattern for it |

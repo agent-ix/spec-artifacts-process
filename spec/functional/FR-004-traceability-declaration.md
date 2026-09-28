@@ -47,6 +47,21 @@ modules can version apart.
   guarantee the minting section on every document **SHALL** declare
   `required: false`, so an ordinary document of that archetype without the
   section is healthy rather than a false `section-matches-nothing`.
+- `trace_targets` **SHALL** mint a `constraint` target from the `FR` `##
+  Constraints` section's `ID` column, the same archetype-bound, `exclude`-scoped
+  shape as `acceptance-criterion` — a `-CON-` id is minted by the same
+  mechanism a criterion id already is, because the section is a table with an
+  `ID` column exactly like `## Acceptance Criteria` (PLAT-1079).
+- The `verification` and `nfr-verification` document references' captured
+  `TC-…` ids **SHALL** resolve against no declared target, so a `Verification`
+  cell in an `FR`/`NFR` Acceptance Criteria table that still names a test-case
+  id is reported `dangling-trace-reference` (quire-rs FR-049) rather than
+  resolved. TC ids are retired ecosystem-wide (epic PLAT-1076): a criterion is
+  now bound to its evidence directly by trace tag, so a `Verification` cell
+  **SHALL** name a method only, and a lingering `TC-…` reference is stale data
+  to be reported, not a resolvable cross-reference to keep honouring. The
+  `interface-verification` reference is unaffected in shape — same pattern,
+  same empty `targets` — for the same reason (PLAT-1079).
 - **Every** target and reference **SHALL** be bound by `archetype`, the Test
   Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
   deleted that form (CR-062) and rejects the key outright.
@@ -104,6 +119,33 @@ modules can version apart.
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
 | FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so an `interface` document with no Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
+| FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set as `acceptance-criterion`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test (TC-148) |
+| FR-004-AC-21 | The `verification` and `nfr-verification` document references declare `targets: []`, so a captured `TC-…` id in an `FR`/`NFR` Acceptance Criteria `Verification` cell resolves to no target and `quire validate --okf` reports it `dangling-trace-reference`; a cell naming a bare method (`Test`, `Inspection`, …) with no `TC-…` id raises nothing. | Test (TC-149) |
+
+> **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
+> before authoring the above, not assumed from the ticket that asked for it.
+>
+> **The ticket's own premise was wrong in one place, and re-measuring is why
+> that matters.** PLAT-1079 states constraints "are a trace target but not an
+> obligation source." `manifest.yaml`'s `trace_targets` list carries no
+> `constraint`/`-CON-` entry at all — `[RAN]` `grep -ni constraint
+> spec_artifacts_process/manifest.yaml` found none, and `quire validate --okf
+> --scope .` measured **13** `dangling-trace-reference` warnings naming a
+> `-CON-` id in this repository's own `spec/tests.md`, out of 76 warnings
+> total. Constraints were neither a trace target nor an obligation source;
+> AC-20 here mints the target and FR-007-AC-15 declares the obligation source
+> against it, and both are needed — an obligation source with no matching
+> target has no id namespace to mint into (the same "declare both or load
+> fails" shape `ObligationSource::target` already requires).
+>
+> **The other two asks are genuine, and neither is a manifest-only fix.**
+> `-M-` ids have no table `ID` column for `TraceTarget` to bind, and `US`
+> acceptance criteria are prose headings inside a section the archetype's own
+> template calls illustrative, not verification criteria. Both are recorded
+> in Known Limits above with the exact upstream dependency each needs — a
+> quire-rs `TraceTarget` capability for the first, a `spec-artifacts-iso`
+> archetype change for the second — rather than declared here against a
+> table or a column that does not exist.
 
 > **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
@@ -435,6 +477,14 @@ modules can version apart.
   [FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) (coverage rollup) and
   [FR-051](ix://agent-ix/quire-rs/spec/functional/FR-051) (source symbol
   extraction + trace tags)
+- **Blocked on (PLAT-1079, not yet filed as of this spec)**: a quire-rs
+  `TraceTarget` capability minting a synthetic row id from `archetype` +
+  `section` + `id_format` with no `id_column` (mirrors `ObligationSource`),
+  required before an `nfr-metric` trace target can be declared; and a
+  `spec-artifacts-iso` change adding a normative `## Acceptance Criteria` table
+  to `US`, distinct from the illustrative `## Acceptance Examples`, required
+  before a `user-story-acceptance-criterion` trace target can be declared. See
+  Known Limits.
 - **Downstream**: the quoin `gap-analysis` wiring, which reads the rollup rather
   than grepping for tags
 
@@ -445,6 +495,55 @@ Recorded rather than papered over:
 - `US` acceptance criteria are authored as a bullet list and `declared_tables`
   reads tables only; `StR` criteria are validated by review, not by a test.
   Neither is minted — a denominator nothing can satisfy is noise, not rigour.
+  **Measured against PLAT-1079** (2026-09-27): this is still true and is a
+  cross-repo blocker, not a decision this module can reverse alone —
+  - The `US` archetype (`spec-artifacts-iso`, `spec_artifacts_iso/manifest.yaml`)
+    declares `acceptance_examples` as `section_body` under `## Acceptance
+    Examples (Illustrative)`: unstructured prose carrying `### [US-NNN-EX-N]
+    …` H3 headings, not a table, and `TraceTarget` mints only from a
+    `section`+`id_column` table row (quire-rs `traceability.rs::TraceTarget`,
+    no `id_format` field). Both the archetype's own comment and this
+    repository's own `US-001`/`US-002` (`spec/usecase/`) state the examples
+    are **"illustrative only — not test cases and not verification
+    criteria."** Minting them as an obligation would assert a verification
+    demand the archetype's own authoring contract explicitly disclaims.
+  - Landing a `user-story-acceptance-criterion` trace target and obligation
+    source therefore needs a `spec-artifacts-iso` change first: a genuinely
+    normative `## Acceptance Criteria` table on `US`, shaped like the
+    `FR`/`NFR`/`interface` one (`ID | Criteria | Verification`), distinct from
+    the illustrative examples section — a decision for that module's owner,
+    not this one. This module's half, once that table exists, is a
+    `user-story-acceptance-criterion` target and obligation source that
+    mirror `interface-acceptance-criterion` exactly (`required: false`, same
+    three-glob `exclude`, added to every `targets` list
+    `interface-acceptance-criterion` is already in).
+  - `[RAN]` `quire validate --okf --scope .` against this repository's own
+    bundle before this change: **5** `dangling-trace-reference` warnings
+    naming `US-001`/`US-002` (the `traces-to` reference resolving `Traces To`
+    cells that already name a `User Story`), of 76 warnings total — the
+    concrete cost of the gap in the one repository that must stay green.
+- NFR metric rows (the `## Measurement and Evaluation` table `nfr-metric`
+  obligation source mints, `{document}-M-{row}`) are an obligation source but
+  **not** a trace target, for a different reason than `US`/`StR`: the table
+  has no `ID` column at all (`Metric | Target | Threshold | Method`), so there
+  is no column for `id_column` to name. `ObligationSource` covers this case
+  with `archetype`+`section`+`id_format`, synthesising a row id with no
+  column; `TraceTarget` has no equivalent field (quire-rs `traceability.rs`,
+  checked against the pinned `quire-rs` v0.47.1 — confirmed absent, not just
+  unreleased). A test tagging `NFR-012-M-1` is accepted as a legal trace-tag
+  id shape (the marker/legacy patterns admit any `KIND-NNN(-KIND-NN)?` id) but
+  reconciles against nothing, so it is never counted backed or unbacked
+  (PLAT-1079).
+  - This module cannot declare a `nfr-metric` trace target until quire-rs
+    extends `TraceTarget` with the same synthetic-id mechanism
+    `ObligationSource` already has — an `id_format` field usable with
+    `archetype`+`section` in place of `id_column`. That is an engine change,
+    not a manifest declaration; filing it is the paired quire-rs ticket this
+    requirement depends on, not a `spec-artifacts-process` change.
+  - Once the capability ships, the declaration is a two-line mirror of the
+    `nfr-metric` obligation source already in `manifest.yaml`: same
+    `archetype: NFR`, same `section: Measurement and Evaluation`, same
+    `id_format: "{document}-M-{row}"`, `exclude` matching every other target.
 - The two CR-017 authoring shorthands the shape contract admits — continuation
   (`FR-001-AC-2, -AC-3`) and slash enumeration (`FR-016-AC-1/2/3`) — are not
   expanded by the engine, so such a cell contributes its first token only.
