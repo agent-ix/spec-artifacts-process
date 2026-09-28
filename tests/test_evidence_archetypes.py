@@ -161,6 +161,8 @@ def test_tc043_suite_and_inspection_are_trace_targets() -> None:
         "acceptance-criterion",
         "nfr-acceptance-criterion",
         "interface-acceptance-criterion",
+        # PLAT-1079: an inspection can now discharge a constraint too.
+        "constraint",
     }
 
 

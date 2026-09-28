@@ -239,6 +239,9 @@ def test_tc055_obligation_sources_are_declared() -> None:
         "interface-acceptance-criterion",
         "nfr-metric",
         "configuration-matrix",
+        # PLAT-1079: the sixth source, over the `FR` `## Constraints` table —
+        # TC-150 asserts its own shape and the end-to-end obligation listing.
+        "constraint",
     }
 
     # `configuration-matrix` is the only source whose arity is not one-per-row
@@ -278,6 +281,56 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert metric["id_format"] == "{document}-M-{row}"
     assert "target" not in metric
     assert metric["parameters"] == {"target": "Target", "threshold": "Threshold"}
+
+    # PLAT-1079: `constraint` reads the same two columns `acceptance-criterion`
+    # reads under different headers (`Criteria`/`Verification` there,
+    # `Constraint`/`Validation` here) — the exact `ID | Constraint | Type |
+    # Validation` shape this repository's own `## Constraints` tables carry.
+    constraint = sources["constraint"]
+    assert constraint["target"] == "constraint"
+    assert "archetype" not in constraint, "target and archetype are mutually exclusive"
+    assert constraint["statement_column"] == "Constraint"
+    assert constraint["method_column"] == "Validation"
+
+
+def test_tc150_constraint_obligations_are_derived() -> None:
+    """TC-150 (FR-007-AC-15): the end-to-end measurement. Before PLAT-1079 a
+    `-CON-` row was a normative constraint excluded from the obligation set
+    FR-053 derives, so no evidence act could ever discharge it. `quire
+    coverage --json`'s obligation listing now carries an `FR-NNN-CON-N`
+    obligation for every `## Constraints` row."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for the rollup")
+
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--module",
+            str(pack.PACK_ROOT),
+            "--scope",
+            str(pack.PACK_ROOT.parent),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    constraint_targets = {
+        row["id"] for row in report["minted_targets"] if row["target"] == "constraint"
+    }
+    constraint_obligations = {
+        o["id"] for o in report["obligations"] if o["source"] == "constraint"
+    }
+    assert constraint_targets, "no `-CON-` row minted — has the target regressed?"
+    # SR-020 FND-004: every minted `-CON-` row gets an obligation, not merely
+    # "at least one" — the obligation ids equal the minted target ids exactly,
+    # so a row silently dropped from the obligation set would be caught.
+    assert constraint_obligations == constraint_targets
+    for constraint_id in constraint_obligations:
+        assert constraint_id.count("-CON-") == 1, constraint_id
 
 
 # TC-056 (FR-007-AC-9): the two methods the corpus needed and the catalog

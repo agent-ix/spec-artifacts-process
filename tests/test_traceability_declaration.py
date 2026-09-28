@@ -79,6 +79,90 @@ def test_interface_archetype_string_is_exact(traceability: dict) -> None:
     assert refs["interface-verification"]["archetype"] == "interface"
 
 
+def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> None:
+    """TC-148 (FR-004-AC-20): a `-CON-` id is minted by the same section +
+    `id_column` mechanism `acceptance-criterion` already mints from — `##
+    Constraints` is a table with an `ID` column exactly like `## Acceptance
+    Criteria` is.
+
+    `required: false`: spec-artifacts-iso's own FR skeleton lists
+    `Constraints` among its OPTIONAL level-2 sections ("Omit the section
+    rather than inventing filler constraints"), unlike `Acceptance Criteria`,
+    which is required on every FR — the same condition that already makes
+    `interface-acceptance-criterion` declare `required: false`. Measured in
+    this repository: 6 of 14 FR documents carry no `## Constraints` section.
+    """
+    targets = {t["name"]: t for t in traceability["trace_targets"]}
+    acceptance = targets["acceptance-criterion"]
+    constraint = targets["constraint"]
+
+    assert constraint["archetype"] == "FR"
+    assert constraint["section"] == "Constraints"
+    assert constraint["id_column"] == "ID"
+    assert constraint["exclude"] == acceptance["exclude"]
+    # No `evidence: reference_only` — a constraint enters the same
+    # evidence-bearing denominator `acceptance-criterion` does. Omitted is the
+    # default `source` posture, so neither declares the key at all.
+    assert "evidence" not in constraint
+    assert "evidence" not in acceptance
+    assert constraint["required"] is False
+
+
+def test_constraint_is_a_traces_to_and_inspection_target(traceability: dict) -> None:
+    """TC-148 (FR-004-AC-20): declaring the target alone mints the id but
+    resolves no existing `-CON-` reference in a `Traces To` cell and
+    discharges no constraint through an `Inspections` record, so both
+    reference declarations widen alongside it."""
+    refs = {r["name"]: r for r in traceability["document_references"]}
+    assert "constraint" in refs["traces-to"]["targets"]
+    assert "constraint" in refs["inspection-obligation"]["targets"]
+
+
+def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
+    """TC-148 (FR-004-AC-20): the end-to-end measurement. `quire coverage
+    --json` mints `FR-NNN-CON-N` rows among `minted_targets`, and `quire
+    validate --okf` reports zero `dangling-trace-reference` warnings naming a
+    `-CON-` id — down from the measured baseline of 13 (PLAT-1079 CR-064)."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for the rollup")
+
+    coverage = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--module",
+            str(pack.PACK_ROOT),
+            "--scope",
+            str(REPO_ROOT),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert coverage.returncode == 0, coverage.stderr
+    report = json.loads(coverage.stdout)
+    minted_constraints = [
+        row for row in report["minted_targets"] if row["target"] == "constraint"
+    ]
+    assert minted_constraints, "no `-CON-` row minted — has the target regressed?"
+    assert all(re.match(r"^FR-\d+-CON-\d+$", row["id"]) for row in minted_constraints)
+
+    validation = subprocess.run(
+        ["quire", "validate", "--okf", "--scope", str(REPO_ROOT)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    output = validation.stdout + validation.stderr
+    con_dangling = [
+        line
+        for line in output.splitlines()
+        if "dangling-trace-reference" in line and "CON-" in line
+    ]
+    assert not con_dangling, con_dangling
+
+
 def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
     traceability: dict,
 ) -> None:
@@ -644,6 +728,93 @@ def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> N
             "retry_3: backoff",
         ):
             assert not re.search(pattern, opener + rejected), f"{name}: {rejected!r}"
+
+
+def _verification_lint_rule() -> dict:
+    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    rules = [r for r in manifest["lint_rules"] if r.get("column") == "Verification"]
+    assert len(rules) == 1, rules
+    return rules[0]
+
+
+def test_verification_lint_rule_is_scoped_and_advisory() -> None:
+    """TC-149 (FR-004-AC-21): a `table_column_values` rule scoped to
+    `FR`/`NFR`/`interface` requires the Acceptance Criteria `Verification`
+    column to hold a class or catalog method id, with no trailing `TC-…`/
+    `IT-…` id, at `severity: warning`."""
+    rule = _verification_lint_rule()
+    assert rule["type"] == "table_column_values"
+    assert set(rule["archetypes"]) == {"FR", "NFR", "interface"}
+    assert rule["section"] == "Acceptance Criteria"
+    assert rule["severity"] == "warning"
+    # No `annotation_pattern`: admitting one would re-admit the very
+    # `TC-…`/`IT-…` suffix this rule exists to reject.
+    assert not rule.get("annotation_pattern")
+
+
+def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
+    """TC-149 (FR-004-AC-21): the behavioural half — `quire lint` against a
+    fixture document. A `Verification` cell reading `Test (TC-999)` reports a
+    `acceptance-criterion-verification-method` finding at `warning` severity
+    naming the id; a cell naming a bare class or a bare catalog method id
+    raises nothing.
+
+    The fixture is written under `tmp_path`, never the repo's own
+    `tests/fixtures/` (SR-020 FND-003) — the exclude globs on every trace
+    target and document reference cover `fixtures/**` precisely so a
+    throwaway document never mints or resolves a real id, and a fixture
+    that outlives the test would do exactly that. There is no `quire
+    validate --okf` assertion here: `validate` never evaluates `lint_rules`
+    (0 rule diagnostics appear in its output), so an exit-code check on it
+    would still pass at any severity and asserts nothing about this rule.
+    """
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for lint")
+
+    fixture = tmp_path / "lint-verification-column.md"
+    fixture.write_text(
+        "---\nid: FR-999\ntype: FR\ntitle: Fixture\n---\n\n"
+        "## Acceptance Criteria\n\n"
+        "| ID | Criteria | Verification |\n|----|----------|--------------|\n"
+        "| FR-999-AC-1 | bare class | Test |\n"
+        "| FR-999-AC-2 | catalog method | property-based-testing |\n"
+        "| FR-999-AC-3 | stale TC id | Test (TC-999) |\n"
+        "| FR-999-AC-4 | stale IT id | Inspection (IT-3) |\n"
+    )
+    result = subprocess.run(
+        ["quire", "lint", "--module", str(pack.PACK_ROOT), str(fixture)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    findings = result.stdout + result.stderr
+    assert "row 1" not in findings and "row 2" not in findings, findings
+    for row, needle in ((3, "TC-999"), (4, "IT-3")):
+        line = (
+            "warning: acceptance-criterion-verification-method: section "
+            f"'Acceptance Criteria' column 'Verification' row {row}:"
+        )
+        assert line in findings, findings
+        assert needle in findings, findings
+
+
+def test_verification_lint_rule_allowed_set_is_classes_union_catalog(
+    manifest: dict,
+) -> None:
+    """TC-151 (FR-004-AC-22): the `allowed` set equals the four IADT classes
+    union every `verification_catalog` key, exactly — derived-by-assertion
+    rather than hand-maintained, so an entry added to the catalog and this
+    rule's `allowed` list cannot silently drift apart. `Eval`/`Manual` are
+    `traceability.vocabularies.test_type` values, not catalog keys, and stay
+    absent."""
+    rule = _verification_lint_rule()
+    classes = {"Test", "Inspection", "Analysis", "Demonstration"}
+    catalog_keys = set(manifest["verification_catalog"])
+
+    assert set(rule["allowed"]) == classes | catalog_keys
+    assert len(rule["allowed"]) == len(set(rule["allowed"])), "no duplicate entry"
+    assert "Eval" not in rule["allowed"]
+    assert "Manual" not in rule["allowed"]
 
 
 def _testmatrix_extraction() -> dict:

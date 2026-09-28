@@ -669,7 +669,91 @@ object_types:
           required: false
   allowed_links:
     references: []
-lint_rules: []
+
+# ── Declarative lint rules (quire-rs FR-036) ───────────────────────────────
+# PLAT-1079: TC ids are retired ecosystem-wide (epic PLAT-1076) — a criterion
+# is bound to its evidence by trace tag now, not by a `TC-…`/`IT-…` id sitting
+# in the `Verification` cell, so a lingering one is stale data. This is a
+# `table_column_values` rule rather than a `document_references` change:
+# quire-rs rejects a `document_references` entry that declares an empty
+# `targets` at module load, so emptying `verification`/`nfr-verification`/
+# `interface-verification`'s `targets` was never an option — those three stay
+# untouched, bound to `test-case` exactly as before, and are retired later,
+# with the Test Matrix itself.
+#
+# `severity: warning`, not `error`: this repository's own FR/NFR Acceptance
+# Criteria tables carry existing violations — `Test (TC-…)`/`Inspection
+# (TC-…)` cells (SR-018 FND-003) — today, and an error-severity rule would
+# fail every one of them the moment it shipped. Any measured count here would
+# drift as the corpus changes; PLAT-1081 sweeps that population and PLAT-1082
+# promotes this rule to `error` once the sweep clears it. Neither is this
+# change.
+#
+# `allowed` is the four ISO 29148 IADT classes union every `verification_catalog`
+# method id below, written out rather than referenced: quire-rs's
+# `table_column_values` `allowed` is a plain `Vec<String>`, with no mechanism to
+# point at another manifest block. FR-004-AC-22 keeps the two from drifting
+# apart by asserting set equality in a test rather than trusting a second
+# hand-maintained list. Restricting `allowed` to the four classes alone would
+# warn on an author who follows FR-007's own CR-005 guidance and writes the
+# precise catalog method (`property-based-testing`) instead of the class
+# (`Test`) — quire-rs FR-054-AC-11 already accepts either in this same cell for
+# the `acceptance-criterion` obligation's `method_column`. `Eval` and `Manual`
+# are deliberately absent: they are `traceability.vocabularies.test_type`
+# values, never catalog method ids, and this column is never populated from
+# that vocabulary.
+#
+# No `annotation_pattern`: admitting one would mean re-admitting the very
+# `TC-…`/`IT-…` suffix this rule exists to reject, so a cell naming an allowed
+# value plus any trailing annotation is not valid here — unlike the retired
+# `spec-artifacts-iso` rule (`ac-verification-method`) this one replaces
+# ecosystem-default coverage for; PLAT-1085 removes that rule from `iso`, and
+# the two changes ship together.
+lint_rules:
+- type: table_column_values
+  id: acceptance-criterion-verification-method
+  archetypes: [FR, NFR, interface]
+  section: Acceptance Criteria
+  column: Verification
+  allowed:
+    - Test
+    - Inspection
+    - Analysis
+    - Demonstration
+    - unit-testing
+    - integration-testing
+    - e2e-testing
+    - property-based-testing
+    - metamorphic-testing
+    - model-based-test-generation
+    - combinatorial-tway
+    - mutation-testing
+    - fuzzing
+    - grammar-based-fuzzing
+    - concolic-execution
+    - bdd-spec-by-example
+    - contract-testing
+    - design-by-contract
+    - runtime-monitoring
+    - deterministic-simulation
+    - fault-injection
+    - performance-benchmarking
+    - golden-approval-testing
+    - negative-abuse-testing
+    - dast
+    - iast
+    - sast
+    - sca-sbom
+    - architecture-conformance
+    - compile-time-check
+    - dynamic-analysis-sanitizer
+    - static-quality
+    - formal-analysis-smt
+    - model-checking
+    - inspection
+    - demonstration
+    - agent-behaviour-eval
+  severity: warning
 
 # ── Traceability model (quire-rs FR-050) ──────────────────────────────────
 # The single source for what this module's matrix columns mean. The TestMatrix
@@ -781,6 +865,27 @@ traceability:
     archetype: interface
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Acceptance Criteria
+    id_column: ID
+    required: false
+  # PLAT-1079: a `-CON-` id is minted by the same section+id_column mechanism
+  # `acceptance-criterion` already mints from — `## Constraints` is a table
+  # with an `ID` column exactly like `## Acceptance Criteria` is. No `evidence:
+  # reference_only`: a constraint is a criterion, so it enters the same
+  # evidence-bearing denominator `acceptance-criterion` does (omitting the key
+  # keeps the default `source` posture, same as `acceptance-criterion` above).
+  #
+  # `required: false`: spec-artifacts-iso's own FR skeleton lists `Constraints`
+  # among the OPTIONAL level-2 sections ("Omit the section rather than
+  # inventing filler constraints"), unlike `Acceptance Criteria`, which is
+  # required on every FR. Measured in this repository: 6 of 14 FR documents
+  # carry no `## Constraints` section. Leaving `required` at its default
+  # (`true`) raised a `section-matches-nothing` finding on every one of them —
+  # the same false-positive `interface-acceptance-criterion` already avoids
+  # for the same reason.
+  - name: constraint
+    archetype: FR
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Constraints
     id_column: ID
     required: false
   # ── Evidence layer (#34) ──
@@ -897,6 +1002,10 @@ traceability:
     - acceptance-criterion
     - nfr-acceptance-criterion
     - interface-acceptance-criterion
+    # PLAT-1079: an inspection can now discharge a constraint, not only a
+    # criterion — `constraint` mints the same shape id (`FR-NNN-CON-N`) this
+    # pattern already matches.
+    - constraint
     expand_ranges: false
     strip_annotations: true
   # Most `Verification` cells carry no test id at all — a sweep over quire-rs,
@@ -945,7 +1054,11 @@ traceability:
     row_id_column: Test ID
     # quire-rs#460: same BASE widening as `inspection-obligation` above.
     pattern: '\b((?:[A-Za-z]{2,4}-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)\b'
-    targets: [acceptance-criterion, nfr-acceptance-criterion, interface-acceptance-criterion]
+    # PLAT-1079: `constraint` joins the other three, so a `-CON-` id authored
+    # in a `Traces To` cell resolves instead of reporting
+    # `dangling-trace-reference` — measured at 13 such warnings in this
+    # repository's own `spec/tests.md` before this addition (CR-064).
+    targets: [acceptance-criterion, nfr-acceptance-criterion, interface-acceptance-criterion, constraint]
     expand_ranges: true
     strip_annotations: true
   - name: functional-coverage
@@ -1214,6 +1327,17 @@ traceability:
     target: interface-acceptance-criterion
     statement_column: Criteria
     method_column: Verification
+  # PLAT-1079: the sixth obligation source. `statement_column`/`method_column`
+  # name the same two columns `acceptance-criterion` already reads under
+  # different headers (`Criteria`/`Verification` there, `Constraint`/
+  # `Validation` here) — the exact `ID | Constraint | Type | Validation` shape
+  # this repository's own `## Constraints` tables already carry, so no new row
+  # shape is introduced, only a sixth declared source for one FR-053 already
+  # defines.
+  - name: constraint
+    target: constraint
+    statement_column: Constraint
+    method_column: Validation
   # The second source, and not an afterthought: an NFR `Measurement and
   # Evaluation` row states one number three times over — the spec threshold, the
   # benchmark assertion and the evidence gate are the same quantity. Its rows

@@ -176,8 +176,16 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     current_refs = by_name(current["traceability"]["document_references"])
     for widened in ("inspection-obligation", "traces-to"):
         entry = current_refs[widened]
-        assert "interface-acceptance-criterion" in entry["targets"], widened
         assert "interface_\\d+" in entry["pattern"], widened
+        # SR-020 FND-001: pin the exact widened list, not membership — a
+        # membership check alone lets a stray target (e.g.
+        # `stakeholder-validation-criterion`) join `targets` unnoticed.
+        # PLAT-1079 appended `constraint` after quire-rs#460's
+        # `interface-acceptance-criterion`.
+        assert entry["targets"] == baseline_refs[widened]["targets"] + [
+            "interface-acceptance-criterion",
+            "constraint",
+        ], widened
         entry["pattern"] = baseline_refs[widened]["pattern"]
         entry["targets"] = baseline_refs[widened]["targets"]
     baseline_tags_by_name = {}
@@ -226,6 +234,60 @@ def test_every_0_1_0_declaration_survives_unchanged(manifest, baseline):
     ][
         "Traces To"
     ]
+    # PLAT-1079: the fifth addition, removed the same way. A `constraint`
+    # trace target, `constraint` widening `inspection-obligation`'s and
+    # `traces-to`'s `targets`, a `constraint` obligation source, and one new
+    # top-level `lint_rules` entry — pinned to their exact shape here, then
+    # excluded so the wholesale diff below still covers everything else.
+    constraint_target = [
+        t for t in current["traceability"]["trace_targets"] if t["name"] == "constraint"
+    ]
+    assert constraint_target == [
+        {
+            "name": "constraint",
+            "archetype": "FR",
+            "exclude": ["tests/**", "tests_integration/**", "fixtures/**"],
+            "section": "Constraints",
+            "id_column": "ID",
+            "required": False,
+        }
+    ], "unexpected constraint trace_targets entry"
+    current["traceability"]["trace_targets"] = [
+        t for t in current["traceability"]["trace_targets"] if t["name"] != "constraint"
+    ]
+    constraint_obligation = [
+        o for o in current["traceability"]["obligations"] if o["name"] == "constraint"
+    ]
+    assert constraint_obligation == [
+        {
+            "name": "constraint",
+            "target": "constraint",
+            "statement_column": "Constraint",
+            "method_column": "Validation",
+        }
+    ], "unexpected constraint obligations entry"
+    current["traceability"]["obligations"] = [
+        o for o in current["traceability"]["obligations"] if o["name"] != "constraint"
+    ]
+    # SR-020 FND-002: `allowed` is pinned against the derived classes ∪
+    # catalog-keys set, the same derivation TC-151 asserts, rather than read
+    # back from itself — a self-referential read would pin nothing about the
+    # allowed values.
+    iadt_classes = {"Test", "Inspection", "Analysis", "Demonstration"}
+    catalog_keys = set(current["verification_catalog"])
+    assert current["lint_rules"] == [
+        {
+            "type": "table_column_values",
+            "id": "acceptance-criterion-verification-method",
+            "archetypes": ["FR", "NFR", "interface"],
+            "section": "Acceptance Criteria",
+            "column": "Verification",
+            "allowed": current["lint_rules"][0]["allowed"],
+            "severity": "warning",
+        }
+    ], "unexpected lint_rules entry"
+    assert set(current["lint_rules"][0]["allowed"]) == iadt_classes | catalog_keys
+    current["lint_rules"] = []
     for key in DECLARATION_CLASSES:
         assert current.get(key) == baseline.get(
             key
@@ -450,11 +512,14 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
       comment/docstring/implements/trace-line forms — all so an
       underscore-object id (`interface_004-AC-1`) works everywhere an
       `FR`/`NFR` acceptance-criterion id already does.
+    - PLAT-1079: a `constraint` trace_targets entry, and `constraint` joining
+      `inspection-obligation`'s and `traces-to`'s `targets` — this test pins
+      the exact widened list for both (SR-020 FND-001), the same as TC-091.
     """
     trace_targets = [
         t
         for t in manifest["traceability"]["trace_targets"]
-        if t["name"] != "interface-acceptance-criterion"
+        if t["name"] not in ("interface-acceptance-criterion", "constraint")
     ]
     document_references = copy.deepcopy(manifest["traceability"]["document_references"])
     document_references = [
@@ -463,6 +528,13 @@ def test_the_trace_targets_are_byte_identical(manifest, baseline):
     baseline_refs = by_name(baseline["traceability"]["document_references"])
     for ref in document_references:
         if ref["name"] in ("inspection-obligation", "traces-to"):
+            # SR-020 FND-001: pin the exact widened list before the reset —
+            # membership alone would let a stray target join `targets`
+            # unnoticed.
+            assert ref["targets"] == baseline_refs[ref["name"]]["targets"] + [
+                "interface-acceptance-criterion",
+                "constraint",
+            ], ref["name"]
             ref["pattern"] = baseline_refs[ref["name"]]["pattern"]
             ref["targets"] = baseline_refs[ref["name"]]["targets"]
     trace_tags = copy.deepcopy(manifest["traceability"]["trace_tags"])

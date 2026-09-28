@@ -60,9 +60,9 @@ type: TestMatrix
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
 | FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
 | FR-004 | FR-004-AC-19 | TC-147 | ✅ Complete |
-| FR-004 | FR-004-AC-20 | TC-148 | 🚧 Planned |
-| FR-004 | FR-004-AC-21 | TC-149 | 🚧 Planned |
-| FR-004 | FR-004-AC-22 | TC-151 | 🚧 Planned |
+| FR-004 | FR-004-AC-20 | TC-148 | ✅ Complete |
+| FR-004 | FR-004-AC-21 | TC-149 | ✅ Complete |
+| FR-004 | FR-004-AC-22 | TC-151 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -88,7 +88,7 @@ type: TestMatrix
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
-| FR-007 | FR-007-AC-15 | TC-150 | 🚧 Planned |
+| FR-007 | FR-007-AC-15 | TC-150 | ✅ Complete |
 | FR-008 | FR-008-AC-1 | TC-060 | ✅ Complete |
 | FR-008 | FR-008-AC-2 | TC-061 | ✅ Complete |
 | FR-008 | FR-008-AC-3 | TC-061 | ✅ Complete |
@@ -257,7 +257,7 @@ claim (SR-008 FND-004).
 | TC-088 | `toolchain.json` records the resolved semantic-core version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes | Unit | P1 | FR-009-AC-9 | ✅ |
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
 | TC-090 | Every declared artifact type carries reference-form `data_schema`, the referenced file exists, and its SHA-256 equals the recorded digest; none carries an inline `data_schema` | Unit | P0 | FR-010-AC-2 | ✅ |
-| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), and CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
+| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference, and PLAT-1079's additions — the `constraint` trace target, `constraint` joining `inspection-obligation`'s and `traces-to`'s `targets` (each pinned to its exact widened list), the `constraint` obligation source, and the new `lint_rules` entry — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
 | TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
 | TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
 | TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, and an altered `data_schema.digest` is refused naming the path (expected failure: quire-rs#221, quire-rs#394 make both refusals silent) | Unit | P0 | FR-010-AC-6 | ✅ |
@@ -310,10 +310,10 @@ claim (SR-008 FND-004).
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
 | TC-147 | `interface-acceptance-criterion` declares `required: false`, so an `interface` document with no Acceptance Criteria section raises no `section-matches-nothing`, while a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the `legacy`/`implements` comment and `Implements:` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
-| TC-148 | A `constraint` trace target is declared (archetype `FR`, section `Constraints`, `id_column: ID`, `evidence: source`, same `exclude` as `acceptance-criterion`), and `constraint` is added to `traces-to`'s and `inspection-obligation`'s `targets`; `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows in `minted_targets`, and `quire validate --okf` reports zero `dangling-trace-reference` warnings naming a `-CON-` id, down from the measured baseline of 13 (PLAT-1079) | Integration | P0 | FR-004-AC-20 | 🚧 |
-| TC-149 | A `lint_rules` `table_column_values` entry scoped to `FR`/`NFR`/`interface` checks the `Acceptance Criteria` `Verification` column against the four IADT classes union the `verification_catalog` method ids, with no trailing `TC-…`/`IT-…` id, `severity: warning`; a fixture document with a `Verification` cell reading `Test (TC-999)` reports a warning-severity `quire lint` finding naming the id, a cell naming a bare class (`Test`) or a bare catalog method (`property-based-testing`) raises nothing, and `quire validate --okf` exit code is unaffected either way | Unit | P0 | FR-004-AC-21 | 🚧 |
-| TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | 🚧 |
-| TC-151 | The lint rule's `allowed` list, loaded from the manifest, equals the four IADT classes union every `verification_catalog` key exactly — a test asserts set equality so the two cannot drift — and `Eval`/`Manual` are confirmed absent (they are `test_type` values, not catalog keys) | Unit | P0 | FR-004-AC-22 | 🚧 |
+| TC-148 | A `constraint` trace target is declared (archetype `FR`, section `Constraints`, `id_column: ID`, `evidence` defaults to `source` — the same posture `acceptance-criterion` relies on, same `exclude`), and `constraint` is added to `traces-to`'s and `inspection-obligation`'s `targets`; `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows in `minted_targets`, and `quire validate --okf` reports zero `dangling-trace-reference` warnings naming a `-CON-` id, down from the measured baseline of 13 (PLAT-1079) | Integration | P0 | FR-004-AC-20 | ✅ |
+| TC-149 | A `lint_rules` `table_column_values` entry scoped to `FR`/`NFR`/`interface` checks the `Acceptance Criteria` `Verification` column against the four IADT classes union the `verification_catalog` method ids, with no trailing `TC-…`/`IT-…` id, `severity: warning`; a fixture document with a `Verification` cell reading `Test (TC-999)` reports a warning-severity `quire lint` finding naming the id, a cell naming a bare class (`Test`) or a bare catalog method (`property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all | Unit | P0 | FR-004-AC-21 | ✅ |
+| TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | ✅ |
+| TC-151 | The lint rule's `allowed` list, loaded from the manifest, equals the four IADT classes union every `verification_catalog` key exactly — a test asserts set equality so the two cannot drift — and `Eval`/`Manual` are confirmed absent (they are `test_type` values, not catalog keys) | Unit | P0 | FR-004-AC-22 | ✅ |
 
 ## Option Permutation Matrix
 
