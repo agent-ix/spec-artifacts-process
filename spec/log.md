@@ -7,6 +7,92 @@ description: "Chronological log of structural changes to this bundle."
 
 ## History
 
+* **2026-09-27** — **PLAT-1079 fix round 3** (SR-018 disposition pass 2,
+  comment 39618dfa): FND-010 (LOW) — FR-004 said "the rest of the 31 catalog
+  keys", but `verification_catalog` declares 33. Dropped the number entirely
+  rather than correcting it: the `allowed` set is derived from the manifest
+  (FR-004-AC-22), so a hard-coded count in the prose can only drift from it
+  again. `reviews/` copies of SR-018 and SR-019 replaced verbatim with the
+  reviewer's round-2 versions.
+
+* **2026-09-27** — **PLAT-1079 fix round 2** (SR-018 disposition pass 1,
+  comment 28db75b3): three new findings on the round-1 fix. FND-007 (MED):
+  the lint rule's `allowed` set was the four IADT classes only, which warns
+  on an author following FR-007's own CR-005 guidance to write a precise
+  catalog method (`property-based-testing`) instead of the class — the same
+  cell is the `acceptance-criterion` obligation's `method_column`, and
+  quire-rs FR-054-AC-11 already accepts either there. `allowed` is now
+  classes ∪ `verification_catalog` keys, derived from the manifest with a new
+  AC/TC (FR-004-AC-22/TC-151) asserting the two cannot drift; `Eval`/`Manual`
+  stay excluded (`test_type` values, not catalog keys). FND-008 (MED):
+  `spec-artifacts-iso` already declares a conflicting `ac-verification-method`
+  lint rule over the same cell, admitting a `TC-\d+` annotation this rule
+  rejects — `lint_rules` merge across every loaded module, so a released
+  default module set would carry both contracts at once. FR-004 now states
+  this module owns the correction (it already owns the catalog and the
+  obligation sources reading the cell) and that **PLAT-1085**
+  (`spec-artifacts-iso`) removes `iso`'s rule and the `TC-…` annotation from
+  its StR sibling rule, shipping together with this module's release. FND-009
+  (LOW): named the two deferred tickets — **PLAT-1081** (sweep clearing the
+  ~156 existing violations) and **PLAT-1082** (warning→error promotion) — in
+  place of "the epic's own sweep ticket." `reviews/` copies of SR-018 and
+  SR-019 replaced verbatim with the reviewer's round-1 (post-disposition)
+  versions.
+
+* **2026-09-27** — **PLAT-1079 fix round** (SR-018, SR-019, `reviews/`):
+  AC-21's `targets: []` mechanism is dropped entirely — quire-rs rejects an
+  empty `document_references.targets` at module load (`traceability.rs:1014`,
+  SR-018 FND-001) — and replaced with a `lint_rules` `table_column_values`
+  entry (quire-rs FR-036), `severity: warning`, scoped to `FR`/`NFR`/`interface`,
+  checking the `Verification` column for a bare method with no `TC-…`/`IT-…`
+  id. The `verification`/`nfr-verification`/`interface-verification` document
+  references are untouched (FND-005's contradiction resolves by leaving all
+  three alone). `warning`, not `error`, because ~156 existing cells already
+  violate the rule (FND-003); promotion to `error` after the epic's own sweep
+  clears them is that ticket's job. AC-20 now states `constraint` joins
+  `traces-to`'s and `inspection-obligation`'s `targets` (FND-004) and that the
+  target is evidence-bearing, `source` not `reference_only` (FND-006). AC-20,
+  AC-21 and FR-007-AC-15's own `Verification` cells now name a bare method,
+  not their own TC id, so the new rule they mint does not itself violate the
+  rule it states. FR-007-AC-9/10/11 and the new AC-15 move into the real
+  `## Acceptance Criteria` table — all four previously sat in a second,
+  headerless row block below the CR-029 blockquote, invisible to
+  `declared_tables` and to `quire coverage --json` (SR-019 FND-001); AC-9/10/11
+  were broken before this PR, not introduced by it, but were fixed alongside
+  the new row rather than left broken next to it. FR-010-AC-3 / TC-091's
+  allowed-change list now names the new target, the new obligation source, the
+  two widened reference `targets` and the new `lint_rules` entry (SR-019
+  FND-002). "sixth"/"fourth" source-count wording in FR-007 made consistent
+  (SR-019 FND-003, LOW). `reviews/2026-09-27-plat-1079-spec-review.md`
+  (SR-018) and `reviews/2026-09-27-plat-1079-spec-review-spec-integrity-analysis.md`
+  (SR-019) added verbatim.
+
+* **2026-09-27** — **PLAT-1079** (spec only, epic PLAT-1076): mint every
+  criterion kind the module can mint today. FR-004 gains a `constraint` trace
+  target (`FR-004-AC-20`, mirrors `acceptance-criterion` over the `##
+  Constraints` table's `ID` column) and empties the `verification`/
+  `nfr-verification` document references' `targets` so a `TC-…` id in an
+  `FR`/`NFR` `Verification` cell reports `dangling-trace-reference` instead of
+  resolving — TC ids are retired ecosystem-wide (`FR-004-AC-21`). FR-007 gains
+  a matching `constraint` obligation source (`FR-007-AC-15`) so a `-CON-` row
+  enters the obligation set FR-053 derives. **Re-measured the ticket's own
+  premise rather than trusting it**: PLAT-1079 stated constraints were
+  "already a trace target"; `grep`/`quire validate --okf` found none declared
+  and 13 dangling `-CON-` references in this repo's own `spec/tests.md` (of 76
+  warnings total) — recorded in FR-004's CR-064 note. The other two asks are
+  **ruled resolved without a new declaration**, per the team leader
+  (2026-09-27): `-M-` ids need no trace target — quire-rs's computed
+  CoverageMatrix (FR-050-AC-47, `agent-ix/quire-rs#494`) reconciles binders
+  against the full derived obligation set, and `nfr-metric` is already an
+  obligation source, so no `TraceTarget` capability is requested. `US`
+  acceptance criteria get no target and no obligation source **by design**,
+  not as a gap: the archetype's only structured section is illustrative
+  examples, explicitly disclaimed by that archetype and by this repo's own
+  `US-001`/`US-002` as not verification criteria — recorded in FR-004's Known
+  Limits as a design fact, with no upstream ticket requested.
+  `TC-148`/`TC-149`/`TC-150` added 🚧 Planned, pending the manifest change
+  this ticket's implementation stage makes.
+
 * **2026-09-22** — **PLAT-974**: CI off the dev-only mirrors. `quire` is now a dev dependency pinned to `internal-pypi` (`^0.47.1`), the `local-pypi`/`pypi.ix` poetry source and the `dev-quire` poe task and Makefile target are deleted, and `.github/workflows/ci.yml`'s `ci:` job calls `semantic-module-ci.yml` (adds `REGISTRY_TOKEN` for `@agent-ix/semantic-core` from GitHub Packages) in place of `lib-ci.yml`; `tests/conftest.py`'s `QUIRE_MISSING` message now names `poetry install` rather than `dev-quire`/quire-rs#392 (the `schema_registry` message already named `make semantic-install`). `package-lock.json` already resolved `@agent-ix/semantic-core` from `npm.pkg.github.com`. NFR-001-AC-5 (TC-131) is removed: the owner ruled that prerelease software carries no backward-compat test; NFR-001-AC-1..4 are unaffected and still compare against the checked-in `tests/fixtures/baseline-0.1.0/` baseline. `tests/test_skeletons_and_roles.py`'s TC-119 test is split in two: `test_no_fixture_reaches_the_wheel` (the `make build`/wheel-packaging half, which needs no engine and always runs, with a mutation check proving it can fail) and `test_no_fixture_mints_an_id` (the `quire coverage` half, which keeps the CLI skip guard) — real CI never installs a `quire` CLI binary, only the Python package and the npm toolchain, and the original single test's guard was skipping the packaging half for no reason. `pyproject.toml` also had a committed `poetry-dynamic-versioning` leftover predating this PR — `version = "0.24.0+20260920.225303.cc6561d.6c4d8ec2"` and `[tool.poetry-dynamic-versioning] enable = false` — which would have shipped every publish at that frozen version instead of one derived from the tag; restored to `version = "0.1.0"  # Placeholder, dynamically replaced` and `enable = true`, matching every other repo's `main`.
 
 * **2026-09-20** — **PLAT-902**: deleted `tests/fixtures/module-manifest-semantic.schema.json` and `test_manifest_validates_against_fr035_schema`, the repository's local copy of the FR-035 module-manifest schema and the gate over it. **What the gate actually did**: it imported `spec-artifacts-iso`'s redistributed copy, removed the whole `semantic` block (that copy rejects it under `additionalProperties: false`), removed `required` from every `traceability.trace_targets` entry (that copy predates quire-rs #327; `agent-ix/spec-artifacts-iso#32`, CR-013), validated the remainder against it, then validated the `semantic` block against a *second* copy committed here. Its own docstring said "imported rather than copied — one source for every module repository", and this repository held a copy. **This is the failure mode the ban on vendoring exists for**: two copies, a manifest edited to fit them, and a green result that says nothing about conformance to `filament-core-service`'s schema — which is itself the third document in the chain, since what `spec-artifacts-iso` ships is a fork keeping the original's `$id`. The gate carried no `@pytest.mark.trace`, so no matrix row loses a backing test. FR-001-AC-1 is retired: conformance to FR-035 is now verified nowhere in this repository, and FR-001 says so rather than implying otherwise — IT-001 has no implementing test and IT-002 is a strict expected failure (GAP-003). The executed copy-free checks are narrower and do not substitute for it: the module loads with its full archetype set (FR-010-AC-5, TC-093) and an unknown `semantic` key is refused at load (FR-010-AC-6, TC-094). Removing a check that verified nothing leaves less coverage on paper and the same coverage in fact. The `spec-artifacts-iso` dev dependency goes with it; nothing else in this repository imports it. No replacement copy and no new mechanism: a module proves conformance by installing.
