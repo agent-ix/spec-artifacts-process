@@ -752,16 +752,26 @@ def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     assert not rule.get("annotation_pattern")
 
 
-def test_verification_lint_rule_flags_stale_test_ids_only() -> None:
+def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
     """TC-149 (FR-004-AC-21): the behavioural half — `quire lint` against a
     fixture document. A `Verification` cell reading `Test (TC-999)` reports a
-    warning-severity finding naming the id; a cell naming a bare class or a
-    bare catalog method id raises nothing; `quire validate --okf` exit code is
-    unaffected either way (lint is advisory, never a validation gate)."""
+    `acceptance-criterion-verification-method` finding at `warning` severity
+    naming the id; a cell naming a bare class or a bare catalog method id
+    raises nothing.
+
+    The fixture is written under `tmp_path`, never the repo's own
+    `tests/fixtures/` (SR-020 FND-003) — the exclude globs on every trace
+    target and document reference cover `fixtures/**` precisely so a
+    throwaway document never mints or resolves a real id, and a fixture
+    that outlives the test would do exactly that. There is no `quire
+    validate --okf` assertion here: `validate` never evaluates `lint_rules`
+    (0 rule diagnostics appear in its output), so an exit-code check on it
+    would still pass at any severity and asserts nothing about this rule.
+    """
     if shutil.which("quire") is None:
         pytest.skip("the `quire` CLI is required for lint")
 
-    fixture = REPO_ROOT / "tests" / "fixtures" / "lint-verification-column.md"
+    fixture = tmp_path / "lint-verification-column.md"
     fixture.write_text(
         "---\nid: FR-999\ntype: FR\ntitle: Fixture\n---\n\n"
         "## Acceptance Criteria\n\n"
@@ -771,34 +781,21 @@ def test_verification_lint_rule_flags_stale_test_ids_only() -> None:
         "| FR-999-AC-3 | stale TC id | Test (TC-999) |\n"
         "| FR-999-AC-4 | stale IT id | Inspection (IT-3) |\n"
     )
-    try:
-        result = subprocess.run(
-            ["quire", "lint", "--module", str(pack.PACK_ROOT), str(fixture)],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        findings = result.stdout + result.stderr
-        assert "row 1" not in findings and "row 2" not in findings, findings
-        assert "row 3" in findings and "TC-999" in findings, findings
-        assert "row 4" in findings and "IT-3" in findings, findings
-    finally:
-        fixture.unlink(missing_ok=True)
-
-    # Lint is advisory and never a validation gate: this repository's own
-    # spec carries roughly 156 pre-existing `Test (TC-…)`/`Inspection (TC-…)`
-    # Verification cells the rule now warns on (SR-018 FND-003), and
-    # `quire validate --okf` still exits clean.
-    validation = subprocess.run(
-        ["quire", "validate", "--okf", "--scope", str(REPO_ROOT)],
+    result = subprocess.run(
+        ["quire", "lint", "--module", str(pack.PACK_ROOT), str(fixture)],
         capture_output=True,
         text=True,
         check=False,
     )
-    assert validation.returncode == 0, (
-        f"lint findings must never move the validate exit code: "
-        f"{validation.stdout}\n{validation.stderr}"
-    )
+    findings = result.stdout + result.stderr
+    assert "row 1" not in findings and "row 2" not in findings, findings
+    for row, needle in ((3, "TC-999"), (4, "IT-3")):
+        line = (
+            "warning: acceptance-criterion-verification-method: section "
+            f"'Acceptance Criteria' column 'Verification' row {row}:"
+        )
+        assert line in findings, findings
+        assert needle in findings, findings
 
 
 def test_verification_lint_rule_allowed_set_is_classes_union_catalog(

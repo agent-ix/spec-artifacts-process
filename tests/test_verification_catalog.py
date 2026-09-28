@@ -318,12 +318,19 @@ def test_tc150_constraint_obligations_are_derived() -> None:
     )
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
-    constraint_obligations = [
-        o for o in report["obligations"] if o["source"] == "constraint"
-    ]
-    assert constraint_obligations, "no `constraint` obligation derived"
-    for obligation in constraint_obligations:
-        assert obligation["id"].count("-CON-") == 1, obligation
+    constraint_targets = {
+        row["id"] for row in report["minted_targets"] if row["target"] == "constraint"
+    }
+    constraint_obligations = {
+        o["id"] for o in report["obligations"] if o["source"] == "constraint"
+    }
+    assert constraint_targets, "no `-CON-` row minted — has the target regressed?"
+    # SR-020 FND-004: every minted `-CON-` row gets an obligation, not merely
+    # "at least one" — the obligation ids equal the minted target ids exactly,
+    # so a row silently dropped from the obligation set would be caught.
+    assert constraint_obligations == constraint_targets
+    for constraint_id in constraint_obligations:
+        assert constraint_id.count("-CON-") == 1, constraint_id
 
 
 # TC-056 (FR-007-AC-9): the two methods the corpus needed and the catalog

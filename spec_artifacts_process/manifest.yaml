@@ -681,12 +681,13 @@ object_types:
 # untouched, bound to `test-case` exactly as before, and are retired later,
 # with the Test Matrix itself.
 #
-# `severity: warning`, not `error`: measured at roughly 156 existing
-# `Test (TC-…)`/`Inspection (TC-…)` cells across this repository's own FR/NFR
-# Acceptance Criteria tables today (SR-018 FND-003) — an error-severity rule
-# would fail every one of them the moment it shipped. PLAT-1081 sweeps that
-# population and PLAT-1082 promotes this rule to `error` once the sweep clears
-# it; neither is this change.
+# `severity: warning`, not `error`: this repository's own FR/NFR Acceptance
+# Criteria tables carry existing violations — `Test (TC-…)`/`Inspection
+# (TC-…)` cells (SR-018 FND-003) — today, and an error-severity rule would
+# fail every one of them the moment it shipped. Any measured count here would
+# drift as the corpus changes; PLAT-1081 sweeps that population and PLAT-1082
+# promotes this rule to `error` once the sweep clears it. Neither is this
+# change.
 #
 # `allowed` is the four ISO 29148 IADT classes union every `verification_catalog`
 # method id below, written out rather than referenced: quire-rs's
