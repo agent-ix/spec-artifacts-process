@@ -17,7 +17,6 @@ help:
 	@echo "  make semantic-install - npm ci the TypeSpec package (spec_artifacts_process/semantic)"
 	@echo "  make schemas        - Regenerate the semantic JSON Schemas from TypeSpec (FR-009)"
 	@echo "  make schemas-check  - Fail if the committed schemas differ from a fresh projection"
-	@echo "  make manifest-digests - Rewrite manifest data_schema digests from the shipped bytes"
 	@echo "  make format         - Format code (black + ruff --fix)"
 	@echo "  make build          - Build distribution"
 	@echo "  make clean          - Clean build artifacts"
@@ -88,12 +87,6 @@ schemas:
 .PHONY: schemas-check
 schemas-check:
 	cd $(SEMANTIC_DIR) && npm run --silent check
-
-# FR-010: rewrite every `data_schema.digest` in manifest.yaml from the shipped
-# bytes of the file its `data_schema.schema` names. Run after `make schemas`.
-.PHONY: manifest-digests
-manifest-digests:
-	$(POETRY) run python scripts/manifest_digests.py
 
 .PHONY: format
 format:

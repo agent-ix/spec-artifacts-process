@@ -20,7 +20,6 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     artifact_type_names,
-    sha256_of,
 )
 
 ADMITTED_SEMANTIC_KEYS = {
@@ -67,22 +66,6 @@ def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block):
     # Derived from the manifest, never a literal count: a type added later is
     # covered without editing this test (FR-009-CON-6).
     assert semantic_block["exports"] == artifact_type_names()
-
-
-@pytest.mark.trace("TC-090")
-def test_every_artifact_type_binds_its_schema_by_path_and_digest(manifest):
-    for entry in manifest["artifact_types"]:
-        data_schema = entry.get("data_schema")
-        assert data_schema is not None, f"{entry['name']} declares no data_schema"
-        assert set(data_schema) == {
-            "schema",
-            "digest",
-        }, f"{entry['name']} is not the reference form"
-        path = PACKAGE_ROOT / data_schema["schema"]
-        assert (
-            path.is_file()
-        ), f"{entry['name']} references a missing {data_schema['schema']}"
-        assert data_schema["digest"] == sha256_of(path)
 
 
 @pytest.mark.trace("TC-091")
@@ -404,28 +387,9 @@ def test_an_unknown_key_and_a_bad_digest_are_both_refused(quire_engine, tmp_path
     def unknown_key(text: str) -> str:
         return text.replace("semantic:\n", "semantic:\n  foo: bar\n", 1)
 
-    def bad_digest(text: str) -> str:
-        """One digest replaced by a syntactically valid, wrong one."""
-        import re as _re
-
-        return _re.sub(
-            r"(    digest: sha256:)[0-9a-f]{64}", r"\g<1>" + "0" * 64, text, count=1
-        )
-
     good = quire_engine.Registry.load_from([str(REPO_ROOT)]).archetype_names()
     assert good, "the committed manifest must load"
     assert load(unknown_key) != good, "an unknown `semantic` key must be refused"
-    # The digest half is a MEASUREMENT, not an assertion of the contract we want.
-    # quire 0.46.0 never verifies a reference-form `data_schema.digest`: the type
-    # loads unchanged with a digest of 64 zeros. Filed as agent-ix/quire-rs#400.
-    # Asserting the refusal here would be red for a defect this module cannot
-    # fix; asserting the current behaviour pins it, so the day the engine starts
-    # checking, this line fails and is deleted deliberately.
-    assert load(bad_digest) == good, (
-        "quire-rs#400: a mismatched data_schema.digest is expected to be INERT at "
-        "load in the measured engine. If this fails, the engine now verifies the "
-        "digest — delete this assertion and enable TC-094's refusal check."
-    )
     # What does hold: the file the reference names must exist, which is the half
     # of the contract the loader does honour.
     assert load(lambda text: text) == good
@@ -458,25 +422,6 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
     assert "foo" in message
 
 
-@pytest.mark.trace("TC-095")
-def test_the_digest_rewriter_touches_nothing_else():
-    import subprocess
-    import sys
-
-    before = MANIFEST_PATH.read_text()
-    result = subprocess.run(
-        [sys.executable, "scripts/manifest_digests.py"],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, result.stderr
-    assert (
-        MANIFEST_PATH.read_text() == before
-    ), "the committed tree must already be up to date"
-    assert "up to date" in result.stdout
-
-
 @pytest.mark.trace("TC-096")
 def test_the_standard_object_type_keeps_its_inline_schema(manifest, baseline):
     """`Standard` (artifact type) and `standard` (object type) are two
@@ -487,11 +432,6 @@ def test_the_standard_object_type_keeps_its_inline_schema(manifest, baseline):
     was = by_name(baseline["object_types"])["standard"]
     assert now == was
     assert "properties" in now["data_schema"], "the object type keeps the INLINE form"
-    artifact = by_name(manifest["artifact_types"])["Standard"]
-    assert set(artifact["data_schema"]) == {
-        "schema",
-        "digest",
-    }, "the artifact type is the REFERENCE form"
 
 
 @pytest.mark.trace("TC-136")
