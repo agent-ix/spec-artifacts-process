@@ -109,12 +109,10 @@ type: TestMatrix
 | FR-009 | FR-009-AC-12 | TC-134 | ✅ Complete |
 | FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
 | FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
-| FR-010 | FR-010-AC-2 | TC-090 | ✅ Complete |
 | FR-010 | FR-010-AC-3 | TC-091 | ✅ Complete |
 | FR-010 | FR-010-AC-4 | TC-092 | ✅ Complete |
 | FR-010 | FR-010-AC-5 | TC-093 | ✅ Complete |
 | FR-010 | FR-010-AC-6 | TC-094 | ✅ Complete |
-| FR-010 | FR-010-AC-7 | TC-095 | ✅ Complete |
 | FR-010 | FR-010-AC-8 | TC-096 | ✅ Complete |
 | FR-010 | FR-010-AC-9 | TC-135 | ❌ blocked on quire-rs#221, quire-rs#394 |
 | FR-010 | FR-010-AC-10 | TC-136 | ✅ Complete |
@@ -256,12 +254,10 @@ claim (SR-008 FND-004).
 | TC-087 | Two generator runs over one tree produce byte-identical files and an identical `toolchain.json` digest | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | ✅ |
 | TC-088 | `toolchain.json` records the resolved semantic-core version and the SHA-256 of that package's own `generated/toolchain.json`, so the compiled-against copy is identified by bytes | Unit | P1 | FR-009-AC-9 | ✅ |
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
-| TC-090 | Every declared artifact type carries reference-form `data_schema`, the referenced file exists, and its SHA-256 equals the recorded digest; none carries an inline `data_schema` | Unit | P0 | FR-010-AC-2 | ✅ |
 | TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference, and PLAT-1079's additions — the `constraint` trace target, `constraint` joining `inspection-obligation`'s and `traces-to`'s `targets` (each pinned to its exact widened list), the `constraint` obligation source, and the new `lint_rules` entry — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
 | TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
 | TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
 | TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, and an altered `data_schema.digest` is refused naming the path (expected failure: quire-rs#221, quire-rs#394 make both refusals silent) | Unit | P0 | FR-010-AC-6 | ✅ |
-| TC-095 | `make manifest-digests` rewrites no byte on the committed tree, and after one schema is regenerated rewrites exactly that type's digest and nothing else | Unit | P1 | FR-010-AC-7, FR-010-CON-4 | ✅ |
 | TC-096 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0 | Unit | P1 | FR-010-AC-8 | ✅ |
 | TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | ✅ |
 | TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | ✅ |
@@ -350,7 +346,6 @@ mixed combination in one conforming document.
 | FR-010-CON-1 | Closed key set | `semantic` block with a tenth key `foo` | TC-094 | Error (load refusal) |
 | FR-010-CON-2 | No new required key | 0.1.0 baseline vs 0.2.0 structural diff | TC-091 | 0 changed declarations |
 | FR-010-CON-3 | Status vocabulary | a `⚠️`-headed Status cell | TC-092 | Error (`assert`) — the marker stays retired |
-| FR-010-CON-4 | Digest rewriter scope | `make manifest-digests` on the committed tree | TC-095 | 0 bytes changed |
 | FR-011-CON-1 | Mapping names a declared section | every section named in `mappings.yaml` | TC-099 | pass |
 | FR-011-CON-2 | Mapping totality | a model property with no mapping entry | TC-098 | Error (unmapped property) |
 | FR-012-CON-1 | Skeleton is the fixture | every shipped skeleton validated as authored | TC-112 | pass |

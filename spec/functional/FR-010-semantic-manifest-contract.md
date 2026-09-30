@@ -34,8 +34,6 @@ exact meaning it has today.
 
 - `manifest.yaml` at `version: 0.2.0`, carrying a `semantic` block and a reference-form
   `data_schema` on each of the twelve declared artifact types.
-- `scripts/manifest_digests.py`, which rewrites every `data_schema.digest` from the shipped bytes
-  of the file its `data_schema.schema` names.
 
 ## Behavior
 
@@ -75,9 +73,6 @@ exact meaning it has today.
   the document record `Standard.json` describes.
 - The manifest SHALL load through Quire's registry loader with no load failure for any artifact
   type, and every recorded schema digest SHALL equal the SHA-256 of the shipped file.
-- `make manifest-digests` SHALL rewrite every `data_schema.digest` from the shipped bytes.
-- `make manifest-digests` SHALL change no byte of the manifest outside a `data_schema.digest`
-  value.
 - If Quoin or Quire rejects the manifest, then this module SHALL correct its own manifest or
   schemas rather than relax a contract key, a digest, an `$id` rule, or an archetype vocabulary
   to make a consumer accept them.
@@ -106,7 +101,6 @@ exact meaning it has today.
 | FR-010-AC-4 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline. | Test (TC-092) |
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader, and a copy whose `data_schema.digest` is altered is refused — the refusal happens in both cases. | Test (TC-094) |
-| FR-010-AC-7 | `make manifest-digests` on the committed tree rewrites no byte, and after one schema is regenerated it rewrites exactly that type's digest and nothing else. | Test (TC-095) |
 | FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
 | FR-010-AC-9 | The refusal of an unknown `semantic` key names the key, and the refusal of a mismatched digest names the path. Measured against quire 0.46.0 both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221` and `agent-ix/quire-rs#394`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
 | FR-010-AC-10 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of the `inspection-obligation` and `traces-to` patterns and their `targets` lists. | Test (TC-136) |
