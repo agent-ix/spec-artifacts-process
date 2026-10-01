@@ -1,30 +1,30 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestCaseRow.json",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestCaseRow.json",
   "type": "object",
   "properties": {
     "id": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestRowId.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestRowId.json"
     },
     "title": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json",
       "description": "free text: the row title."
     },
     "type": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestType.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestType.json"
     },
     "priority": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Priority.json",
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Priority.json",
       "description": "Absent where the matrix omits the whole column, which the archetype allows (CR-018); never synthesised."
     },
     "tracesTo": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TraceCell.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TraceCell.json"
     },
     "status": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CoverageStatus.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/CoverageStatus.json"
     },
     "line": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/LineNumber.json"
     }
   },
   "required": [

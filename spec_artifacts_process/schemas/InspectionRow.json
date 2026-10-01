@@ -1,31 +1,31 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/InspectionRow.json",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/InspectionRow.json",
   "type": "object",
   "properties": {
     "id": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/InspectionId.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/InspectionId.json"
     },
     "obligation": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json",
       "description": "free text: the obligation id or statement the act discharges."
     },
     "who": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json",
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json",
       "description": "free text: who performed the inspection."
     },
     "commit": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CommitRef.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/CommitRef.json"
     },
     "verdict": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Verdict.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Verdict.json"
     },
     "note": {
       "type": "string",
       "description": "Absent when the author omitted the optional column; never synthesised."
     },
     "line": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/LineNumber.json"
     }
   },
   "required": [

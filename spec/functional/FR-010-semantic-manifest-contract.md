@@ -17,8 +17,7 @@ relationships:
 ## Description
 
 `spec_artifacts_process/manifest.yaml` SHALL carry the quoin FR-070 `semantic` block, referencing
-every declared artifact type's emitted schema by path (quoin FR-073) at manifest
-`version` 0.2.0, so that Quoin verifies the shipped schemas at install and a consumer can resolve
+every declared artifact type's emitted schema by path (quoin FR-073), so that Quoin verifies the shipped schemas at install and a consumer can resolve
 a type's record schema from the manifest alone, while every existing archetype contract keeps the
 exact meaning it has today.
 
@@ -47,8 +46,7 @@ exact meaning it has today.
   `SuiteRegistry`, `Inspections`.
 - Every declared artifact type SHALL carry `data_schema: { schema: schemas/<Model>.json }`.
 - No artifact type SHALL carry an inline `data_schema`.
-- The manifest `version` SHALL be `0.2.0`, because the emitted `$id` embeds it and the previous
-  value was `0.1.0`; `manifest_version` SHALL stay `1.0.0`, because it names the manifest format
+- `manifest_version` SHALL stay `1.0.0`, because it names the manifest format
   rather than this module.
 - Every `archetypes`, `artifact_types`, `object_types`, `doc_kinds`, `grammars`, `traceability`,
   `lint_rules` and `verification_catalog` declaration present at 0.1.0 SHALL be present at 0.2.0
@@ -75,7 +73,7 @@ exact meaning it has today.
 - If Quoin or Quire rejects the manifest, then this module SHALL correct its own manifest or
   schemas rather than relax a contract key, an `$id` rule, or an archetype vocabulary
   to make a consumer accept them.
-- Measured against quire 0.46.0 the two available refusals are silent: a `semantic` key the loader
+- The two available refusals are silent: a `semantic` key the loader
   cannot parse drops every declaration of the module. `agent-ix/quire-rs#221` owns that defect; the naming half of FR-010-AC-6 is carried as an
   explicit expected failure rather than dropped.
 
@@ -97,7 +95,7 @@ exact meaning it has today.
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
 | FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
-| FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Measured against quire 0.46.0 both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
+| FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
 | FR-010-AC-10 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of the `inspection-obligation` and `traces-to` patterns and their `targets` lists. | Test (TC-136) |
 
 ## Dependencies

@@ -15,7 +15,7 @@ relationships:
 ## Description
 
 The module build SHALL emit one JSON Schema 2020-12 document per declared process artifact type
-from a TypeSpec source that imports `@agent-ix/semantic-core` 0.1.0, using the official
+from a TypeSpec source that imports `@agent-ix/semantic-core`, using the official
 `@typespec/json-schema` emitter at a pinned toolchain, into
 `spec_artifacts_process/schemas/`, so that the shipped schema is the compiled one and any drift
 between the source and the shipped bytes fails the build.
@@ -23,9 +23,8 @@ between the source and the shipped bytes fails the build.
 ## Inputs
 
 - `spec_artifacts_process/semantic/main.tsp`: namespace `AgentIx.SpecArtifactsProcess`, decorated
-  `@jsonSchema("https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<version>/")` where
-  `<version>` is the manifest `version`.
-- `@agent-ix/semantic-core` 0.1.0, resolved from the scope-routed registry through the user-level
+  `@jsonSchema("https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/")`.
+- `@agent-ix/semantic-core`, resolved from the scope-routed registry through the user-level
   npm config, supplying `ClauseRef`, `FieldDecl`, `TypeRef`, `Multiplicity`, `ConstraintDecl`,
   `Identifier` and `SemanticId`.
 - `@typespec/compiler` and `@typespec/json-schema` as `devDependencies` of
@@ -64,12 +63,11 @@ between the source and the shipped bytes fails the build.
   all.
 - Where no `$id` and no `$ref` is relative, the generator SHALL record the normalization as
   `applied: false`.
-- If the `@jsonSchema` base in `main.tsp` differs from the manifest `version`, then the generator SHALL exit non-zero naming both values.
 - Every emitted schema SHALL declare `$schema: https://json-schema.org/draft/2020-12/schema` and
-  `$id: https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<manifest version>/<Model>.json`
+  `$id: https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<Model>.json`
   matching its file name.
 - Every `$ref` in an emitted schema SHALL name either a sibling schema that ships under
-  `spec_artifacts_process/schemas/`, or a `https://schemas.agent-ix.org/semantic-core/0.1.0/` model.
+  `spec_artifacts_process/schemas/`, or a `https://schemas.agent-ix.org/semantic-core/` model.
 - The module SHALL emit one exported model for each of the twelve declared artifact types — `ADR`,
   `Plan`, `Task`, `Review`, `SpecReview`, `Finding`, `Feedback`, `TestMatrixIndex`, `TestMatrix`,
   `Standard`, `SuiteRegistry`, `Inspections` — and SHALL emit no artifact model for a type the
@@ -88,9 +86,6 @@ between the source and the shipped bytes fails the build.
   registry the workflow does not reach (`agent-ix/filament-core-data#11`). A CI job asserting it
   would fail for a reason that is not a defect in this module, and the pre-push `make lint` is
   where it holds.
-- If the schemas agree with each other but carry a version segment other than the
-  manifest's current `version`, then the check SHALL exit non-zero, so a half-completed version
-  bump cannot pass by being internally consistent.
 - The Python package SHALL include `spec_artifacts_process/schemas/*.json` in the wheel and sdist.
 - The repository SHALL mark every file `eol=lf` in `.gitattributes`.
 - `scripts/stage-npm.mjs` SHALL stage `schemas/` beside `manifest.yaml` at pack time, so a
@@ -103,24 +98,20 @@ between the source and the shipped bytes fails the build.
 | FR-009-CON-1 | The build SHALL use the official `@typespec/json-schema` emitter only; no custom emitter and no hand-edited emitted file. | Architecture | Inspection |
 | FR-009-CON-2 | The repository SHALL carry no `.npmrc`, no `file:` or `link:` dependency, and no version bound on the TypeSpec toolchain beyond the exact pin. | Packaging | Inspection |
 | FR-009-CON-3 | Emission SHALL be deterministic: two runs over one source tree produce byte-identical files. | Integrity | Test |
-| FR-009-CON-4 | The `$id` base SHALL embed the manifest `version`, bumped as one atomic regeneration — source base, manifest version and schemas in one commit. | Compatibility | Test |
-| FR-009-CON-5 | Each test and fixture SHALL read the version segment of the `$id` base from the manifest `version` rather than hard-coding it. | Maintainability | Test |
 | FR-009-CON-6 | Every test asserting a property of "every" member of a set SHALL enumerate that set from the manifest or the emitted bundle, never from a list written into the test, so a type added later is covered without editing the test. | Maintainability | Inspection |
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-009-AC-2 | Every shipped projection declares the 2020-12 `$schema` and an `$id` of `https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<manifest version>/<Model>.json` matching its file name, with the version segment read from `manifest.yaml` rather than hard-coded. | Test (TC-081) |
-| FR-009-AC-3 | Every `$ref` across the shipped projections resolves to a shipped sibling or to a semantic-core `0.1.0` model; a `$ref` to any other host or version is absent. | Test (TC-082) |
+| FR-009-AC-2 | Every shipped projection declares the 2020-12 `$schema` and an `$id` of `https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<Model>.json` matching its file name. | Test (TC-081) |
+| FR-009-AC-3 | Every `$ref` across the shipped projections resolves to a shipped sibling or to a semantic-core model; a `$ref` to any other host is absent. | Test (TC-082) |
 | FR-009-AC-4 | `make schemas-check` on the committed tree exits zero; after one byte of any shipped projection is changed it exits non-zero naming that file and writes nothing. | Test (TC-083) |
-| FR-009-AC-5 | A `@jsonSchema` base whose version segment differs from the manifest `version` makes the generator exit non-zero naming both values. | Test (TC-084) |
 | FR-009-AC-6 | `make schemas-check` on a tree carrying an extra `spec_artifacts_process/schemas/Stale.json` exits non-zero naming that file, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed. | Test (TC-085) |
 | FR-009-AC-7 | The wheel built by `make build` contains `spec_artifacts_process/schemas/<Model>.json` for every exported model, and the tree `scripts/stage-npm.mjs` stages carries `manifest.yaml` with a sibling `schemas/` holding the same set. | Test (TC-086) |
 | FR-009-AC-8 | Running the generator twice over one tree produces byte-identical files. | Test (TC-087) |
 | FR-009-AC-10 | With the toolchain uninstalled, the generator exits non-zero naming the missing component and `make semantic-install`, and does not fail inside the compiler. | Test (TC-132) |
 | FR-009-AC-11 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values. | Test (TC-133) |
-| FR-009-AC-12 | A tree whose schemas agree with each other but were generated against a different manifest `version` fails `make schemas-check`. | Test (TC-134) |
 | FR-009-AC-13 | Every test in the suite that asserts a property of all declared types derives the type list from `manifest.yaml` or from the emitted bundle; none carries a hard-coded list. | Inspection |
 
 ## Dependencies

@@ -22,7 +22,7 @@ using AgentIx.Semantic.Core;
  * `spec_artifacts_process/manifest.yaml`, which is the single source. A value
  * this file admits that the manifest does not is a defect in this file.
  */
-@jsonSchema("https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/")
+@jsonSchema("https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/")
 namespace AgentIx.SpecArtifactsProcess;
 
 // ---------------------------------------------------------------------------

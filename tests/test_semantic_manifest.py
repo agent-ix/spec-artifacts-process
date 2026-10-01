@@ -397,7 +397,7 @@ def test_an_unknown_key_is_refused(quire_engine, tmp_path):
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "FR-010-AC-9. quire 0.47.1 refuses an unknown `semantic` key "
+        "FR-010-AC-9. quire refuses an unknown `semantic` key "
         "SILENTLY: no diagnostic names the key or the path "
         "(agent-ix/quire-rs#221). This row is red by design and "
         "turns green the day the engine names them. It is never skipped, because a "

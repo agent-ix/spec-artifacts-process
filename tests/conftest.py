@@ -45,8 +45,6 @@ SEMANTIC_CORE_DIR = (
     / "json-schema"
 )
 
-SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.3.0/"
-
 QUIRE_MISSING = (
     "the Quire wheel exposing the semantic surface is not installed in this "
     "environment. Run `poetry install` (quire is a dev dependency from "
@@ -65,19 +63,11 @@ def load_baseline() -> dict[str, Any]:
     return yaml.safe_load(BASELINE_MANIFEST.read_text())
 
 
-def manifest_version() -> str:
-    return load_manifest()["version"]
-
-
-def module_base() -> str:
-    """The `$id` base, read from the manifest version.
-
-    Never hard-coded (FR-009-CON-5).
-    """
-    return (
-        "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/"
-        f"{manifest_version()}/"
-    )
+MODULE_BASE = "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/"
+SEMANTIC_CORE_BASE = (
+    "https://schemas.agent-ix.org/semantic-core/"
+    f"{load_manifest()['semantic']['semantic_core']}/"
+)
 
 
 def artifact_type_names() -> list[str]:

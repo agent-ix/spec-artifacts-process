@@ -71,21 +71,12 @@ function manifestText() {
   return readFileSync(resolve(moduleRoot, "manifest.yaml"), "utf8");
 }
 
-/** The manifest `version` is the authority; the `@jsonSchema` base must embed it (FR-009-AC-5). */
+/** The `@jsonSchema` base declared in main.tsp (FR-009). */
 function packageBase() {
-  const manifest = manifestText();
-  const manifestVersion = manifest.match(/^version:\s*["']?([0-9]+\.[0-9]+\.[0-9]+)["']?\s*$/m)?.[1];
-  if (!manifestVersion) throw new Error("manifest.yaml declares no top-level semver version");
   const source = readFileSync(resolve(packageRoot, "main.tsp"), "utf8");
-  const declared = source.match(/@jsonSchema\("([^"]+)"\)/)?.[1];
-  if (!declared) throw new Error("main.tsp declares no @jsonSchema base");
-  const expected = `${MODULE_BASE_PREFIX}${manifestVersion}/`;
-  if (declared !== expected) {
-    throw new Error(
-      `@jsonSchema base ${declared} does not match manifest version ${manifestVersion} (expected ${expected})`,
-    );
-  }
-  return { base: expected };
+  const base = source.match(/@jsonSchema\("([^"]+)"\)/)?.[1];
+  if (!base) throw new Error("main.tsp declares no @jsonSchema base");
+  return { base };
 }
 
 /**
