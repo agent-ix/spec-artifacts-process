@@ -92,8 +92,7 @@ between the source and the shipped bytes fails the build.
   manifest's current `version`, then the check SHALL exit non-zero, so a half-completed version
   bump cannot pass by being internally consistent.
 - The Python package SHALL include `spec_artifacts_process/schemas/*.json` in the wheel and sdist.
-- The repository SHALL mark every file `eol=lf` in `.gitattributes`, so a checkout with
-  `autocrlf` cannot change the digested bytes.
+- The repository SHALL mark every file `eol=lf` in `.gitattributes`.
 - `scripts/stage-npm.mjs` SHALL stage `schemas/` beside `manifest.yaml` at pack time, so a
   manifest-relative `schema:` path resolves inside the npm tarball.
 
@@ -118,6 +117,7 @@ between the source and the shipped bytes fails the build.
 | FR-009-AC-5 | A `@jsonSchema` base whose version segment differs from the manifest `version` makes the generator exit non-zero naming both values. | Test (TC-084) |
 | FR-009-AC-6 | `make schemas-check` on a tree carrying an extra `spec_artifacts_process/schemas/Stale.json` exits non-zero naming that file, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed. | Test (TC-085) |
 | FR-009-AC-7 | The wheel built by `make build` contains `spec_artifacts_process/schemas/<Model>.json` for every exported model, and the tree `scripts/stage-npm.mjs` stages carries `manifest.yaml` with a sibling `schemas/` holding the same set. | Test (TC-086) |
+| FR-009-AC-8 | Running the generator twice over one tree produces byte-identical files. | Test (TC-087) |
 | FR-009-AC-10 | With the toolchain uninstalled, the generator exits non-zero naming the missing component and `make semantic-install`, and does not fail inside the compiler. | Test (TC-132) |
 | FR-009-AC-11 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values. | Test (TC-133) |
 | FR-009-AC-12 | A tree whose schemas agree with each other but were generated against a different manifest `version` fails `make schemas-check`. | Test (TC-134) |

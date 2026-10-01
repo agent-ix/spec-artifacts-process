@@ -1,6 +1,6 @@
 """The emitted JSON Schema bundle and its drift gate (requirement FR-009).
 
-TC-081..TC-086 and TC-132..TC-134.
+TC-081..TC-087 and TC-132..TC-134.
 
 Every assertion that quantifies over "all declared types" enumerates them from
 the manifest or from the emitted bundle (FR-009-CON-6). A hard-coded list stops
@@ -154,6 +154,20 @@ def test_the_wheel_and_the_npm_tree_carry_every_projection():
         assert f"spec_artifacts_process/schemas/{path.name}" in names
     assert "spec_artifacts_process/manifest.yaml" in names
     assert "spec_artifacts_process/mappings.yaml" in names
+
+
+@pytest.mark.trace("TC-087")
+def test_two_runs_are_byte_identical(sandbox: Path):
+    first = run_generator([], cwd=sandbox)
+    assert first.returncode == 0, first.stderr
+    snapshot = {
+        p.name: p.read_bytes() for p in (sandbox.parent / "schemas").glob("*.json")
+    }
+    second = run_generator([], cwd=sandbox)
+    assert second.returncode == 0, second.stderr
+    assert {
+        p.name: p.read_bytes() for p in (sandbox.parent / "schemas").glob("*.json")
+    } == snapshot
 
 
 @pytest.mark.trace("TC-132")

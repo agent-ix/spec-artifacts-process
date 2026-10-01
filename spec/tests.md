@@ -101,6 +101,7 @@ type: TestMatrix
 | FR-009 | FR-009-AC-5 | TC-084 | ✅ Complete |
 | FR-009 | FR-009-AC-6 | TC-085 | ✅ Complete |
 | FR-009 | FR-009-AC-7 | TC-086 | ✅ Complete |
+| FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
 | FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
 | FR-009 | FR-009-AC-11 | TC-133 | ✅ Complete |
 | FR-009 | FR-009-AC-12 | TC-134 | ✅ Complete |
@@ -247,6 +248,7 @@ claim (SR-008 FND-004).
 | TC-084 | A `@jsonSchema` base whose version differs from the manifest `version` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-5, FR-009-CON-4 | ✅ |
 | TC-085 | An extra `schemas/Stale.json` makes the check exit non-zero naming it, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed | Unit | P0 | FR-009-AC-6 | ✅ |
 | TC-086 | The built wheel and the staged npm tree each carry `schemas/<Model>.json` for every exported model beside `manifest.yaml` | Unit | P1 | FR-009-AC-7 | ✅ |
+| TC-087 | Two generator runs over one tree produce byte-identical files | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | ✅ |
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
 | TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference, and PLAT-1079's additions — the `constraint` trace target, `constraint` joining `inspection-obligation`'s and `traces-to`'s `targets` (each pinned to its exact widened list), the `constraint` obligation source, and the new `lint_rules` entry — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
 | TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
@@ -334,6 +336,7 @@ mixed combination in one conforming document.
 | Optional table presence | Present, wrong columns | renamed column | TC-015 | Error (`assert`) |
 | min_rows (SpecReview Findings) | Below Min | 0 data rows (header only) | TC-019 | Error (`assert`) |
 | FR-003-CON-1 | Process gate | enforcing module version published before ecosystem `tests.md` sweep + user sign-off | Inspection (plan gate, no TC) | violation |
+| FR-009-CON-3 | Determinism | two generator runs on one tree | TC-087 | byte-identical output |
 | FR-009-CON-4 | Atomic bump | manifest version bumped without the `@jsonSchema` base | TC-084 | Error (generator exits non-zero) |
 | FR-009-CON-5 | Hard-coded version | a test reading the `$id` version from the manifest | TC-081 | pass |
 | FR-010-CON-1 | Closed key set | `semantic` block with a tenth key `foo` | TC-094 | Error (load refusal) |
