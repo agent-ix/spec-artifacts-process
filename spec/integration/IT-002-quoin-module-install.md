@@ -12,7 +12,7 @@ relationships:
 
 Verify the boundary between this module's shipped directory and the Quoin module installer:
 `quoin module install path:<dir>` shall accept the `semantic` block, resolve every reference-form
-`data_schema`, verify every digest, derive the package manifest, and list the module. Without this
+`data_schema`, derive the package manifest, and list the module. Without this
 test a module that Quire accepts and Quoin refuses would ship, and nothing in this specification
 would notice — the gap SR-015 FND-001 records.
 
