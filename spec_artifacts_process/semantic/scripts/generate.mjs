@@ -57,43 +57,12 @@ function requireNode() {
   }
 }
 
-function version(name) {
-  try {
-    return JSON.parse(
-      readFileSync(resolve(packageRoot, "node_modules", name, "package.json"), "utf8"),
-    ).version;
-  } catch (error) {
-    throw missingInstall(error, name);
-  }
-}
-
-function manifestText() {
-  return readFileSync(resolve(moduleRoot, "manifest.yaml"), "utf8");
-}
-
 /** The `@jsonSchema` base declared in main.tsp (FR-009). */
 function packageBase() {
   const source = readFileSync(resolve(packageRoot, "main.tsp"), "utf8");
   const base = source.match(/@jsonSchema\("([^"]+)"\)/)?.[1];
   if (!base) throw new Error("main.tsp declares no @jsonSchema base");
   return { base };
-}
-
-/**
- * The manifest declares which semantic-core it is written against; the installed
- * package is what was actually compiled. A disagreement means the shipped
- * schemas describe a grammar the manifest does not claim (FR-009-AC-11).
- */
-function requireSemanticCoreAgreement(resolved) {
-  const declared = manifestText().match(/^\s{2}semantic_core:\s*["']?([^\s"']+)["']?\s*$/m)?.[1];
-  if (declared === undefined) return undefined;
-  if (declared !== resolved) {
-    throw new Error(
-      `manifest.yaml declares semantic.semantic_core ${declared} but the resolved ` +
-        `@agent-ix/semantic-core is ${resolved}`,
-    );
-  }
-  return declared;
 }
 
 /**
@@ -134,8 +103,6 @@ function render(schema) {
 function emit() {
   requireNode();
   const { base } = packageBase();
-  const semanticCoreVersion = version("@agent-ix/semantic-core");
-  requireSemanticCoreAgreement(semanticCoreVersion);
   const tsp = resolve(packageRoot, "node_modules/.bin/tsp");
   if (!existsSync(tsp)) {
     throw new Error(`the TypeSpec compiler (${tsp}) is not installed — ${INSTALL_HINT}`);

@@ -34,7 +34,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 - The filament-core-service activation machinery that registers the Module, referenced here only by relationship.
 - Deployment topology and infrastructure of the target cluster.
-- Changing the meaning of any archetype this module already publishes. This module owns the contracts every repository in the programme validates against, so tightening or loosening an existing pattern is a build break everywhere; NFR-001 measures that nothing moved. In particular `⚠️` stays out of the `Status` vocabulary — it was retired by CR-031 because a row carrying it was exempt from the status-lie check by construction (quire-rs CR-083). The `quoin:spec-matrix` skill still documents it as valid; the skill is the defect and is filed as `agent-ix/quoin#337`.
+- Changing the meaning of any archetype this module already publishes. This module owns the contracts every repository in the programme validates against, so tightening or loosening an existing pattern is a build break everywhere; In particular `⚠️` stays out of the `Status` vocabulary — it was retired by CR-031 because a row carrying it was exempt from the status-lie check by construction (quire-rs CR-083). The `quoin:spec-matrix` skill still documents it as valid; the skill is the defect and is filed as `agent-ix/quoin#337`.
 - Editing any corpus repository. The advisory sweep and the corpus promotion are `agent-ix/quoin#291`; this specification's consumer measurement reads two repositories and writes to neither.
 - Generated-language fixtures (Rust, TypeScript, Python) for the process types: produced by the TypeSpec frontend and compiler core (`agent-ix/filament-core-data#21`, `#22`, `#23`) and published only behind the promotion gate (`agent-ix/quoin#290`); the semantic-core language packages are `agent-ix/filament-core-data#11`. None is produced or faked here.
 - An engine-side extractor that builds a process record from Markdown. `quire.validate_document` validates a *declaration* record on the `object:` axis and never reaches an artifact-type record; the FR-011 reference mapping is this module's test oracle, and the extractor is quire-rs work (`agent-ix/quire-rs#393`).
@@ -93,9 +93,6 @@ contract sits on top of those: FR-009 emits one JSON Schema per declared artifac
 TypeSpec source, FR-010 declares the contract in the manifest without altering an archetype,
 FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
-NFR-001 bounds the whole change to additive compatibility, measured by a structural diff of every
-0.1.0 archetype declaration and vocabulary against the checked-in 0.1.0 baseline and by every
-shipped skeleton validating with zero error findings (AC-1..4).
 
 ## References
 

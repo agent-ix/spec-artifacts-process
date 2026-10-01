@@ -87,7 +87,6 @@ from the schema alone which concept a document owns.
 | FR-013-AC-4 | `SpecReview` findings rows carry `id`, `severity`, `summary`, `refs` and an optional `escapeCause`, and a `Finding` document id matches `FIND-` while a row id matches `FND-`. | Test (TC-123) |
 | FR-013-AC-5 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, and a matrix record answers "which criteria does this row claim to cover" without re-parsing the cell. | Test (TC-124) |
 | FR-013-AC-6 | `mappings.yaml` records the run-record concepts this module does not model and names their owner. | Test (TC-125) |
-| FR-013-AC-7 | This requirement adds no manifest declaration of its own: the baseline comparison is [FR-010-AC-3](./FR-010-semantic-manifest-contract.md), which is the single normative statement of it, and this criterion is discharged by that test rather than by a second copy. | Inspection |
 | FR-013-AC-8 | A reviewer has read every emitted model's property documentation and recorded that none *means* a run outcome under a different name. A test can check names; only a reader can check meaning, and presenting that judgement as a test would be the fabrication this module's own escape-cause vocabulary exists to name. | Inspection (TC-143) |
 
 ## Dependencies

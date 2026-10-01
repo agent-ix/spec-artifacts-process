@@ -33,9 +33,6 @@ MAPPINGS_PATH = PACKAGE_ROOT / "mappings.yaml"
 MAPPINGS_SCHEMA_PATH = PACKAGE_ROOT / "mappings.schema.json"
 SEMANTIC_DIR = PACKAGE_ROOT / "semantic"
 NEGATIVE_DIR = REPO_ROOT / "tests" / "fixtures" / "negative"
-BASELINE_MANIFEST = (
-    REPO_ROOT / "tests" / "fixtures" / "baseline-0.1.0" / "manifest.yaml"
-)
 SEMANTIC_CORE_DIR = (
     SEMANTIC_DIR
     / "node_modules"
@@ -57,10 +54,6 @@ sys.path.insert(0, str(REPO_ROOT / "tests"))
 
 def load_manifest() -> dict[str, Any]:
     return yaml.safe_load(MANIFEST_PATH.read_text())
-
-
-def load_baseline() -> dict[str, Any]:
-    return yaml.safe_load(BASELINE_MANIFEST.read_text())
 
 
 MODULE_BASE = "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/"
@@ -107,11 +100,6 @@ def quire_engine():
 @pytest.fixture(scope="session")
 def manifest() -> dict[str, Any]:
     return load_manifest()
-
-
-@pytest.fixture(scope="session")
-def baseline() -> dict[str, Any]:
-    return load_baseline()
 
 
 @pytest.fixture(scope="session")

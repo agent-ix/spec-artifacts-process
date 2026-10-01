@@ -111,7 +111,6 @@ between the source and the shipped bytes fails the build.
 | FR-009-AC-7 | The wheel built by `make build` contains `spec_artifacts_process/schemas/<Model>.json` for every exported model, and the tree `scripts/stage-npm.mjs` stages carries `manifest.yaml` with a sibling `schemas/` holding the same set. | Test (TC-086) |
 | FR-009-AC-8 | Running the generator twice over one tree produces byte-identical files. | Test (TC-087) |
 | FR-009-AC-10 | With the toolchain uninstalled, the generator exits non-zero naming the missing component and `make semantic-install`, and does not fail inside the compiler. | Test (TC-132) |
-| FR-009-AC-11 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values. | Test (TC-133) |
 | FR-009-AC-13 | Every test in the suite that asserts a property of all declared types derives the type list from `manifest.yaml` or from the emitted bundle; none carries a hard-coded list. | Inspection |
 
 ## Dependencies

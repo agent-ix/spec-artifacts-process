@@ -298,5 +298,5 @@ the third instance of the engine-before-module ordering gap in that program.
 
 ## Dependencies
 
-- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge, released in v0.29.0), FR-006 (the suite registry sharing the evidence-kind vocabulary), [FR-004](./FR-004-traceability-declaration.md) (the `constraint` trace target AC-20's obligation source targets), quire-rs FR-050-AC-47 (computed CoverageMatrix, `agent-ix/quire-rs#494`, reconciles obligations as well as trace targets)
+- **Upstream**: quire-rs [FR-054](ix://agent-ix/quire-rs/FR-054) (the block shape and the merge), FR-006 (the suite registry sharing the evidence-kind vocabulary), [FR-004](./FR-004-traceability-declaration.md) (the `constraint` trace target AC-20's obligation source targets), quire-rs FR-050-AC-47 (computed CoverageMatrix, `agent-ix/quire-rs#494`, reconciles obligations as well as trace targets)
 - **Downstream**: agent-ix/quoin#89 (the test-plan advisor reads the merged catalog and matches its applicability rules), agent-ix/quoin#80 (method conformance is checked against it), agent-ix/quoin#91 (evidence adapters map tool output onto these kinds)

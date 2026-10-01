@@ -125,5 +125,5 @@ other broken trace reference instead of recording an act against nothing.
 
 ## Dependencies
 
-- **Upstream**: quire-rs [FR-053](ix://agent-ix/quire-rs/FR-053) (the obligation record these acts discharge, released in v0.29.0), FR-050 (the traceability model), FR-033 (the `assert` facet and its `optional_columns` / `column_choices` keys)
+- **Upstream**: quire-rs [FR-053](ix://agent-ix/quire-rs/FR-053) (the obligation record these acts discharge), FR-050 (the traceability model), FR-033 (the `assert` facet and its `optional_columns` / `column_choices` keys)
 - **Downstream**: agent-ix/quoin#79 (the evidence store consumes both as a typed registry), agent-ix/quoin#80 (suite-based freshness and vacuity checks)

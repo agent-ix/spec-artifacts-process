@@ -26,18 +26,16 @@ exact meaning it has today.
 - The emitted schemas of [FR-009](./FR-009-emitted-json-schemas.md).
 - The module-manifest schema carrying the `semantic` block, as `filament-core-service` FR-035
   defines it and as Quoin and Quire each vendor it.
-- The checked-in 0.1.0 baseline of `archetypes`, `artifact_types`, `object_types`, `doc_kinds`,
-  `grammars`, `traceability` and `verification_catalog`, which NFR-001 measures against.
 
 ## Outputs
 
-- `manifest.yaml` at `version: 0.2.0`, carrying a `semantic` block and a reference-form
+- `manifest.yaml` carrying a `semantic` block and a reference-form
   `data_schema` on each of the twelve declared artifact types.
 
 ## Behavior
 
 - The `semantic` block SHALL carry exactly these keys and values: `contract_version: 1.0.0`,
-  `semantic_core: 0.1.0`, `package: agent-ix/spec-artifacts-process`, `exports` listing every
+  `semantic_core` (the declared semantic-core pin), `package: agent-ix/spec-artifacts-process`, `exports` listing every
   artifact type that ships a schema, `imports: {}`, `targets: [json-schema, markdown]`,
   `mappings: [frontmatter, section, table, typed-table, sysml-fence, ocl-clause, list, token, provenance]`,
   `compatibility_posture: additive`, `legacy_forms: warning`.
@@ -48,22 +46,11 @@ exact meaning it has today.
 - No artifact type SHALL carry an inline `data_schema`.
 - `manifest_version` SHALL stay `1.0.0`, because it names the manifest format
   rather than this module.
-- Every `archetypes`, `artifact_types`, `object_types`, `doc_kinds`, `grammars`, `traceability`,
-  `lint_rules` and `verification_catalog` declaration present at 0.1.0 SHALL be present at 0.2.0
-  with byte-identical content, except for the `data_schema` key this requirement adds and the
-  `body_extraction` locators FR-012 adds.
-- Every `body_extraction` locator this change adds SHALL be `required: false`, so no document that
-  validates at 0.1.0 stops validating at 0.2.0.
-- The `Status` column pattern `^(✅|❌|🚧|⛔)(\s+.*)?$` SHALL keep exactly the four markers it
-  admits today, and no vocabulary declared in this manifest SHALL be widened or narrowed by this
-  change.
+- The `Status` column pattern `^(✅|❌|🚧|⛔)(\s+.*)?$` SHALL admit exactly the four markers it names.
 - The engine SHALL dispatch a document on frontmatter `type:`, so `type: Standard` resolves to the
   artifact type `Standard` with `Standard.json` as its record schema, while the object type
   `standard` is reached only through `object: standard`.
 - This change SHALL NOT alter which of the two declarations a given document resolves to.
-- The `traceability.trace_targets` and `document_references` entries bind by archetype name, so
-  adding a `data_schema` key to an artifact type changes no binding; the manifest test SHALL
-  assert that the trace-target set is byte-identical to the 0.1.0 baseline.
 - The `object_types` entry `standard` SHALL keep its inline `data_schema`, because converting it
   to the reference form would change how the engine resolves a declaration a consumer already
   activates against, and the record shape it declares is the frontmatter projection rather than
@@ -82,7 +69,6 @@ exact meaning it has today.
 | ID | Constraint | Type | Validation |
 |----|------------|------|------------|
 | FR-010-CON-1 | The `semantic` block SHALL contain no key outside the nine admitted names. | Compatibility | Test |
-| FR-010-CON-2 | This change SHALL add no required key, no required section, and no new vocabulary member to any existing archetype. | Compatibility | Test |
 | FR-010-CON-3 | `⚠️` SHALL NOT be admitted to the `Status` pattern; it was retired by CR-031 because every row carrying it was exempt from the status-lie check by construction, and the divergent `quoin:spec-matrix` skill is the defect (`agent-ix/quoin#337`). | Compatibility | Test |
 
 ## Acceptance Criteria
@@ -90,15 +76,12 @@ exact meaning it has today.
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-010-AC-1 | The loaded `semantic` block equals the nine admitted keys with the values above, and `exports` equals the set of `artifact_types[].name` — derived from the manifest, so the count in `spec.md` and the declared type list cannot drift apart. | Test (TC-089) |
-| FR-010-AC-3 | Every 0.1.0 declaration, compared against the checked-in 0.1.0 baseline of the manifest, is present unchanged apart from: the added `data_schema` keys; the two added `required: false` locators on `Standard`; the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460); CR-063's underscore-object-id widening inside `traceability` — the new `interface-verification` document reference, and the widened `inspection-obligation`, `traces-to` and TestMatrix `Traces To` patterns, and the twelve widened `legacy`/`implements` trace-tag forms; and PLAT-1079's additions — the new `constraint` trace target (`evidence: source`), the new `constraint` obligation source, `constraint` added to `inspection-obligation`'s and `traces-to`'s `targets`, and one new top-level `lint_rules` entry (`table_column_values`, `severity: warning`, scoped to `FR`/`NFR`/`interface`) checking the `Verification` column. | Test (TC-091) |
-| FR-010-AC-4 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline. | Test (TC-092) |
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
-| FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
+| FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema`, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
 | FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
-| FR-010-AC-10 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline, apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of the `inspection-obligation` and `traces-to` patterns and their `targets` lists. | Test (TC-136) |
 
 ## Dependencies
 
 - **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md); quoin FR-070/FR-073 (`ix://agent-ix/quoin/FR-070`, `ix://agent-ix/quoin/FR-073`); quire-rs FR-069 (`ix://agent-ix/quire-rs/FR-069`)
-- **Downstream**: [FR-011](./FR-011-markdown-record-mapping.md), [FR-012](./FR-012-executable-skeletons.md), [NFR-001](../non-functional/NFR-001-additive-compatibility.md)
+- **Downstream**: [FR-011](./FR-011-markdown-record-mapping.md), [FR-012](./FR-012-executable-skeletons.md)

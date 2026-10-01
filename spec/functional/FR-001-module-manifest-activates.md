@@ -41,7 +41,7 @@ this requirement claims no otherwise. It is verified where the schema is applied
 at `POST /api/v1/modules/activate` — FR-001-AC-2 through AC-4, whose IT-001 has
 no implementing test (`spec/tests.md` carries FR-001 as `🚧 Specified`). What
 *is* executed here is narrower and is not a substitute: `quire.Registry.load_from`
-over this module loads every declared archetype against the 0.1.0 baseline
+over this module loads every declared archetype
 (FR-010-AC-5, TC-093), and a `semantic` block gaining an unknown key is refused
 at load (FR-010-AC-6, TC-094 — whose "names the offender" half is a strict expected
 failure). A manifest edit that breaks FR-035 conformance without

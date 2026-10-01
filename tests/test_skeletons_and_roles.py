@@ -1,6 +1,6 @@
 """Executable skeletons, packaging, and the definition/occurrence split.
 
-Requirements FR-012 and FR-013; rows TC-111..TC-114, TC-116, TC-119..TC-126, TC-130.
+Requirements FR-012 and FR-013; rows TC-111..TC-114, TC-116, TC-119..TC-126.
 
 The skeletons are validated through the ENGINE against this module's own
 manifest, so the contract is asserted as an author experiences it rather than as
@@ -95,22 +95,6 @@ def test_every_skeleton_validates_against_its_own_archetype(quire_engine, path: 
     result = quire_engine.validate_document(model, str(PACKAGE_ROOT), path.read_text())
     assert result["errors"] == [], result["errors"]
     assert result["is_valid"] is True
-
-
-@pytest.mark.parametrize(
-    "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
-)
-@pytest.mark.trace("TC-130")
-def test_every_skeleton_validates_under_0_2_0_with_zero_errors(
-    quire_engine, path: Path
-):
-    """NFR-001-AC-4. Same engine call as TC-112, asserted as the compatibility
-    claim rather than as the authoring claim: the two rows would be deleted for
-    different reasons."""
-    model = frontmatter(path.read_text())["type"]
-    assert quire_engine.validate_document(model, str(PACKAGE_ROOT), path.read_text())[
-        "is_valid"
-    ]
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))

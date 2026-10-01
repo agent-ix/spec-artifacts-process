@@ -291,13 +291,12 @@ validation engine's cross-reference job and is out of scope here.
 > mode this contract exists to catch, so the contract was fixed instead of the
 > corpus. Nothing else relaxes: the column is still declared, still ordered,
 > and its values are still constrained to `P0..P4` in every matrix that
-> authors it (quire-rs FR-033-AC-14/15, CR-023). Requires an engine at
-> **v0.16.0 or later** — an older engine rejects `optional_columns` as an
+> authors it (quire-rs FR-033-AC-14/15, CR-023). Requires an engine that
+> accepts `optional_columns`: an older engine rejects it as an
 > unknown assert key at load time.
 >
 > **CR-017 note (2026-08-06):** The FR-003-CON-1 gate was re-run and the 171
-> failures classified (report: `reports/2026-08-06-fr003-signoff-gate.md`,
-> agent-ix/spec-artifacts-process#12). The harness is now committed at
+> failures classified (agent-ix/spec-artifacts-process#12). The harness is now committed at
 > `scripts/testmatrix_sweep.py`; the original run's was not, which is why the
 > figure could not be re-derived.
 >
@@ -349,7 +348,7 @@ validation engine's cross-reference job and is out of scope here.
 > treating the ~110 unauthored matrices as a backlog rather than a blocker.
 
 > **CR-016 note:** The FR-003-CON-1 sweep
-> (`reports/2026-08-04-tests-md-sweep.md`) validated this contract against all
+> validated this contract against all
 > 177 ecosystem `TestMatrix` documents: **6 passed**. The vocabulary failures
 > were mostly the contract being narrower than reality — `Benchmark` (8 repo
 > families), review/inspection (5), `Static` (3), decorated statuses (6),
@@ -377,7 +376,7 @@ validation engine's cross-reference job and is out of scope here.
   [US-001](../usecase/US-001-machine-validated-test-matrix.md)
 - **External (not yet available)**: a quire-rs id-uniqueness table assert
   (follow-on to [FR-033](ix://agent-ix/quire-rs/spec/functional/FR-033);
-  verified absent from `LocatorAssert`/`assert_eval` as of 2026-08-04) —
+  verified absent from `LocatorAssert`/`assert_eval`) —
   required to machine-enforce FR-003-AC-11; until it ships, AC-11 is normative
   guidance verified by review
 - **Downstream**: the quoin `spec-matrix` flow that authors `tests.md`, and

@@ -56,7 +56,7 @@ states, so that a skeleton is an executable fixture rather than an example nothi
   declares the properties a conforming artifact carries and the invariants conformance requires,
   and the other eleven types declare process content rather than a typed structure. Introducing a
   `## Properties` section on a type whose documents do not carry one would be a new required form
-  for every consuming repository, which NFR-001 forbids.
+  for every consuming repository.
 - The module SHALL author each golden record from its skeleton and validate it against its emitted
   schema, never producing it by recording whatever the reference mapping happened to output. A
   blessed output is a snapshot of the mapping's bugs, and the golden record exists precisely to
@@ -118,4 +118,3 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 ## Dependencies
 
 - **Upstream**: [FR-011](./FR-011-markdown-record-mapping.md); quoin FR-074 (`ix://agent-ix/quoin/FR-074`)
-- **Downstream**: [NFR-001](../non-functional/NFR-001-additive-compatibility.md)
