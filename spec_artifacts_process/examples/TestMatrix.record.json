@@ -23,7 +23,7 @@
   ],
   "id": "TM-001",
   "provenance": {
-    "digest": "sha256:a36b676b32944027a695ae1a167de336d427a57cdbd71efb8aec7d0acfac33a2",
+    "digest": "sha256:6d07fcc30a52a918eca5102f6359fb1032c157db64fdb33c3cb08907ed107a2f",
     "path": "skeletons/TestMatrix.md"
   },
   "testCases": [
@@ -71,7 +71,7 @@
       "tracesTo": {
         "noTrace": false,
         "tokens": [
-          "NFR-001-AC-1"
+          "FR-003-AC-1"
         ]
       },
       "type": "Benchmark"

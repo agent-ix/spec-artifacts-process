@@ -55,5 +55,5 @@ type: TestMatrix
 |---------|-------|------|----------|-----------|--------|
 | TC-001 | A matching digest persists the artifact | Unit | P0 | FR-001-AC-1 | ✅ |
 | TC-002 | A mismatched digest rejects the import and names both digests | Unit | P0 | FR-001-AC-2 | ✅ |
-| TC-003 | Import throughput holds at the declared threshold | Benchmark | P2 | NFR-001-AC-1 | 🚧 not yet run at scale |
+| TC-003 | Import throughput holds at the declared threshold | Benchmark | P2 | FR-003-AC-1 | 🚧 not yet run at scale |
 | TC-004 | Digest computed before any transform | Unit | P1 | - | ⛔ superseded by TC-001 |
