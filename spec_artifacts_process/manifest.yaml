@@ -1903,7 +1903,7 @@ verification_catalog:
 # activates this module.
 semantic:
   contract_version: 1.0.0
-  semantic_core: 0.3.0
+  semantic_core: 0.3.2
   package: agent-ix/spec-artifacts-process
   exports:
   - ADR
