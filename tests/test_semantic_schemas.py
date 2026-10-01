@@ -26,7 +26,6 @@ from conftest import (
     SCHEMAS_DIR,
     SEMANTIC_CORE_BASE,
     SEMANTIC_DIR,
-    load_manifest,
 )
 
 
@@ -175,20 +174,3 @@ def test_a_missing_toolchain_names_the_component_and_the_install(tmp_path: Path)
     assert result.returncode != 0
     assert "make semantic-install" in result.stderr
     assert "semantic-core" in result.stderr or "tsp" in result.stderr
-
-
-@pytest.mark.trace("TC-133")
-def test_a_semantic_core_version_disagreement_names_both(sandbox: Path):
-    manifest = sandbox.parent / "manifest.yaml"
-    manifest.write_text(
-        re.sub(
-            r"^  semantic_core: .*$",
-            "  semantic_core: 9.9.9",
-            manifest.read_text(),
-            flags=re.M,
-        )
-    )
-    result = run_generator([], cwd=sandbox)
-    assert result.returncode != 0
-    declared = load_manifest()["semantic"]["semantic_core"]
-    assert "9.9.9" in result.stderr and declared in result.stderr

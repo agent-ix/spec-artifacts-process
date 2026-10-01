@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Run the FR-003 TestMatrix contract over every `spec/tests.md` in a corpus.
 
-This is the harness behind `reports/2026-08-04-tests-md-sweep.md`. That run's
-script was never committed, so the 171/177 figure could not be re-derived
-without rebuilding it (agent-ix/spec-artifacts-process#12). It lives here now.
+It lives here so the sweep can be re-run rather than re-derived.
 
 Read-only: it validates and reports, and never edits a document. The
 normalization sweep it informs is user-gated by FR-003-CON-1.

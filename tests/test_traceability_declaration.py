@@ -122,7 +122,7 @@ def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
     """TC-148 (FR-004-AC-20): the end-to-end measurement. `quire coverage
     --json` mints `FR-NNN-CON-N` rows among `minted_targets`, and `quire
     validate --okf` reports zero `dangling-trace-reference` warnings naming a
-    `-CON-` id — down from the measured baseline of 13 (PLAT-1079 CR-064)."""
+    `-CON-` id (PLAT-1079 CR-064)."""
     if shutil.which("quire") is None:
         pytest.skip("the `quire` CLI is required for the rollup")
 

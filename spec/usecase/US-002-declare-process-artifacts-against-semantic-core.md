@@ -68,7 +68,7 @@ shared with the sibling modules; or teaching the engine to synthesise a schema f
 
 Maintainers noted that this module is a dependency of every other repository's validation, so
 discovery treated "nothing a consuming repository authors today may stop validating" as the
-governing worry. This context is not binding and is made normative by NFR-001 rather than here.
+governing worry. This context is not binding.
 
 ## Dependencies (Contextual)
 

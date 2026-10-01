@@ -377,7 +377,7 @@ artifact_types:
               # same-prefix range or a trailing parenthetical note is allowed.
               #
               # CR-017 admits two authoring shorthands the sweep found in real
-              # matrices (report: reports/2026-08-06-fr003-signoff-gate.md):
+              # matrices:
               #   * continuation, where the parent id is elided —
               #     `FR-001-AC-2, -AC-3, -AC-4`
               #   * slash enumeration of sub-ids — `FR-016-AC-1/2/3/6`
@@ -388,7 +388,7 @@ artifact_types:
               # trace to — withdrawing it is precisely the act of severing that
               # edge — and the pattern admitted nothing valid to write.
               #
-              # [RAN] `agent-ix/filament-ide-rs` @ fc5d644: 16 rows across 8
+              # [RAN] `agent-ix/filament-ide-rs`: 16 rows across 8
               # module matrices carry `Traces To: -`, and **16 of 16 are
               # retired** (`⛔`). Zero are live rows with a missing trace. The
               # corpus wrote the conventional "not applicable" and the pattern
@@ -462,8 +462,7 @@ artifact_types:
   # BOTH ARE `required: false`, and that is the whole compatibility story: every
   # Standard document in every consuming repository validates today without
   # either section, and still does. Introducing a required section on a type
-  # the ecosystem already authors would be a build break everywhere, which is
-  # exactly what NFR-001 forbids.
+  # the ecosystem already authors would be a build break everywhere.
   body_extraction:
     yield_pattern:
       match:
@@ -783,7 +782,7 @@ traceability:
   #   * `archetype: TestMatrix` could not see the canonical matrix at all — the
   #     corpus walk skipped every file named `tests.md` (quire-rs
   #     `corpus/walk.rs` `DEFAULT_SKIP`). Type-driven corpus membership
-  #     (quire-rs #73, v0.26.0) removed that skip, so the premise is gone.
+  #     (quire-rs #73) removed that skip, so the premise is gone.
   #   * Archetype binding still sees matrices that are *test data* — scanning
   #     this module's own repo by archetype minted 67 test-case ids from
   #     `tests/fixtures/testmatrix/*.md` and reported 50 of them "backed",
@@ -1102,7 +1101,7 @@ traceability:
     # matches once and stops at the comma, so the rest was never *read*.
     #
     # The engine splits capture group 1 the way `marker_ids` already splits a
-    # marker's argument list (quire-rs FR-051-AC-16, v0.21.0). Both halves are
+    # marker's argument list (quire-rs FR-051-AC-16). Both halves are
     # required: widening alone would hand the engine one id of `"A, B"`, and
     # splitting alone finds nothing to split.
     #
@@ -1371,7 +1370,7 @@ traceability:
     # 29148-aligned corpus also authors verification by inspection, by analysis
     # and by demonstration, and had no declared value for any of them.
     #
-    # [RAN] `agent-ix/filament-ide-rs` @ fc5d644: of 496 `[assert]` findings,
+    # [RAN] `agent-ix/filament-ide-rs`: of 496 `[assert]` findings,
     # 453 were rejected `Type` cells, and 128 of those were a means the
     # vocabulary had no word for — `Inspection` 112, `Analysis` 11,
     # `Demonstration` 5. Rows read rather than assumed: TC-085 "Inspect Core for

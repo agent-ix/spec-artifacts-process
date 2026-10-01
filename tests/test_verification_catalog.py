@@ -2,7 +2,7 @@
 
 Manifest-data assertions plus one behavioural check that the engine actually
 reads what this module declares. The behavioural half matters more than it looks:
-the catalog is a manifest block quire-rs v0.29.0 introduced, and a module that
+the catalog is a manifest block quire-rs introduced, and a module that
 declares it against an older engine loads with the block silently ignored.
 """
 
@@ -143,7 +143,7 @@ def test_tc051_every_entry_is_selectable() -> None:
 def test_tc052_engine_loads_the_catalog() -> None:
     """TC-052 (FR-007-AC-5): the engine reads what this module declares.
 
-    `verification_catalog` is a quire-rs v0.29.0 manifest block. Against an
+    `verification_catalog` is a quire-rs manifest block. Against an
     older engine the top-level key is tolerated and silently ignored — the
     module would look correct and contribute nothing — so this asserts the
     manifest loads clean rather than assuming it.

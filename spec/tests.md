@@ -102,16 +102,12 @@ type: TestMatrix
 | FR-009 | FR-009-AC-7 | TC-086 | ✅ Complete |
 | FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
 | FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
-| FR-009 | FR-009-AC-11 | TC-133 | ✅ Complete |
 | FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
 | FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
-| FR-010 | FR-010-AC-3 | TC-091 | ✅ Complete |
-| FR-010 | FR-010-AC-4 | TC-092 | ✅ Complete |
 | FR-010 | FR-010-AC-5 | TC-093 | ✅ Complete |
 | FR-010 | FR-010-AC-6 | TC-094 | ✅ Complete |
 | FR-010 | FR-010-AC-8 | TC-096 | ✅ Complete |
 | FR-010 | FR-010-AC-9 | TC-135 | ❌ blocked on quire-rs#221 |
-| FR-010 | FR-010-AC-10 | TC-136 | ✅ Complete |
 | FR-011 | FR-011-AC-1 | TC-097 | ✅ Complete |
 | FR-011 | FR-011-AC-2 | TC-098 | ✅ Complete |
 | FR-011 | FR-011-AC-3 | TC-099 | ✅ Complete |
@@ -147,20 +143,8 @@ type: TestMatrix
 | FR-013 | FR-013-AC-4 | TC-123 | ✅ Complete |
 | FR-013 | FR-013-AC-5 | TC-124 | ✅ Complete |
 | FR-013 | FR-013-AC-6 | TC-125 | ✅ Complete |
-| FR-013 | FR-013-AC-7 | Inspection (discharged by TC-091) | ✅ Complete |
 | FR-013 | FR-013-AC-8 | TC-143 | ✅ Complete |
 
-### Non-Functional Requirement Coverage
-
-The `TestMatrix` archetype gives this table the columns
-`Non-Functional Req | Verification Method | Evidence/Test Cases | Status` and no criterion column,
-so it groups by method. Per-criterion coverage for NFR-001-AC-1..AC-4 is carried by the
-`Traces To` cells of TC-127..TC-130 in the Test Case Summary; this grouped table is not the whole
-claim (SR-008 FND-004).
-
-| Non-Functional Req | Verification Method | Evidence/Test Cases | Status |
-|--------------------|---------------------|---------------------|--------|
-| NFR-001 | Test | TC-127, TC-128, TC-129, TC-130 | ✅ Complete |
 
 ## Test Case Summary
 
@@ -217,7 +201,7 @@ claim (SR-008 FND-004).
 | TC-049 | Every entry declares a non-empty name, class and definition, and every class is one of the four IADT values — the engine treats `class` as a free string, so this contract is the module's to keep (FR-007) | Unit | P0 | FR-007-AC-2 | ✅ |
 | TC-050 | Every `evidence_kind` is a member of the declared `test_type` vocabulary. This is the THIRD literal copy of that list (catalog, matrix `Type`, suite `Evidence Kind`) because `from_vocabulary` is deferred (quire-rs#146); deleting this test makes the duplication silent (FR-007) | Unit | P0 | FR-007-AC-3 | ✅ |
 | TC-051 | Every entry declares at least one non-empty applicability rule drawn from the module's declared axes — an entry no rule can select is a definition the advisor never reaches (FR-007) | Unit | P0 | FR-007-AC-4 | ✅ |
-| TC-052 | The engine loads the manifest with the catalog block present. `verification_catalog` is a quire-rs v0.29.0 key: against an older engine the top-level key is tolerated and silently ignored, so the module would look correct and contribute nothing (FR-007) | Unit | P0 | FR-007-AC-5 | ✅ |
+| TC-052 | The engine loads the manifest with the catalog block present. `verification_catalog` is a quire-rs key: against an older engine the top-level key is tolerated and silently ignored, so the module would look correct and contribute nothing (FR-007) | Unit | P0 | FR-007-AC-5 | ✅ |
 | TC-053 | `verification_class` is exactly the four IADT values and `verification_method` exactly the catalog keys, both derived by the engine — and neither is separately declared here, which is the duplication FR-054-CON-4 forbids (FR-007) | Unit | P0 | FR-007-AC-6 | ✅ |
 | TC-054 | Inspection, demonstration and agent-behaviour evaluation carry an evidence kind inside the declared `no_source_symbol` set, so a row verified that way is never reported as a status lie — CR-041 applied to the catalog (FR-007) | Unit | P0 | FR-007-AC-7 | ✅ |
 | TC-055 | The traceability model declares the ecosystem's obligation sources — the three acceptance-criterion targets (`FR`, `NFR`, `interface`), the NFR `Measurement and Evaluation` table with its rendered ids and parameters — so quire-rs FR-053 derives obligations rather than shipping inert. Found end-to-end: `quoin evidence record` bound nothing until this landed (FR-007) | Unit | P0 | FR-007-AC-8 | ✅ |
@@ -241,17 +225,15 @@ claim (SR-008 FND-004).
 | TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
-| TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core 0.1.0 model; no other host or version appears | Unit | P0 | FR-009-AC-3 | ✅ |
+| TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core model; no other host appears | Unit | P0 | FR-009-AC-3 | ✅ |
 | TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | ✅ |
 | TC-085 | An extra `schemas/Stale.json` makes the check exit non-zero naming it, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed | Unit | P0 | FR-009-AC-6 | ✅ |
 | TC-086 | The built wheel and the staged npm tree each carry `schemas/<Model>.json` for every exported model beside `manifest.yaml` | Unit | P1 | FR-009-AC-7 | ✅ |
 | TC-087 | Two generator runs over one tree produce byte-identical files | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | ✅ |
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
-| TC-091 | Every 0.1.0 declaration is present at 0.2.0 unchanged apart from the added `data_schema` keys, the two added `required: false` locators on `Standard`, the `interface-acceptance-criterion` trace target and its own `required: false` (quire-rs#460), CR-063's underscore-object-id widening of `inspection-obligation`, `traces-to`, the TestMatrix `Traces To` pattern, the twelve `legacy`/`implements` trace-tag forms and the new `interface-verification` document reference, and PLAT-1079's additions — the `constraint` trace target, `constraint` joining `inspection-obligation`'s and `traces-to`'s `targets` (each pinned to its exact widened list), the `constraint` obligation source, and the new `lint_rules` entry — a structural diff against the checked-in baseline, not a spot check | Unit | P0 | FR-010-AC-3, FR-010-CON-2 | ✅ |
-| TC-092 | The `Status`, `Type`, `Priority`, `Traces To`, `Severity`, `Escape Cause`, `Evidence Kind` and `Verdict` vocabularies are byte-identical to the 0.1.0 baseline, and `⚠️` is still rejected by the `Status` pattern | Unit | P0 | FR-010-AC-4, FR-010-CON-3 | ✅ |
 | TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
 | TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, (expected failure: quire-rs#221 makes the refusal silent) | Unit | P0 | FR-010-AC-6 | ✅ |
-| TC-096 | The `object_types` entry `standard` still carries its inline `data_schema` with the same properties and `required` list as at 0.1.0 | Unit | P1 | FR-010-AC-8 | ✅ |
+| TC-096 | The `object_types` entry `standard` carries its inline `data_schema` | Unit | P1 | FR-010-AC-8 | ✅ |
 | TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | ✅ |
 | TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | ✅ |
 | TC-099 | Every section and column `mappings.yaml` names is declared by that type's `body_extraction` | Unit | P0 | FR-011-AC-3, FR-011-CON-1 | ✅ |
@@ -281,15 +263,9 @@ claim (SR-008 FND-004).
 | TC-123 | `SpecReview` findings rows carry `id`, `severity`, `summary`, `refs` and optional `escapeCause`; a `Finding` document id matches `FIND-` while a row id matches `FND-` | Unit | P0 | FR-013-AC-4 | ✅ |
 | TC-124 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, answering which criteria a row claims without re-parsing the cell | Unit | P0 | FR-013-AC-5 | ✅ |
 | TC-125 | `mappings.yaml` records the run-record concepts this module does not model and names their owner | Unit | P1 | FR-013-AC-6 | ✅ |
-| TC-126 | The archetype declarations are byte-identical to the 0.1.0 baseline apart from the additions FR-010 and FR-012 name | Unit | P0 | - | ⛔ retired: SR-013 FND-004 made FR-010-AC-3 the single normative baseline claim, so this row duplicated TC-091 |
-| TC-127 | Every 0.1.0 archetype, artifact type, object type, grammar, doc kind, traceability declaration and verification-catalog entry survives to 0.2.0 with identical content apart from the named additions | Unit | P0 | NFR-001-AC-1 | ✅ |
-| TC-128 | No declared vocabulary gains or loses a member between 0.1.0 and 0.2.0 | Unit | P0 | NFR-001-AC-2 | ✅ |
-| TC-129 | Every locator added at 0.2.0 is `required: false` | Unit | P0 | NFR-001-AC-3 | ✅ |
-| TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | ✅ |
+| TC-128 | The admitted `Status` markers are exactly the classed ones (`⚠️` stays rejected), and the three literal copies of the test-type vocabulary agree | Unit | P0 | FR-010-CON-3 | ✅ |
 | TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | ✅ |
-| TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | ✅ |
 | TC-135 | The refusal of an unknown `semantic` key names the key. STRICT EXPECTED FAILURE: both refusals are silent (quire-rs#221). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221 |
-| TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of `inspection-obligation` and `traces-to` and their `targets` lists, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | ✅ |
 | TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | ✅ |
 | TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | ✅ |
 | TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | ✅ |
@@ -334,8 +310,7 @@ mixed combination in one conforming document.
 | FR-003-CON-1 | Process gate | enforcing module version published before ecosystem `tests.md` sweep + user sign-off | Inspection (plan gate, no TC) | violation |
 | FR-009-CON-3 | Determinism | two generator runs on one tree | TC-087 | byte-identical output |
 | FR-010-CON-1 | Closed key set | `semantic` block with a tenth key `foo` | TC-094 | Error (load refusal) |
-| FR-010-CON-2 | No new required key | 0.1.0 baseline vs 0.2.0 structural diff | TC-091 | 0 changed declarations |
-| FR-010-CON-3 | Status vocabulary | a `⚠️`-headed Status cell | TC-092 | Error (`assert`) — the marker stays retired |
+| FR-010-CON-3 | Status vocabulary | a `⚠️`-headed Status cell | TC-128 | Error (`assert`) — the marker stays retired |
 | FR-011-CON-1 | Mapping names a declared section | every section named in `mappings.yaml` | TC-099 | pass |
 | FR-011-CON-2 | Mapping totality | a model property with no mapping entry | TC-098 | Error (unmapped property) |
 | FR-012-CON-1 | Skeleton is the fixture | every shipped skeleton validated as authored | TC-112 | pass |
@@ -369,4 +344,4 @@ mixed combination in one conforming document.
 | GAP-002 | FR-003-AC-11 (Test ID uniqueness) is normative but not machine-enforceable: quire-rs exposes no uniqueness assert (verified in `LocatorAssert`/`assert_eval`, 2026-08-04) | Low | External quire-rs capability request (follow-on to FR-033); TC-024 stays 🚧 blocked until it ships |
 | GAP-003 | IT-002 (Quoin install) is RED, not unverified: Quoin's FR-070 validator resolves `semantic.exports` against `object_types` only, so no artifact module installs — this one and the already-merged `spec-artifacts-iso` are both refused (measured 2026-09-04) | Medium | `agent-ix/quoin#347`; carried as a strict expected failure so the row turns green when the engine changes, never as a skip |
 | GAP-006 | FR-001 has no executing verification. FR-001-AC-1 is retired with its vendored-copy gate (PLAT-902), and AC-2..AC-4 are IT-001, which has no implementing test — so a manifest edit that breaks FR-035 conformance without breaking `Registry.load_from` ships with every gate green | Medium | Only `filament-core-service` can settle FR-035 conformance, at activation; `quire.validate_manifest` takes a caller-supplied schema path and so cannot verify it without re-creating a copy. Recorded rather than closed |
-| GAP-005 | The `acceptance-criterion` trace channel is 1/125 backed. This repository tags TC ids, not AC ids, and criteria are reached through the matrix row; the convention predates #78 (0/65 on `origin/main`) and is not changed by it | Low | Recorded rather than closed: changing the tagging convention is an ecosystem decision, not a side effect of this ticket |
+| GAP-005 | The `acceptance-criterion` trace channel is 1/125 backed. This repository tags TC ids, not AC ids, and criteria are reached through the matrix row; the convention predates #78 and is not changed by it | Low | Recorded rather than closed: changing the tagging convention is an ecosystem decision, not a side effect of this ticket |

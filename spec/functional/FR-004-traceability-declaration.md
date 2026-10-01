@@ -258,9 +258,8 @@ modules can version apart.
 > (`agent-ix/spec-artifacts-process#59`, epic `agent-ix/quoin#197`).
 >
 > **What the number counts:** function-definition sites in
-> `agent-ix/filament-ide-rs` @ `3349cf8` (24 crates, ~143k LOC), counted by
-> spelling, under `quire 0.29.0` / engine `quire-rs v0.42.0` /
-> `spec-artifacts-process v0.23.0`. `fn tc_NNN_` (underscore): **1,292**.
+> `agent-ix/filament-ide-rs` (24 crates, ~143k LOC), counted by
+> spelling. `fn tc_NNN_` (underscore): **1,292**.
 > `fn tcNNN_` (the declared spelling): **0**. Every tracking tag written in that
 > repository's dominant convention bound nothing.
 >
@@ -339,9 +338,9 @@ modules can version apart.
 > toolchain turned 38 of this repository's 81 tests red with
 > `unknown field 'source_exclude'`. The chain is therefore engine → **every**
 > consumer → module, and it has four hops rather than the three the plan
-> assumed: `quire-rs` v0.41.0, then **both** `quire-cli` v0.28.0 (the binary
+> assumed: `quire-rs`, then **both** `quire-cli` (the binary
 > `subprocess` tests shell out to) and the `quire` **Python wheel** (which
-> `testmatrix_sweep.py` imports), then `spec-artifacts-iso` v0.18.0 for the
+> `testmatrix_sweep.py` imports), then `spec-artifacts-iso` for the
 > `additionalProperties: false` schema gate, and only then this module.
 
 > **CR-031 note (2026-08-20):** cross-reference only — the status **vocabulary
@@ -389,19 +388,19 @@ modules can version apart.
 > programme keeps finding.
 >
 > **Ordering, and the defect it exposed.** This cannot ship against an engine
-> older than quire-rs **v0.38.0**. v0.36.0 minted the relation and v0.37.0
+> that predates the fix: the engine minted the relation and
 > carried it into `coverage --json`, but the forms a *module* declared were
 > dropped between the manifest and the binding — `merge_traceability` and
 > `TraceabilityModel::is_empty` are hand-maintained per-field functions and
 > neither listed the key. Declaring this block is what surfaced it (quire-rs
-> CR-081); against v0.37.0 the declaration loads and mints nothing.
+> CR-081); against such an engine the declaration loads and mints nothing.
 
 > **CR-062 note (2026-08-17):** FR-004-AC-2 **reverses**: every entry is now
 > archetype-bound and `document:` is gone, because quire-rs deleted the form
 > (agent-ix/quire-rs#74). Both halves of the original justification changed.
 >
 > The first half is simply void: the corpus walk no longer skips `tests.md`
-> (type-driven membership, quire-rs#73, v0.26.0), so archetype binding sees the
+> (type-driven membership, quire-rs#73), so archetype binding sees the
 > canonical matrix. The second half — archetype binding admits matrices that are
 > test data — is still true, and is answered by `exclude:` rather than by path
 > enumeration. That is why AC-9 now covers the matrix entries as well, and why
@@ -470,7 +469,7 @@ modules can version apart.
 > Verified against real input, that is false: capture group 1 is *already* a
 > single id, so splitting it in the engine converts nothing. The engine splits
 > group 1 the way `marker_ids` splits a marker's argument list (quire-rs
-> FR-051-AC-16, shipped in v0.21.0); this declaration widens the group so there
+> FR-051-AC-16); this declaration widens the group so there
 > is something to split.
 >
 > **`rust-test-name-id` is not list-widened.** It declares `id_format`, and
@@ -487,7 +486,7 @@ modules can version apart.
 > still binds `TC-480` alone. The prose guard CR-002's predecessor measured is
 > intact: `# FR-003-CON-1 sweep found in real matrices` still matches nothing.
 >
-> **Ordering:** this cannot ship against an engine older than quire-rs v0.21.0.
+> **Ordering:** this cannot ship against an older engine.
 > A widened group there yields a single id of literally `"A, B"`, which resolves
 > to nothing — strictly worse than today.
 
@@ -507,7 +506,7 @@ modules can version apart.
 > usually asserted by real code — this repo's own static boundary audit is a
 > test — so exempting them would hide overclaims rather than explain them.
 >
-> **Ordering:** this could not ship before quire-rs v0.20.0 / quire-cli v0.14.0.
+> **Ordering:** this could not ship before the engine learned the keys.
 > `ColumnVocabularies` is `deny_unknown_fields`, so declaring the keys against an
 > older engine fails module load outright and took 31 of this repo's own tests
 > with it.
