@@ -1,63 +1,63 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestMatrix.json",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestMatrix.json",
   "type": "object",
   "properties": {
     "id": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UpperDocId.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/UpperDocId.json"
     },
     "title": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonEmptyText.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
     },
     "type": {
       "type": "string",
       "const": "TestMatrix"
     },
     "object": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/ObjectTypeName.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/ObjectTypeName.json"
     },
     "relationships": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Relationship.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Relationship.json"
       },
       "description": "Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15)."
     },
     "provenance": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/Provenance.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Provenance.json"
     },
     "functionalCoverage": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/FunctionalCoverageRow.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FunctionalCoverageRow.json"
       },
       "minItems": 1
     },
     "testCases": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/TestCaseRow.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestCaseRow.json"
       },
       "minItems": 1
     },
     "stakeholderCoverage": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/StakeholderCoverageRow.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/StakeholderCoverageRow.json"
       },
       "description": "Optional: a bundle with no StR artifacts cannot truthfully populate it."
     },
     "userStoryCoverage": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/UserStoryCoverageRow.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/UserStoryCoverageRow.json"
       },
       "description": "Optional, for the same reason."
     },
     "nonFunctionalCoverage": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/NonFunctionalCoverageRow.json"
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonFunctionalCoverageRow.json"
       },
       "description": "Optional, for the same reason."
     }

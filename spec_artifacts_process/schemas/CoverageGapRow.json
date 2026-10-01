@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/CoverageGapRow.json",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/CoverageGapRow.json",
   "type": "object",
   "properties": {
     "id": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/GapId.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/GapId.json"
     },
     "cells": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/RecordString.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/RecordString.json"
     },
     "line": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/LineNumber.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/LineNumber.json"
     }
   },
   "required": [

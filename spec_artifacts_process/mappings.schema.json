@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/0.2.0/mappings.schema.json",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/mappings.schema.json",
   "title": "spec-artifacts-process Markdown record mapping",
   "description": "The schema mappings.yaml itself validates against, so a malformed mapping is a schema error rather than a reader's surprise (FR-011).",
   "type": "object",

@@ -1,6 +1,6 @@
 """The emitted JSON Schema bundle and its drift gate (requirement FR-009).
 
-TC-081..TC-087 and TC-132..TC-134.
+TC-081..TC-087 and TC-132..TC-133.
 
 Every assertion that quantifies over "all declared types" enumerates them from
 the manifest or from the emitted bundle (FR-009-CON-6). A hard-coded list stops
@@ -20,15 +20,14 @@ from pathlib import Path
 import pytest
 from conftest import (
     MANIFEST_PATH,
+    MODULE_BASE,
     PACKAGE_ROOT,
     REPO_ROOT,
     SCHEMAS_DIR,
+    SEMANTIC_CORE_BASE,
     SEMANTIC_DIR,
-    manifest_version,
-    module_base,
+    load_manifest,
 )
-
-SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.3.0/"
 
 
 def projections() -> list[Path]:
@@ -75,9 +74,8 @@ def sandbox(tmp_path: Path) -> Path:
 
 
 @pytest.mark.trace("TC-081")
-def test_every_projection_declares_the_versioned_id():
-    base = module_base()
-    assert manifest_version() in base
+def test_every_projection_declares_the_id():
+    base = MODULE_BASE
     for path in projections():
         schema = json.loads(path.read_text())
         assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
@@ -86,7 +84,7 @@ def test_every_projection_declares_the_versioned_id():
 
 @pytest.mark.trace("TC-082")
 def test_every_ref_resolves_to_a_sibling_or_to_semantic_core():
-    base = module_base()
+    base = MODULE_BASE
     shipped = {p.name for p in projections()}
     for path in projections():
         for ref in re.findall(r'"\$ref":\s*"([^"]+)"', path.read_text()):
@@ -110,15 +108,6 @@ def test_check_is_clean_and_fails_on_one_changed_byte(sandbox: Path):
     assert (
         victim.read_text() != original
     ), "--check must not rewrite the file it reports"
-
-
-@pytest.mark.trace("TC-084")
-def test_a_base_version_that_disagrees_with_the_manifest_fails(sandbox: Path):
-    source = sandbox / "main.tsp"
-    source.write_text(source.read_text().replace(f"/{manifest_version()}/", "/9.9.9/"))
-    result = run_generator([], cwd=sandbox)
-    assert result.returncode != 0
-    assert "9.9.9" in result.stderr and manifest_version() in result.stderr
 
 
 @pytest.mark.trace("TC-085")
@@ -201,18 +190,6 @@ def test_a_semantic_core_version_disagreement_names_both(sandbox: Path):
     )
     result = run_generator([], cwd=sandbox)
     assert result.returncode != 0
-    assert "9.9.9" in result.stderr and "0.3.0" in result.stderr
+    declared = load_manifest()["semantic"]["semantic_core"]
+    assert "9.9.9" in result.stderr and declared in result.stderr
 
-
-@pytest.mark.trace("TC-134")
-def test_a_stale_version_segment_fails_even_when_internally_consistent(sandbox: Path):
-    """Schemas that agree with each other but were generated against
-    a different manifest version must not pass by being internally consistent."""
-    manifest = sandbox.parent / "manifest.yaml"
-    old = manifest_version()
-    manifest.write_text(
-        manifest.read_text().replace(f"version: {old}", "version: 0.3.0", 1)
-    )
-    result = run_generator(["--check"], cwd=sandbox)
-    assert result.returncode != 0
-    assert "0.3.0" in result.stderr

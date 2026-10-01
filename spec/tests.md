@@ -98,13 +98,11 @@ type: TestMatrix
 | FR-009 | FR-009-AC-2 | TC-081 | ✅ Complete |
 | FR-009 | FR-009-AC-3 | TC-082 | ✅ Complete |
 | FR-009 | FR-009-AC-4 | TC-083 | ✅ Complete |
-| FR-009 | FR-009-AC-5 | TC-084 | ✅ Complete |
 | FR-009 | FR-009-AC-6 | TC-085 | ✅ Complete |
 | FR-009 | FR-009-AC-7 | TC-086 | ✅ Complete |
 | FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
 | FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
 | FR-009 | FR-009-AC-11 | TC-133 | ✅ Complete |
-| FR-009 | FR-009-AC-12 | TC-134 | ✅ Complete |
 | FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
 | FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
 | FR-010 | FR-010-AC-3 | TC-091 | ✅ Complete |
@@ -242,10 +240,9 @@ claim (SR-008 FND-004).
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
 | TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
-| TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name, with the version segment read from the manifest rather than hard-coded | Unit | P0 | FR-009-AC-2, FR-009-CON-5 | ✅ |
+| TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core 0.1.0 model; no other host or version appears | Unit | P0 | FR-009-AC-3 | ✅ |
 | TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | ✅ |
-| TC-084 | A `@jsonSchema` base whose version differs from the manifest `version` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-5, FR-009-CON-4 | ✅ |
 | TC-085 | An extra `schemas/Stale.json` makes the check exit non-zero naming it, while the hand-authored `*-frontmatter.schema.json` files are neither reported nor removed | Unit | P0 | FR-009-AC-6 | ✅ |
 | TC-086 | The built wheel and the staged npm tree each carry `schemas/<Model>.json` for every exported model beside `manifest.yaml` | Unit | P1 | FR-009-AC-7 | ✅ |
 | TC-087 | Two generator runs over one tree produce byte-identical files | Unit | P0 | FR-009-AC-8, FR-009-CON-3 | ✅ |
@@ -291,8 +288,7 @@ claim (SR-008 FND-004).
 | TC-130 | Every shipped skeleton validates under 0.2.0 with zero error findings | Integration | P0 | NFR-001-AC-4 | ✅ |
 | TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | ✅ |
 | TC-133 | A resolved `@agent-ix/semantic-core` version differing from `semantic.semantic_core` makes the generator exit non-zero naming both values | Unit | P1 | FR-009-AC-11 | ✅ |
-| TC-134 | A tree whose schemas agree with each other but carry a stale version segment fails `make schemas-check` — internal consistency is not the check | Unit | P0 | FR-009-AC-12 | ✅ |
-| TC-135 | The refusal of an unknown `semantic` key names the key. STRICT EXPECTED FAILURE against quire 0.46.0: both refusals are silent (quire-rs#221). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221 |
+| TC-135 | The refusal of an unknown `semantic` key names the key. STRICT EXPECTED FAILURE: both refusals are silent (quire-rs#221). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221 |
 | TC-136 | `traceability.trace_targets` and `document_references` are byte-identical to the 0.1.0 baseline apart from the `interface-acceptance-criterion` trace target, the `interface-verification` document reference, and CR-063's underscore-object-id widening of `inspection-obligation` and `traces-to` and their `targets` lists, so adding `data_schema` to an artifact type changed no binding | Unit | P0 | FR-010-AC-10 | ✅ |
 | TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | ✅ |
 | TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | ✅ |
@@ -337,8 +333,6 @@ mixed combination in one conforming document.
 | min_rows (SpecReview Findings) | Below Min | 0 data rows (header only) | TC-019 | Error (`assert`) |
 | FR-003-CON-1 | Process gate | enforcing module version published before ecosystem `tests.md` sweep + user sign-off | Inspection (plan gate, no TC) | violation |
 | FR-009-CON-3 | Determinism | two generator runs on one tree | TC-087 | byte-identical output |
-| FR-009-CON-4 | Atomic bump | manifest version bumped without the `@jsonSchema` base | TC-084 | Error (generator exits non-zero) |
-| FR-009-CON-5 | Hard-coded version | a test reading the `$id` version from the manifest | TC-081 | pass |
 | FR-010-CON-1 | Closed key set | `semantic` block with a tenth key `foo` | TC-094 | Error (load refusal) |
 | FR-010-CON-2 | No new required key | 0.1.0 baseline vs 0.2.0 structural diff | TC-091 | 0 changed declarations |
 | FR-010-CON-3 | Status vocabulary | a `⚠️`-headed Status cell | TC-092 | Error (`assert`) — the marker stays retired |

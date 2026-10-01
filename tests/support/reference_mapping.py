@@ -578,7 +578,7 @@ class ReferenceMapper:
         multiplicity: dict[str, Any] = {"lower": int(lower)}
         if upper and upper != "*":
             multiplicity["upper"] = int(upper)
-        # semantic-core 0.3.0 requires `ordered` and `unique` on every emitted
+        # semantic-core requires `ordered` and `unique` on every emitted
         # Multiplicity. A singular field (upper absent means unbounded, so this
         # is "at most one" only when upper is present and <= 1) is clamped to
         # `false`/`false` per the semantic-core producer rule (owner ruling
