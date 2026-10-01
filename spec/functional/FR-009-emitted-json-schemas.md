@@ -28,11 +28,11 @@ between the source and the shipped bytes fails the build.
 - `@agent-ix/semantic-core` 0.1.0, resolved from the scope-routed registry through the user-level
   npm config, supplying `ClauseRef`, `FieldDecl`, `TypeRef`, `Multiplicity`, `ConstraintDecl`,
   `Identifier` and `SemanticId`.
-- `@typespec/compiler` 1.15.0 and `@typespec/json-schema` 1.15.0 as exact `devDependencies` of
+- `@typespec/compiler` and `@typespec/json-schema` as `devDependencies` of
   `spec_artifacts_process/semantic/package.json`, resolved through its committed
   `package-lock.json`.
 - `spec_artifacts_process/semantic/scripts/generate.mjs`, Node built-ins only.
-- Node 20 or later, the runtime `@typespec/compiler` 1.15.0 requires.
+- Node 20 or later.
 
 ## Outputs
 
