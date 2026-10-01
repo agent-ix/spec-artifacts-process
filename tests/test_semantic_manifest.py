@@ -16,7 +16,6 @@ import shutil
 import pytest
 from conftest import (
     MANIFEST_PATH,
-    PACKAGE_ROOT,
     REPO_ROOT,
     SCHEMAS_DIR,
     artifact_type_names,
