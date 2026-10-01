@@ -17,7 +17,6 @@ include = [
     { path = "spec_artifacts_process/mappings.schema.json", format = ["sdist", "wheel"] },
     { path = "spec_artifacts_process/examples/**/*.json", format = ["sdist", "wheel"] },
     { path = "spec_artifacts_process/semantic/main.tsp", format = ["sdist", "wheel"] },
-    { path = "spec_artifacts_process/semantic/generated/toolchain.json", format = ["sdist", "wheel"] },
 ]
 
 [tool.poetry.dependencies]
