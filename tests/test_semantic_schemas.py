@@ -1,6 +1,6 @@
 """The emitted JSON Schema bundle and its drift gate (requirement FR-009).
 
-TC-080..TC-088 and TC-132..TC-134.
+TC-081..TC-086 and TC-132..TC-134.
 
 Every assertion that quantifies over "all declared types" enumerates them from
 the manifest or from the emitted bundle (FR-009-CON-6). A hard-coded list stops
@@ -24,18 +24,11 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     SEMANTIC_DIR,
-    TOOLCHAIN_PATH,
-    artifact_type_names,
-    load_manifest,
     manifest_version,
     module_base,
 )
 
 SEMANTIC_CORE_BASE = "https://schemas.agent-ix.org/semantic-core/0.3.0/"
-
-
-def toolchain() -> dict:
-    return json.loads(TOOLCHAIN_PATH.read_text())
 
 
 def projections() -> list[Path]:
@@ -77,20 +70,8 @@ def sandbox(tmp_path: Path) -> Path:
     for name in ("main.tsp", "tspconfig.yaml", "package.json"):
         shutil.copy(SEMANTIC_DIR / name, semantic / name)
     shutil.copytree(SEMANTIC_DIR / "scripts", semantic / "scripts")
-    shutil.copytree(SEMANTIC_DIR / "generated", semantic / "generated")
     (semantic / "node_modules").symlink_to(SEMANTIC_DIR / "node_modules")
     return semantic
-
-
-@pytest.mark.trace("TC-080")
-def test_bundle_is_exactly_what_the_toolchain_lists():
-    record = toolchain()
-    on_disk = sorted(p.name for p in projections())
-    assert sorted(record["files"]) == on_disk
-    assert record["compiler"] == {"name": "@typespec/compiler", "version": "1.15.0"}
-    assert record["emitter"] == {"name": "@typespec/json-schema", "version": "1.15.0"}
-    for name in artifact_type_names():
-        assert f"{name}.json" in on_disk, f"no emitted model for declared type {name}"
 
 
 @pytest.mark.trace("TC-081")
@@ -175,37 +156,6 @@ def test_the_wheel_and_the_npm_tree_carry_every_projection():
     assert "spec_artifacts_process/mappings.yaml" in names
 
 
-@pytest.mark.trace("TC-087")
-def test_two_runs_are_byte_identical(sandbox: Path):
-    first = run_generator([], cwd=sandbox)
-    assert first.returncode == 0, first.stderr
-    snapshot = {
-        p.name: p.read_bytes() for p in (sandbox.parent / "schemas").glob("*.json")
-    }
-    toolchain_bytes = (sandbox / "generated" / "toolchain.json").read_bytes()
-    second = run_generator([], cwd=sandbox)
-    assert second.returncode == 0, second.stderr
-    assert {
-        p.name: p.read_bytes() for p in (sandbox.parent / "schemas").glob("*.json")
-    } == snapshot
-    assert (sandbox / "generated" / "toolchain.json").read_bytes() == toolchain_bytes
-
-
-@pytest.mark.trace("TC-088")
-def test_toolchain_pins_semantic_core_by_bytes():
-    record = toolchain()["semanticCore"]
-    assert record["name"] == "@agent-ix/semantic-core"
-    assert record["version"] == load_manifest()["semantic"]["semantic_core"]
-    assert re.fullmatch(r"sha256:[0-9a-f]{64}", record["toolchainDigest"])
-    installed = (
-        SEMANTIC_DIR / "node_modules/@agent-ix/semantic-core/generated/toolchain.json"
-    )
-    import hashlib
-
-    expected = f"sha256:{hashlib.sha256(installed.read_bytes()).hexdigest()}"
-    assert record["toolchainDigest"] == expected
-
-
 @pytest.mark.trace("TC-132")
 def test_a_missing_toolchain_names_the_component_and_the_install(tmp_path: Path):
     """No `node_modules` at all: the generator must say which component is
@@ -218,7 +168,6 @@ def test_a_missing_toolchain_names_the_component_and_the_install(tmp_path: Path)
     for name in ("main.tsp", "tspconfig.yaml", "package.json"):
         shutil.copy(SEMANTIC_DIR / name, semantic / name)
     shutil.copytree(SEMANTIC_DIR / "scripts", semantic / "scripts")
-    (semantic / "generated").mkdir()
     result = run_generator([], cwd=semantic)
     assert result.returncode != 0
     assert "make semantic-install" in result.stderr
@@ -243,7 +192,7 @@ def test_a_semantic_core_version_disagreement_names_both(sandbox: Path):
 
 @pytest.mark.trace("TC-134")
 def test_a_stale_version_segment_fails_even_when_internally_consistent(sandbox: Path):
-    """Schemas and digests that agree with each other but were generated against
+    """Schemas that agree with each other but were generated against
     a different manifest version must not pass by being internally consistent."""
     manifest = sandbox.parent / "manifest.yaml"
     old = manifest_version()

@@ -65,8 +65,8 @@ lint: schemas-check
 # Semantic data schemas (FR-009): TypeSpec -> JSON Schema projection
 # =============================================================================
 # The TypeSpec package lives in spec_artifacts_process/semantic/ (npm, lockfile
-# committed). `make schemas` regenerates spec_artifacts_process/schemas/<Model>.json
-# and semantic/generated/toolchain.json; `make schemas-check` fails on any byte
+# committed). `make schemas` regenerates spec_artifacts_process/schemas/<Model>.json;
+# `make schemas-check` fails on any byte
 # drift.
 #
 # `schemas-check` is a LOCAL gate, wired into `make lint`. It is deliberately not

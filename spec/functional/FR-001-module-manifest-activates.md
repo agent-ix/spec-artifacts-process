@@ -44,7 +44,7 @@ no implementing test (`spec/tests.md` carries FR-001 as `🚧 Specified`). What
 over this module loads every declared archetype against the 0.1.0 baseline
 (FR-010-AC-5, TC-093), and a `semantic` block gaining an unknown key is refused
 at load (FR-010-AC-6, TC-094 — whose "names the offender" half is a strict expected
-failure, GAP-004). A manifest edit that breaks FR-035 conformance without
+failure). A manifest edit that breaks FR-035 conformance without
 breaking the loader ships green.
 
 ## Acceptance Criteria

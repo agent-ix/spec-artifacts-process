@@ -32,7 +32,6 @@ EXAMPLES_DIR = PACKAGE_ROOT / "examples"
 MAPPINGS_PATH = PACKAGE_ROOT / "mappings.yaml"
 MAPPINGS_SCHEMA_PATH = PACKAGE_ROOT / "mappings.schema.json"
 SEMANTIC_DIR = PACKAGE_ROOT / "semantic"
-TOOLCHAIN_PATH = SEMANTIC_DIR / "generated" / "toolchain.json"
 NEGATIVE_DIR = REPO_ROOT / "tests" / "fixtures" / "negative"
 BASELINE_MANIFEST = (
     REPO_ROOT / "tests" / "fixtures" / "baseline-0.1.0" / "manifest.yaml"
