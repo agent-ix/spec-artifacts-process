@@ -192,4 +192,3 @@ def test_a_semantic_core_version_disagreement_names_both(sandbox: Path):
     assert result.returncode != 0
     declared = load_manifest()["semantic"]["semantic_core"]
     assert "9.9.9" in result.stderr and declared in result.stderr
-
