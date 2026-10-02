@@ -84,7 +84,7 @@ def test_tc040_suite_registry_archetype_declared() -> None:
     assert facet["columns"] == ["ID", "Name", "Command", "Tool", "Evidence Kind"]
     assert facet["min_rows"] == 1
     assert facet["id_column"] == "ID"
-    # Structured and doc-scoped. A kebab slug here is what produced the 1,014
+    # Structured and doc-scoped. A kebab slug here is what produced the
     # dead trace tags (quire-rs#72); everything joins on this id.
     assert facet["id_pattern"] == r"^SUITE-\d+$"
 

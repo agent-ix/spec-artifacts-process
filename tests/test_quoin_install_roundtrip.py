@@ -5,7 +5,7 @@ before #78 nothing in this specification asserted it: a manifest Quire accepts
 and Quoin refuses would have shipped (SR-015 FND-001). It shipped anyway in the
 sibling module, and this row is what found it.
 
-**[RAN] 2026-09-04 and it is red for a named upstream reason.** Quoin's FR-070
+**It is red for a named upstream reason.** Quoin's FR-070
 validator resolves `semantic.exports` against `object_types` only, so an
 **artifact** module cannot be installed at all — this one is refused with
 `semantic.export-without-schema` (the schemas exist, on the `artifact_types`
@@ -23,8 +23,7 @@ repository in the programme validates against*. A failed restore does not
 inconvenience one test run; it repoints the whole development environment at an
 uncommitted branch. So it runs only when `QUOIN_INSTALL_ROUNDTRIP=1` says the
 operator has agreed to that, and the restore runs whether or not the earlier
-steps passed (IT-002-SC-06) — verified: after the 2026-09-04 run the module
-store was byte-identical to a copy taken beforehand.
+steps passed (IT-002-SC-06).
 """
 
 from __future__ import annotations

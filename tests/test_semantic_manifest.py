@@ -1,6 +1,6 @@
 """The semantic block and the reference-form data_schema.
 
-Requirements FR-010 and NFR-001; rows TC-089, TC-093, TC-094, TC-096, TC-128, TC-135.
+Requirement FR-010; rows TC-089, TC-093, TC-094, TC-096, TC-128, TC-135.
 """
 
 from __future__ import annotations

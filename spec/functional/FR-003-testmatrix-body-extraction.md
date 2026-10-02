@@ -208,22 +208,10 @@ validation engine's cross-reference job and is out of scope here.
 > `status_lies` read zero.
 >
 > **Retired rather than classed**, per the rule that unifying means enforcing.
-> `🚧` already means pending, and every `⚠️` cell measured in the corpus reads
+> `🚧` already means pending, and every `⚠️` cell in the corpus reads
 > `⚠️ Partial: …` or `⚠️ Pending` — the same meaning in a second form. A
 > vocabulary that accepts every spelling enforces nothing.
 >
-> **What the number counts** — rows under `## Test Case Summary` in a
-> `type: TestMatrix` document, column `Status`, across the 239 `~/dev`
-> repositories `quire-rs/scripts/corpus.py` enumerates: **20 rows in 5
-> repositories**, of which 18 are `⚠️` and 2 are `🟡` (a glyph this contract never
-> admitted, already failing). Only **10 rows in 3 repositories** validate cleanly
-> today and therefore gate this change — `quire-cli` (6), `sync-github-service`
-> (3) and this module (1). The remaining ~270 `⚠️` cells ecosystem-wide sit in
-> `Status` columns and undeclared sections no `column_patterns` reaches;
-> migrating those is consistency work with no enforcement value, tracked
-> separately.
->
-> FR-003-CON-1 gates the enforcing release on that sweep: **normalize before
 > enforce**, the sequence the FR-042 EARS rollout used.
 >
 > **The guard that should have caught this now does.**
@@ -238,7 +226,7 @@ validation engine's cross-reference job and is out of scope here.
 > CR-019 below settled that a prefix naming no declared archetype encodes in the
 > id what the row already states one column over, and renamed `BENCH-`, `AUDIT-`,
 > `SB-` and `IS-` to `TC-` on exactly that reasoning. `EV-` is the same case and
-> was missed: quoin's `spec/evals.md` carries **40 bare `EV-nnn` ids shadowing 40
+> was missed: quoin's `spec/evals.md` carries **bare `EV-nnn` ids shadowing
 > `TC-EV-nnn` rows** — the same evals, numbered twice, with the code and the FR
 > `Verification` cells (`Eval (EV-050)`) referring to the bare form.
 >
@@ -260,8 +248,8 @@ validation engine's cross-reference job and is out of scope here.
 > the declared **evidence archetypes** rather than enumerating kinds of
 > testing. `spec-artifacts-iso` mints exactly two test-id families —
 > `TC-{next:03d}` and `IT-{next:03d}` — so a contract admitting only `TC`
-> contradicted a sibling module: `quire-cli` alone carries 84 `IT-` ids
-> referenced across seven of its spec files, minted the way the iso module
+> contradicted a sibling module: `quire-cli` alone carries many `IT-` ids
+> referenced across its spec files, minted the way the iso module
 > declares. Every other artifact type that mints an id (`FR`, `NFR`, `US`,
 > `SR`, `ADR`, `FB`, `GLO`) is a requirement or process artifact, not evidence.
 >
@@ -275,17 +263,17 @@ validation engine's cross-reference job and is out of scope here.
 > document shape, at which point the manifest and this pattern change together.
 >
 > The three prefixes the sweep found that name no archetype — `BENCH-`/`AUDIT-`
-> (quire-cli, 6 ids) and `SB-`/`IS-` (chat-window, 12 ids) — encode in the id
+> (quire-cli) and `SB-`/`IS-` (chat-window) — encode in the id
 > what the row already states one column over (`Type: Benchmark | Static |
 > Snapshot`), so they were renamed to `TC-` rather than admitted. No
 > information is lost by that rename.
 >
 > **CR-018 note (2026-08-07):** `Priority` is now declared in
 > `optional_columns` rather than required outright. The FR-003-CON-1 sweep
-> found that 49 of 169 ecosystem matrices carry real, well-formed test-case
+> found that many ecosystem matrices carry real, well-formed test-case
 > rows with **no priority anywhere in the document** — not a formatting drift
 > that a sweep can normalize, but planning data that was simply never
-> recorded. The only two ways to enforce presence were to leave all 49
+> recorded. The only two ways to enforce presence were to leave all of them
 > permanently failing, or to write an invented priority into each. The second
 > fabricates planning data to satisfy a checker, which is the exact failure
 > mode this contract exists to catch, so the contract was fixed instead of the
@@ -295,47 +283,26 @@ validation engine's cross-reference job and is out of scope here.
 > accepts `optional_columns`: an older engine rejects it as an
 > unknown assert key at load time.
 >
-> **CR-017 note (2026-08-06):** The FR-003-CON-1 gate was re-run and the 171
-> failures classified (agent-ix/spec-artifacts-process#12). The harness is now committed at
-> `scripts/testmatrix_sweep.py`; the original run's was not, which is why the
-> figure could not be re-derived.
+> **CR-017 note (2026-08-06):** The FR-003-CON-1 gate was re-run and its
+> failures classified (agent-ix/spec-artifacts-process#12).
 >
-> **The headline was inflated.** `ecaz` carries 20 worktree checkouts under
-> `.worktrees/` and `.claude/worktrees/`, each a byte-copy of its `tests.md`, so
-> that one repo's diagnostics were counted 20 times — 945 `Status` cell failures
-> collapse to 111 once deduplicated. Deduplicated: 169 TestMatrix documents,
-> **13 passing (7.7%)**. The pass rate stands; the composition does not.
->
-> **Only 42 repos have a matrix that could be normalized.** Classified:
-> `missing-table` **70** (no `Test Case Summary` and no id-column table
-> anywhere), `renamable` **44** (an id-column table under another heading —
-> which the earlier addendum showed is a *different artifact* in all but ~4
-> cases), `malformed` **42**. So ~110 repos have never authored a matrix, and no
-> amendment to this contract will change that. A 92% failure rate reads as
-> over-strictness; two thirds of it is a missing artifact.
->
-> **Is the contract too narrow? Almost nowhere.** `Type` (158 cells, 21 repos) —
-> **no amendment**: what remains is abbreviations of declared values (`Bench`,
-> `Perf`), annotations belonging in `Title` (`Unit (git)`), harness names that
-> are not test types (`pg_test`, `Storybook`, `axe-core`), and verification
-> methods in the wrong column (`Inspection`, `Review`). CR-016 widened this once
-> already; widening again would be fitting the check to non-conforming data.
-> `Status` (111 cells, 7 repos) — **no amendment**: the pattern already admits a
-> marker plus a note, and what remains is markers outside the set (`⬜`, `🔴`,
-> `⊘`) and bare word statuses. Column headers (87 mismatches, 40 repos) — **no
-> amendment**: only 4 documents fail on headers alone, and the rest are
-> genuinely different tables, mostly in the *optional* coverage sections.
+> **Is the contract too narrow? Almost nowhere.** `Type` — **no amendment**: what
+> remains is abbreviations of declared values (`Bench`, `Perf`), annotations
+> belonging in `Title` (`Unit (git)`), harness names that are not test types
+> (`pg_test`, `Storybook`, `axe-core`), and verification methods in the wrong
+> column (`Inspection`, `Review`). CR-016 widened this once already; widening
+> again would be fitting the check to non-conforming data. `Status` — **no
+> amendment**: the pattern already admits a marker plus a note, and what remains
+> is markers outside the set (`⬜`, `🔴`, `⊘`) and bare word statuses. Column
+> headers — **no amendment**: the rest are genuinely different tables, mostly in
+> the *optional* coverage sections.
 >
 > **One amendment, and only one.** `Traces To` rejects two legitimate authoring
 > shorthands — continuation (`FR-001-AC-2, -AC-3, -AC-4`) and slash enumeration
-> (`FR-016-AC-1/2/3/6`) — ~25 cells across ~6 repos. Both denote exactly what
-> the expanded list denotes and expanding them by hand makes matrices longer and
-> no clearer, so the pattern now admits them. The other `Traces To` failures,
-> `—` (10) and empty (6), stay failing on purpose.
->
-> **Proportion, which is what the gate issue existed to determine:** contract
-> too narrow ≈ 25 cells / 6 repos; corpus non-conformant = 42 repos; artifact
-> never authored ≈ 110 repos.
+> (`FR-016-AC-1/2/3/6`). Both denote exactly what the expanded list denotes and
+> expanding them by hand makes matrices longer and no clearer, so the pattern now
+> admits them. The other `Traces To` failures, `—` and empty, stay failing on
+> purpose.
 >
 > **Publishing.** The gate has been framed as "publishing fails every repo
 > simultaneously". Module adoption is per-repo — a repo installs this module
@@ -343,27 +310,24 @@ validation engine's cross-reference job and is out of scope here.
 > is repos that update, not all repos at once. That is not licence to publish
 > carelessly, and one prerequisite is unchecked: whether
 > `quoin module ensure-defaults` resolves to latest, which would turn adoption
-> into a broadcast. Recommended sequence: this amendment → normalize the 42
+> into a broadcast. Recommended sequence: this amendment → normalize the
 > malformed matrices (Task-005, user-gated) → verify `ensure-defaults` → publish,
-> treating the ~110 unauthored matrices as a backlog rather than a blocker.
+> treating the unauthored matrices as a backlog rather than a blocker.
 
-> **CR-016 note:** The FR-003-CON-1 sweep
-> validated this contract against all
-> 177 ecosystem `TestMatrix` documents: **6 passed**. The vocabulary failures
-> were mostly the contract being narrower than reality — `Benchmark` (8 repo
-> families), review/inspection (5), `Static` (3), decorated statuses (6),
-> `Traces To` ranges (4), segmented test ids (7) — rather than corpus drift.
-> This amendment widens the four vocabularies accordingly and moves the status
-> classes into the module's traceability declaration so the contract and the
-> coverage rollup cannot disagree.
+> **CR-016 note:** The FR-003-CON-1 sweep validated this contract against the
+> ecosystem's `TestMatrix` documents. The vocabulary failures were mostly the
+> contract being narrower than reality — `Benchmark`, review/inspection,
+> `Static`, decorated statuses, `Traces To` ranges, segmented test ids — rather
+> than corpus drift. This amendment widens the four vocabularies accordingly and
+> moves the status classes into the module's traceability declaration so the
+> contract and the coverage rollup cannot disagree.
 >
-> It is deliberately **not** enough on its own: simulating the amendment puts
-> the ecosystem at 18/177. The remaining 154 failures are structural — 70
-> matrices have no test-case table at all, and of the 44 with an id-column table
-> under another heading, inspection showed only ~4 are a renamed test-case
-> summary (the rest are edge-case registers and coverage maps). Those need
-> authoring and renaming, not a looser contract: alternative section headings
-> are **not** admitted, because accepting them would recover ~4 repos while
+> It is deliberately **not** enough on its own: the remaining failures are
+> structural — many matrices have no test-case table at all, and most of those
+> with an id-column table under another heading are edge-case registers and
+> coverage maps, not a renamed test-case summary. Those need authoring and
+> renaming, not a looser contract: alternative section headings are **not**
+> admitted, because accepting them would recover almost nothing while
 > re-introducing the engine-facing alias lists that quire-rs CR-013/CR-014
 > removed.
 

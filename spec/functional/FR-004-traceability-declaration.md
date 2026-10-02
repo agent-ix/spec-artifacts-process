@@ -70,7 +70,7 @@ modules can version apart.
   stale data. This is enforced as a declarative `lint_rules` entry (quire-rs
   FR-036, `table_column_values`), not a `document_references`/`trace_targets`
   change — quire-rs rejects a `document_references` entry that declares an
-  empty `targets` at module load (`traceability.rs:1014`; confirmed against
+  empty `targets` at module load (confirmed against
   the pinned engine, so an earlier draft of this requirement that emptied
   `verification`/`nfr-verification`'s `targets` would have failed module load
   for every consumer). The existing `verification`, `nfr-verification` and
@@ -93,9 +93,9 @@ modules can version apart.
     catalog method ids, and this column is never populated from that
     vocabulary.
   - The lint rule **SHALL** declare `severity: warning`. This SHALL is
-    already violated by roughly 156 existing `Test (TC-…)`/`Inspection
+    already violated by existing `Test (TC-…)`/`Inspection
     (TC-…)` cells across this repository's own FR/NFR Acceptance Criteria
-    tables (measured, SR-018 FND-003) — an error-severity rule would fail
+    tables — an error-severity rule would fail
     every one of them the moment it shipped. **PLAT-1081** sweeps and clears
     that existing population; **PLAT-1082** promotes the rule from `warning`
     to `error` once the sweep clears it. Neither is this ticket's job.
@@ -185,11 +185,9 @@ modules can version apart.
 > **The ticket's own premise was wrong in one place, and re-measuring is why
 > that matters.** PLAT-1079 states constraints "are a trace target but not an
 > obligation source." `manifest.yaml`'s `trace_targets` list carries no
-> `constraint`/`-CON-` entry at all — `[RAN]` `grep -ni constraint
-> spec_artifacts_process/manifest.yaml` found none, and `quire validate --okf
-> --scope .` measured **13** `dangling-trace-reference` warnings naming a
-> `-CON-` id in this repository's own `spec/tests.md`, out of 76 warnings
-> total. Constraints were neither a trace target nor an obligation source;
+> `constraint`/`-CON-` entry at all — and
+> `-CON-` ids named in this repository's own `spec/tests.md` raised
+> `dangling-trace-reference` warnings. Constraints were neither a trace target nor an obligation source;
 > AC-20 here mints the target and FR-007-AC-15 declares the obligation source
 > against it, and both are needed — an obligation source with no matching
 > target has no id namespace to mint into (the same "declare both or load
@@ -207,14 +205,14 @@ modules can version apart.
 > a gap awaiting an upstream change.
 
 > **CR-065 note (fix round, PLAT-1079, 2026-09-27):** SR-018 and SR-019
-> reviewed 96080f2 and found AC-21 as originally drafted unshippable — a
+> reviewed the draft and found AC-21 as originally drafted unshippable — a
 > `document_references` entry with `targets: []` fails module load
-> (`traceability.rs:1014`, confirmed against the pinned engine) rather than
+> (confirmed against the pinned engine) rather than
 > reporting a dangling reference (SR-018 FND-001). The mechanism above
 > replaces it: a `lint_rules` `table_column_values` entry, advisory by
 > construction, which is also how the severity SR-018 FND-002 asked for is
 > stated directly rather than inherited from `dangling-trace-reference`'s
-> fixed warning tier. FND-003's 156-violation count is why the rule ships at
+> fixed warning tier. FND-003's count of existing violations is why the rule ships at
 > `warning`, not `error` (see Behavior above); FND-004 is why `constraint`
 > is now named explicitly in `traces-to`/`inspection-obligation`'s `targets`,
 > not left implied; FND-005's contradiction over `interface-verification` is
@@ -225,7 +223,7 @@ modules can version apart.
 > `reference_only`.
 
 > **CR-066 note (fix round 2, PLAT-1079, 2026-09-27):** SR-018's disposition
-> pass 1 (50350b6) found the fixed rule's `allowed` list still wrong.
+> pass 1 found the fixed rule's `allowed` list still wrong.
 > Restricting it to the four IADT classes contradicts FR-007's own CR-005
 > guidance to write the precise catalog method (`property-based-testing`,
 > `fuzzing`) rather than the class, and quire-rs FR-054-AC-11 already accepts
@@ -257,42 +255,14 @@ modules can version apart.
 > — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
 > (`agent-ix/spec-artifacts-process#59`, epic `agent-ix/quoin#197`).
 >
-> **What the number counts:** function-definition sites in
-> `agent-ix/filament-ide-rs` (24 crates, ~143k LOC), counted by
-> spelling. `fn tc_NNN_` (underscore): **1,292**.
-> `fn tcNNN_` (the declared spelling): **0**. Every tracking tag written in that
-> repository's dominant convention bound nothing.
->
-> **Measured effect** of changing this one pattern in a copy of the module and
-> re-running `quire coverage --scope .` with `--module <copy>` — unit: Test
-> Matrix rows; population: 2,389 rows in that repository:
->
-> | metric | declared | with separator | delta |
-> |---|---|---|---|
-> | backed | 555 | 1158 | **+603** |
-> | backed % | 23% | 48% | **+25pt** |
-> | unbacked rows | 1538 | 528 | **−1010 (−66%)** |
-> | status lies | 761 | 265 | **−496 (−65%)** |
-> | untracked symbols | 19 | 32 | +13 |
->
-> **Bad rule, not bad corpus** — settled by opening documents, not by the delta.
-> **Sampled 10 flipped rows: 10 rule, 0 real.** Every one has a real test
-> carrying its id — TC-914 at
-> `crates/filament-backend/tests/reindex_code_postgres.rs:1081`, TC-1341 at
-> `crates/filament-backend-client/src/liveness.rs:360`, TC-216 at
-> `crates/filament-retrieval/src/fusion.rs:454`, TC-113 at
-> `crates/filament-shell/src/open.rs:366`, and six more bound through their doc
-> comment. The justification is independent of the count: **`fn tc744_x` and
+> **Why:** every tracking tag written in `agent-ix/filament-ide-rs`'s dominant
+> convention (`fn tc_NNN_`, with an underscore) bound nothing against the
+> declared spelling (`fn tcNNN_`), so most of its Test Matrix rows read as
+> unbacked. The justification does not depend on a count: **`fn tc744_x` and
 > `fn tc_744_x` are the same token under the declared convention** — `tc`, the
 > number, then the name — and `(?i:tc)` already admits four spellings of that
-> token, so the separator is the same class of variation.
->
-> **Precision does not move.** `_?` is anchored on both sides, adds no capture
-> group and no list, and the `+13` untracked symbols are the confirmation rather
-> than the cost: all thirteen are real tests whose ids no matrix declares
-> (TC-1058, TC-1060…TC-1069 in the `filament-cli`/`filament-mcp` front-door
-> suites, TC-1484 ×2 in `embedding_worker.rs`). The widened form surfaces
-> genuine orphan tests; it binds no garbage.
+> token, so the separator is the same class of variation. `_?` is anchored on
+> both sides and adds no capture group and no list, so precision does not move.
 >
 > **The comment that appeared to forbid this** said `rust-test-name-id` is
 > "deliberately not widened". That is CR-024, and it is about **list support** —
@@ -301,20 +271,12 @@ modules can version apart.
 > function name. Orthogonal to the separator. Both notes now say which axis they
 > mean.
 >
-> **Deliberately not fixed here:** the same repository writes `/// Tracing:`
-> 643 times against a declared `rust-trace-line` keyword of `Trace:`. **That one
-> is bad corpus.** Measured, widening to `Trac(?:e|ing):` on top of this change
-> buys **+56 backed** while taking untracked symbols from **32 to 200** — those
-> lines are semicolon-separated and carry `Task-NNN` ids, so the comma form
-> reads ids that are not test-case declarations. Precision loss for marginal
-> recall; the corpus is swept onto the declared form instead
-> (`agent-ix/filament-ide-rs#460`).
->
-> **Consequence for published reviews.** Three SpecReviews in filament-ide-rs
-> (SR-150, SR-151, SR-152) cite coverage figures computed under the broken
-> pattern; those figures measure marker-form mismatch, not coverage. SR-152's
-> FND-004 concludes "binding is on the `tc_NNNN_` function name" — the form that
-> bound nothing at all. FR-004-AC-11, TC-071.
+> **Deliberately not fixed here:** the same repository writes `/// Tracing:` against
+> a declared `rust-trace-line` keyword of `Trace:`. **That one is bad corpus.**
+> Widening to `Trac(?:e|ing):` would read semicolon-separated lines carrying
+> `Task-NNN` ids, so the comma form would read ids that are not test-case
+> declarations: precision loss for marginal recall. The corpus is swept onto the
+> declared form instead (`agent-ix/filament-ide-rs#460`). FR-004-AC-11, TC-071.
 
 > **CR-032 note (2026-08-20):** this module now **declares**
 > `traceability.source_exclude` (quire-rs FR-050-AC-22 / CR-085,
@@ -360,10 +322,9 @@ modules can version apart.
 >
 > **What was missing.** `verifies` links an evidence symbol to a trace id.
 > Nothing linked a requirement to the code that implements it, so mutation
-> scoping (quoin FR-039) had no file set to mutate. **[RAN]** across quire-rs's
-> 52 functional requirements: **38 had at least one mutable target, 14 had
-> none** — and the fourteen fail for one reason, that every symbol verifying
-> them lives in `tests/`. Reach correlated with **test placement**, not with
+> scoping (quoin FR-039) had no file set to mutate. Some
+> functional requirements had no mutable target, for one reason: every symbol
+> verifying them lives in `tests/`. Reach correlated with **test placement**, not with
 > requirement quality (quire-rs CR-071).
 >
 > **Why a second list and not a flag.** quire-rs CR-061 stopped `verifies`
@@ -379,8 +340,7 @@ modules can version apart.
 > macro in every consuming crate, and the point is to annotate production code
 > that already exists. `attached_source` spans the leading comment block, so a
 > line above the item binds to it. Comma lists, same grammar as the `Trace:`
-> forms, because authors already write them that way (CR-024 measured 98 lines
-> carrying 205 ids across `~/dev`).
+> forms, because authors already write them that way (CR-024).
 >
 > **Criterion ids are admitted** (`FR-001-AC-1`, not only `FR-001`). Scoping
 > truncates to the requirement trivially, whereas rejecting the shape would make
@@ -404,27 +364,21 @@ modules can version apart.
 > canonical matrix. The second half — archetype binding admits matrices that are
 > test data — is still true, and is answered by `exclude:` rather than by path
 > enumeration. That is why AC-9 now covers the matrix entries as well, and why
-> the exclusion is asserted rather than assumed: dropping it readmits the 67
-> phantom ids from `tests/fixtures/testmatrix/*.md` that this declaration
-> recorded, 50 of them reported "backed".
+> the exclusion is asserted rather than assumed: dropping it readmits the
+> phantom ids from `tests/fixtures/testmatrix/*.md`, which would be reported
+> "backed".
 >
 > Enumeration was the cost nobody had priced. Three entries per table kind, one
-> per filename the ecosystem happens to use, reaching nothing nested. **[RAN]**
-> `scripts/sweep_coverage.py` over `~/dev`, 238 repositories, worktrees deduped:
-> collapsing nine declarations to three takes ecosystem dead trace tags from
-> **1,401 occurrences / 1,052 distinct ids to 1,207 / 873**, and
-> `filament-ide-rs` — the one repository authoring nested module matrices — from
-> **214 dead tags to 20**, its rollup going 17/850 to **473/2,184** rows backed.
-> Rebinding only `test-case` leaves 49 there: `traces-to` and
-> `functional-coverage` were path-bound too and could not read the nested
+> per filename the ecosystem happens to use, reaching nothing nested. Collapsing
+> nine declarations to three removes the dead trace tags that nested module
+> matrices produced. Rebinding only `test-case` would leave some: `traces-to`
+> and `functional-coverage` were path-bound too and could not read the nested
 > matrices they describe, which is why all three collapse together.
 >
 > One ecosystem precondition had to land first, and it is the reason this is not
 > a pure win on its own: a **mistyped** matrix now mints nothing, where under
-> path binding frontmatter was irrelevant. 6 matrices in the ecosystem declared
-> `type: index` while carrying a Test Case Summary; uncorrected, this change took
-> repositories minting zero test-case ids from 154 to **159**. All six were
-> corrected first and the sweep re-run: **153**.
+> path binding frontmatter was irrelevant. Matrices declaring `type: index`
+> while carrying a Test Case Summary had to be corrected first.
 
 > **CR-025 note (2026-08-15):** FR-004-AC-6 was already the right gate and this
 > declaration failed it — outside this repository. TC-033 measures `quire
@@ -433,26 +387,12 @@ modules can version apart.
 >
 > **The claim that justified the omission was false.** The manifest and this
 > requirement both stated that no fixture in the ecosystem is typed `FR`/`NFR`.
-> **[RAN]** `quire coverage --scope . --json` in `quire-cli` against the
-> pre-change and post-change manifests: 6 fixture documents minted criterion
-> ids — `tests/fixtures/validate-mod/docs/{valid,placeholder,missing-section,
-> unknown-object}-fr.md` and `tests/fixtures/lint-mod/docs/{clean,warn}.md` —
-> putting **9 phantom criteria** in the denominator (total 215 → 206). Backed
-> stayed 27 and no group's ratio moved, so nothing real was excluded and, in
-> that repo, nothing was falsely *backed*; the damage was denominator
-> inflation, not a false green.
->
-> **[RAN]** Ecosystem sweep for typed `FR`/`NFR` under any test tree:
-> `quire-cli` (13 corpus docs — an earlier grep said 15 by counting two `.rs`
-> hits), `filament-parser-lib` (2), `cloudmanager-local-sync` (1). All
-> fixtures; no repository authors a real requirement under a test tree. Two of
-> them sit under `tests_integration/`, which `tests/**` alone never covers —
-> `cloudmanager-local-sync/tests_integration/fixtures/fastapi-service/spec/FR-001-test.md`
-> and `filament-parser-lib/tests_integration/fixtures/FR-001.md`, both typed
-> `FR` and both colliding with a real `FR-001` in their repo. Neither mints AC
-> rows today, so no phantom is live, but the first Acceptance Criteria table
-> added to one would mint silently; the declared exclusion covers both
-> conventions so it cannot.
+> Fixtures typed `FR`/`NFR` under a test tree minted phantom criterion ids
+> into the denominator; nothing real was excluded, and the damage was
+> denominator inflation, not a false green. Some such fixtures sit under
+> `tests_integration/`, which `tests/**` alone never covers; the declared
+> exclusion covers both conventions so a later Acceptance Criteria table in one
+> cannot mint silently.
 >
 > AC-9 exists because AC-6 is only checkable where the phantom happens to
 > land. A declaration-level assertion holds in every consuming repository,
@@ -460,9 +400,8 @@ modules can version apart.
 
 > **CR-024 note (2026-08-14):** A legacy form declaring a single id matches once
 > and stops at the comma, so `// Trace: FR-001-AC-1, FR-001-AC-2` bound the
-> first id and the rest was never *read*. **[RAN]** 98 such lines across `~/dev`,
-> worktrees and `-task<N>` copies excluded, carried **205 ids that bound to
-> nothing across 17 repos** — every shape declared here and all three languages.
+> first id and the rest was never *read*. Ids written that way
+> bound to nothing under every shape declared here and all three languages.
 >
 > **Both halves are required, and the filing said otherwise.**
 > agent-ix/quire-rs#68 stated that no module needs to re-declare anything.
@@ -494,7 +433,7 @@ modules can version apart.
 > not have. A row verified by an agent-behaviour eval or by a manual step cannot
 > have that evidence — neither produces a symbol a trace tag could attach to —
 > so reporting it as a lie asserts something its own declared method makes
-> impossible. Measured in `quoin`: 40 of its 55 status lies were eval rows
+> impossible. In `quoin`, most status lies were eval rows
 > (agent-ix/quoin#65).
 >
 > `no_source_symbol` names the values that are exempt, and `test_type_column`
@@ -508,7 +447,7 @@ modules can version apart.
 >
 > **Ordering:** this could not ship before the engine learned the keys.
 > `ColumnVocabularies` is `deny_unknown_fields`, so declaring the keys against an
-> older engine fails module load outright and took 31 of this repo's own tests
+> older engine fails module load outright and took this repo's own tests
 > with it.
 
 > **CR-063 note (2026-09-18):** `interface-acceptance-criterion` (quire-rs#460)
@@ -519,17 +458,8 @@ modules can version apart.
 > (quire-rs `traceability.rs`), and the SOA `interface` template has no
 > Acceptance Criteria section on most interface documents — so the declared
 > (implicit) default raised a false `section-matches-nothing` on every
-> ordinary interface doc. **[RAN] before/after** with `required: false`
-> against QSpec, tl-syntax, quire-analyze, contract-runtime and
-> contract-codegen:
->
-> | repo | diagnostics before | after | tl-syntax hit rate |
-> |---|---|---|---|
-> | QSpec | +20 | +0 | — |
-> | tl-syntax | +9 | +0 | 24/24 → 24/33 → 24/24 |
-> | quire-analyze | +1 | +0 | — |
-> | contract-runtime | +1 | +0 | — |
-> | contract-codegen | +1 | +0 | — |
+> ordinary interface doc. With `required: false`
+> that false diagnostic is gone.
 >
 > The two `interface_004-AC-*` ids kept minting throughout — `required` gates
 > the section-absent diagnostic, not the target itself.

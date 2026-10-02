@@ -62,7 +62,7 @@ development environment validating against an uncommitted branch.
 
 ## Notes
 
-**[RAN] 2026-09-04, and step 2 fails for a named upstream reason.** Quoin's FR-070 validator
+**Step 2 fails for a named upstream reason.** Quoin's FR-070 validator
 resolves `semantic.exports` against `object_types` only, so no **artifact** module installs at
 all. This module is refused with `semantic.export-without-schema` — the schemas exist and are
 referenced in the FR-073 form, on the `artifact_types` entries the validator does not read — and
@@ -74,8 +74,6 @@ This test is therefore a **strict expected failure**, not a skip: the boundary i
 every opted-in run and the row turns green the day Quoin resolves an artifact-type export.
 Finding it is precisely what this integration test was added for — a manifest Quire accepts and
 Quoin refuses had already shipped once.
-
-Step 5 was verified on that run: the module store was byte-identical to a copy taken beforehand.
 
 ## Dependencies
 

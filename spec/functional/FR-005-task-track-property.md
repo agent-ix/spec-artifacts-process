@@ -14,8 +14,8 @@ The Task artifact type **SHALL** declare `track` as an optional string property,
 grouping label the ecosystem already authors on plan tasks validates against a *declared*
 property rather than through the schema's `additionalProperties: true`.
 
-The property is not new to the corpus — it is new to the contract. A sweep of `~/dev` found
-230 task files carrying `track:` across this repo, `filament-ide-rs` and `filament-plan-sync`.
+The property is not new to the corpus — it is new to the contract. Task files carrying
+`track:` already exist across this repo, `filament-ide-rs` and `filament-plan-sync`.
 Every one of them validates today, and none of them is checked: an undeclared key passes
 because the schema admits any key, which is the same unchecked door an invented `tracks:`
 frontmatter map went through in `filament-ide-rs` before being removed (SR-074 FND-002/FND-004,
