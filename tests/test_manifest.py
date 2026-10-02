@@ -170,8 +170,8 @@ def test_testmatrix_body_extraction_contract() -> None:
         # CR-035: the three ISO 29148 verification methods. Every value above
         # names a harness kind; a 29148-aligned corpus also verifies by
         # inspection, analysis and demonstration, and had no word for any of
-        # them — 128 rows in one repository, reported as rejected `Type` cells
-        # and, for the `Inspection` ones, as status lies.
+        # them — rows reported as rejected `Type` cells and, for the
+        # `Inspection` ones, as status lies.
         "Inspection",
         "Analysis",
         "Demonstration",
@@ -611,10 +611,10 @@ def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
     """TC-076 (FR-003-AC-12, CR-039): a repository past a certain size has a
     matrix TREE, and the archetype modelled only the leaf.
 
-    `agent-ix/filament-ide-rs`'s root matrix indexes 12 module matrices and
+    `agent-ix/filament-ide-rs`'s root matrix indexes its module matrices and
     declares no test case of its own, so it was permanently `[missing]` on both
     required tables with no way to clear them without inventing content —
-    copying the 1,475 module rows up would give every TC two declaring
+    copying the module rows up would give every TC two declaring
     matrices, and a tracking tag then binds to neither.
     """
     manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())

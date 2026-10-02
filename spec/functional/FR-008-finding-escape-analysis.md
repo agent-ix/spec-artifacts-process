@@ -40,15 +40,15 @@ The obvious home is the `Finding` artifact type, and it is the wrong one.
 would break" — precisely so the analysis skills would not have to touch the `Review`/`Finding`
 container-and-child path. Findings-as-inline-rows was the decision, not an accident.
 
-**[RAN]** over the `~/dev` corpus: **169 `SpecReview` documents**, **90 `Review` documents**, and
-**2 documents typed `Finding`** — both of which are mistyped analyses (`AN-002 "Spec Integrity
+Across the corpus, `SpecReview` and `Review` documents exist in number, and the only
+documents typed `Finding` are mistyped analyses (`AN-002 "Spec Integrity
 Analysis"`) rather than findings. Nothing has ever authored a real `Finding`.
 
 So an escape-cause contract on `Finding` would attach the axis to a form nobody produces, and
 wiring the skills to emit one would reverse a shipped decision. The axis goes where the findings
 actually are.
 
-### Optional, because 169 documents already exist
+### Optional, because documents already exist
 
 `Escape Cause` is declared in `optional_columns` (CR-023). Headers must be an ordered subsequence
 of the declared list containing every non-optional column, so a four-column table

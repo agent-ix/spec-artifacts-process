@@ -123,10 +123,8 @@ from `Verification: Test` defaulted by habit.
 ### What a `Method` cell should say (CR-005)
 
 quire-rs FR-054-AC-11 began reporting a declared method this catalog does not
-carry, and the first sweep — quire-rs' own 20 NFR `Measurement and Evaluation`
-tables, **55 rows, 17 distinct strings** — showed the corpus reaching for four
-different things in one column. Fifteen of the seventeen named something the
-catalog already had:
+carry, and a sweep of the corpus showed it reaching for four different
+things in one column. Most named something the catalog already had:
 
 | what the cell said | what it is | write instead |
 |---|---|---|
@@ -134,7 +132,7 @@ catalog already had:
 | `Unit Test`, `Integration Test`, `Snapshot Test`, `Static Analysis`, `Static Inspection` | a **class synonym** or an evidence kind | the method — `unit-testing`, `integration-testing`, `golden-approval-testing`, `static-quality`, `inspection`. |
 | `CI Gate`, `Scheduled CI Gate` | a **cadence** | the method actually being run (`static-quality` for a lint script's exit status, `sca-sbom` for `cargo deny check licenses`). The schedule belongs to the suite. |
 
-The remaining two were real: the corpus was verifying by means this catalog had
+The remainder were real: the corpus was verifying by means this catalog had
 no word for, and they are added rather than forced into a near neighbour
 (FR-007-AC-9).
 
@@ -273,7 +271,7 @@ the third instance of the engine-before-module ordering gap in that program.
 > **CR-006 note (PLAT-1079, 2026-09-27):** a `-CON-` row is a normative
 > constraint, not documentation, and it was silently excluded from the
 > obligation set FR-053 derives — the same "declared but not wired" gap
-> AC-8's `[RAN]` finding already measured for acceptance criteria, found again
+> AC-8's finding already established for acceptance criteria, found again
 > for constraints because nobody had asked the question of this table
 > specifically. `statement_column`/`method_column` name the same two columns
 > `acceptance-criterion` already reads under different headers (`Criteria`/

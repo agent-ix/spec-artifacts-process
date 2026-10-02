@@ -57,10 +57,8 @@ def test_interface_acceptance_criterion_is_not_required(traceability: dict) -> N
     """TC-147 (FR-004-AC-19): the SOA `interface` template has no Acceptance
     Criteria section on most interface documents. `required:` defaults to
     `true` (quire-rs `traceability.rs`), so leaving it unset raised a false
-    `section-matches-nothing` diagnostic on every ordinary interface doc —
-    measured across QSpec (+20 diagnostics) and tl-syntax (+9, hit rate 24/24
-    to 24/33), plus one each on quire-analyze, contract-runtime and
-    contract-codegen. Pinned so it cannot regress back to the default.
+    `section-matches-nothing` diagnostic on every ordinary interface doc. Pinned
+    so it cannot regress back to the default.
     """
     targets = {t["name"]: t for t in traceability["trace_targets"]}
     assert targets["interface-acceptance-criterion"]["required"] is False
@@ -89,8 +87,8 @@ def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> N
     `Constraints` among its OPTIONAL level-2 sections ("Omit the section
     rather than inventing filler constraints"), unlike `Acceptance Criteria`,
     which is required on every FR — the same condition that already makes
-    `interface-acceptance-criterion` declare `required: false`. Measured in
-    this repository: 6 of 14 FR documents carry no `## Constraints` section.
+    `interface-acceptance-criterion` declare `required: false`. In
+    this repository, some FR documents carry no `## Constraints` section.
     """
     targets = {t["name"]: t for t in traceability["trace_targets"]}
     acceptance = targets["acceptance-criterion"]
@@ -255,8 +253,8 @@ def test_legacy_forms_rewrite_within_their_own_language(traceability: dict) -> N
 
 def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> None:
     """TC-035 (FR-004-AC-8, CR-024): a form declaring a single id matches once
-    and stops at the comma, so the rest of the line is never read — 205 ids
-    across 17 repos. The engine splits capture group 1 (quire-rs FR-051-AC-16);
+    and stops at the comma, so the rest of the line is never read. The engine
+    splits capture group 1 (quire-rs FR-051-AC-16);
     this asserts the declaration gives it something to split.
 
     `rust-test-name-id` is deliberately excluded **from list widening**:
@@ -340,10 +338,9 @@ def test_test_name_form_binds_both_spellings_of_its_token(
     traceability: dict,
 ) -> None:
     """TC-071 (FR-004-AC-11, CR-034): the declared form had no separator between
-    `tc` and the digits, so `fn tc_744_…` bound nothing — 1,292 sites in
-    `agent-ix/filament-ide-rs` against 0 of the `fn tc744_…` spelling, and two
-    thirds of what that repository's coverage reported as missing tests was the
-    tool failing to read a tag that was present.
+    `tc` and the digits, so `fn tc_744_…` bound nothing, and most of what
+    `agent-ix/filament-ide-rs` coverage reported as missing tests was the tool
+    failing to read a tag that was present.
 
     Both spellings are the same token under this convention — `tc`, the number,
     then the name — and `(?i:tc)` already admits four spellings of `tc`. The
@@ -577,8 +574,8 @@ def test_verification_methods_are_declared_test_types(traceability: dict) -> Non
     harness kind; a 29148-aligned corpus also authors verification by
     inspection, analysis and demonstration, and had no declared value for any.
 
-    128 rows in one repository named a means the vocabulary had no word for
-    (`Inspection` 112, `Analysis` 11, `Demonstration` 5). Because they were
+    Rows naming a means the vocabulary had no word for (`Inspection`,
+    `Analysis`, `Demonstration`) were rejected. Because they were
     undeclared, those rows were typed as something that demands a source symbol
     and coverage reported them as status lies.
     """
@@ -603,8 +600,8 @@ def test_verification_methods_are_declared_test_types(traceability: dict) -> Non
 def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
     """TC-073 (FR-004-AC-13, CR-036): a retired row has no live requirement to
     trace to — withdrawing it is the act of severing that edge — and the
-    pattern admitted nothing valid to write. 16 of 16 rows carrying `-` in one
-    repository were retired; none was a live row with a missing trace.
+    pattern admitted nothing valid to write. Every row carrying `-` was
+    retired; none was a live row with a missing trace.
     """
     matrix = _testmatrix_extraction()
     pattern = matrix["column_patterns"]["Traces To"]
@@ -623,7 +620,7 @@ def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
     # …and the loosening buys nothing else: prose, a bare word and a malformed
     # id still fail, so a live row cannot smuggle a non-reference through.
     # Deliberately NOT widened past the form the corpus writes: `—` has been
-    # pinned as rejected since CR-017 and no measured row uses it.
+    # pinned as rejected since CR-017 and no row uses it.
     for form in ("see the other matrix", "none", "n/a", "—", "FR-", "-FR-001"):
         assert not re.match(pattern, form), form
 

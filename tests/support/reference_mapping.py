@@ -581,9 +581,8 @@ class ReferenceMapper:
         # semantic-core requires `ordered` and `unique` on every emitted
         # Multiplicity. A singular field (upper absent means unbounded, so this
         # is "at most one" only when upper is present and <= 1) is clamped to
-        # `false`/`false` per the semantic-core producer rule (owner ruling
-        # 2026-09-19T15:39:32Z on FCD #199) — no functionality lost, since a
-        # single value has no order or duplicate to speak of.
+        # `false`/`false` per the semantic-core producer rule — no functionality
+        # lost, since a single value has no order or duplicate to speak of.
         #
         # A real collection is not clamped: it is reasoned per field. Today the
         # only collection this module emits is `Standard.supersedes` (0..*, a

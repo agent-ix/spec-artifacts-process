@@ -55,8 +55,8 @@ Test Matrix `Type` column and the obligation record's verification method
 
 > **This corrects a premise in agent-ix/quoin#79**, which places `evidence/` at
 > the repository root on the grounds that *"corpus membership is type-driven
-> post-quire-rs#73, so quire validates them wherever they live"*. **[RAN]** that
-> claim and it does not hold: quire-rs **CR-045** bounds the document walk to
+> post-quire-rs#73, so quire validates them wherever they live"*. That
+> claim does not hold: quire-rs **CR-045** bounds the document walk to
 > `<scope>/spec`, and #73 made membership type-driven *within the walked root*,
 > not everywhere on disk. A typed, well-formed `evidence/suites.md` at the
 > repository root minted **nothing** and was reported nowhere; the identical

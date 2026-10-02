@@ -285,7 +285,7 @@ def test_traces_to_rejects_the_forms_the_pattern_rejects(cell: str):
 
 @pytest.mark.trace("TC-103")
 def test_an_omitted_optional_column_yields_no_key(mapper):
-    """CR-018: 49 of 169 ecosystem matrices author no priority anywhere. The
+    """CR-018: many ecosystem matrices author no priority anywhere. The
     record must omit the key, never synthesise a value."""
     text = skeleton("TestMatrix.md")
     lines = []

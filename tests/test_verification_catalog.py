@@ -337,8 +337,7 @@ def test_tc150_constraint_obligations_are_derived() -> None:
 # lacked.
 #
 # quire-rs FR-054-AC-11 began reporting a declared method no catalog carries,
-# and the first sweep — quire-rs' own 20 NFR `Measurement and Evaluation`
-# tables, 55 rows, 17 distinct strings — found these two being verified by means
+# and a sweep of the corpus found these two being verified by means
 # this registry had no word for. They are added rather than forced into a near
 # neighbour, because a catalog whose nearest entry is wrong advises worse than
 # one that admits the gap.
@@ -462,8 +461,8 @@ def test_no_method_is_keyed_on_the_implementations_control_flow() -> None:
     `concolic-execution` was keyed on `path-sensitive` and
     `hard-to-reach-branch`, and nothing could ever produce either. Both name the
     *implementation's* control flow, and a specification states what the system
-    must do — never that a branch behind it is hard to reach. Measured across
-    the installed catalog, it was the last of 33 methods no requirement could
+    must do — never that a branch behind it is hard to reach. Across
+    the installed catalog, it was the last method no requirement could
     elicit (agent-ix/quoin#128).
 
     A denylist rather than a general rule, deliberately: "is this observable" is
