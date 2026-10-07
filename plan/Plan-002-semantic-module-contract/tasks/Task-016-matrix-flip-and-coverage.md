@@ -26,8 +26,7 @@ Closing the loop between what the matrix claims and what the suite proves.
 - [ ] Run `quire coverage --scope .` and reconcile its headline against the `spec/tests.md` figure, stating what each number counts — they count different populations and the difference must be explained, not averaged.
 - [ ] Grep for non-binding trace tags before the PR: a `black`-wrapped `@pytest.mark.trace` binds nothing (quire-rs#395), a tag on a module docstring or a plain helper binds nothing, and a bare TC id in a comment binds to the **next** symbol. The target is zero.
 - [ ] Record FR-013-AC-8 and FR-009-AC-13 as inspections with a named reviewer and the commit inspected.
-- [ ] `spec/log.md` entry for the 0.2.0 contract.
 
 ## Deliverables
 
-`spec/tests.md` with honest markers, `spec/log.md` entry, the recorded inspections.
+`spec/tests.md` with honest markers and the recorded inspections.
