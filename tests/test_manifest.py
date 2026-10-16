@@ -9,8 +9,8 @@ import shutil
 import subprocess
 
 import pytest
-import yaml
 from jsonschema import Draft202012Validator
+from support.strict_yaml import load_yaml_strict
 
 import spec_artifacts_process as pack
 
@@ -23,7 +23,7 @@ def test_pack_exposes_manifest_path() -> None:
 
 
 def test_manifest_loads() -> None:
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     assert manifest["manifest_version"] == "1.0.0"
     assert manifest["name"] == "spec-artifacts-process"
     assert manifest["version"]
@@ -33,7 +33,7 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     """SpecReview is the per-analysis review archetype: a Summary section plus a
     Findings table whose Severity column is constrained to low/medium/high
     (quire CR-010 `column_choices`)."""
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
 
     names = {a["name"] for a in manifest["archetypes"]}
     assert "SpecReview" in names, "SpecReview archetype must be registered"
@@ -116,7 +116,7 @@ def test_testmatrix_body_extraction_contract() -> None:
     summary tables, the Test ID pattern, and the Type/Priority/Status/Traces To
     cell vocabularies. The behavioural side is
     `test_testmatrix_body_extraction.py`, which drives `quire validate`."""
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
     match = tm["body_extraction"]["yield_pattern"]["match"]
 
@@ -228,7 +228,7 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     """TC-017 (FR-003-AC-9): the contract is additive. The TestMatrix
     frontmatter schema is untouched, and no other archetype gained or lost a
     `body_extraction`."""
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
 
     schema = json.loads(
         (pack.PACK_ROOT / "schemas" / "testmatrix-frontmatter.schema.json").read_text()
@@ -298,7 +298,7 @@ def test_column_vocabularies_have_one_source() -> None:
     from it. Until quire grows a `from_vocabulary` reference for a
     `column_patterns` entry, the contract restates the list and this test is
     what keeps the two honest — in **both** directions since CR-031."""
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     traceability = manifest["traceability"]
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
     cases = tm["body_extraction"]["yield_pattern"]["match"]["test_cases"]
@@ -399,7 +399,7 @@ def test_track_stays_a_task_property_not_an_archetype() -> None:
     """TC-038 (FR-005-AC-3): scope guard. FR-005 declares a property and nothing
     else — no `Track` document type, and the Task artifact type is otherwise
     untouched. The nodal form was closed as #9 per filament-ide-rs SR-074."""
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
 
     assert "Track" not in {a["name"] for a in manifest["archetypes"]}
     assert "Track" not in {t["name"] for t in manifest["artifact_types"]}
@@ -428,7 +428,7 @@ _ESCAPE_CAUSES = [
 
 
 def _artifact_type(name: str) -> dict:
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     return next(t for t in manifest["artifact_types"] if t["name"] == name)
 
 
@@ -578,7 +578,7 @@ def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> N
     trace tags never bind, and their rows read as unbacked, indistinguishable
     from missing tests (#56, SR-006 FND-002).
     """
-    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     patterns = manifest["traceability"]["source_exclude"]
 
     assert patterns == _SOURCE_EXCLUDE
@@ -617,7 +617,7 @@ def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
     copying the module rows up would give every TC two declaring
     matrices, and a tracking tag then binds to neither.
     """
-    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
     types = {a["name"]: a for a in manifest["artifact_types"]}
     index = types["TestMatrixIndex"]
     leaf = types["TestMatrix"]
