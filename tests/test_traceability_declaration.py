@@ -53,12 +53,10 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     assert criteria == {"FR", "NFR", "interface"}, criteria
 
 
-def test_interface_acceptance_criterion_is_not_required(traceability: dict) -> None:
-    """TC-147 (FR-004-AC-19): the SOA `interface` template has no Acceptance
-    Criteria section on most interface documents. `required:` defaults to
-    `true` (quire-rs `traceability.rs`), so leaving it unset raised a false
-    `section-matches-nothing` diagnostic on every ordinary interface doc. Pinned
-    so it cannot regress back to the default.
+def test_interface_acceptance_criterion_is_optional(traceability: dict) -> None:
+    """TC-147 (FR-004-AC-19): consumers may omit interface docs or their
+    Acceptance Criteria sections. `required:` defaults to `true` (quire-rs
+    `traceability.rs`), so the optional target must pin `false`.
     """
     targets = {t["name"]: t for t in traceability["trace_targets"]}
     assert targets["interface-acceptance-criterion"]["required"] is False

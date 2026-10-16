@@ -142,6 +142,7 @@ def test_tc043_suite_and_inspection_are_trace_targets() -> None:
     assert suite["archetype"] == "SuiteRegistry"
     assert suite["section"] == "Suites"
     assert suite["id_column"] == "ID"
+    assert suite["required"] is False
     # CR-062: archetype binding only; a `document:` key no longer loads.
     assert "document" not in suite
 
@@ -149,6 +150,7 @@ def test_tc043_suite_and_inspection_are_trace_targets() -> None:
     assert inspection is not None, "no `inspection` trace target"
     assert inspection["archetype"] == "Inspections"
     assert inspection["section"] == "Inspections"
+    assert inspection["required"] is False
 
     # The obligation cell is a declared reference, so a typo dangles rather
     # than recording an act against nothing.
