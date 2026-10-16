@@ -17,6 +17,7 @@ import subprocess
 
 import pytest
 import yaml
+from support.strict_yaml import load_yaml_strict
 
 import spec_artifacts_process as pack
 
@@ -26,7 +27,18 @@ LANGUAGES = ["rust", "python", "typescript"]
 
 @pytest.fixture(scope="module")
 def traceability() -> dict:
-    return yaml.safe_load(pack.MANIFEST_PATH.read_text())["traceability"]
+    return load_yaml_strict(pack.MANIFEST_PATH.read_text())["traceability"]
+
+
+def test_strict_manifest_loader_rejects_duplicate_trace_target_keys() -> None:
+    duplicate = (
+        "traceability:\n  trace_targets:\n    - name: suite\n"
+        "      required: false\n      required: false\n"
+    )
+    with pytest.raises(
+        yaml.constructor.ConstructorError, match="duplicate key 'required'"
+    ):
+        load_yaml_strict(duplicate)
 
 
 def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
@@ -726,7 +738,7 @@ def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> N
 
 
 def _verification_lint_rule() -> dict:
-    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
     rules = [r for r in manifest["lint_rules"] if r.get("column") == "Verification"]
     assert len(rules) == 1, rules
     return rules[0]
@@ -814,7 +826,7 @@ def test_verification_lint_rule_allowed_set_is_classes_union_catalog(
 
 def _testmatrix_extraction() -> dict:
     """The TestMatrix `test_cases` assert block, from the shipped manifest."""
-    manifest = yaml.safe_load(pack.MANIFEST_PATH.read_text())
+    manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
     for entry in manifest["artifact_types"]:
         if entry["name"] == "TestMatrix":
             return entry["body_extraction"]["yield_pattern"]["match"]["test_cases"][

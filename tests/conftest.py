@@ -51,9 +51,11 @@ QUIRE_MISSING = (
 
 sys.path.insert(0, str(REPO_ROOT / "tests"))
 
+from support.strict_yaml import load_yaml_strict  # noqa: E402
+
 
 def load_manifest() -> dict[str, Any]:
-    return yaml.safe_load(MANIFEST_PATH.read_text())
+    return load_yaml_strict(MANIFEST_PATH.read_text())
 
 
 MODULE_BASE = "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/"

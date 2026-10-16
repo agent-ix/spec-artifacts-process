@@ -13,7 +13,7 @@ import shutil
 import subprocess
 
 import pytest
-import yaml
+from support.strict_yaml import load_yaml_strict
 
 import spec_artifacts_process as pack
 
@@ -30,7 +30,7 @@ DECLARED_AXES = {"property_shapes", "characteristics", "object_types", "archetyp
 
 
 def _manifest() -> dict:
-    return yaml.safe_load(MANIFEST_PATH.read_text())
+    return load_yaml_strict(MANIFEST_PATH.read_text())
 
 
 def _catalog() -> dict:
