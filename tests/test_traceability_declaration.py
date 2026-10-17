@@ -499,15 +499,13 @@ def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
         assert still_bindable not in exempt
 
 
-def test_implements_forms_require_the_keyword(traceability: dict) -> None:
+def test_implements_forms_match_language_specific_syntax(traceability: dict) -> None:
     """TC-066 (FR-004-AC-10, CR-028): the `implements` forms bind PRODUCTION
     code to the requirement it is about (quire-rs FR-062) — a separate list from
     `markers`, because `markers` mint evidence and these mint scope.
 
-    The literal `Implements:` keyword is the prose guard. The legacy
-    `*-comment-id` forms bind a bare id after `//` and need a trailing-delimiter
-    rule to stop a sentence flowing through the id; here the keyword carries
-    that weight, so a line that merely names a requirement matches nothing.
+    Rust uses ix-trace-rs's compile-checked attribute. Python and TypeScript
+    keep their declared line-comment forms.
     """
     forms = traceability["trace_tags"]["implements"]
     by_language = {f["language"]: f for f in forms}
@@ -516,50 +514,57 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
     assert len(forms) == len(by_language), "one form per language"
 
     listed = ["FR-001", "FR-002-AC-3"]
-    for form in forms:
+    rust = by_language["rust"]
+    assert rust["name"] == "rust-implements-attribute"
+    assert rust["template"] == '#[implements("{ids}")]'
+    rust_pattern = re.compile(rust["pattern"])
+    rust_match = rust_pattern.search(
+        '#[implements("' + ", ".join(listed) + '")]'
+    )
+    assert rust_match, "Rust form does not match ix-trace-rs syntax"
+    assert [part.strip() for part in rust_match.group(1).split(",")] == listed
+    scoped_attribute = rust_pattern.search('#[implements("interface_004-AC-1")]')
+    assert scoped_attribute, "Rust form does not accept an interface criterion"
+    assert scoped_attribute.group(1) == "interface_004-AC-1"
+    assert not rust_pattern.search('/// Implements: FR-001')
+    assert not rust_pattern.search('/// Trace: FR-001')
+    assert not rust_pattern.search('#[implements("sha_256")]')
+
+    comment_examples = {
+        "python": ("# Implements: ", "# FR-001 is prose."),
+        "typescript": ("// Implements: ", "// FR-001 is prose."),
+    }
+    for language, (prefix, prose) in comment_examples.items():
+        form = by_language[language]
         assert form.get("template"), form["name"]
         assert "{ids}" in form["template"], form["name"]
         pattern = re.compile(form["pattern"])
 
-        match = pattern.search("/// Implements: " + ", ".join(listed))
-        assert match, f"{form['name']} does not match a keyword line"
+        match = pattern.search(prefix + ", ".join(listed))
+        assert match, f"{form['name']} does not match its language form"
         ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
         assert ids == listed, f"{form['name']} captured {ids}"
 
-        # Prose naming a requirement is not a declaration of scope. Without the
-        # keyword there is nothing to match, which is the whole reason these
-        # forms need no trailing delimiter.
-        assert not pattern.search(
-            "// FR-001 is the manifest activation requirement."
-        ), f"{form['name']} binds prose"
-
-        # quire-rs#460: the underscore-object-id shape scopes the same way.
-        scoped = pattern.search("Implements: interface_004-AC-1")
+        assert not pattern.search(prose), f"{form['name']} binds prose"
+        scoped = pattern.search(prefix + "interface_004-AC-1")
         assert scoped, f"{form['name']} does not scope interface_004-AC-1"
         assert (
             scoped.group(1) == "interface_004-AC-1"
         ), f"{form['name']} captured {scoped.group(1)!r}"
 
-        # CR-063 finding 3: closed to the literal KIND. A malformed AC suffix
-        # truncates to the requirement id, exactly as an `FR-001-AC` already
-        # would — this form has no trailing-delimiter to enforce, so
-        # "scoping truncates to the requirement trivially" is documented,
-        # intentional behaviour, not a partial bind of the malformed tail.
         for malformed, truncated in (
             ("interface_004-AC", "interface_004"),
             ("interface_004_AC_1", "interface_004"),
         ):
-            trunc_match = pattern.search(f"Implements: {malformed}")
+            trunc_match = pattern.search(prefix + malformed)
             assert trunc_match, f"{form['name']} lost the base id in {malformed!r}"
             assert (
                 trunc_match.group(1) == truncated
             ), f"{form['name']}: {malformed!r} -> {trunc_match.group(1)!r}"
 
-        # No KIND prefix, a leading digit, and an ordinary identifier that
-        # merely shares the `word_number` shape still bind nothing.
         for rejected in ("_004-AC-1", "4_004-AC-1", "sha_256", "retry_3"):
             assert not pattern.search(
-                f"Implements: {rejected}"
+                prefix + rejected
             ), f"{form['name']} binds {rejected!r}"
 
 

@@ -1,6 +1,6 @@
 manifest_version: 1.0.0
 name: spec-artifacts-process
-version: 0.2.1
+version: 0.2.2
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
@@ -1235,34 +1235,14 @@ traceability:
     # symbols, `implements` only functions and containers). A mis-declared
     # marker therefore binds NOTHING rather than the wrong thing.
     #
-    # Why it exists: nothing linked a requirement to its production code, so
-    # mutation scoping (quoin FR-039) had no file set to mutate. Measured across
-    # quire-rs's 52 FRs, 38 had a mutable target and 14 had none — and the 14
-    # fail for one reason, that every symbol verifying them lives in `tests/`.
-    # Reach correlated with TEST PLACEMENT, not requirement quality (quire-rs
-    # CR-071).
-    #
-    # A comment form, not an attribute: `#[implements("…")]` would need a proc
-    # macro in every consuming crate, and the point is to annotate production
-    # code that already exists. `attached_source` spans the leading comment
-    # block, so a line above the item binds to it.
-    #
-    # The `Implements:` prefix is the prose guard. The legacy `*-comment-id`
-    # forms bind a bare id after `//`, which is why they need a
-    # trailing-delimiter rule; here the keyword carries that weight and a
-    # sentence naming a requirement matches nothing. Comma lists, same grammar
-    # as the `Trace:` forms, because authors already write them that way
-    # (the corpus already writes them that way).
-    #
-    # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`) — scoping
-    # truncates to the requirement trivially, whereas rejecting the shape would
-    # make a plausibly-authored marker silently bind nothing, which is the
-    # failure this whole program keeps finding.
+    # Rust uses ix-trace-rs's compile-checked attribute on production items.
+    # Python and TypeScript retain language-appropriate line comments; no Rust
+    # `/// Implements:` or `/// Trace:` lines are propagated.
     implements:
-    - name: rust-implements-line
+    - name: rust-implements-attribute
       language: rust
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
-      template: '/// Implements: {ids}'
+      pattern: '#\[implements\("((?:(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?|interface_\d+)(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?|interface_\d+))*)"\)\]'
+      template: '#[implements("{ids}")]'
     - name: python-implements-line
       language: python
       pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
