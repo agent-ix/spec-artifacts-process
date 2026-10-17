@@ -1241,7 +1241,7 @@ traceability:
     implements:
     - name: rust-implements-attribute
       language: rust
-      pattern: '#\[implements\("((?:(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?|interface_\d+)(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+(?:-[A-Za-z]+-\d+)?|interface_\d+))*)"\)\]'
+      pattern: '#\[implements\("((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)"\)\]'
       template: '#[implements("{ids}")]'
     - name: python-implements-line
       language: python
