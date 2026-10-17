@@ -518,16 +518,14 @@ def test_implements_forms_match_language_specific_syntax(traceability: dict) -> 
     assert rust["name"] == "rust-implements-attribute"
     assert rust["template"] == '#[implements("{ids}")]'
     rust_pattern = re.compile(rust["pattern"])
-    rust_match = rust_pattern.search(
-        '#[implements("' + ", ".join(listed) + '")]'
-    )
+    rust_match = rust_pattern.search('#[implements("' + ", ".join(listed) + '")]')
     assert rust_match, "Rust form does not match ix-trace-rs syntax"
     assert [part.strip() for part in rust_match.group(1).split(",")] == listed
     scoped_attribute = rust_pattern.search('#[implements("interface_004-AC-1")]')
     assert scoped_attribute, "Rust form does not accept an interface criterion"
     assert scoped_attribute.group(1) == "interface_004-AC-1"
-    assert not rust_pattern.search('/// Implements: FR-001')
-    assert not rust_pattern.search('/// Trace: FR-001')
+    assert not rust_pattern.search("/// Implements: FR-001")
+    assert not rust_pattern.search("/// Trace: FR-001")
     assert not rust_pattern.search('#[implements("sha_256")]')
 
     comment_examples = {
@@ -566,6 +564,63 @@ def test_implements_forms_match_language_specific_syntax(traceability: dict) -> 
             assert not pattern.search(
                 prefix + rejected
             ), f"{form['name']} binds {rejected!r}"
+
+
+def test_quire_credits_ix_trace_implements_attribute_on_production(
+    tmp_path: pathlib.Path,
+) -> None:
+    """The installed engine reads the module's configured attribute form."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for the coverage integration")
+
+    spec_dir = tmp_path / "spec"
+    src_dir = tmp_path / "src"
+    spec_dir.mkdir()
+    src_dir.mkdir()
+    (spec_dir / "FR-001.md").write_text(
+        "---\nid: FR-001\ntype: FR\ntitle: Test requirement\n---\n\n"
+        "## Acceptance Criteria\n\n"
+        "| ID | Criteria | Verification |\n| --- | --- | --- |\n"
+        "| FR-001-AC-1 | The function handles an input. | Unit |\n"
+    )
+    (src_dir / "lib.rs").write_text(
+        "use ix_trace_rs::implements;\n\n"
+        '#[implements("FR-001-AC-1")]\n'
+        "pub fn handle_input(value: &str) -> usize { value.len() }\n\n"
+        "/// Implements: FR-001-AC-1\n"
+        "pub fn legacy_comment(value: &str) -> usize { value.len() }\n"
+    )
+
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            "--format",
+            "json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    rust_implements = [
+        relation
+        for relation in report["implements"]
+        if relation["path"] == "src/lib.rs"
+    ]
+    assert rust_implements == [
+        {
+            "path": "src/lib.rs",
+            "symbol": "handle_input",
+            "trace_id": "FR-001-AC-1",
+            "form": "rust-implements-attribute",
+        }
+    ]
 
 
 def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
