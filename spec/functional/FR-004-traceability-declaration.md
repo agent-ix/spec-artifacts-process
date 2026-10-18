@@ -141,9 +141,11 @@ modules can version apart.
   marker of that **same** language. A form spanning languages can name only one
   target marker, so it would suggest Rust attribute syntax inside a `.py` file.
 - `trace_tags.implements` **SHALL** declare one comment form per supported
-  language, each carrying a `template`, and each **SHALL** require the literal
-  keyword `Implements:` before the id list. The keyword is the prose guard: the
-  `legacy` `*-comment-id` forms bind a bare id after `//` and need a
+  language and one additional Rust `#[implements(...)]` attribute form, each
+  carrying a `template`. The comment forms **SHALL** require the literal
+  keyword `Implements:` before the id list; the Rust attribute form **SHALL**
+  capture a comma-separated list of quoted ids. The keyword is the prose guard:
+  the `legacy` `*-comment-id` forms bind a bare id after `//` and need a
   trailing-delimiter rule to stop a sentence flowing through, whereas here a
   sentence that merely names a requirement matches nothing.
 - The module **SHALL** declare those forms as a list separate from `markers`,
@@ -168,7 +170,7 @@ modules can version apart.
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
-| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of rust, python and typescript; every pattern requires the literal `Implements:` before the id list and captures a comma-separated list; and a sentence naming a requirement in prose matches none of them. | Test (TC-066) |
+| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated comment form for each of rust, python and typescript plus one templated Rust `#[implements(...)]` attribute form. Comment patterns require literal `Implements:` before a comma-separated id list; the attribute pattern captures a comma-separated list of quoted ids. A sentence naming a requirement in prose matches none of them. Both Rust forms mint implementation scope, not verification evidence. | Test (TC-066) |
 | FR-004-AC-11 | `rust-test-name-id` binds both spellings of its token — `fn tc744_x` and `fn tc_744_x` render the same `TC-744` — while the separator stays optional, adds no capture group, and admits nothing new: a bare `fn tc_x`, an unanchored `tc_744_` outside a `fn` position, and a digit run with no trailing `_` all still match nothing. | Test (TC-071) |
 | FR-004-AC-12 | `vocabularies.test_type` declares the three ISO 29148 verification methods — `Inspection`, `Analysis`, `Demonstration` — alongside the harness kinds, and `no_source_symbol` carries the two that mint no symbol (`Inspection`, `Analysis`) but not `Demonstration`, which is observed running. | Test (TC-072) |
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
@@ -336,11 +338,12 @@ modules can version apart.
 > test/benchmark/fuzz symbols, `implements` only functions and containers — so a
 > mis-declared form binds **nothing** rather than the wrong thing.
 >
-> **A comment form, not an attribute.** `#[implements("…")]` would need a proc
-> macro in every consuming crate, and the point is to annotate production code
-> that already exists. `attached_source` spans the leading comment block, so a
-> line above the item binds to it. Comma lists, same grammar as the `Trace:`
-> forms, because authors already write them that way (CR-024).
+> **Rust comment and attribute forms.** The comment form keeps existing
+> production annotations readable because `attached_source` spans the leading
+> comment block. `ix-trace-rs` supplies the Rust `#[implements("…")]` proc macro
+> for consumers that opt into attributes. Both forms bind production scope,
+> while `#[trace("…")]` binds test evidence. Comma lists preserve authored
+> multi-id annotations (CR-024).
 >
 > **Criterion ids are admitted** (`FR-001-AC-1`, not only `FR-001`). Scoping
 > truncates to the requirement trivially, whereas rejecting the shape would make

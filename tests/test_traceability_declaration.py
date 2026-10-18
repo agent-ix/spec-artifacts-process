@@ -510,13 +510,14 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
     that weight, so a line that merely names a requirement matches nothing.
     """
     forms = traceability["trace_tags"]["implements"]
-    by_language = {f["language"]: f for f in forms}
+    comment_forms = [f for f in forms if f["name"].endswith("-implements-line")]
+    by_language = {f["language"]: f for f in comment_forms}
 
     assert sorted(by_language) == sorted(LANGUAGES)
-    assert len(forms) == len(by_language), "one form per language"
+    assert len(comment_forms) == len(by_language), "one comment form per language"
 
     listed = ["FR-001", "FR-002-AC-3"]
-    for form in forms:
+    for form in comment_forms:
         assert form.get("template"), form["name"]
         assert "{ids}" in form["template"], form["name"]
         pattern = re.compile(form["pattern"])
@@ -561,6 +562,32 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
             assert not pattern.search(
                 f"Implements: {rejected}"
             ), f"{form['name']} binds {rejected!r}"
+
+
+def test_rust_implements_attribute_declares_scope(traceability: dict) -> None:
+    """TC-066 (FR-004-AC-10): the ix-trace-rs attribute binds production
+    scope through `implements`, without adding a `verifies` marker."""
+    tags = traceability["trace_tags"]
+    forms = [form for form in tags["implements"] if form["language"] == "rust"]
+    assert {form["name"] for form in forms} == {
+        "rust-implements-line",
+        "rust-implements-attribute",
+    }
+    attribute = next(
+        form for form in forms if form["name"] == "rust-implements-attribute"
+    )
+    assert attribute["template"] == "#[implements({ids})]"
+    pattern = re.compile(attribute["pattern"])
+    match = pattern.search('#[implements("FR-001", "FR-002-AC-3")]')
+    assert match
+    assert re.findall(r'"([^"]+)"', match.group(1)) == ["FR-001", "FR-002-AC-3"]
+    for prose in (
+        "/// FR-001 implements this behavior.",
+        '/// #[trace("FR-001")] verifies it.',
+        "#[implements(FR-001)]",
+    ):
+        assert not pattern.search(prose)
+    assert "rust-implements-attribute" not in {form["name"] for form in tags["markers"]}
 
 
 def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
