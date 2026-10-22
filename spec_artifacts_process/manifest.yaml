@@ -1242,23 +1242,26 @@ traceability:
     # Reach correlated with TEST PLACEMENT, not requirement quality (quire-rs
     # CR-071).
     #
-    # A comment form, not an attribute: `#[implements("…")]` would need a proc
-    # macro in every consuming crate, and the point is to annotate production
-    # code that already exists. `attached_source` spans the leading comment
-    # block, so a line above the item binds to it.
+    # ix-trace-rs now provides the `#[implements("…")]` proc macro for Rust
+    # consumers. Retain the comment form for existing production code:
+    # `attached_source` spans the leading comment block, so a line above the
+    # item binds to it. Both forms mint scope, never verification evidence.
     #
-    # The `Implements:` prefix is the prose guard. The legacy `*-comment-id`
-    # forms bind a bare id after `//`, which is why they need a
-    # trailing-delimiter rule; here the keyword carries that weight and a
-    # sentence naming a requirement matches nothing. Comma lists, same grammar
-    # as the `Trace:` forms, because authors already write them that way
-    # (the corpus already writes them that way).
+    # For comment forms, the `Implements:` prefix is the prose guard. The
+    # legacy `*-comment-id` forms bind a bare id after `//`, which is why
+    # they need a trailing-delimiter rule. Here the keyword carries that
+    # weight, and a sentence naming a requirement matches nothing. Comma
+    # lists use the same grammar as `Trace:` forms in the existing corpus.
     #
     # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`) — scoping
     # truncates to the requirement trivially, whereas rejecting the shape would
     # make a plausibly-authored marker silently bind nothing, which is the
     # failure this whole program keeps finding.
     implements:
+    - name: rust-implements-attribute
+      language: rust
+      pattern: '#\[implements\(((?:\s*"[^"]*"\s*,?)+)\)\]'
+      template: '#[implements({ids})]'
     - name: rust-implements-line
       language: rust
       pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
