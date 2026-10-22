@@ -94,3 +94,5 @@ make local-publish    # build and publish to local pypi.ix
 ```
 
 Required CI secrets/variables: `GCP_SERVICE_ACCOUNT_KEY`, `GCP_REGION`, `GCP_PROJECT_NAME`, `GCP_PYPI`.
+
+<!-- STD-30 language-boundary canary: inert README change. -->
