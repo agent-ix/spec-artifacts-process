@@ -69,7 +69,7 @@ type: TestMatrix
 | FR-004 | FR-004-AC-26 | TC-155 | ✅ Complete |
 | FR-004 | FR-004-AC-27 | TC-156 | 🚧 Blocked: syntax-aware quire-rs binding |
 | FR-004 | FR-004-AC-28 | TC-157 | ✅ Complete |
-| FR-004 | FR-004-AC-29 | TC-158 | 🚧 Blocked: syntax-aware quire-rs binding |
+| FR-004 | FR-004-AC-29 | TC-158 | ✅ Complete |
 | FR-004 | FR-004-AC-30 | TC-159 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
@@ -292,7 +292,7 @@ type: TestMatrix
 | TC-155 | Python and TypeScript `Implements:` line-comment forms capture comma-separated ids and reject prose that merely names an id | Unit | P0 | FR-004-AC-26 | ✅ |
 | TC-156 | A Quire coverage run does not credit a line-shaped `#[implements(...)]` example inside a Rust block comment or multi-line raw string | Integration | P0 | FR-004-AC-27 | 🚧 Blocked: syntax-aware quire-rs binding |
 | TC-157 | A Quire coverage run credits Rust `#[implements(...)]` as production scope without increasing backed verification evidence | Integration | P0 | FR-004-AC-28 | ✅ |
-| TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | 🚧 Blocked: syntax-aware quire-rs binding |
+| TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | ✅ |
 | TC-159 | The Rust form rejects malformed attributes and prose naming an id | Unit | P0 | FR-004-AC-30 | ✅ |
 
 ## Option Permutation Matrix

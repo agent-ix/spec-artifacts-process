@@ -1277,7 +1277,7 @@ traceability:
     implements:
     - name: rust-implements-attribute
       language: rust
-      pattern: '(?m)^[ \t]*#\[implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*,?)\s*\)\][ \t]*$'
+      pattern: '(?m)^[ \t]*#\[implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*,?)\s*\)\]'
       template: '#[implements({ids})]'
     - name: python-implements-line
       language: python

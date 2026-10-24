@@ -42,3 +42,19 @@ What is aligned:
 ## Unavailable checks
 
 `quire validate --module <abs module dir> <TestMatrix doc>` returns `unknown type 'TestMatrix' (no archetype registered for it)` under Quire 0.36.2 / engine 0.50.2. It does so for this repository's own `tests/fixtures/testmatrix/conforming.md`, on main's module as well, so it is pre-existing and not caused by this PR. `tests/test_testmatrix_body_extraction.py` fails 31 tests here (1 xfailed). Validating in scoped mode is ambiguous: two `spec-artifacts-process` copies are discovered, the first wins, and the installed copy is 0.2.0. So the body-extraction clause could not be checked against behaviour.
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-004 | medium | The xfailed TC-156 and TC-158 engine tests and the declaration-only TC-152 test carry their TC id in the docstring. The python-docstring-id form therefore mints a `verifies` claim for each. `quire trace --id` shows exactly one claim per TC (test_traceability_declaration.py:810, :832, :242), and `quire coverage` reports TC-152, TC-156 and TC-158 as `backed: True`. Those three rows are honestly 🚧 Blocked today, but flipping any of them to ✅ without a fix would raise no status lie: the guard is disabled for exactly the criteria known to fail. A test that xfails, or that checks only a declaration, should not mint evidence for the blocked TC. | tests/test_traceability_declaration.py:810-845 |
+
+## Dispositions
+
+Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`. Round 1.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |
+| FND-003 | still-open | AC-23 and TC-152 now state the accept/reject/absent behaviour and are honestly marked 🚧 Blocked. The only test is still the declaration-shape read-back (test_combined_table_extraction_declaration), and no follow-up ticket is cited for the `quire validate` unknown-TestMatrix path. The behavioural check is still missing. |

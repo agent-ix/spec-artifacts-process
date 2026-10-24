@@ -28,3 +28,12 @@ Ticket: IR-868, with VER-25 in the same diff. Checked atomicity, consistency and
 
 - FR-004-AC-2, FR-004-AC-10 and FR-004-AC-19 (examined).
 - TC-039, TC-066 and TC-147 (examined).
+
+## Dispositions
+
+Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`. Round 1.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |

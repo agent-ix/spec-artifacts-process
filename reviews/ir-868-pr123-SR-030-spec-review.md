@@ -32,3 +32,18 @@ The FR, AC and TC wording agrees with the manifest on the form set: Rust attribu
 - FR-004-AC-2, FR-004-AC-10 and FR-004-AC-19 (examined).
 - The CR-028 and CR-063 notes and Known Limits (examined).
 - TC-039, TC-066 and TC-147 (examined).
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | medium | Known Limits, the AC-29 and TC-158 matrix status ("🚧 Blocked: syntax-aware quire-rs binding"), the TC-158 xfail reason and the PR body all blame Quire 0.36.2 for missing a valid attribute followed by a trailing comment or a same-line item. The cause is this module's own trailing `[ \t]*$` anchor. Removing only that anchor makes the same engine bind both forms, with every existing positive and negative unchanged. This misroutes a defect the PR can fix itself to an upstream owner, and records a false blocker in the spec. | spec/functional/FR-004-traceability-declaration.md:553-557 |
+
+## Dispositions
+
+Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`. Round 1.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |

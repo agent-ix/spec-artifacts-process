@@ -26,3 +26,11 @@ Ticket: IR-868. Checked the one changed requirement statement, the `trace_tags.i
 
 - FR-004 statement bullet, lines 143-151 (examined).
 - FR-004 lines 120 and 157 (context only): warnings on unchanged text.
+
+## Dispositions
+
+Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`. Round 1.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |

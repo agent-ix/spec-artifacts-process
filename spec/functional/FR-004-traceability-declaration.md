@@ -551,10 +551,9 @@ modules can version apart.
 Recorded rather than papered over:
 
 - Quire 0.36.2 treats a line-shaped `#[implements(...)]` inside a Rust block
-  comment or multi-line raw string as production scope, and misses a valid
-  attribute followed by a trailing `//` comment or its item on the same line.
-  FR-004-AC-27 and AC-29 remain unmet pending syntax-aware quire-rs binding;
-  the regex declaration alone cannot distinguish Rust tokens from their text.
+  comment or multi-line raw string as production scope. FR-004-AC-27 remains
+  unmet pending syntax-aware quire-rs binding; the regex declaration alone
+  cannot distinguish Rust tokens from their text.
 - `quire validate --module <this module> <TestMatrix document>` returns
   `unknown type 'TestMatrix'` under the installed Quire 0.36.2, including for
   the pre-existing conforming fixture. FR-004-AC-23's behavioral

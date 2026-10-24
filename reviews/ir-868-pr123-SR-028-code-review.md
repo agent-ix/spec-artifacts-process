@@ -52,3 +52,13 @@ Fixtures and scripts are under `/home/peter/dev/qualification-logs/ir868-pr123-o
 - `scripts/id_shape_diff.py` is the grammar differential.
 
 The probes ran as `quire coverage --scope <probe> --module <PR module dir> --json`.
+
+## Dispositions
+
+Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`. Round 1.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | still-open | The manifest is unchanged in 8d9b128, so the `^[ \t]*#\[implements\(` regex still matches line-start attribute text inside block comments and multi-line raw strings. TC-156 now measures this and xfails, which documents the defect but does not fix it. The fix is upstream-blocked on syntax-aware quire-rs binding, and no follow-up ticket id is cited. |
+| FND-002 | still-open | The manifest is unchanged, so the trailing `\)\][ \t]*$` anchor still drops valid attributes. This is not an engine limitation. Probe (probes/trailing, probes/anchor-relaxed-module): with this head's manifest, Quire 0.36.2 binds nothing from `#[implements("FR-001-AC-1")] // why` and `#[implements("FR-001-AC-2")] pub fn same_line() {}`. With a scratch copy whose only change drops the trailing `[ \t]*$` anchor, the SAME engine binds both, still rejects the `///` example, and every TC-154 positive and TC-159 negative still holds. A manifest-only fix exists. The fix round mislabels it as blocked on quire-rs; see SR-030 FND-003. |
+| FND-003 | still-open | The stale half is fixed: the PR body now says the attribute is the sole Rust form and that 0.2.2 must not be released until Peter decides the migration. The owner decision and tracked consumer migration are still outstanding, with no ticket id cited. The body names only quire-contract-codegen, quire-contract-runtime and tl-rewrite. The 7146b86 measurement also found quire-rs (14 files), quire-contract-ir (7) and others. |

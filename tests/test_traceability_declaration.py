@@ -240,7 +240,7 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
 
 
 def test_combined_table_extraction_declaration() -> None:
-    """TC-152 (FR-004-AC-23): declaration shape; validator check is pending."""
+    """Check the optional combined-table declaration pending validator support."""
     manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
     matrix = next(
         artifact
@@ -808,7 +808,7 @@ def _quire_rust_implements_ids(tmp_path: pathlib.Path, source: str) -> set[str]:
 
 @pytest.mark.integration
 def test_quire_does_not_credit_attributes_in_rust_text(tmp_path: pathlib.Path) -> None:
-    """TC-156 (FR-004-AC-27): comment and raw-string examples are inert."""
+    """A comment and a raw-string example must not mint implementation scope."""
     if shutil.which("quire") is None:
         pytest.skip("the `quire` CLI is required for the coverage integration")
     ids = _quire_rust_implements_ids(
@@ -829,6 +829,7 @@ def test_quire_does_not_credit_attributes_in_rust_text(tmp_path: pathlib.Path) -
 
 
 @pytest.mark.integration
+@pytest.mark.trace("TC-158")
 def test_quire_credits_valid_trailing_attribute_forms(tmp_path: pathlib.Path) -> None:
     """TC-158 (FR-004-AC-29): valid trailing forms still bind scope."""
     if shutil.which("quire") is None:
@@ -839,8 +840,6 @@ def test_quire_credits_valid_trailing_attribute_forms(tmp_path: pathlib.Path) ->
         "pub fn trailing_comment() {}\n"
         '#[implements("FR-001-AC-2")] pub fn same_line() {}\n',
     )
-    if not ids:
-        pytest.xfail("Quire 0.36.2 rejects valid attributes with trailing source")
     assert ids == {"FR-001-AC-1", "FR-001-AC-2"}, ids
 
 
