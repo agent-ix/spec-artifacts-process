@@ -441,6 +441,13 @@ artifact_types:
           multiple: true
           assert:
             columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
+        nonfunctional_stakeholder_coverage:
+          from: table_row
+          under_section: Nonfunctional and Stakeholder Coverage
+          required: false
+          multiple: true
+          assert:
+            columns: [Requirement, Acceptance Criteria, Test Cases, Status]
 - name: Standard
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
@@ -1050,6 +1057,19 @@ traceability:
     section: Functional Requirement Coverage
     column: Test Cases
     row_id_column: Functional Req
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case]
+    expand_ranges: true
+    strip_annotations: true
+  # Analyze authors StR and NFR rows in one table with the same Test Cases and
+  # Status columns as functional coverage. The reference is scoped to that
+  # section, so a Complete claim with no bound test is a status lie there too.
+  - name: nonfunctional-stakeholder-coverage
+    archetype: TestMatrix
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Nonfunctional and Stakeholder Coverage
+    column: Test Cases
+    row_id_column: Requirement
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
     targets: [test-case]
     expand_ranges: true

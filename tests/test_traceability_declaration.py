@@ -220,12 +220,89 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     matrix_entries = [
         e["name"]
         for e in entries
-        if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
+        if e["section"]
+        in (
+            "Test Case Summary",
+            "Functional Requirement Coverage",
+            "Nonfunctional and Stakeholder Coverage",
+        )
     ]
-    expected = ["functional-coverage", "test-case", "traces-to"]
+    expected = [
+        "functional-coverage",
+        "nonfunctional-stakeholder-coverage",
+        "test-case",
+        "traces-to",
+    ]
     assert (
         sorted(matrix_entries) == expected
     ), f"one entry per table kind, not per filename: {matrix_entries}"
+
+    manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
+    matrix = next(
+        artifact
+        for artifact in manifest["artifact_types"]
+        if artifact["name"] == "TestMatrix"
+    )
+    shape = matrix["body_extraction"]["yield_pattern"]["match"][
+        "nonfunctional_stakeholder_coverage"
+    ]
+    assert shape["under_section"] == "Nonfunctional and Stakeholder Coverage"
+    assert shape["required"] is False
+    assert shape["assert"]["columns"] == [
+        "Requirement",
+        "Acceptance Criteria",
+        "Test Cases",
+        "Status",
+    ]
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-039")
+def test_analyze_matrix_false_complete_is_a_status_lie(tmp_path: pathlib.Path) -> None:
+    """Both Analyze coverage tables make Complete claims visible to Quire."""
+    if shutil.which("quire") is None:
+        pytest.skip("the `quire` CLI is required for the coverage integration")
+
+    spec_dir = tmp_path / "spec"
+    spec_dir.mkdir()
+    (spec_dir / "test-matrix.md").write_text(
+        "---\nid: TM-001\ntype: TestMatrix\ntitle: Analyze matrix\n---\n\n"
+        "## Functional Requirement Coverage\n\n"
+        "| Functional Req | Acceptance Criteria | Test Cases | Status |\n"
+        "| --- | --- | --- | --- |\n"
+        "| FR-001 | FR-001-AC-1 | TC-999 | ✅ Complete |\n\n"
+        "## Nonfunctional and Stakeholder Coverage\n\n"
+        "| Requirement | Acceptance Criteria | Test Cases | Status |\n"
+        "| --- | --- | --- | --- |\n"
+        "| StR-001 | StR-001-VC-1 | TC-998 | ✅ Complete |\n"
+        "| NFR-001 | NFR-001-AC-1 | TC-997 | ✅ Complete |\n\n"
+        "## Test Case Summary\n\n"
+        "| Test ID | Title | Type | Priority | Traces To | Status |\n"
+        "| --- | --- | --- | --- | --- | --- |\n"
+        "| TC-001 | Existing test | Unit | P0 | FR-001 | 🚧 Planned |\n"
+    )
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    lies = json.loads(result.stdout)["status_lies"]
+    assert {(lie["reference"], lie["row_id"]) for lie in lies} == {
+        ("functional-coverage", "FR-001"),
+        ("nonfunctional-stakeholder-coverage", "StR-001"),
+        ("nonfunctional-stakeholder-coverage", "NFR-001"),
+    }
+    assert all(lie["status"] == "✅ Complete" for lie in lies)
 
 
 def test_one_templated_marker_per_language(traceability: dict) -> None:
