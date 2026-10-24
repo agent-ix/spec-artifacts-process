@@ -47,3 +47,9 @@ Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`.
 | --- | --- | --- |
 | FND-001 | fixed | - |
 | FND-002 | fixed | - |
+
+Round 2: fix head `f5e2f8f749d35b3d9a06deeae4b26af071a9d324`, checked against round-1 head `8d9b1283`.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-003 | fixed | - |

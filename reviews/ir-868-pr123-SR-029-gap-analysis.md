@@ -58,3 +58,10 @@ Fix head `8d9b1283bfaca5a9688261d476ce62b7df406eb1`, reviewed against `7146b86`.
 | FND-001 | fixed | - |
 | FND-002 | fixed | - |
 | FND-003 | still-open | AC-23 and TC-152 now state the accept/reject/absent behaviour and are honestly marked 🚧 Blocked. The only test is still the declaration-shape read-back (test_combined_table_extraction_declaration), and no follow-up ticket is cited for the `quire validate` unknown-TestMatrix path. The behavioural check is still missing. |
+
+Round 2: fix head `f5e2f8f749d35b3d9a06deeae4b26af071a9d324`, checked against round-1 head `8d9b1283`.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-003 | still-open | AC-23 and TC-152 are honestly 🚧 Blocked, but the combined-table accept/reject behaviour is still unverified: the only test reads back the declaration shape. `quire validate --module` still returns unknown type 'TestMatrix' under Quire 0.36.2. This is an external blocker, not fixed. |
+| FND-004 | fixed | - |
