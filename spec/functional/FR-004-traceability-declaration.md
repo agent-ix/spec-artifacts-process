@@ -140,11 +140,12 @@ modules can version apart.
 - Every `legacy` form **SHALL** declare a `language` and a `rewrite_to` naming a
   marker of that **same** language. A form spanning languages can name only one
   target marker, so it would suggest Rust attribute syntax inside a `.py` file.
-- `trace_tags.implements` **SHALL** declare one comment form per supported
-  language and one additional Rust `#[implements(...)]` attribute form, each
-  carrying a `template`. The comment forms **SHALL** require the literal
-  keyword `Implements:` before the id list; the Rust attribute form **SHALL**
-  capture a comma-separated list of quoted ids. The keyword is the prose guard:
+- `trace_tags.implements` **SHALL** declare a Rust `#[implements(...)]`
+  attribute form and one line-comment form for each of Python and TypeScript,
+  each carrying a `template`. The line-comment forms **SHALL** require the
+  literal keyword `Implements:` before the id list; the Rust attribute form
+  **SHALL** capture one or more separately quoted ids, separated by commas,
+  as accepted by `ix-trace-rs`. The keyword is the prose guard:
   the `legacy` `*-comment-id` forms bind a bare id after `//` and need a
   trailing-delimiter rule to stop a sentence flowing through, whereas here a
   sentence that merely names a requirement matches nothing.
@@ -170,13 +171,13 @@ modules can version apart.
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
-| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated comment form for each of rust, python and typescript plus one templated Rust `#[implements(...)]` attribute form. Comment patterns require literal `Implements:` before a comma-separated id list; the attribute pattern captures a comma-separated list of quoted ids. A sentence naming a requirement in prose matches none of them. Both Rust forms mint implementation scope, not verification evidence. | Test (TC-066) |
+| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of Rust, Python and TypeScript. Rust uses only `#[implements("ID1", "ID2")]`, capturing the separately quoted id list; Python and TypeScript use `Implements:` line comments with comma-separated ids. Malformed attributes and prose naming a requirement match no Rust form. The Rust attribute mints implementation scope, not verification evidence. | Test (TC-066) |
 | FR-004-AC-11 | `rust-test-name-id` binds both spellings of its token — `fn tc744_x` and `fn tc_744_x` render the same `TC-744` — while the separator stays optional, adds no capture group, and admits nothing new: a bare `fn tc_x`, an unanchored `tc_744_` outside a `fn` position, and a digit run with no trailing `_` all still match nothing. | Test (TC-071) |
 | FR-004-AC-12 | `vocabularies.test_type` declares the three ISO 29148 verification methods — `Inspection`, `Analysis`, `Demonstration` — alongside the harness kinds, and `no_source_symbol` carries the two that mint no symbol (`Inspection`, `Analysis`) but not `Demonstration`, which is observed running. | Test (TC-072) |
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
-| FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
+| FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, the declared `legacy` and `implements` forms, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
 | FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set and evidence posture (`source`, not `reference_only`) as `acceptance-criterion`. `constraint` is added to the `targets` of `traces-to` and `inspection-obligation`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows among `minted_targets`, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test |
 | FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of the four IADT classes (`Test`/`Inspection`/`Analysis`/`Demonstration`) or a `verification_catalog` method id, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare class or a bare catalog method id (e.g. `property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all. The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
 | FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
@@ -338,12 +339,11 @@ modules can version apart.
 > test/benchmark/fuzz symbols, `implements` only functions and containers — so a
 > mis-declared form binds **nothing** rather than the wrong thing.
 >
-> **Rust comment and attribute forms.** The comment form keeps existing
-> production annotations readable because `attached_source` spans the leading
-> comment block. `ix-trace-rs` supplies the Rust `#[implements("…")]` proc macro
-> for consumers that opt into attributes. Both forms bind production scope,
-> while `#[trace("…")]` binds test evidence. Comma lists preserve authored
-> multi-id annotations (CR-024).
+> **Rust attribute form.** `ix-trace-rs` supplies the compile-checked
+> `#[implements("ID1", "ID2")]` proc macro for production code. Each id is a
+> separate string literal. The attribute binds production scope, while
+> `#[trace("…")]` binds test evidence. Python and TypeScript retain line-comment
+> forms with comma-separated ids (CR-024).
 >
 > **Criterion ids are admitted** (`FR-001-AC-1`, not only `FR-001`). Scoping
 > truncates to the requirement trivially, whereas rejecting the shape would make
@@ -488,10 +488,10 @@ modules can version apart.
 > - The TestMatrix `Traces To` `column_patterns` check rejected
 >   `interface_004-AC-1` outright (anchored, hyphen-only KIND); widened the
 >   same way.
-> - The `legacy`/`implements` comment, docstring and `Implements:` forms admit
+> - The `legacy` comment, docstring and `Implements:` forms admit
 >   it too — the open forms (`*-trace-line`) by the same BASE alternation, the
 >   closed-enum forms (`*-comment-id`, `*-docstring-id`, `*-doc-comment-id`,
->   `*-implements-line`) by adding the same alternative alongside their
+>   Python and TypeScript `*-implements-line`) by adding the same alternative alongside their
 >   `TC|IT|FR|NFR|StR|US` enum, since those forms already bind `FR` ids today.
 > - `interface-verification` is new, mirroring `verification`/
 >   `nfr-verification`, so a stale `TC` id in an interface document's
