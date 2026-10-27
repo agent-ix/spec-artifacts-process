@@ -63,6 +63,14 @@ type: TestMatrix
 | FR-004 | FR-004-AC-20 | TC-148 | ✅ Complete |
 | FR-004 | FR-004-AC-21 | TC-149 | ✅ Complete |
 | FR-004 | FR-004-AC-22 | TC-151 | ✅ Complete |
+| FR-004 | FR-004-AC-23 | TC-152 | 🚧 Blocked: Quire 0.36.2 rejects TestMatrix validation as unknown type |
+| FR-004 | FR-004-AC-24 | TC-153 | ✅ Complete |
+| FR-004 | FR-004-AC-25 | TC-154 | ✅ Complete |
+| FR-004 | FR-004-AC-26 | TC-155 | ✅ Complete |
+| FR-004 | FR-004-AC-27 | TC-156 | 🚧 Blocked: syntax-aware quire-rs binding |
+| FR-004 | FR-004-AC-28 | TC-157 | ✅ Complete |
+| FR-004 | FR-004-AC-29 | TC-158 | ✅ Complete |
+| FR-004 | FR-004-AC-30 | TC-159 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
@@ -188,7 +196,7 @@ type: TestMatrix
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
-| TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
+| TC-039 | There is exactly one archetype-bound entry per matrix table kind — `test-case`, `traces-to`, `functional-coverage`, `nonfunctional-stakeholder-coverage` — never one per matrix filename (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
 | TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |
 | TC-042 | `Evidence Kind` is byte-equal to the declared `test_type` vocabulary AND to the Test Matrix `Type` choices — one vocabulary, three uses. This test is what keeps the copies honest until `from_vocabulary` lands (quire-rs#146) (FR-006) | Unit | P0 | FR-006-AC-3 | ✅ |
@@ -213,7 +221,7 @@ type: TestMatrix
 | TC-063 | `Finding.id_pattern` mints an id satisfying the archetype's own frontmatter schema — `Finding-001` failed `^[A-Z]{2,4}-[0-9]+$` for every id it produced — and does NOT fall in the `^FND-\d+$` namespace SpecReview's findings ROWS use (FR-008) | Unit | P0 | FR-008-AC-4 | ✅ |
 | TC-064 | `Finding` declares no `body_extraction`: nothing authors one — the two corpus documents typed Finding are mistyped analyses — and the review skills emit SpecReview by the 2026-06-20 decision (FR-008) | Unit | P0 | FR-008-AC-5 | ✅ |
 | TC-065 | `fault-injection` is advised by a declared `hazard` or `failure_mode`, the pre-existing `reliability` signal is intact, and every object type any entry advises on is one a `spec-objects-*` module declares | Unit | P1 | FR-007-AC-11 | ✅ |
-| TC-066 | `trace_tags.implements` declares one templated form per language; every pattern requires the literal `Implements:` keyword and captures a comma-separated list; and prose naming a requirement matches none of them — the keyword is what the `*-comment-id` forms need a trailing delimiter for (CR-028) | Unit | P0 | FR-004-AC-10 | ✅ |
+| TC-066 | `trace_tags.implements` retains the templated Rust `Implements:` comment form, adds the templated Rust attribute form, and retains exactly one templated comment form each for Python and TypeScript | Unit | P0 | FR-004-AC-10 | ✅ |
 | TC-067 | No method is keyed on `path-sensitive` or `hard-to-reach-branch` — values naming the implementation's control flow, which no spec states and no fact source reads. Keyed only on those, `concolic-execution` was the last of 33 methods no requirement could elicit (CR-029) | Unit | P0 | FR-007-AC-13 | ✅ |
 | TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
 | TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
@@ -273,11 +281,19 @@ type: TestMatrix
 | TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | ✅ |
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
-| TC-147 | `interface-acceptance-criterion` declares `required: false`, so a corpus with no `interface` documents and an `interface` document with no Acceptance Criteria section raise no missing-target finding; a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the `legacy`/`implements` comment and `Implements:` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
+| TC-147 | `interface-acceptance-criterion` declares `required: false`, so a corpus with no `interface` documents and an `interface` document with no Acceptance Criteria section raise no missing-target finding; a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the declared `legacy` and `implements` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
 | TC-148 | A `constraint` trace target is declared (archetype `FR`, section `Constraints`, `id_column: ID`, `evidence` defaults to `source` — the same posture `acceptance-criterion` relies on, same `exclude`), and `constraint` is added to `traces-to`'s and `inspection-obligation`'s `targets`; `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows in `minted_targets`, and `quire validate --okf` reports zero `dangling-trace-reference` warnings naming a `-CON-` id, down from the measured baseline of 13 (PLAT-1079) | Integration | P0 | FR-004-AC-20 | ✅ |
 | TC-149 | A `lint_rules` `table_column_values` entry scoped to `FR`/`NFR`/`interface` checks the `Acceptance Criteria` `Verification` column against the four IADT classes union the `verification_catalog` method ids, with no trailing `TC-…`/`IT-…` id, `severity: warning`; a fixture document with a `Verification` cell reading `Test (TC-999)` reports a warning-severity `quire lint` finding naming the id, a cell naming a bare class (`Test`) or a bare catalog method (`property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all | Unit | P0 | FR-004-AC-21 | ✅ |
 | TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | ✅ |
 | TC-151 | The lint rule's `allowed` list, loaded from the manifest, equals the four IADT classes union every `verification_catalog` key exactly — a test asserts set equality so the two cannot drift — and `Eval`/`Manual` are confirmed absent (they are `test_type` values, not catalog keys) | Unit | P0 | FR-004-AC-22 | ✅ |
+| TC-152 | `quire validate` accepts a TestMatrix with the four combined coverage columns, rejects one with a renamed required column, and accepts a matrix omitting the optional combined table | Integration | P0 | FR-004-AC-23 | 🚧 Blocked: Quire 0.36.2 reports unknown TestMatrix type for both existing and candidate modules |
+| TC-153 | An Analyze-shaped matrix reports false Complete in functional, nonfunctional and stakeholder rows as status lies; a backed Complete and unbacked Planned control in the combined table are not lies | Integration | P0 | FR-004-AC-24 | ✅ |
+| TC-154 | The Rust form captures one or multiple separately quoted ids, including an interface criterion and trailing comma; a Quire coverage run credits both ids on a production symbol | Integration | P0 | FR-004-AC-25 | ✅ |
+| TC-155 | Python and TypeScript `Implements:` line-comment forms capture comma-separated ids and reject prose that merely names an id | Unit | P0 | FR-004-AC-26 | ✅ |
+| TC-156 | A Quire coverage run does not credit a line-shaped `#[implements(...)]` example inside a Rust block comment or multi-line raw string | Integration | P0 | FR-004-AC-27 | 🚧 Blocked: syntax-aware quire-rs binding |
+| TC-157 | A Quire coverage run credits Rust `#[implements(...)]` as production scope without increasing backed verification evidence | Integration | P0 | FR-004-AC-28 | ✅ |
+| TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | ✅ |
+| TC-159 | The Rust form rejects malformed attributes and prose naming an id | Unit | P0 | FR-004-AC-30 | ✅ |
 
 ## Option Permutation Matrix
 

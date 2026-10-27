@@ -1,6 +1,6 @@
 manifest_version: 1.0.0
 name: spec-artifacts-process
-version: 0.2.1
+version: 0.2.2
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
@@ -441,6 +441,13 @@ artifact_types:
           multiple: true
           assert:
             columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
+        nonfunctional_stakeholder_coverage:
+          from: table_row
+          under_section: Nonfunctional and Stakeholder Coverage
+          required: false
+          multiple: true
+          assert:
+            columns: [Requirement, Acceptance Criteria, Test Cases, Status]
 - name: Standard
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
@@ -1054,6 +1061,19 @@ traceability:
     targets: [test-case]
     expand_ranges: true
     strip_annotations: true
+  # Analyze authors StR and NFR rows in one table with the same Test Cases and
+  # Status columns as functional coverage. The reference is scoped to that
+  # section, so a Complete claim with no bound test is a status lie there too.
+  - name: nonfunctional-stakeholder-coverage
+    archetype: TestMatrix
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Nonfunctional and Stakeholder Coverage
+    column: Test Cases
+    row_id_column: Requirement
+    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
+    targets: [test-case]
+    expand_ranges: true
+    strip_annotations: true
 
   # ── How a test carries a trace id (FR-051) ──
   #
@@ -1242,27 +1262,29 @@ traceability:
     # Reach correlated with TEST PLACEMENT, not requirement quality (quire-rs
     # CR-071).
     #
-    # A comment form, not an attribute: `#[implements("…")]` would need a proc
-    # macro in every consuming crate, and the point is to annotate production
-    # code that already exists. `attached_source` spans the leading comment
-    # block, so a line above the item binds to it.
+    # Rust keeps its existing Implements: line-comment form and adds ix-trace-rs's
+    # compile-checked attribute on production items. Python and TypeScript use
+    # their language-appropriate line comments.
+    # These forms mint scope, never verification evidence.
     #
-    # The `Implements:` prefix is the prose guard. The legacy `*-comment-id`
-    # forms bind a bare id after `//`, which is why they need a
-    # trailing-delimiter rule; here the keyword carries that weight and a
-    # sentence naming a requirement matches nothing. Comma lists, same grammar
-    # as the `Trace:` forms, because authors already write them that way
-    # (the corpus already writes them that way).
+    # For line-comment forms, the `Implements:` prefix is the prose guard. The
+    # legacy `*-comment-id` forms bind a bare id after `//`, which is why
+    # they need a trailing-delimiter rule. Here the keyword carries that
+    # weight, and a sentence naming a requirement matches nothing. Comma
+    # lists use the same grammar as `Trace:` forms in the existing corpus.
+    # The Rust attribute instead takes one quoted literal per id. Both Rust
+    # forms remain declared while consumers choose the attribute.
     #
-    # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`) — scoping
-    # truncates to the requirement trivially, whereas rejecting the shape would
-    # make a plausibly-authored marker silently bind nothing, which is the
-    # failure this whole program keeps finding.
+    # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`).
     implements:
     - name: rust-implements-line
       language: rust
       pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
       template: '/// Implements: {ids}'
+    - name: rust-implements-attribute
+      language: rust
+      pattern: '(?m)^[ \t]*#\[implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*,?)\s*\)\]'
+      template: '#[implements({ids})]'
     - name: python-implements-line
       language: python
       pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
