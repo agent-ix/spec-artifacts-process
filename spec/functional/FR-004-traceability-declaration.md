@@ -140,10 +140,10 @@ modules can version apart.
 - Every `legacy` form **SHALL** declare a `language` and a `rewrite_to` naming a
   marker of that **same** language. A form spanning languages can name only one
   target marker, so it would suggest Rust attribute syntax inside a `.py` file.
-- `trace_tags.implements` **SHALL** declare a templated Rust
-  `#[implements(...)]` attribute form and one templated line-comment form for
-  each of Python and TypeScript.
-- The Python and TypeScript `implements` forms **SHALL** require the literal
+- `trace_tags.implements` **SHALL** retain the templated Rust
+  `Implements:` line-comment form and add a templated Rust `#[implements(...)]`
+  attribute form; Python and TypeScript each retain one templated line-comment form.
+- The Rust, Python and TypeScript line-comment `implements` forms **SHALL** require the literal
   keyword `Implements:` before a comma-separated id list. The keyword is the prose guard:
   the `legacy` `*-comment-id` forms bind a bare id after `//` and need a
   trailing-delimiter rule to stop a sentence flowing through, whereas here a
@@ -172,7 +172,7 @@ modules can version apart.
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-8 | Every `legacy` form without an `id_format` declares its id as a comma-separated list, so a match carries every id the line names; a form declaring `id_format` declares a single id; and the `*-comment-id` delimiter still rejects prose flowing through an id. | Test (TC-035) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
-| FR-004-AC-10 | `trace_tags.implements` declares exactly one templated form for each of Rust, Python and TypeScript. | Test (TC-066) |
+| FR-004-AC-10 | `trace_tags.implements` declares exactly the existing templated Rust `Implements:` line-comment form plus the new templated Rust `#[implements(...)]` attribute form, and exactly one templated `Implements:` line-comment form each for Python and TypeScript. | Test (TC-066) |
 | FR-004-AC-11 | `rust-test-name-id` binds both spellings of its token — `fn tc744_x` and `fn tc_744_x` render the same `TC-744` — while the separator stays optional, adds no capture group, and admits nothing new: a bare `fn tc_x`, an unanchored `tc_744_` outside a `fn` position, and a digit run with no trailing `_` all still match nothing. | Test (TC-071) |
 | FR-004-AC-12 | `vocabularies.test_type` declares the three ISO 29148 verification methods — `Inspection`, `Analysis`, `Demonstration` — alongside the harness kinds, and `no_source_symbol` carries the two that mint no symbol (`Inspection`, `Analysis`) but not `Demonstration`, which is observed running. | Test (TC-072) |
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
@@ -367,15 +367,13 @@ modules can version apart.
 > neither listed the key. Declaring this block is what surfaced it (quire-rs
 > CR-081); against such an engine the declaration loads and mints nothing.
 
-> **IR-868 reversal of CR-028 (2026-10-24):** `ix-trace-rs` now supplies the
-> compile-checked `#[implements("ID1", "ID2")]` proc macro. Rust uses that
-> attribute alone for production scope; Python and TypeScript retain their
-> line-comment forms. This reverses the Rust comment choice recorded above,
-> without changing the separation between implementation scope and test
-> evidence. Existing Rust `Implements:` consumers lose scope until they migrate;
-> the module release waits on the owner decision and migration plan. CR-063's
-> `*-implements-line` description below records the earlier comment form; the
-> current Rust form also admits `interface_004-AC-1` through a quoted literal.
+> **IR-868 addition to CR-028 (2026-10-26):** `ix-trace-rs` supplies the
+> compile-checked `#[implements("ID1", "ID2")]` proc macro. The module adds
+> this Rust production-scope form while retaining the existing Rust
+> `Implements:` line-comment form and the Python and TypeScript line-comment
+> forms. Scope remains distinct from test evidence. Existing Rust comment
+> consumers keep their scope; retiring that form requires a later consumer
+> decision. The attribute also admits `interface_004-AC-1` as a quoted literal.
 
 > **VER-25 extension of CR-062 (2026-10-24):** Analyze authors a combined
 > `Nonfunctional and Stakeholder Coverage` table. Its `Test Cases` and `Status`
@@ -558,9 +556,6 @@ Recorded rather than papered over:
   `unknown type 'TestMatrix'` under the installed Quire 0.36.2, including for
   the pre-existing conforming fixture. FR-004-AC-23's behavioral
   accept/reject check remains pending until that validator path works.
-- Removing the Rust `Implements:` form drops scope for current consumers that
-  still author it. Module 0.2.2 release is held for an owner decision and
-  tracked consumer migration; this file does not authorize that release.
 - `US` acceptance criteria are authored as a bullet list and `declared_tables`
   reads tables only; `StR` criteria are validated by review, not by a test.
   Neither is minted — a denominator nothing can satisfy is noise, not rigour.

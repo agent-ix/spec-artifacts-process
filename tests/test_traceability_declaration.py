@@ -598,14 +598,31 @@ def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
 
 
 @pytest.mark.trace("TC-066")
-def test_one_templated_implements_form_per_language(traceability: dict) -> None:
-    """TC-066 (FR-004-AC-10): exactly one form per language."""
+def test_templated_implements_forms_include_both_rust_spellings(
+    traceability: dict,
+) -> None:
+    """TC-066 (FR-004-AC-10): retain the Rust comment while adding the attribute."""
     forms = traceability["trace_tags"]["implements"]
-    by_language = {f["language"]: f for f in forms}
+    by_language = {
+        language: [form for form in forms if form["language"] == language]
+        for language in LANGUAGES
+    }
 
-    assert sorted(by_language) == sorted(LANGUAGES)
-    assert len(forms) == len(by_language), "one form per language"
+    assert len(forms) == 4
+    assert {form["name"] for form in by_language["rust"]} == {
+        "rust-implements-line",
+        "rust-implements-attribute",
+    }
+    for language in ("python", "typescript"):
+        assert [form["name"] for form in by_language[language]] == [
+            f"{language}-implements-line"
+        ]
     assert all("{ids}" in form.get("template", "") for form in forms)
+    rust_comment = next(
+        form for form in by_language["rust"] if form["name"] == "rust-implements-line"
+    )
+    assert re.search(rust_comment["pattern"], "/// Implements: FR-001-AC-1")
+    assert not re.search(rust_comment["pattern"], "/// FR-001-AC-1 is implemented here")
 
 
 @pytest.mark.trace("TC-155")
@@ -668,7 +685,11 @@ def test_comment_implements_forms_match_language_syntax(traceability: dict) -> N
 def test_rust_implements_attribute_matches_ix_trace_syntax(traceability: dict) -> None:
     """TC-154 (FR-004-AC-25): Rust's form captures separate id literals."""
     tags = traceability["trace_tags"]
-    forms = [form for form in tags["implements"] if form["language"] == "rust"]
+    forms = [
+        form
+        for form in tags["implements"]
+        if form["name"] == "rust-implements-attribute"
+    ]
     assert len(forms) == 1, forms
     attribute = forms[0]
     assert attribute["name"] == "rust-implements-attribute"
@@ -696,7 +717,7 @@ def test_rust_implements_attribute_rejects_malformed_forms(
     form = next(
         form
         for form in traceability["trace_tags"]["implements"]
-        if form["language"] == "rust"
+        if form["name"] == "rust-implements-attribute"
     )
     pattern = re.compile(form["pattern"])
     for malformed in (
@@ -760,15 +781,14 @@ def test_quire_credits_ix_trace_implements_attribute_on_production(
     )
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
-    assert report["implements"] == [
-        {
-            "path": "src/lib.rs",
-            "symbol": "handle_input",
-            "trace_id": trace_id,
-            "form": "rust-implements-attribute",
-        }
-        for trace_id in ("FR-001-AC-1", "FR-001-AC-2")
-    ]
+    assert {
+        (edge["path"], edge["symbol"], edge["trace_id"], edge["form"])
+        for edge in report["implements"]
+    } == {
+        ("src/lib.rs", "handle_input", "FR-001-AC-1", "rust-implements-attribute"),
+        ("src/lib.rs", "handle_input", "FR-001-AC-2", "rust-implements-attribute"),
+        ("src/lib.rs", "comment_only", "FR-001-AC-1", "rust-implements-line"),
+    }
     assert report["totals"]["backed"] == 0
 
 

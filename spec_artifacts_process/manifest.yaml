@@ -1262,8 +1262,9 @@ traceability:
     # Reach correlated with TEST PLACEMENT, not requirement quality (quire-rs
     # CR-071).
     #
-    # Rust uses ix-trace-rs's compile-checked attribute on production items.
-    # Python and TypeScript use their language-appropriate line comments.
+    # Rust keeps its existing Implements: line-comment form and adds ix-trace-rs's
+    # compile-checked attribute on production items. Python and TypeScript use
+    # their language-appropriate line comments.
     # These forms mint scope, never verification evidence.
     #
     # For line-comment forms, the `Implements:` prefix is the prose guard. The
@@ -1271,10 +1272,15 @@ traceability:
     # they need a trailing-delimiter rule. Here the keyword carries that
     # weight, and a sentence naming a requirement matches nothing. Comma
     # lists use the same grammar as `Trace:` forms in the existing corpus.
-    # The Rust attribute instead takes one quoted literal per id.
+    # The Rust attribute instead takes one quoted literal per id. Both Rust
+    # forms remain declared while consumers choose the attribute.
     #
     # Criterion ids are admitted (`FR-001-AC-1`, not just `FR-001`).
     implements:
+    - name: rust-implements-line
+      language: rust
+      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
+      template: '/// Implements: {ids}'
     - name: rust-implements-attribute
       language: rust
       pattern: '(?m)^[ \t]*#\[implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*,?)\s*\)\]'
