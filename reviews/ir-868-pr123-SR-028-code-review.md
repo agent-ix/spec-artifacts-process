@@ -70,3 +70,10 @@ Round 2: fix head `f5e2f8f749d35b3d9a06deeae4b26af071a9d324`, checked against ro
 | FND-001 | still-open | Real attribute text inside block comments and multi-line raw strings still binds as production scope at f5e2f8f7: probes/falsepos credits block_comment_example and raw_string_example, and TC-156 still xfails. Removing the end anchor also widens this class. Two shapes that bound nothing at 8d9b128 now bind (probes/widening): a block comment closing `*/` on the attribute's own line, and a raw string with text after the attribute. Both are the same comment/raw-string defect. Fixing it is upstream-blocked on syntax-aware quire-rs binding; no fix has landed. |
 | FND-002 | fixed | - |
 | FND-003 | still-open | There is still no owner migration decision and no tracked consumer migration; release and install remain held. A re-measure at this pass found 72 Rust files in 11 local repos still using `// Implements:` or `/// Implements:` (quire-contract-codegen 21, quire-rs 14, quire-contract-runtime 14, quire-contract-ir 7, tl-rewrite 7, tl-mltl 4, and one each in five more). The PR body names only quire-contract-codegen, quire-contract-runtime and tl-rewrite. |
+
+Round 3: fix head `1aec2181409a626bbcd426b1de244b169317bd1a`, checked against round-2 reviewed head `8c215724100e328d044646e9d53ecb75074b8f9c`.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | still-open | Quire 0.36.2 still credits line-shaped attribute text inside a Rust block comment and a multi-line raw string. The unchanged attribute regex scans text; the focused engine negative case xfails. PLAT-1181 tracks syntax-aware binding, but FR-004-AC-27/TC-156 remain unmet on this head. |
+| FND-003 | fixed | The exact rust-implements-line name, language, pattern and template from main 34a4531 are restored in the manifest. The engine integration test credits comment_only via rust-implements-line alongside handle_input via rust-implements-attribute. FR-004-AC-10, TC-066 and the PR body describe both forms. |

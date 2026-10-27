@@ -65,3 +65,9 @@ Round 2: fix head `f5e2f8f749d35b3d9a06deeae4b26af071a9d324`, checked against ro
 | --- | --- | --- |
 | FND-003 | still-open | AC-23 and TC-152 are honestly 🚧 Blocked, but the combined-table accept/reject behaviour is still unverified: the only test reads back the declaration shape. `quire validate --module` still returns unknown type 'TestMatrix' under Quire 0.36.2. This is an external blocker, not fixed. |
 | FND-004 | fixed | - |
+
+Round 3: fix head `1aec2181409a626bbcd426b1de244b169317bd1a`, checked against round-2 reviewed head `8c215724100e328d044646e9d53ecb75074b8f9c`.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-003 | still-open | Quire 0.36.2 still rejects the pre-existing conforming TestMatrix fixture with unknown type 'TestMatrix' under the candidate module. TC-152 reads the declaration shape only; there is no passing engine accept/reject check for FR-004-AC-23. This remains an external validator blocker. |
