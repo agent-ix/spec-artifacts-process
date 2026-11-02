@@ -46,7 +46,7 @@ def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block):
     assert semantic_block["exports"] == artifact_type_names()
 
 
-@pytest.mark.trace("TC-093")
+@pytest.mark.trace("TC-093", "FR-004-AC-1", "FR-004-AC-23")
 def test_the_module_loads_with_every_declared_archetype(quire_engine):
     """A `semantic` key the loader cannot parse empties the whole model silently
     (agent-ix/quire-rs#221), so the archetype set is compared, not merely counted."""
