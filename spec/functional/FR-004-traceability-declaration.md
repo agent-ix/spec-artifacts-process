@@ -64,7 +64,8 @@ modules can version apart.
   reference in a `Traces To` cell and discharges no constraint through an
   `Inspections` record, so both reference declarations widen alongside it.
 - A `Verification` cell in an `FR`, `NFR` or `interface` Acceptance Criteria
-  table **SHALL** name a method only, with no `TC-…`/`IT-…` id. TC ids are
+  table **SHALL** name a method or the explicitly declared retirement token
+  `Withdrawn`, with no `TC-…`/`IT-…` id. TC ids are
   retired ecosystem-wide (epic PLAT-1076): a criterion is now bound to its
   evidence directly by trace tag, so a lingering test-case id in that cell is
   stale data. This is enforced as a declarative `lint_rules` entry (quire-rs
@@ -80,7 +81,8 @@ modules can version apart.
   not by this ticket.
   - The rule's `allowed` set **SHALL** be the four IADT classes
     (`Test`/`Inspection`/`Analysis`/`Demonstration`) **union** every method id
-    the manifest's `verification_catalog` declares — `unit-testing`,
+    the manifest's `verification_catalog` declares, **union** the module's
+    `traceability.vocabularies.retired` tokens — `unit-testing`,
     `property-based-testing`, `fuzzing`, `agent-behaviour-eval`, and every
     other catalog key — derived from the manifest, not hand-maintained
     as a second list. A `Verification` cell is also the `acceptance-criterion`
@@ -118,6 +120,16 @@ modules can version apart.
     drops the `TC-…` annotation from its StR sibling rule. PLAT-1085 and this
     module's release **SHALL** ship together — a released default module set
     **SHALL NOT** carry both contracts at once.
+- The module **SHALL** declare `traceability.vocabularies.retired: [Withdrawn]`
+  for explicitly withdrawn verification rows. `Withdrawn` is a historical
+  disposition, **not** a verification method or a `no_source_symbol` exemption;
+  it **SHALL NOT** appear in `verification_catalog`, `test_type` or
+  `no_source_symbol`. The existing `status.retired: ["⛔"]` declaration **SHALL**
+  remain distinct and unchanged. Coverage interprets the exact declared token
+  through quire-rs FR-050's retirement contract, preserving criterion ids,
+  statements and reasons while excluding retired rows from live unbacked
+  behavior. The module **SHALL NOT** infer retirement from Criteria prose or
+  treat `Planned`, `Test`, `Inspection` or `Analysis` as retirement tokens.
 - **Every** target and reference **SHALL** be bound by `archetype`, the Test
   Matrix included, and **SHALL NOT** declare a `document` path — quire-rs
   deleted that form (CR-062) and rejects the key outright.
@@ -157,6 +169,16 @@ modules can version apart.
 
 ## Acceptance Criteria
 
+> **CR-PLAT-1236 (2026-11-02):** IR-1141 retains withdrawn criterion ids
+> and reasons as historical tombstones with `Verification: Withdrawn`.
+> The global retired Status marker cannot describe those cells, and treating
+> them as unknown verification methods invents live evidence obligations.
+> Declare the exact retirement token separately from methods and non-symbol
+> verification. Extend this module's owning Verification lint vocabulary by
+> that same declared set so it does not contradict its coverage declaration.
+> Quire-rs FR-050 owns the engine interpretation; this module change alone
+> does not supply engine support or claim a strict-coverage execution pass.
+
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR`, `NFR` and `interface`, and loads without a validation error | Test (TC-028) |
@@ -176,8 +198,9 @@ modules can version apart.
 | FR-004-AC-15 | Every doc-comment form (`rust-doc-comment-id`, `python-docstring-id`, `typescript-doc-comment-id`) requires a trailing delimiter after the id list, so a sentence beginning with an id is not read as a tag; the authored forms — trailing colon, parenthesis, slash, dash, period, and end of line — all still bind. | Test (TC-075) |
 | FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, every `legacy`/`implements` comment form, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
 | FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set and evidence posture (`source`, not `reference_only`) as `acceptance-criterion`. `constraint` is added to the `targets` of `traces-to` and `inspection-obligation`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows among `minted_targets`, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test |
-| FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of the four IADT classes (`Test`/`Inspection`/`Analysis`/`Demonstration`) or a `verification_catalog` method id, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare class or a bare catalog method id (e.g. `property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all. The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
-| FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
+| FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of the four IADT classes (`Test`/`Inspection`/`Analysis`/`Demonstration`), a `verification_catalog` method id or an explicitly declared `vocabularies.retired` token, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare class or a bare catalog method id (e.g. `property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all. The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
+| FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` union the manifest's `traceability.vocabularies.retired` tokens — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
+| FR-004-AC-23 | The model declares exactly `vocabularies.retired: [Withdrawn]`, disjoint from the verification catalog, test types and `no_source_symbol`. The existing retired Status marker remains `⛔`. The Verification lint rule accepts the declared retirement token and still rejects `Planned` and misspelled retirement values; it does not classify them as retirement. | Test |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
