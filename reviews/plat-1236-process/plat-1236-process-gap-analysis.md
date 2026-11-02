@@ -37,3 +37,11 @@ Reviewed frozen head fb67cd16cb55bb1c916dc43f0c576291bae60d41 against e6ce2f63bf
 ## Verdict
 
 CONDITIONAL for this method. Final PR merge is held until findings are resolved and actual candidate-engine qualification succeeds.
+
+## Dispositions
+
+Round 1, checked frozen head f9dc0913ae0d773fcf74b937fecbaac2f6a31bcc. Candidate CLI 0.38.1 reports engine 0.51.0; candidate Python wheel from engine b18cc5e0 loads all 14 archetypes. The provided four-target run is 64 passed and 1 pre-existing xfailed, including traceability 27 passed. Candidate qualification is not a registry release or a lockfile resolution. No Cargo runs or source edits during this pass.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The source marker is present, and the candidate-model computed matrix now reports FR-004-AC-22 tagged with the intended test binder. |
