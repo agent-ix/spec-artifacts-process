@@ -173,7 +173,14 @@ def test_no_fixture_mints_an_id():
     if shutil.which("quire") is None:
         pytest.skip("the `quire` CLI is required for `quire coverage`")
     coverage = subprocess.run(
-        ["quire", "coverage", "--scope", str(REPO_ROOT)],
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(REPO_ROOT),
+            "--module",
+            str(PACKAGE_ROOT),
+        ],
         capture_output=True,
         text=True,
     )
