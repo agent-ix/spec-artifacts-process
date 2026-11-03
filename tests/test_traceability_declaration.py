@@ -543,7 +543,7 @@ def test_templated_implements_forms_include_both_rust_spellings(
     assert not re.search(rust_comment["pattern"], "/// FR-001-AC-1 is implemented here")
 
 
-@pytest.mark.trace("TC-155")
+@pytest.mark.trace("TC-155", "FR-004-AC-26")
 def test_comment_implements_forms_match_language_syntax(traceability: dict) -> None:
     """TC-155 (FR-004-AC-26): comments bind ids only after `Implements:`."""
     forms = traceability["trace_tags"]["implements"]
@@ -599,7 +599,7 @@ def test_comment_implements_forms_match_language_syntax(traceability: dict) -> N
             ), f"{form['name']} binds {rejected!r}"
 
 
-@pytest.mark.trace("TC-154")
+@pytest.mark.trace("TC-154", "FR-004-AC-25")
 def test_rust_implements_attribute_matches_ix_trace_syntax(traceability: dict) -> None:
     """TC-154 (FR-004-AC-25): Rust's form captures separate id literals."""
     tags = traceability["trace_tags"]
@@ -630,7 +630,7 @@ def test_rust_implements_attribute_matches_ix_trace_syntax(traceability: dict) -
     assert "rust-implements-attribute" not in {form["name"] for form in tags["markers"]}
 
 
-@pytest.mark.trace("TC-159")
+@pytest.mark.trace("TC-159", "FR-004-AC-30")
 def test_rust_implements_attribute_rejects_malformed_forms(
     traceability: dict,
 ) -> None:
@@ -659,7 +659,7 @@ def test_rust_implements_attribute_rejects_malformed_forms(
 
 @pytest.mark.integration
 @pytest.mark.trace("TC-154")
-@pytest.mark.trace("TC-157")
+@pytest.mark.trace("TC-157", "FR-004-AC-28")
 def test_quire_credits_ix_trace_implements_attribute_on_production(
     tmp_path: pathlib.Path,
 ) -> None:
@@ -765,7 +765,7 @@ def test_quire_does_not_credit_attributes_in_rust_text(tmp_path: pathlib.Path) -
 
 
 @pytest.mark.integration
-@pytest.mark.trace("TC-158")
+@pytest.mark.trace("TC-158", "FR-004-AC-29")
 def test_quire_credits_valid_trailing_attribute_forms(tmp_path: pathlib.Path) -> None:
     """TC-158 (FR-004-AC-29): valid trailing forms still bind scope."""
     assert shutil.which("quire") is not None, "a guard-capable quire CLI is required"

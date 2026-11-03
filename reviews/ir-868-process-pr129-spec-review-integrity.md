@@ -129,3 +129,32 @@ dispositions:
     narrowed; no false TC152 completion, no new waiver, and no other-lane123 rewrite.
     The restored table-kind assertion is the surviving same test artifact.
 ```
+
+
+## Current-main consumer refresh
+
+This independent scoped refresh examines process PR129 against current main after CLI PR145 merged, using CLI 0.38.1 / engine 0.51.0 and the isolated installed current-main Python wheel. It does not claim a released consumer installation. The four production/spec/test files retain the main retirement vocabulary unchanged. All historical finding rows and dispositions above remain unchanged. Their latest fixed outcomes were rechecked: token whitespace before the trailing comma is accepted, the attribute obligation names its subject, and unrelated draft TestMatrix scope remains absent.
+
+The mandatory rust_attribute guard remains declared. Existing exact production-edge assertions preserve comment scopes and zero backed verification; block-comment and raw-string adverse inputs share a genuine outer-attribute control. Same-line, trailing-comment, malformed-input and whitespace/newline-comma controls discriminate their respective cases. Independent reviewer rerun: 33 declaration tests passed, no skips or xfails. Preserved owner qualification adds the Registry/current-wheel control for 34 focused passes and package initializer coverage 100 percent (six statements, not semantic coverage). Ruff, Black and changed-document structural checks passed in retained qualification logs.
+
+Actual computed matrix and deterministic quoin advise were rerun. Repository-wide baseline untagged criteria preclude a repository-wide gap PASS; this refresh assesses changed obligations only. No applicable AssuranceProfile was found. Optional semantic gap-review was not invoked. Plan completion: not assessed. No Rust/Cargo production changes occur in this PR, so a Rust review lane is inapplicable. EARS advisories concern retained statements, and no new requirement grammar defect was found. Test is a suitable reviewer-selected evidence method for the changed syntax and adverse cases; advisor recommendations are advisory.
+
+The unchanged full schemas-check and semantic suite remain unavailable because private @agent-ix/semantic-core installation returns E401 and offline cache is missing. This is disclosed as unavailable aggregate evidence; the guard declaration, Registry and document checks do not depend on that npm package. No blanket registry gate or lock-refresh condition is added.
+
+## Refresh verdict
+
+PASS within the scoped spec-review/integrity method; no new findings. Overall PR readiness is blocked by the separately recorded missing criterion trace bindings.
+
+## Refresh examined scope
+
+```yaml
+scope:
+  - {"id": "FR-004-AC-10", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "`trace_tags.implements` declares exactly the existing templated Rust `Implements:` line-comment form plus the new templated Rust `#[implements(...)]` attribute form, and exactly one templated `Implements:` line-comment form each for Python and TypeScript."}
+  - {"id": "FR-004-AC-19", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does \u2014 `inspection-obligation`, `traces-to`, the `Traces To` column check, the declared `legacy` and `implements` forms, and a new `interface-verification` reference covering its own `Verification` column."}
+  - {"id": "FR-004-AC-25", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "The Rust `implements` attribute form captures each separately quoted id in a one- or multi-literal `#[implements(\"ID1\", \"ID2\")]` attribute, including a trailing comma and an `interface_004-AC-1` id."}
+  - {"id": "FR-004-AC-26", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "The Python and TypeScript `implements` forms require `Implements:` before a comma-separated id list and bind no id from a sentence that merely names a requirement."}
+  - {"id": "FR-004-AC-27", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "Rust `implements` binds no scope from a syntactically complete attribute example inside a block comment or multi-line raw string."}
+  - {"id": "FR-004-AC-28", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "The Rust `implements` attribute mints production implementation scope and does not mint verification evidence."}
+  - {"id": "FR-004-AC-29", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "Rust `implements` binds a valid attribute followed by a trailing `//` comment or by its item on the same line."}
+  - {"id": "FR-004-AC-30", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "Malformed Rust attributes and prose naming a requirement bind no implementation scope."}
+```
