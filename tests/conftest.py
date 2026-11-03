@@ -15,6 +15,7 @@ Two policies are enforced here and nowhere else:
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import re
 import sys
@@ -52,6 +53,13 @@ QUIRE_MISSING = (
 sys.path.insert(0, str(REPO_ROOT / "tests"))
 
 from support.strict_yaml import load_yaml_strict  # noqa: E402
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Expose semantic npm tools, including quire, to CLI integration tests."""
+    bin_dir = SEMANTIC_DIR / "node_modules" / ".bin"
+    if bin_dir.is_dir():
+        os.environ["PATH"] = f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"
 
 
 def load_manifest() -> dict[str, Any]:

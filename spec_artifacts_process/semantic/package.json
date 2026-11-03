@@ -14,6 +14,7 @@
     "@agent-ix/semantic-core": "0.3.3"
   },
   "devDependencies": {
+    "@agent-ix/quire-cli": "0.38.2",
     "@typespec/compiler": "1.15.0",
     "@typespec/json-schema": "1.15.0"
   },
