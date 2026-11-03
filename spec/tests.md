@@ -65,11 +65,11 @@ type: TestMatrix
 | FR-004 | FR-004-AC-22 | TC-151 | ✅ Complete |
 | FR-004 | FR-004-AC-23 | TC-152 | 🚧 Blocked: Quire 0.36.2 rejects TestMatrix validation as unknown type |
 | FR-004 | FR-004-AC-24 | TC-153 | ✅ Complete |
-| FR-004 | FR-004-AC-25 | TC-154 | 🚧 Pending: guard-capable consumer qualification |
+| FR-004 | FR-004-AC-25 | TC-154 | ✅ Complete |
 | FR-004 | FR-004-AC-26 | TC-155 | ✅ Complete |
-| FR-004 | FR-004-AC-27 | TC-156 | 🚧 Pending: guard-capable consumer qualification |
-| FR-004 | FR-004-AC-28 | TC-157 | 🚧 Pending: guard-capable consumer qualification |
-| FR-004 | FR-004-AC-29 | TC-158 | 🚧 Pending: guard-capable consumer qualification |
+| FR-004 | FR-004-AC-27 | TC-156 | ✅ Complete |
+| FR-004 | FR-004-AC-28 | TC-157 | ✅ Complete |
+| FR-004 | FR-004-AC-29 | TC-158 | ✅ Complete |
 | FR-004 | FR-004-AC-30 | TC-159 | ✅ Complete |
 | FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
 | FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
@@ -288,11 +288,11 @@ type: TestMatrix
 | TC-151 | The lint rule's `allowed` list, loaded from the manifest, equals the four IADT classes union every `verification_catalog` key exactly — a test asserts set equality so the two cannot drift — and `Eval`/`Manual` are confirmed absent (they are `test_type` values, not catalog keys) | Unit | P0 | FR-004-AC-22 | ✅ |
 | TC-152 | `quire validate` accepts a TestMatrix with the four combined coverage columns, rejects one with a renamed required column, and accepts a matrix omitting the optional combined table | Integration | P0 | FR-004-AC-23 | 🚧 Blocked: Quire 0.36.2 reports unknown TestMatrix type for both existing and candidate modules |
 | TC-153 | An Analyze-shaped matrix reports false Complete in functional, nonfunctional and stakeholder rows as status lies; a backed Complete and unbacked Planned control in the combined table are not lies | Integration | P0 | FR-004-AC-24 | ✅ |
-| TC-154 | The Rust form captures one or multiple separately quoted ids, including an interface criterion and trailing comma; a Quire coverage run credits both ids on a production symbol | Integration | P0 | FR-004-AC-25 | 🚧 Pending: guard-capable consumer qualification |
+| TC-154 | The Rust form captures one or multiple separately quoted ids, including an interface criterion and trailing comma; a Quire coverage run credits both ids on a production symbol | Integration | P0 | FR-004-AC-25 | ✅ Complete |
 | TC-155 | Python and TypeScript `Implements:` line-comment forms capture comma-separated ids and reject prose that merely names an id | Unit | P0 | FR-004-AC-26 | ✅ |
-| TC-156 | A Quire coverage run does not credit a line-shaped `#[implements(...)]` example inside a Rust block comment or multi-line raw string | Integration | P0 | FR-004-AC-27 | 🚧 Pending: guard-capable consumer qualification |
-| TC-157 | A Quire coverage run credits Rust `#[implements(...)]` as production scope without increasing backed verification evidence | Integration | P0 | FR-004-AC-28 | 🚧 Pending: guard-capable consumer qualification |
-| TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | 🚧 Pending: guard-capable consumer qualification |
+| TC-156 | A Quire coverage run does not credit a line-shaped `#[implements(...)]` example inside a Rust block comment or multi-line raw string | Integration | P0 | FR-004-AC-27 | ✅ Complete |
+| TC-157 | A Quire coverage run credits Rust `#[implements(...)]` as production scope without increasing backed verification evidence | Integration | P0 | FR-004-AC-28 | ✅ Complete |
+| TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | ✅ Complete |
 | TC-159 | The Rust form rejects malformed attributes and prose naming an id | Unit | P0 | FR-004-AC-30 | ✅ |
 
 ## Option Permutation Matrix
