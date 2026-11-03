@@ -515,29 +515,49 @@ def test_withdrawn_is_declared_retirement_not_a_verification_method(
         assert live_method not in vocabularies["retired"]
 
 
-def test_implements_forms_require_the_keyword(traceability: dict) -> None:
-    """TC-066 (FR-004-AC-10, CR-028): the `implements` forms bind PRODUCTION
-    code to the requirement it is about (quire-rs FR-062) — a separate list from
-    `markers`, because `markers` mint evidence and these mint scope.
+@pytest.mark.trace("TC-066")
+def test_templated_implements_forms_include_both_rust_spellings(
+    traceability: dict,
+) -> None:
+    """TC-066 (FR-004-AC-10): retain the Rust comment while adding the attribute."""
+    forms = traceability["trace_tags"]["implements"]
+    by_language = {
+        language: [form for form in forms if form["language"] == language]
+        for language in LANGUAGES
+    }
 
-    The literal `Implements:` keyword is the prose guard. The legacy
-    `*-comment-id` forms bind a bare id after `//` and need a trailing-delimiter
-    rule to stop a sentence flowing through the id; here the keyword carries
-    that weight, so a line that merely names a requirement matches nothing.
-    """
+    assert len(forms) == 4
+    assert {form["name"] for form in by_language["rust"]} == {
+        "rust-implements-line",
+        "rust-implements-attribute",
+    }
+    for language in ("python", "typescript"):
+        assert [form["name"] for form in by_language[language]] == [
+            f"{language}-implements-line"
+        ]
+    assert all("{ids}" in form.get("template", "") for form in forms)
+    rust_comment = next(
+        form for form in by_language["rust"] if form["name"] == "rust-implements-line"
+    )
+    assert re.search(rust_comment["pattern"], "/// Implements: FR-001-AC-1")
+    assert not re.search(rust_comment["pattern"], "/// FR-001-AC-1 is implemented here")
+
+
+@pytest.mark.trace("TC-155", "FR-004-AC-26")
+def test_comment_implements_forms_match_language_syntax(traceability: dict) -> None:
+    """TC-155 (FR-004-AC-26): comments bind ids only after `Implements:`."""
     forms = traceability["trace_tags"]["implements"]
     by_language = {f["language"]: f for f in forms}
 
-    assert sorted(by_language) == sorted(LANGUAGES)
-    assert len(forms) == len(by_language), "one form per language"
-
     listed = ["FR-001", "FR-002-AC-3"]
-    for form in forms:
+    for language, prefix in (("python", "# "), ("typescript", "// ")):
+        form = by_language[language]
+        assert form["name"] == f"{language}-implements-line"
         assert form.get("template"), form["name"]
         assert "{ids}" in form["template"], form["name"]
         pattern = re.compile(form["pattern"])
 
-        match = pattern.search("/// Implements: " + ", ".join(listed))
+        match = pattern.search(prefix + "Implements: " + ", ".join(listed))
         assert match, f"{form['name']} does not match a keyword line"
         ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
         assert ids == listed, f"{form['name']} captured {ids}"
@@ -550,7 +570,7 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
         ), f"{form['name']} binds prose"
 
         # quire-rs#460: the underscore-object-id shape scopes the same way.
-        scoped = pattern.search("Implements: interface_004-AC-1")
+        scoped = pattern.search(prefix + "Implements: interface_004-AC-1")
         assert scoped, f"{form['name']} does not scope interface_004-AC-1"
         assert (
             scoped.group(1) == "interface_004-AC-1"
@@ -565,7 +585,7 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
             ("interface_004-AC", "interface_004"),
             ("interface_004_AC_1", "interface_004"),
         ):
-            trunc_match = pattern.search(f"Implements: {malformed}")
+            trunc_match = pattern.search(prefix + f"Implements: {malformed}")
             assert trunc_match, f"{form['name']} lost the base id in {malformed!r}"
             assert (
                 trunc_match.group(1) == truncated
@@ -575,12 +595,196 @@ def test_implements_forms_require_the_keyword(traceability: dict) -> None:
         # merely shares the `word_number` shape still bind nothing.
         for rejected in ("_004-AC-1", "4_004-AC-1", "sha_256", "retry_3"):
             assert not pattern.search(
-                f"Implements: {rejected}"
+                prefix + f"Implements: {rejected}"
             ), f"{form['name']} binds {rejected!r}"
 
 
+@pytest.mark.trace("TC-154", "FR-004-AC-25")
+def test_rust_implements_attribute_matches_ix_trace_syntax(traceability: dict) -> None:
+    """TC-154 (FR-004-AC-25): Rust's form captures separate id literals."""
+    tags = traceability["trace_tags"]
+    forms = [
+        form
+        for form in tags["implements"]
+        if form["name"] == "rust-implements-attribute"
+    ]
+    assert len(forms) == 1, forms
+    attribute = forms[0]
+    assert attribute["name"] == "rust-implements-attribute"
+    assert attribute["syntax"] == "rust_attribute"
+    assert attribute["template"] == "#[implements({ids})]"
+    pattern = re.compile(attribute["pattern"])
+    for syntax, expected in (
+        ('#[implements("FR-001")]', ["FR-001"]),
+        ('#[implements("FR-001" ,)]', ["FR-001"]),
+        ('#[implements("FR-001"\n,)]', ["FR-001"]),
+        ('#[implements("FR-001", "FR-002-AC-3")]', ["FR-001", "FR-002-AC-3"]),
+        (
+            '    #[implements("interface_004-AC-1", "TC-CB-01",)]',
+            ["interface_004-AC-1", "TC-CB-01"],
+        ),
+    ):
+        match = pattern.search(syntax)
+        assert match, syntax
+        assert re.findall(r'"([^"]+)"', match.group(1)) == expected
+    assert "rust-implements-attribute" not in {form["name"] for form in tags["markers"]}
+
+
+@pytest.mark.trace("TC-159", "FR-004-AC-30")
+def test_rust_implements_attribute_rejects_malformed_forms(
+    traceability: dict,
+) -> None:
+    """TC-159 (FR-004-AC-30): malformed attributes and prose bind nothing."""
+    form = next(
+        form
+        for form in traceability["trace_tags"]["implements"]
+        if form["name"] == "rust-implements-attribute"
+    )
+    pattern = re.compile(form["pattern"])
+    for malformed in (
+        "/// FR-001 implements this behavior.",
+        "/// Implements: FR-001",
+        '/// #[implements("FR-001")]',
+        'let example = "#[implements(\\"FR-001\\")]";',
+        "#[implements(FR-001)]",
+        '#[implements("FR-001, FR-002-AC-3")]',
+        '#[implements("FR-001" extra)]',
+        '#[implements("not an id")]',
+        '#[implements("sha_256")]',
+        '#[implements("")]',
+        "#[implements()]",
+    ):
+        assert not pattern.search(malformed), malformed
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-154")
+@pytest.mark.trace("TC-157", "FR-004-AC-28")
+def test_quire_credits_ix_trace_implements_attribute_on_production(
+    tmp_path: pathlib.Path,
+) -> None:
+    """The installed engine loads this module and credits Rust production scope."""
+    assert shutil.which("quire") is not None, "a guard-capable quire CLI is required"
+
+    spec_dir = tmp_path / "spec"
+    src_dir = tmp_path / "src"
+    spec_dir.mkdir()
+    src_dir.mkdir()
+    (spec_dir / "FR-001.md").write_text(
+        "---\nid: FR-001\ntype: FR\ntitle: Test requirement\n---\n\n"
+        "## Acceptance Criteria\n\n"
+        "| ID | Criteria | Verification |\n| --- | --- | --- |\n"
+        "| FR-001-AC-1 | The function handles an input. | Unit |\n"
+        "| FR-001-AC-2 | The function handles another input. | Unit |\n"
+    )
+    (src_dir / "lib.rs").write_text(
+        "use ix_trace_rs::implements;\n\n"
+        '#[implements("FR-001-AC-1", "FR-001-AC-2")]\n'
+        "pub fn handle_input(value: &str) -> usize { value.len() }\n\n"
+        "/// Implements: FR-001-AC-1\n"
+        "pub fn comment_only(value: &str) -> usize { value.len() }\n"
+    )
+
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    assert {
+        (edge["path"], edge["symbol"], edge["trace_id"], edge["form"])
+        for edge in report["implements"]
+    } == {
+        ("src/lib.rs", "handle_input", "FR-001-AC-1", "rust-implements-attribute"),
+        ("src/lib.rs", "handle_input", "FR-001-AC-2", "rust-implements-attribute"),
+        ("src/lib.rs", "comment_only", "FR-001-AC-1", "rust-implements-line"),
+    }
+    assert report["totals"]["backed"] == 0
+
+
+def _quire_rust_implements_ids(tmp_path: pathlib.Path, source: str) -> set[str]:
+    spec_dir = tmp_path / "spec"
+    src_dir = tmp_path / "src"
+    spec_dir.mkdir()
+    src_dir.mkdir()
+    (spec_dir / "FR-001.md").write_text(
+        "---\nid: FR-001\ntype: FR\ntitle: Attribute cases\n---\n\n"
+        "## Acceptance Criteria\n\n"
+        "| ID | Criteria | Verification |\n| --- | --- | --- |\n"
+        "| FR-001-AC-1 | First case. | Unit |\n"
+        "| FR-001-AC-2 | Second case. | Unit |\n"
+        "| FR-001-AC-3 | Third case. | Unit |\n"
+    )
+    (src_dir / "lib.rs").write_text(source)
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    return {
+        edge["trace_id"] for edge in json.loads(result.stdout).get("implements", [])
+    }
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-156", "FR-004-AC-27")
+def test_quire_does_not_credit_attributes_in_rust_text(tmp_path: pathlib.Path) -> None:
+    """A comment and a raw-string example must not mint implementation scope."""
+    assert shutil.which("quire") is not None, "a guard-capable quire CLI is required"
+    ids = _quire_rust_implements_ids(
+        tmp_path,
+        "pub fn block_comment_example() {\n"
+        '/*\n#[implements("FR-001-AC-1")]\n*/\n}\n'
+        "pub fn raw_string_example() {\n"
+        'let _example = r#"\n#[implements("FR-001-AC-2")]\n"#;\n}\n'
+        '#[implements("FR-001-AC-3")]\n'
+        "pub fn real_attribute() {}\n",
+    )
+    assert "FR-001-AC-3" in ids, "the real-attribute control must bind"
+    assert ids == {"FR-001-AC-3"}, ids
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-158", "FR-004-AC-29")
+def test_quire_credits_valid_trailing_attribute_forms(tmp_path: pathlib.Path) -> None:
+    """TC-158 (FR-004-AC-29): valid trailing forms still bind scope."""
+    assert shutil.which("quire") is not None, "a guard-capable quire CLI is required"
+    ids = _quire_rust_implements_ids(
+        tmp_path,
+        '#[implements("FR-001-AC-1")] // why\n'
+        "pub fn trailing_comment() {}\n"
+        '#[implements("FR-001-AC-2")] pub fn same_line() {}\n'
+        '#[implements("FR-001-AC-3" ,)]\n'
+        "pub fn spaced_comma() {}\n"
+        '#[implements("FR-001-AC-4"\n,)]\n'
+        "pub fn newline_comma() {}\n",
+    )
+    assert ids == {"FR-001-AC-1", "FR-001-AC-2", "FR-001-AC-3", "FR-001-AC-4"}, ids
+
+
+@pytest.mark.trace("TC-157")
 def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
-    """TC-066 (FR-004-AC-10, CR-028): no name is shared between the two lists.
+    """TC-157 (FR-004-AC-28, CR-028): the form sets stay separate.
 
     quire-rs CR-061 stopped `verifies` binding production symbols because a doc
     comment citing `FR-053-AC-1` would otherwise count as evidence backing it.
