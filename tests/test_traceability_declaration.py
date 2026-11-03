@@ -499,6 +499,22 @@ def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
         assert still_bindable not in exempt
 
 
+@pytest.mark.trace("FR-004-AC-23")
+def test_withdrawn_is_declared_retirement_not_a_verification_method(
+    manifest: dict,
+) -> None:
+    """Keep withdrawal separate from live verification and status markers."""
+    traceability = manifest["traceability"]
+    vocabularies = traceability["vocabularies"]
+    assert vocabularies["retired"] == ["Withdrawn"]
+    assert traceability["status"]["retired"] == ["⛔"]
+    assert set(vocabularies["retired"]).isdisjoint(manifest["verification_catalog"])
+    for live_vocabulary in ("test_type", "no_source_symbol"):
+        assert set(vocabularies["retired"]).isdisjoint(vocabularies[live_vocabulary])
+    for live_method in ("Test", "Planned", "Inspection", "Analysis"):
+        assert live_method not in vocabularies["retired"]
+
+
 @pytest.mark.trace("TC-066")
 def test_templated_implements_forms_include_both_rust_spellings(
     traceability: dict,
@@ -963,12 +979,13 @@ def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     assert not rule.get("annotation_pattern")
 
 
-def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
+@pytest.mark.trace("FR-004-AC-21", "FR-004-AC-23")
+def test_verification_lint_accepts_withdrawn_and_flags_invalid_values(tmp_path) -> None:
     """TC-149 (FR-004-AC-21): the behavioural half — `quire lint` against a
     fixture document. A `Verification` cell reading `Test (TC-999)` reports a
     `acceptance-criterion-verification-method` finding at `warning` severity
-    naming the id; a cell naming a bare class or a bare catalog method id
-    raises nothing.
+    naming the id. A bare class, catalog method or declared withdrawal token
+    raises nothing; Planned and a misspelled withdrawal remain invalid.
 
     The fixture is written under `tmp_path`, never the repo's own
     `tests/fixtures/` (SR-020 FND-003) — the exclude globs on every trace
@@ -980,7 +997,7 @@ def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
     would still pass at any severity and asserts nothing about this rule.
     """
     if shutil.which("quire") is None:
-        pytest.skip("the `quire` CLI is required for lint")
+        pytest.fail("the `quire` CLI is required for lint")
 
     fixture = tmp_path / "lint-verification-column.md"
     fixture.write_text(
@@ -989,8 +1006,11 @@ def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
         "| ID | Criteria | Verification |\n|----|----------|--------------|\n"
         "| FR-999-AC-1 | bare class | Test |\n"
         "| FR-999-AC-2 | catalog method | property-based-testing |\n"
-        "| FR-999-AC-3 | stale TC id | Test (TC-999) |\n"
-        "| FR-999-AC-4 | stale IT id | Inspection (IT-3) |\n"
+        "| FR-999-AC-3 | withdrawn tombstone | Withdrawn |\n"
+        "| FR-999-AC-4 | stale TC id | Test (TC-999) |\n"
+        "| FR-999-AC-5 | stale IT id | Inspection (IT-3) |\n"
+        "| FR-999-AC-6 | live future behavior | Planned |\n"
+        "| FR-999-AC-7 | misspelled retirement | Withdrawnn |\n"
     )
     result = subprocess.run(
         ["quire", "lint", "--module", str(pack.PACK_ROOT), str(fixture)],
@@ -999,8 +1019,9 @@ def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
         check=False,
     )
     findings = result.stdout + result.stderr
-    assert "row 1" not in findings and "row 2" not in findings, findings
-    for row, needle in ((3, "TC-999"), (4, "IT-3")):
+    assert result.returncode == 0, findings
+    assert all(f"row {row}:" not in findings for row in (1, 2, 3)), findings
+    for row, needle in ((4, "TC-999"), (5, "IT-3"), (6, "Planned"), (7, "Withdrawnn")):
         line = (
             "warning: acceptance-criterion-verification-method: section "
             f"'Acceptance Criteria' column 'Verification' row {row}:"
@@ -1009,20 +1030,21 @@ def test_verification_lint_rule_flags_stale_test_ids_only(tmp_path) -> None:
         assert needle in findings, findings
 
 
+@pytest.mark.trace("FR-004-AC-22")
 def test_verification_lint_rule_allowed_set_is_classes_union_catalog(
     manifest: dict,
 ) -> None:
     """TC-151 (FR-004-AC-22): the `allowed` set equals the four IADT classes
-    union every `verification_catalog` key, exactly — derived-by-assertion
-    rather than hand-maintained, so an entry added to the catalog and this
-    rule's `allowed` list cannot silently drift apart. `Eval`/`Manual` are
-    `traceability.vocabularies.test_type` values, not catalog keys, and stay
-    absent."""
+    union every `verification_catalog` key and retirement token, exactly —
+    derived-by-assertion rather than hand-maintained, so an entry added to the
+    catalog and the lint rule cannot silently drift apart. `Eval` and
+    `Manual` remain test types, not methods or retirement tokens."""
     rule = _verification_lint_rule()
     classes = {"Test", "Inspection", "Analysis", "Demonstration"}
     catalog_keys = set(manifest["verification_catalog"])
 
-    assert set(rule["allowed"]) == classes | catalog_keys
+    retirement = set(manifest["traceability"]["vocabularies"]["retired"])
+    assert set(rule["allowed"]) == classes | catalog_keys | retirement
     assert len(rule["allowed"]) == len(set(rule["allowed"])), "no duplicate entry"
     assert "Eval" not in rule["allowed"]
     assert "Manual" not in rule["allowed"]

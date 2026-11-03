@@ -676,7 +676,8 @@ object_types:
 # change.
 #
 # `allowed` is the four ISO 29148 IADT classes union every `verification_catalog`
-# method id below, written out rather than referenced: quire-rs's
+# method id and the explicitly declared retirement tokens below, written out
+# rather than referenced: quire-rs's
 # `table_column_values` `allowed` is a plain `Vec<String>`, with no mechanism to
 # point at another manifest block. FR-004-AC-22 keeps the two from drifting
 # apart by asserting set equality in a test rather than trusting a second
@@ -706,6 +707,7 @@ lint_rules:
     - Inspection
     - Analysis
     - Demonstration
+    - Withdrawn
     - unit-testing
     - integration-testing
     - e2e-testing
@@ -1406,6 +1408,9 @@ traceability:
     # overclaim rather than explain one — the same line `Static`/`Benchmark`
     # are held to above.
     no_source_symbol: [Eval, Manual, Inspection, Analysis]
+    # Historical verification rows, not methods or source-symbol exemptions.
+    # The independent status.retired marker applies to Status cells only.
+    retired: [Withdrawn]
 
 # ── Verification-method catalog (quire-rs FR-054, #35) ────────────────────────
 # The 29119-4-shaped answer to "how should this requirement be verified".
