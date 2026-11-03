@@ -158,3 +158,14 @@ scope:
   - {"id": "FR-004-AC-29", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "Rust `implements` binds a valid attribute followed by a trailing `//` comment or by its item on the same line."}
   - {"id": "FR-004-AC-30", "path": "spec/functional/FR-004-traceability-declaration.md", "role": "examined", "excerpt": "Malformed Rust attributes and prose naming a requirement bind no implementation scope."}
 ```
+
+
+## Criterion-binding fix dispositions
+
+Independently inspected the fix: exactly five existing test decorators gain their corresponding FR criterion IDs; assertions and the existing AC27 adverse-control tag are unchanged. Recomputed current-main matrix reports AC25 through AC30 all tagged to their intended behavioral tests. This is criterion binding, not an assertion that tagged status itself proves behavior. The reviewed test bodies assert multi-literal and comma whitespace captures, comment keyword/prose rejection, exact production scope without backed evidence, real-attribute versus comment/raw-string controls, valid trailing forms, and malformed rejection respectively.
+
+Retained post-fix qualification reports 34 focused passes without skips or xfails, 100 percent package initializer coverage (six statements), Ruff and Black PASS, and all eight changed/review documents structurally valid. Current-main CLI and isolated wheel qualification remain applicable. The unchanged semantic aggregate remains unavailable because private npm installation returns E401 and the offline cache is missing; no changed guard requirement requires that package. No release/install-from-published-artifact claim is made. No new findings.
+
+## Current disposition verdict
+
+PASS for this bounded method and READY for bounded PR129 handoff. All historical and refresh findings are fixed. This is not a repository-wide gap PASS or a claim that the unavailable full semantic aggregate passed. Plan completion: not assessed.
