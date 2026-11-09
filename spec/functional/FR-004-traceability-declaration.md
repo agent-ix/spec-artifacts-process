@@ -151,8 +151,17 @@ modules can version apart.
   migration suggestion derivable.
 - `trace_tags.implements` **SHALL** retain the templated Rust
   `Implements:` line-comment form and add a templated Rust `#[implements(...)]`
-  attribute form; Python and TypeScript each retain one templated line-comment form.
-- The Rust, Python and TypeScript line-comment `implements` forms **SHALL** require the literal
+  attribute form. Python and TypeScript declare structural `implements` forms
+  instead of line comments (quire-rs FR-062 syntax positions): Python a
+  `python_decorator` form for `@implements("ID", ...)`, TypeScript a
+  `typescript_decorator` form for `@implementing("ID", ...)` and a
+  `typescript_wrapper` form for `implementing("ID", ...)(declaration)`, each
+  carrying an authoring `template`. Each captures one or more separately quoted
+  ids, as `ix-trace-py` and `ix-trace-ts` accept them, and admits an unqualified
+  call as well as the package-qualified one. The Python and TypeScript
+  `Implements:` line-comment forms are removed, not kept beside them, once every
+  production symbol that bound only through one is retagged.
+- The Rust line-comment `implements` form **SHALL** require the literal
   keyword `Implements:` before a comma-separated id list. The keyword is the prose guard:
   a sentence that merely names a requirement matches nothing.
 - The Rust `implements` attribute form **SHALL** capture one or more separately quoted
@@ -187,7 +196,7 @@ modules can version apart.
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |
 | FR-004-AC-9 | Every `trace_targets` entry and every `document_references` entry declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture mints no id in any consuming repository. Since CR-062 this covers the matrix entries too, and is what makes archetype binding safe for them. | Test (TC-036) |
-| FR-004-AC-10 | `trace_tags.implements` declares exactly the existing templated Rust `Implements:` line-comment form plus the new templated Rust `#[implements(...)]` attribute form, and exactly one templated `Implements:` line-comment form each for Python and TypeScript. | Test (TC-066) |
+| FR-004-AC-10 | `trace_tags.implements` declares the existing templated Rust `Implements:` line-comment form and the templated Rust `#[implements(...)]` attribute form, and for Python and TypeScript only structural forms — `python_decorator`, `typescript_decorator` and `typescript_wrapper` — each templated, with no Python or TypeScript line-comment form. | Test (TC-066) |
 | FR-004-AC-12 | `vocabularies.test_type` declares the three ISO 29148 verification methods — `Inspection`, `Analysis`, `Demonstration` — alongside the harness kinds, and `no_source_symbol` carries the two that mint no symbol (`Inspection`, `Analysis`) but not `Demonstration`, which is observed running. | Test (TC-072) |
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
@@ -197,11 +206,16 @@ modules can version apart.
 | FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` union the manifest's `traceability.vocabularies.retired` tokens — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
 | FR-004-AC-23 | The model declares exactly `vocabularies.retired: [Withdrawn]`, disjoint from the verification catalog, test types and `no_source_symbol`. The existing retired Status marker remains `⛔`. The Verification lint rule accepts the declared retirement token and still rejects `Planned` and misspelled retirement values; it does not classify them as retirement. | Test |
 | FR-004-AC-25 | The Rust `implements` attribute form captures each separately quoted id in a one- or multi-literal `#[implements("ID1", "ID2")]` attribute, including a trailing comma and an `interface_004-AC-1` id. | Test (TC-154) |
-| FR-004-AC-26 | The Python and TypeScript `implements` forms require `Implements:` before a comma-separated id list and bind no id from a sentence that merely names a requirement. | Test (TC-155) |
+| FR-004-AC-26 | The Rust line-comment form requires `Implements:` before a comma-separated id list and binds no id from a sentence that merely names a requirement. | Test (TC-155) |
 | FR-004-AC-27 | Rust `implements` binds no scope from a syntactically complete attribute example inside a block comment or multi-line raw string. | Test (TC-156) |
 | FR-004-AC-28 | The Rust `implements` attribute mints production implementation scope and does not mint verification evidence. | Test (TC-157) |
 | FR-004-AC-29 | Rust `implements` binds a valid attribute followed by a trailing `//` comment or by its item on the same line. | Test (TC-158) |
 | FR-004-AC-30 | Malformed Rust attributes and prose naming a requirement bind no implementation scope. | Test (TC-159) |
+| FR-004-AC-31 | The Python `implements` form declares `syntax: python_decorator` and captures each separately quoted id of `@implements("FR-001-AC-1", "FR-001-AC-2")`, with and without the `ix_trace_py.` qualifier, a trailing comma, line breaks between arguments, and an `interface_004-AC-1` id; it rejects an unquoted argument, an empty call, a call naming another function (`@implements_all(...)`) and a lone `implements` word. | Test (TC-160) |
+| FR-004-AC-32 | The TypeScript `implements` forms declare `syntax: typescript_decorator` for `@implementing("ID", ...)` and `syntax: typescript_wrapper` for `implementing("ID", ...)`, each capturing separately quoted ids with the same grammar as the Python form, with and without the `ixTrace.` namespace qualifier, and rejecting an unquoted argument, an empty call and a call naming another function. | Test (TC-161) |
+| FR-004-AC-33 | A quire coverage run over a fixture tree credits a Python production function, a TypeScript class, a TypeScript method and an arrow-valued `const` wrapped by `implementing(...)(...)` each as production scope with an `implements` relation, and none of them raises `backed` or any verification evidence count. | Test (TC-162) |
+| FR-004-AC-34 | Under this module a Python `# Implements: FR-001` and a TypeScript `// Implements: FR-001` comment on a production function mint no `implements` relation. | Test (TC-163) |
+| FR-004-AC-35 | A fixture tree carrying a structural `implements` marker form on a test symbol, and a `trace` marker on a production symbol, binds nothing from either, for Python and TypeScript. | Test (TC-164) |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
