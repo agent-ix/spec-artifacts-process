@@ -174,7 +174,11 @@ modules can version apart.
   `ixTrace.implementing(...)`, where `ixTrace` is the namespace-import name
   `ix-trace-ts` documents (`import * as ixTrace from "@agent-ix/ix-trace-ts"`).
   A renamed import (`import ix_trace_py as t`, `import { implementing as impl }`),
-  or any other qualifier, is not resolved and binds nothing.
+  or any other qualifier, is not resolved and binds nothing. Every structural
+  pattern **SHALL** be anchored at the start of its candidate (`\A`), so a
+  spelling it does not name, such as `t.implementing("X")`, contains no
+  substring a search can match and raises no `partial-implements-syntax-match`
+  finding.
 - **Removal of the comment forms.** The module **SHALL** keep declaring the Python
   `python-implements-line` and TypeScript `typescript-implements-line` forms until
   `quire coverage --json` over every repository that consumes this module reports
@@ -404,7 +408,7 @@ modules can version apart.
 > consumers keep their scope; retiring that form requires a later consumer
 > decision. The attribute also admits `interface_004-AC-1` as a quoted literal.
 
-> **PLAT-866 (current design):** Python and TypeScript production scope is
+> **PLAT-866 (target design):** Python and TypeScript production scope is
 > structural only, reversing the IR-868 note above where it kept their comment
 > forms; the Rust comment form is unchanged.
 
