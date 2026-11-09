@@ -40,7 +40,7 @@ works against a source that compiles.
 - [ ] `spec_artifacts_process/semantic/main.tsp` shell: namespace `AgentIx.SpecArtifactsProcess`, `@jsonSchema` base `https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/<manifest version>/`, importing `@agent-ix/semantic-core`.
 - [ ] `spec_artifacts_process/semantic/scripts/generate.mjs`, Node built-ins only: compile into a tmpdir, refuse any emitter entry that is not a top-level `*.json`, keep the files whose `$id` starts with the module base, record the discarded semantic-core files, rewrite any relative `$id`, render two-space JSON with a trailing newline.
 - [ ] Preconditions with real diagnostics: missing `node_modules`, missing `tsp`, a Node older than 20 — each exits non-zero naming the missing component and `make semantic-install`, never failing inside the compiler (FR-009-AC-10).
-- [ ] Version agreement: `@jsonSchema` base vs manifest `version` (AC-5); resolved `@agent-ix/semantic-core` vs `semantic.semantic_core` (AC-11); a stale version segment that is internally consistent (AC-12).
+- [ ] Version agreement: `@jsonSchema` base vs manifest `version` (AC-5); a stale version segment that is internally consistent (AC-12).
 - [ ] `generated/toolchain.json`: compiler, emitter, semantic-core version **and** the SHA-256 of that package's own `generated/toolchain.json`, base, manifest version, excluded imports, file list, normalization record, digest.
 - [ ] `--check` mode: writes nothing anywhere; reports differing, stale and missing files by path; leaves every `*-frontmatter.schema.json` alone.
 - [ ] `scripts/manifest_digests.py`: rewrite `data_schema.digest` values textually so comments and formatting survive; touch no other byte.

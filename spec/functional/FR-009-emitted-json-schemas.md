@@ -44,9 +44,6 @@ between the source and the shipped bytes fails the build.
   hold the pinned compiler, emitter and `@agent-ix/semantic-core`, then the generator SHALL exit
   non-zero naming the missing component and the command that installs it
   (`make semantic-install`), rather than failing inside the compiler.
-- If the resolved `@agent-ix/semantic-core` version differs from the manifest's
-  `semantic.semantic_core`, then the generator SHALL exit non-zero naming both values, so the
-  declared grammar version and the compiled-against grammar version cannot diverge.
 - `make schemas` SHALL run the generator.
 - `make schemas-check` SHALL run the generator with `--check`.
 - The generator SHALL compile `spec_artifacts_process/semantic/` with `tsp compile` into a
