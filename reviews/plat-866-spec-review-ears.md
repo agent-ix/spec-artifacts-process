@@ -36,3 +36,9 @@ scope:
 - {id: FR-004-AC-10, path: spec/functional/FR-004-traceability-declaration.md, role: context_only}
 - {id: FR-004-AC-34, path: spec/functional/FR-004-traceability-declaration.md, role: context_only}
 ```
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | Python and TypeScript are now normative ("`trace_tags.implements` **SHALL** declare structural forms ..."). Removal is a SHALL with a measurable trigger: `quire coverage --json` reports zero `implements` relations whose `form` is either comment form. `ImplementsRelation.form` exists in quire-rs `src/symbols/trace.rs`. The bullet says the structural forms are planned until the engine release. |

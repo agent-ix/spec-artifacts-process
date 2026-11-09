@@ -41,3 +41,16 @@ scope:
 - {id: FR-004-AC-31, path: spec/functional/FR-004-traceability-declaration.md, role: context_only}
 - {id: FR-004, path: spec/functional/FR-004-traceability-declaration.md, role: examined}
 ```
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | TC-160..TC-166 appear exactly once each, under `## Test Case Summary` after TC-159 (spec/tests.md:292-298). Every Functional Requirement Coverage `FR` row has four cells. The coverage rows at lines 68-74 cite only registered ids. |
+| FND-002 | fixed | A PLAT-866 note follows the IR-868 note and records the reversal for Python and TypeScript. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | low | The new PLAT-866 note says Python and TypeScript production scope "is structural only" as "current design". But the Removal bullet keeps `python-implements-line` and `typescript-implements-line` declared until the consumer condition holds, and AC-10 and AC-26 describe them as current. Call it the target design and say that the comment forms remain until the removal condition. | spec/functional/FR-004-traceability-declaration.md:407-409 |

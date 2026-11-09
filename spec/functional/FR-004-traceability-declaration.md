@@ -179,14 +179,15 @@ modules can version apart.
   spelling it does not name, such as `t.implementing("X")`, contains no
   substring a search can match and raises no `partial-implements-syntax-match`
   finding.
-- **Removal of the comment forms.** The module **SHALL** keep declaring the Python
-  `python-implements-line` and TypeScript `typescript-implements-line` forms until
-  `quire coverage --json` over every repository that consumes this module reports
-  zero `implements` relations whose form is one of those two; the module
-  **SHALL** remove both forms in the change that follows. After removal
-  `# Implements:` and `// Implements:` bind nothing. The structural forms are the
-  target design and are declared in the same change as the engine release that
-  accepts the new `syntax` values; until then they are planned, not declared.
+- **Replacement of the comment forms.** In one change, the module **SHALL**
+  declare the structural Python and TypeScript `implements` forms and **SHALL**
+  remove the `python-implements-line` and `typescript-implements-line` forms, and
+  that change **SHALL** ship with the engine release that accepts the new `syntax`
+  values. There is no coexistence window and no precondition measurement. After
+  it, `# Implements:` and `// Implements:` bind nothing, and the quire-rs advisory
+  (FR-051-AC-22) names the structural replacement for a comment id that remains.
+  Until that change the manifest still declares the comment forms, and the
+  structural forms are planned, not declared.
 - The Rust line-comment `implements` form **SHALL** require the literal
   keyword `Implements:` before a comma-separated id list. The keyword is the prose guard:
   a sentence that merely names a requirement matches nothing.
@@ -237,13 +238,13 @@ modules can version apart.
 | FR-004-AC-28 | The Rust `implements` attribute mints production implementation scope and does not mint verification evidence. | Test (TC-157) |
 | FR-004-AC-29 | Rust `implements` binds a valid attribute followed by a trailing `//` comment or by its item on the same line. | Test (TC-158) |
 | FR-004-AC-30 | Malformed Rust attributes and prose naming a requirement bind no implementation scope. | Test (TC-159) |
-| FR-004-AC-31 | The Python `python_decorator` form (planned: the manifest declares it only after the engine accepts the syntax value) matches the complete decorator node, `@` included, of `@implements("FR-001-AC-1", "FR-001-AC-2")` and of `@ix_trace_py.implements(...)`, capturing every quoted id across a trailing comma, line breaks between arguments and an `interface_004-AC-1` id; `re.fullmatch` against the node text is required, and the pattern rejects an unquoted argument, an empty call, another function (`@implements_all(...)`), a renamed import and a lone `implements` word. | Test (TC-160) |
-| FR-004-AC-32 | The TypeScript `typescript_decorator` form (planned, as AC-31) fully matches `@implementing("ID", ...)` and `@ixTrace.implementing(...)`, and the `typescript_wrapper` form fully matches the inner call `implementing("ID", ...)` and `ixTrace.implementing(...)`, with the id grammar of AC-31; each rejects an unquoted argument, an empty call, another function and a renamed import, and the two forms appear in the order and with the templates the Behavior section pins. | Test (TC-161) |
+| FR-004-AC-31 | The Python `python_decorator` form (planned: the manifest declares it only after the engine accepts the syntax value) matches the complete decorator node, `@` included, of `@implements("FR-001-AC-1", "FR-001-AC-2")` and of `@ix_trace_py.implements(...)`, capturing every quoted id across a trailing comma, line breaks between arguments and an `interface_004-AC-1` id; `re.fullmatch` against the node text is required, and the pattern rejects an unquoted argument, an empty call, another function (`@implements_all(...)`), a renamed import and a lone `implements` word; the pattern is anchored at the start of the candidate, so `re.search` over `@t.implements("X")` finds nothing. | Test (TC-160) |
+| FR-004-AC-32 | The TypeScript `typescript_decorator` form (planned, as AC-31) fully matches `@implementing("ID", ...)` and `@ixTrace.implementing(...)`, and the `typescript_wrapper` form fully matches the inner call `implementing("ID", ...)` and `ixTrace.implementing(...)`, with the id grammar of AC-31; each rejects an unquoted argument, an empty call, another function and a renamed import, each is anchored at the start of the candidate so `re.search` over `t.implementing("X")` and `@t.implementing("X")` finds nothing, and the two forms appear in the order and with the templates the Behavior section pins. | Test (TC-161) |
 | FR-004-AC-33 | A quire coverage run over a fixture tree (planned) credits a Python production function written `@implements(...)` and another written `@ix_trace_py.implements(...)`, a TypeScript class, a method, and an arrow-valued `const` wrapped by `implementing(...)(...)` and one by `ixTrace.implementing(...)(...)`, each as production scope with an `implements` relation, and none raises `backed` or any verification evidence count; a renamed import binds nothing. | Test (TC-162) |
-| FR-004-AC-34 | Once the removal condition of the Removal bullet holds (planned), a Python `# Implements: FR-001` and a TypeScript `// Implements: FR-001` comment on a production function mint no `implements` relation. | Test (TC-163) |
+| FR-004-AC-34 | In the replacement change (planned), a Python `# Implements: FR-001` and a TypeScript `// Implements: FR-001` comment on a production function mint no `implements` relation, and the module declares no Python or TypeScript line-comment form. | Test (TC-163) |
 | FR-004-AC-35 | A fixture tree carrying a structural `implements` marker on a test symbol, and a `trace` marker on a production symbol, binds nothing from either, for Python and TypeScript (planned). | Test (TC-164) |
 | FR-004-AC-36 | The Rust `Implements:` line-comment form requires `Implements:` before a comma-separated id list and binds no id from a sentence that merely names a requirement. | Test (TC-165) |
-| FR-004-AC-37 | Planned end state: `trace_tags.implements` declares for Python only `python-implements-decorator` and for TypeScript only `typescript-implements-decorator` then `typescript-implements-wrapper`, each templated as the Behavior section pins, and no Python or TypeScript line-comment form. AC-10 and AC-26 describe the manifest until then. | Test (TC-166) |
+| FR-004-AC-37 | Planned end state: `trace_tags.implements` declares for Python only `python-implements-decorator` and for TypeScript only `typescript-implements-decorator` then `typescript-implements-wrapper`, each templated as the Behavior section pins, and no Python or TypeScript line-comment form. AC-10 and AC-26 describe the manifest until the replacement change. | Test (TC-166) |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.

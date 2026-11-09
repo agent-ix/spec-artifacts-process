@@ -89,3 +89,19 @@ scope:
 - {id: TC-155, path: spec/tests.md, role: examined}
 - {id: FR-062, path: "agent-ix/quire-rs#628 spec/functional/FR-062-implements-relation.md", role: context_only}
 ```
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | AC-10 and the TC-066 row at 0ee78cb are byte-identical to origin/main and match the manifest and the TC-066 test again; the end state moved to the new planned FR-004-AC-37 / TC-166 (🚧 Planned). |
+| FND-002 | fixed | AC-26 and the TC-155 row at 0ee78cb are byte-identical to origin/main, which the Python/TypeScript test exercises; the Rust form is the new planned FR-004-AC-36 / TC-165 (🚧 Planned). |
+| FND-003 | fixed | A new bullet requires every structural pattern to match its complete candidate; AC-31 and AC-32 require `re.fullmatch` on the node text; AC-33 adds `@ix_trace_py.implements(...)` and `ixTrace.implementing(...)(...)` spellings. |
+| FND-004 | fixed | The Spellings bullet pins a closed set (`implements`, `ix_trace_py.implements`, `implementing`, `ixTrace.implementing`), names `ixTrace` as the documented namespace import of `@agent-ix/ix-trace-ts` (the package.json name), and says renamed imports bind nothing. The text agrees with quire-rs#628 @8407145, ix-trace-py#4 @81e8e85 and ix-trace-ts#8 @5c171f4. |
+| FND-005 | fixed | The bullet pins the form names, the order (decorator before wrapper) and the templates `@implements({ids})`, `@implementing({ids})` and `implementing({ids})`. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-006 | low | Under quire-rs FR-062, a renamed namespace wrapper (`t.implementing("FR-1")(fn)`) has the inner-call candidate `t.implementing("FR-1")`. A wrapper pattern that is not anchored at the candidate start still matches its proper substring `implementing("FR-1")`. The engine then emits `partial-implements-syntax-match`, which contradicts the quire-rs#628 Spellings text ("yields no finding because it matches no pattern"). AC-32 checks rejection with `re.fullmatch`, so it cannot detect this. Require the wrapper pattern to be anchored at the candidate start (or reject a preceding `.`/identifier character), and test that `re.search` finds nothing on a renamed spelling. | spec/functional/FR-004-traceability-declaration.md:237 |
