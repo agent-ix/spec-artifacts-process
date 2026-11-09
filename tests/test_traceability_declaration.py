@@ -230,9 +230,9 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
         if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
     ]
     expected = ["functional-coverage", "test-case", "traces-to"]
-    assert (
-        sorted(matrix_entries) == expected
-    ), f"one entry per table kind, not per filename: {matrix_entries}"
+    assert sorted(matrix_entries) == expected, (
+        f"one entry per table kind, not per filename: {matrix_entries}"
+    )
 
 
 @pytest.mark.trace("TC-030", "FR-004-AC-3")
@@ -278,9 +278,9 @@ def test_references_resolve_against_declared_targets(traceability: dict) -> None
         assert reference["targets"], reference["name"]
         unknown = set(reference["targets"]) - declared
         assert not unknown, f"{reference['name']} names undeclared {unknown}"
-        assert (
-            re.compile(reference["pattern"]).groups >= 1
-        ), f"{reference['name']}: capture group 1 is the referenced id"
+        assert re.compile(reference["pattern"]).groups >= 1, (
+            f"{reference['name']}: capture group 1 is the referenced id"
+        )
 
 
 @pytest.mark.trace("TC-033", "FR-004-AC-6")
@@ -403,12 +403,25 @@ def _implements_forms(traceability: dict) -> dict[str, dict]:
     return {f["name"]: f for f in traceability["trace_tags"]["implements"]}
 
 
-@pytest.mark.trace("TC-066", "TC-166", "FR-004-AC-10", "FR-004-AC-37")
+@pytest.mark.trace("TC-066", "FR-004-AC-10")
+def test_rust_implements_forms_are_line_and_attribute(traceability: dict) -> None:
+    """TC-066 (FR-004-AC-10): Rust keeps the comment form and adds the attribute."""
+    rust = [
+        f for f in traceability["trace_tags"]["implements"] if f["language"] == "rust"
+    ]
+    assert [f["name"] for f in rust] == [
+        "rust-implements-line",
+        "rust-implements-attribute",
+    ]
+    assert all("{ids}" in f["template"] for f in rust)
+
+
+@pytest.mark.trace("TC-166", "FR-004-AC-37")
 def test_implements_forms_are_rust_plus_structural_python_typescript(
     traceability: dict,
 ) -> None:
-    """TC-066/TC-166: Rust keeps both forms; Python and TypeScript declare only
-    structural forms, in the pinned order, with the pinned templates."""
+    """TC-166 (FR-004-AC-37): Python and TypeScript declare only structural
+    forms, in the pinned order, with the pinned templates."""
     forms = traceability["trace_tags"]["implements"]
     by_language = {
         language: [form for form in forms if form["language"] == language]
@@ -420,9 +433,9 @@ def test_implements_forms_are_rust_plus_structural_python_typescript(
         "rust-implements-line",
         "rust-implements-attribute",
     ]
-    assert [
-        (f["name"], f["syntax"], f["template"]) for f in by_language["python"]
-    ] == [("python-implements-decorator", "python_decorator", "@implements({ids})")]
+    assert [(f["name"], f["syntax"], f["template"]) for f in by_language["python"]] == [
+        ("python-implements-decorator", "python_decorator", "@implements({ids})")
+    ]
     assert [
         (f["name"], f["syntax"], f["template"]) for f in by_language["typescript"]
     ] == [
@@ -437,7 +450,9 @@ def test_implements_forms_are_rust_plus_structural_python_typescript(
             "implementing({ids})",
         ),
     ]
-    assert not [f for f in forms if f["name"].endswith("-line") and f["language"] != "rust"]
+    assert not [
+        f for f in forms if f["name"].endswith("-line") and f["language"] != "rust"
+    ]
     for form in by_language["python"] + by_language["typescript"]:
         assert form["pattern"].startswith("\\A"), form["name"]
 
@@ -454,7 +469,6 @@ def test_rust_line_form_requires_keyword_and_rejects_prose(traceability: dict) -
     assert not pattern.search("/// FR-001-AC-1 is implemented here")
 
 
-_IDS = ['"FR-001"', '"FR-001-AC-1"', '"interface_004-AC-1"']
 _REJECTED_ARGS = [
     "FR-001",
     "'FR-001'",
@@ -467,7 +481,9 @@ _REJECTED_ARGS = [
 ]
 
 
-def _structural_cases(fn: str, qualifier: str, prefix: str) -> tuple[list[str], list[str]]:
+def _structural_cases(
+    fn: str, qualifier: str, prefix: str
+) -> tuple[list[str], list[str]]:
     ok = [
         f'{prefix}{fn}("FR-001")',
         f'{prefix}{fn}("FR-001-AC-1", "FR-001-AC-2",)',
@@ -480,7 +496,7 @@ def _structural_cases(fn: str, qualifier: str, prefix: str) -> tuple[list[str], 
         f'{prefix}{fn}_all("FR-001")',
         f'{prefix}t.{fn}("FR-001")',
         f'{prefix}other.{fn}("FR-001")',
-        f'{prefix}{fn}',
+        f"{prefix}{fn}",
         f'{prefix}{fn}("FR-001") extra',
         f'x {prefix}{fn}("FR-001")',
     ]
@@ -751,7 +767,9 @@ def _edges(report: dict) -> set[tuple[str, str, str, str]]:
 
 
 _PY_PRODUCTION = (
-    "from ix_trace_py import implements\nimport ix_trace_py\nimport ix_trace_py as t\n\n"
+    "from ix_trace_py import implements\n"
+    "import ix_trace_py\n"
+    "import ix_trace_py as t\n\n"
     '@implements("FR-001-AC-1")\ndef plain():\n    pass\n\n'
     '@ix_trace_py.implements("FR-001-AC-2")\ndef qualified():\n    pass\n\n'
     '@t.implements("FR-001-AC-1")\ndef renamed():\n    pass\n'
@@ -784,8 +802,9 @@ def test_quire_credits_structural_python_typescript_implements(
         ("src/mod.py", "qualified", "FR-001-AC-2", "python-implements-decorator"),
     }
     ts = {e for e in edges if e[0] == "src/mod.ts"}
-    assert {(e[1], e[2], e[3]) for e in ts} >= {
+    assert {(e[1], e[2], e[3]) for e in ts} == {
         ("Decorated", "FR-001-AC-1", "typescript-implements-decorator"),
+        ("Decorated.method", "FR-001-AC-2", "typescript-implements-decorator"),
         ("wrapped", "FR-001-AC-1", "typescript-implements-wrapper"),
         ("qualified", "FR-001-AC-2", "typescript-implements-wrapper"),
     }
@@ -824,12 +843,20 @@ def test_quire_binds_nothing_for_misplaced_structural_markers(
                 '@implements("FR-001-AC-1")\ndef test_x():\n    pass\n'
             ),
             "src/mod.py": (
-                "from ix_trace_py import trace\n\n"
-                '@trace("FR-001-AC-1")\ndef production():\n    pass\n'
+                "import pytest\n\n"
+                '@pytest.mark.trace("FR-001-AC-1")\ndef production():\n    pass\n'
             ),
             "tests/mod.test.ts": (
                 'import { implementing } from "@agent-ix/ix-trace-ts";\n'
                 'it("x", implementing("FR-001-AC-1")(() => {}));\n'
+            ),
+            "src/ctl.py": (
+                "from ix_trace_py import implements\n\n"
+                '@implements("FR-001-AC-2")\ndef ctl():\n    pass\n'
+            ),
+            "src/ctl.ts": (
+                'import { implementing } from "@agent-ix/ix-trace-ts";\n'
+                'export const ctl = implementing("FR-001-AC-2")(() => 1);\n'
             ),
             "src/mod.ts": (
                 'import { trace } from "@agent-ix/ix-trace-ts";\n'
@@ -837,7 +864,13 @@ def test_quire_binds_nothing_for_misplaced_structural_markers(
             ),
         },
     )
-    assert _edges(report) == set()
+    # TypeScript test symbols are `it`/`test` calls, which no decorator can
+    # attach to, so the wrapper nested in one binds nothing (FR-062-AC-24). The
+    # controls prove the engine binds the same markers on production symbols.
+    assert _edges(report) == {
+        ("src/ctl.py", "ctl", "FR-001-AC-2", "python-implements-decorator"),
+        ("src/ctl.ts", "ctl", "FR-001-AC-2", "typescript-implements-wrapper"),
+    }
     assert report["totals"]["backed"] == 0
 
 
