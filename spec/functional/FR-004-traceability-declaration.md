@@ -147,8 +147,10 @@ modules can version apart.
   of the rollup.
 - `trace_tags.markers` **SHALL** declare one canonical marker per supported
   language — Python `@pytest.mark.trace(...)`, Rust `#[trace(...)]`, TypeScript
-  `trace(...)` — each carrying an authoring `template`, which is what makes a
-  migration suggestion derivable.
+  `trace(...)`, shell `# trace: ...` — each carrying an authoring `template`,
+  which is what makes a migration suggestion derivable. The shell form declares
+  `syntax: comment` and an `entry_paths` glob list (`scripts/audits/**/*.sh`);
+  only a script matching a glob can bind (quire-rs FR-051-AC-38).
 - `trace_tags.implements` **SHALL** retain the templated Rust
   `Implements:` line-comment form and add a templated Rust `#[implements(...)]`
   attribute form.
@@ -218,7 +220,7 @@ modules can version apart.
 |----|----------|--------------|
 | FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR`, `NFR` and `interface`, and loads without a validation error | Test (TC-028) |
 | FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`, `functional-coverage`), never one per matrix filename | Test (TC-029, TC-039) |
-| FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python and typescript, and each declares a `template` | Test (TC-030) |
+| FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python, typescript and shell, each declares a `template`, and the shell marker declares `syntax: comment` and `entry_paths` | Test (TC-030) |
 | FR-004-AC-5 | Every `document_references.targets` name is a declared trace target, and every `pattern` compiles with at least one capture group | Test (TC-032) |
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
 | FR-004-AC-7 | The model declares `vocabularies.test_type_column` and a `no_source_symbol` list naming only test-type values whose verification method mints no source symbol. | Test (TC-034) |

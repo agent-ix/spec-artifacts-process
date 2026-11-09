@@ -243,12 +243,29 @@ def test_one_templated_marker_per_language(traceability: dict) -> None:
     markers = traceability["trace_tags"]["markers"]
     by_language = {m["language"]: m for m in markers}
 
-    assert sorted(by_language) == sorted(LANGUAGES)
+    assert sorted(by_language) == sorted([*LANGUAGES, "shell"])
     assert len(markers) == len(by_language), "one canonical marker per language"
     for marker in markers:
         assert marker.get("template"), marker["name"]
         assert "{ids}" in marker["template"], marker["name"]
         re.compile(marker["pattern"])
+
+
+@pytest.mark.trace("FR-004-AC-3")
+def test_shell_marker_is_a_comment_form_gated_by_entry_paths(
+    traceability: dict,
+) -> None:
+    """FR-004-AC-3 (quire-rs FR-051-AC-38, AC-42, AC-43): shell has no attribute
+    syntax, so its canonical marker is a `#` comment, and only a script under an
+    `entry_paths` glob may bind."""
+    (form,) = [
+        m for m in traceability["trace_tags"]["markers"] if m["language"] == "shell"
+    ]
+    assert form["syntax"] == "comment"
+    assert form["entry_paths"] == ["scripts/audits/**/*.sh"]
+    match = re.search(form["pattern"], "# trace: FR-024-AC-9, TC-502")
+    assert match and match.group(1) == "FR-024-AC-9, TC-502"
+    assert not re.search(form["pattern"], "# trace is not a tag")
 
 
 @pytest.mark.trace("TC-032", "FR-004-AC-5")
