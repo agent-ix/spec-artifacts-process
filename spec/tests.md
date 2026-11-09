@@ -284,18 +284,18 @@ type: TestMatrix
 | TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | ✅ |
 | TC-151 | The lint rule's `allowed` list, loaded from the manifest, equals the four IADT classes union every `verification_catalog` key exactly — a test asserts set equality so the two cannot drift — and `Eval`/`Manual` are confirmed absent (they are `test_type` values, not catalog keys) | Unit | P0 | FR-004-AC-22 | ✅ |
 | TC-154 | The Rust form captures one or multiple separately quoted ids, including an interface criterion and trailing comma; a Quire coverage run credits both ids on a production symbol | Integration | P0 | FR-004-AC-25 | ✅ Complete |
-| TC-155 | Python and TypeScript `Implements:` line-comment forms capture comma-separated ids and reject prose that merely names an id | Unit | P0 | FR-004-AC-26 | ✅ |
+| TC-155 | Python and TypeScript `Implements:` line-comment forms capture comma-separated ids and reject prose that merely names an id | Unit | P0 | FR-004-AC-26 | ⛔ |
 | TC-156 | A Quire coverage run does not credit a line-shaped `#[implements(...)]` example inside a Rust block comment or multi-line raw string | Integration | P0 | FR-004-AC-27 | ✅ Complete |
 | TC-157 | A Quire coverage run credits Rust `#[implements(...)]` as production scope without increasing backed verification evidence | Integration | P0 | FR-004-AC-28 | ✅ Complete |
 | TC-158 | A Quire coverage run credits valid Rust attributes followed by a trailing `//` comment or their item on the same line | Integration | P0 | FR-004-AC-29 | ✅ Complete |
 | TC-159 | The Rust form rejects malformed attributes and prose naming an id | Unit | P0 | FR-004-AC-30 | ✅ |
-| TC-160 | The Python `python_decorator` form fully matches `@implements(...)` and `@ix_trace_py.implements(...)` node text across wrapped arguments, a trailing comma and an interface criterion, and rejects unquoted, empty, other-function, renamed-import and bare-word text; `re.search` over a renamed spelling finds nothing | Unit | P0 | FR-004-AC-31 | 🚧 Planned |
-| TC-161 | The TypeScript decorator and wrapper forms fully match their spellings, qualified and not, in the pinned order and with the pinned templates, and reject unquoted, empty, other-function and renamed-import text; `re.search` over `t.implementing("X")` finds nothing | Unit | P0 | FR-004-AC-32 | 🚧 Planned |
-| TC-162 | A Quire coverage run credits Python and TypeScript production symbols marked with each accepted spelling as production scope without raising backed evidence, and a renamed import binds nothing | Integration | P0 | FR-004-AC-33 | 🚧 Planned |
-| TC-163 | After the replacement change, a Quire coverage run over Python `# Implements:` and TypeScript `// Implements:` comments mints no implements relation | Integration | P0 | FR-004-AC-34 | 🚧 Planned |
-| TC-164 | A Quire coverage run binds nothing for a structural implements marker on a test or a trace marker on production code, in Python and TypeScript | Integration | P0 | FR-004-AC-35 | 🚧 Planned |
-| TC-165 | The Rust `Implements:` line-comment form requires the keyword and rejects prose naming an id | Unit | P0 | FR-004-AC-36 | 🚧 Planned |
-| TC-166 | The loaded manifest declares only the structural Python and TypeScript `implements` forms, in the pinned order with the pinned templates, and no Python or TypeScript line-comment form | Unit | P0 | FR-004-AC-37 | 🚧 Planned |
+| TC-160 | The Python `python_decorator` form fully matches `@implements(...)` and `@ix_trace_py.implements(...)` node text across wrapped arguments, a trailing comma and an interface criterion, and rejects unquoted, empty, other-function, renamed-import and bare-word text; `re.search` over a renamed spelling finds nothing | Unit | P0 | FR-004-AC-31 | ✅ |
+| TC-161 | The TypeScript decorator and wrapper forms fully match their spellings, qualified and not, in the pinned order and with the pinned templates, and reject unquoted, empty, other-function and renamed-import text; `re.search` over `t.implementing("X")` finds nothing | Unit | P0 | FR-004-AC-32 | ✅ |
+| TC-162 | A Quire coverage run credits Python and TypeScript production symbols marked with each accepted spelling as production scope without raising backed evidence, and a renamed import binds nothing | Integration | P0 | FR-004-AC-33 | ✅ |
+| TC-163 | After the replacement change, a Quire coverage run over Python `# Implements:` and TypeScript `// Implements:` comments mints no implements relation | Integration | P0 | FR-004-AC-34 | ✅ |
+| TC-164 | A Quire coverage run binds nothing for a structural implements marker on a test or a trace marker on production code, in Python and TypeScript | Integration | P0 | FR-004-AC-35 | ✅ |
+| TC-165 | The Rust `Implements:` line-comment form requires the keyword and rejects prose naming an id | Unit | P0 | FR-004-AC-36 | ✅ |
+| TC-166 | The loaded manifest declares only the structural Python and TypeScript `implements` forms, in the pinned order with the pinned templates, and no Python or TypeScript line-comment form | Unit | P0 | FR-004-AC-37 | ✅ |
 
 ## Option Permutation Matrix
 

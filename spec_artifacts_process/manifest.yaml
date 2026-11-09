@@ -1,6 +1,6 @@
 manifest_version: 1.0.0
 name: spec-artifacts-process
-version: 0.2.1
+version: 0.3.0
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
@@ -1116,7 +1116,11 @@ traceability:
     #
     # Rust keeps its existing Implements: line-comment form and adds ix-trace-rs's
     # compile-checked attribute on production items. Python and TypeScript use
-    # their language-appropriate line comments.
+    # structural forms only (quire-rs FR-062): a decorator, and for TypeScript
+    # also the `implementing(...)(fn)` wrapper. Patterns are anchored with \A and
+    # match the whole decorator node or wrapper inner call; double-quoted ids only;
+    # spellings `implements`/`ix_trace_py.implements` and
+    # `implementing`/`ixTrace.implementing`. Renamed imports bind nothing.
     # These forms mint scope, never verification evidence.
     #
     # For line-comment forms, the `Implements:` prefix is the prose guard: a
@@ -1138,14 +1142,21 @@ traceability:
       syntax: rust_attribute
       pattern: '(?m)^[ \t]*#\[implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*\s*,?)\s*\)\]'
       template: '#[implements({ids})]'
-    - name: python-implements-line
+    - name: python-implements-decorator
       language: python
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
-      template: '# Implements: {ids}'
-    - name: typescript-implements-line
+      syntax: python_decorator
+      pattern: '\A@(?:ix_trace_py\.)?implements\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*\s*,?)\s*\)'
+      template: '@implements({ids})'
+    - name: typescript-implements-decorator
       language: typescript
-      pattern: '(?m)Implements:\s*((?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?(?:\s*,\s*(?:(?:TC|IT|FR|NFR|StR|US)-\d+|interface_\d+)(?:-[A-Za-z]+-\d+)?)*)'
-      template: '// Implements: {ids}'
+      syntax: typescript_decorator
+      pattern: '\A@(?:ixTrace\.)?implementing\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*\s*,?)\s*\)'
+      template: '@implementing({ids})'
+    - name: typescript-implements-wrapper
+      language: typescript
+      syntax: typescript_wrapper
+      pattern: '\A(?:ixTrace\.)?implementing\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*\s*,?)\s*\)'
+      template: 'implementing({ids})'
   status:
     column: Status
     complete: ["✅"]

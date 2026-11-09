@@ -399,88 +399,130 @@ def test_withdrawn_is_declared_retirement_not_a_verification_method(
         assert live_method not in vocabularies["retired"]
 
 
-@pytest.mark.trace("TC-066")
-def test_templated_implements_forms_include_both_rust_spellings(
+def _implements_forms(traceability: dict) -> dict[str, dict]:
+    return {f["name"]: f for f in traceability["trace_tags"]["implements"]}
+
+
+@pytest.mark.trace("TC-066", "TC-166", "FR-004-AC-10", "FR-004-AC-37")
+def test_implements_forms_are_rust_plus_structural_python_typescript(
     traceability: dict,
 ) -> None:
-    """TC-066 (FR-004-AC-10): retain the Rust comment while adding the attribute."""
+    """TC-066/TC-166: Rust keeps both forms; Python and TypeScript declare only
+    structural forms, in the pinned order, with the pinned templates."""
     forms = traceability["trace_tags"]["implements"]
     by_language = {
         language: [form for form in forms if form["language"] == language]
         for language in LANGUAGES
     }
 
-    assert len(forms) == 4
-    assert {form["name"] for form in by_language["rust"]} == {
+    assert len(forms) == 5
+    assert [f["name"] for f in by_language["rust"]] == [
         "rust-implements-line",
         "rust-implements-attribute",
-    }
-    for language in ("python", "typescript"):
-        assert [form["name"] for form in by_language[language]] == [
-            f"{language}-implements-line"
-        ]
-    assert all("{ids}" in form.get("template", "") for form in forms)
-    rust_comment = next(
-        form for form in by_language["rust"] if form["name"] == "rust-implements-line"
+    ]
+    assert [
+        (f["name"], f["syntax"], f["template"]) for f in by_language["python"]
+    ] == [("python-implements-decorator", "python_decorator", "@implements({ids})")]
+    assert [
+        (f["name"], f["syntax"], f["template"]) for f in by_language["typescript"]
+    ] == [
+        (
+            "typescript-implements-decorator",
+            "typescript_decorator",
+            "@implementing({ids})",
+        ),
+        (
+            "typescript-implements-wrapper",
+            "typescript_wrapper",
+            "implementing({ids})",
+        ),
+    ]
+    assert not [f for f in forms if f["name"].endswith("-line") and f["language"] != "rust"]
+    for form in by_language["python"] + by_language["typescript"]:
+        assert form["pattern"].startswith("\\A"), form["name"]
+
+
+@pytest.mark.trace("TC-165", "FR-004-AC-36")
+def test_rust_line_form_requires_keyword_and_rejects_prose(traceability: dict) -> None:
+    """TC-165 (FR-004-AC-36): the Rust line form binds ids only after `Implements:`."""
+    form = _implements_forms(traceability)["rust-implements-line"]
+    pattern = re.compile(form["pattern"])
+    match = pattern.search("/// Implements: FR-001, FR-002-AC-3")
+    assert match
+    assert match.group(1) == "FR-001, FR-002-AC-3"
+    assert not pattern.search("/// FR-001 is the manifest activation requirement.")
+    assert not pattern.search("/// FR-001-AC-1 is implemented here")
+
+
+_IDS = ['"FR-001"', '"FR-001-AC-1"', '"interface_004-AC-1"']
+_REJECTED_ARGS = [
+    "FR-001",
+    "'FR-001'",
+    '"""FR-001"""',
+    '"FR-001" + "-AC-1"',
+    "",
+    '"not an id"',
+    '"sha_256"',
+    '""',
+]
+
+
+def _structural_cases(fn: str, qualifier: str, prefix: str) -> tuple[list[str], list[str]]:
+    ok = [
+        f'{prefix}{fn}("FR-001")',
+        f'{prefix}{fn}("FR-001-AC-1", "FR-001-AC-2",)',
+        f'{prefix}{fn}(\n    "FR-001-AC-1",\n    "interface_004-AC-1",\n)',
+        f'{prefix}{qualifier}.{fn}("FR-001")',
+        f'{prefix}{qualifier}.{fn}(\n    "FR-001",\n    "FR-002",\n)',
+    ]
+    bad = [f"{prefix}{fn}({arg})" for arg in _REJECTED_ARGS]
+    bad += [
+        f'{prefix}{fn}_all("FR-001")',
+        f'{prefix}t.{fn}("FR-001")',
+        f'{prefix}other.{fn}("FR-001")',
+        f'{prefix}{fn}',
+        f'{prefix}{fn}("FR-001") extra',
+        f'x {prefix}{fn}("FR-001")',
+    ]
+    return ok, bad
+
+
+def _check_structural(form: dict, fn: str, qualifier: str, prefix: str) -> None:
+    pattern = re.compile(form["pattern"])
+    assert form["pattern"].startswith("\\A")
+    ok, bad = _structural_cases(fn, qualifier, prefix)
+    for text in ok:
+        match = pattern.fullmatch(text)
+        assert match, f"{form['name']} rejects {text!r}"
+        ids = re.findall(r'"([^"]+)"', match.group(1))
+        assert ids == re.findall(r'"([^"]+)"', text), (text, ids)
+    for text in bad:
+        assert not pattern.fullmatch(text), f"{form['name']} fully matches {text!r}"
+    # A renamed import contains nothing a search can match.
+    assert not pattern.search(f'{prefix}t.{fn}("X-1")')
+    assert not pattern.search(f'{prefix}t.{fn}("FR-001")')
+
+
+@pytest.mark.trace("TC-160", "FR-004-AC-31")
+def test_python_decorator_form_matches_whole_node(traceability: dict) -> None:
+    """TC-160 (FR-004-AC-31): `python_decorator` pattern is anchored and full-match."""
+    form = _implements_forms(traceability)["python-implements-decorator"]
+    _check_structural(form, "implements", "ix_trace_py", "@")
+
+
+@pytest.mark.trace("TC-161", "FR-004-AC-32")
+def test_typescript_decorator_and_wrapper_forms(traceability: dict) -> None:
+    """TC-161 (FR-004-AC-32): decorator and wrapper, qualified and not."""
+    forms = _implements_forms(traceability)
+    _check_structural(
+        forms["typescript-implements-decorator"], "implementing", "ixTrace", "@"
     )
-    assert re.search(rust_comment["pattern"], "/// Implements: FR-001-AC-1")
-    assert not re.search(rust_comment["pattern"], "/// FR-001-AC-1 is implemented here")
-
-
-@pytest.mark.trace("TC-155", "FR-004-AC-26")
-def test_comment_implements_forms_match_language_syntax(traceability: dict) -> None:
-    """TC-155 (FR-004-AC-26): comments bind ids only after `Implements:`."""
-    forms = traceability["trace_tags"]["implements"]
-    by_language = {f["language"]: f for f in forms}
-
-    listed = ["FR-001", "FR-002-AC-3"]
-    for language, prefix in (("python", "# "), ("typescript", "// ")):
-        form = by_language[language]
-        assert form["name"] == f"{language}-implements-line"
-        assert form.get("template"), form["name"]
-        assert "{ids}" in form["template"], form["name"]
-        pattern = re.compile(form["pattern"])
-
-        match = pattern.search(prefix + "Implements: " + ", ".join(listed))
-        assert match, f"{form['name']} does not match a keyword line"
-        ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
-        assert ids == listed, f"{form['name']} captured {ids}"
-
-        # Prose naming a requirement is not a declaration of scope. Without the
-        # keyword there is nothing to match, which is the whole reason these
-        # forms need no trailing delimiter.
-        assert not pattern.search(
-            "// FR-001 is the manifest activation requirement."
-        ), f"{form['name']} binds prose"
-
-        # quire-rs#460: the underscore-object-id shape scopes the same way.
-        scoped = pattern.search(prefix + "Implements: interface_004-AC-1")
-        assert scoped, f"{form['name']} does not scope interface_004-AC-1"
-        assert (
-            scoped.group(1) == "interface_004-AC-1"
-        ), f"{form['name']} captured {scoped.group(1)!r}"
-
-        # CR-063 finding 3: closed to the literal KIND. A malformed AC suffix
-        # truncates to the requirement id, exactly as an `FR-001-AC` already
-        # would — this form has no trailing-delimiter to enforce, so
-        # "scoping truncates to the requirement trivially" is documented,
-        # intentional behaviour, not a partial bind of the malformed tail.
-        for malformed, truncated in (
-            ("interface_004-AC", "interface_004"),
-            ("interface_004_AC_1", "interface_004"),
-        ):
-            trunc_match = pattern.search(prefix + f"Implements: {malformed}")
-            assert trunc_match, f"{form['name']} lost the base id in {malformed!r}"
-            assert (
-                trunc_match.group(1) == truncated
-            ), f"{form['name']}: {malformed!r} -> {trunc_match.group(1)!r}"
-
-        # No KIND prefix, a leading digit, and an ordinary identifier that
-        # merely shares the `word_number` shape still bind nothing.
-        for rejected in ("_004-AC-1", "4_004-AC-1", "sha_256", "retry_3"):
-            assert not pattern.search(
-                prefix + f"Implements: {rejected}"
-            ), f"{form['name']} binds {rejected!r}"
+    _check_structural(
+        forms["typescript-implements-wrapper"], "implementing", "ixTrace", ""
+    )
+    # The wrapper is the inner call: it must not claim the decorator `@`.
+    wrapper = re.compile(forms["typescript-implements-wrapper"]["pattern"])
+    assert not wrapper.fullmatch('@implementing("FR-001")')
 
 
 @pytest.mark.trace("TC-154", "FR-004-AC-25")
@@ -664,6 +706,139 @@ def test_quire_credits_valid_trailing_attribute_forms(tmp_path: pathlib.Path) ->
         "pub fn newline_comma() {}\n",
     )
     assert ids == {"FR-001-AC-1", "FR-001-AC-2", "FR-001-AC-3", "FR-001-AC-4"}, ids
+
+
+_STRUCTURAL_SPEC = (
+    "---\nid: FR-001\ntype: FR\ntitle: Structural cases\n---\n\n"
+    "## Acceptance Criteria\n\n"
+    "| ID | Criteria | Verification |\n| --- | --- | --- |\n"
+    "| FR-001-AC-1 | First case. | Unit |\n"
+    "| FR-001-AC-2 | Second case. | Unit |\n"
+)
+
+
+def _quire_coverage(tmp_path: pathlib.Path, files: dict[str, str]) -> dict:
+    assert shutil.which("quire") is not None, "a guard-capable quire CLI is required"
+    (tmp_path / "spec").mkdir()
+    (tmp_path / "spec" / "FR-001.md").write_text(_STRUCTURAL_SPEC)
+    for rel, text in files.items():
+        path = tmp_path / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+    result = subprocess.run(
+        [
+            "quire",
+            "coverage",
+            "--scope",
+            str(tmp_path),
+            "--module",
+            str(pack.PACK_ROOT),
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    return json.loads(result.stdout)
+
+
+def _edges(report: dict) -> set[tuple[str, str, str, str]]:
+    return {
+        (e["path"], e["symbol"], e["trace_id"], e["form"])
+        for e in report.get("implements", [])
+    }
+
+
+_PY_PRODUCTION = (
+    "from ix_trace_py import implements\nimport ix_trace_py\nimport ix_trace_py as t\n\n"
+    '@implements("FR-001-AC-1")\ndef plain():\n    pass\n\n'
+    '@ix_trace_py.implements("FR-001-AC-2")\ndef qualified():\n    pass\n\n'
+    '@t.implements("FR-001-AC-1")\ndef renamed():\n    pass\n'
+)
+_TS_PRODUCTION = (
+    'import * as ixTrace from "@agent-ix/ix-trace-ts";\n'
+    'import { implementing } from "@agent-ix/ix-trace-ts";\n'
+    'import * as t from "@agent-ix/ix-trace-ts";\n\n'
+    '@implementing("FR-001-AC-1")\nexport class Decorated {\n'
+    '  @ixTrace.implementing("FR-001-AC-2")\n  method(): void {}\n}\n\n'
+    'export const wrapped = implementing("FR-001-AC-1")(() => 1);\n'
+    'export const qualified = ixTrace.implementing("FR-001-AC-2")(() => 2);\n'
+    'export const renamed = t.implementing("FR-001-AC-1")(() => 3);\n'
+)
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-162", "FR-004-AC-33")
+def test_quire_credits_structural_python_typescript_implements(
+    tmp_path: pathlib.Path,
+) -> None:
+    """TC-162 (FR-004-AC-33): each accepted spelling mints production scope,
+    never backed evidence; a renamed import binds nothing."""
+    report = _quire_coverage(
+        tmp_path, {"src/mod.py": _PY_PRODUCTION, "src/mod.ts": _TS_PRODUCTION}
+    )
+    edges = _edges(report)
+    assert {e for e in edges if e[0] == "src/mod.py"} == {
+        ("src/mod.py", "plain", "FR-001-AC-1", "python-implements-decorator"),
+        ("src/mod.py", "qualified", "FR-001-AC-2", "python-implements-decorator"),
+    }
+    ts = {e for e in edges if e[0] == "src/mod.ts"}
+    assert {(e[1], e[2], e[3]) for e in ts} >= {
+        ("Decorated", "FR-001-AC-1", "typescript-implements-decorator"),
+        ("wrapped", "FR-001-AC-1", "typescript-implements-wrapper"),
+        ("qualified", "FR-001-AC-2", "typescript-implements-wrapper"),
+    }
+    assert not any(e[1] in ("renamed",) for e in edges), edges
+    assert report["totals"]["backed"] == 0
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-163", "FR-004-AC-34")
+def test_quire_binds_nothing_from_python_typescript_implements_comments(
+    tmp_path: pathlib.Path,
+) -> None:
+    """TC-163 (FR-004-AC-34): the removed line-comment forms mint no relation."""
+    report = _quire_coverage(
+        tmp_path,
+        {
+            "src/mod.py": "# Implements: FR-001\ndef f():\n    pass\n",
+            "src/mod.ts": "// Implements: FR-001\nexport function f(): void {}\n",
+        },
+    )
+    assert _edges(report) == set()
+
+
+@pytest.mark.integration
+@pytest.mark.trace("TC-164", "FR-004-AC-35")
+def test_quire_binds_nothing_for_misplaced_structural_markers(
+    tmp_path: pathlib.Path,
+) -> None:
+    """TC-164 (FR-004-AC-35): `implements` on a test symbol and `trace` on a
+    production symbol bind nothing, for Python and TypeScript."""
+    report = _quire_coverage(
+        tmp_path,
+        {
+            "tests/test_mod.py": (
+                "from ix_trace_py import implements\n\n"
+                '@implements("FR-001-AC-1")\ndef test_x():\n    pass\n'
+            ),
+            "src/mod.py": (
+                "from ix_trace_py import trace\n\n"
+                '@trace("FR-001-AC-1")\ndef production():\n    pass\n'
+            ),
+            "tests/mod.test.ts": (
+                'import { implementing } from "@agent-ix/ix-trace-ts";\n'
+                'it("x", implementing("FR-001-AC-1")(() => {}));\n'
+            ),
+            "src/mod.ts": (
+                'import { trace } from "@agent-ix/ix-trace-ts";\n'
+                'export const production = trace("FR-001-AC-1")(() => 1);\n'
+            ),
+        },
+    )
+    assert _edges(report) == set()
+    assert report["totals"]["backed"] == 0
 
 
 @pytest.mark.trace("TC-157")
