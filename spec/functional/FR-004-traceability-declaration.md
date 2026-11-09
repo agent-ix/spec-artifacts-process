@@ -159,14 +159,14 @@ modules can version apart.
   `@implements({ids})`); TypeScript `typescript-implements-decorator`
   (`syntax: typescript_decorator`, template `@implementing({ids})`) first, then
   `typescript-implements-wrapper` (`syntax: typescript_wrapper`, template
-  `implementing({ids})`). The first templated form of a language is the text the
-  quire-rs advisory names, so for TypeScript it is the decorator spelling, which
-  fits a class or method; a function written as an arrow-valued binding carries
-  the wrapper spelling instead.
+  `implementing({ids})`). Which of a language's forms the quire-rs advisory names
+  for a given symbol is decided by that symbol's language and syntax position, as
+  quire-rs FR-062-AC-26 states.
 - Each structural pattern **SHALL** match its complete candidate — the whole
   decorator node including `@`, or the whole inner call of the wrapper — and
-  **SHALL** capture one or more separately quoted ids, as `ix-trace-py` and
-  `ix-trace-ts` accept them. A pattern that matches only part of a candidate binds
+  **SHALL** capture one or more separately **double-quoted** ids, as `ix-trace-py`
+  and `ix-trace-ts` accept them; a single-quoted, raw, triple-quoted, template
+  or concatenated literal binds nothing. A pattern that matches only part of a candidate binds
   nothing (quire-rs FR-062).
 - **Spellings.** The engine resolves no imports. The shipped patterns **SHALL**
   accept exactly these spellings: Python `implements(...)` and

@@ -48,6 +48,7 @@ scope:
 | --- | --- | --- |
 | FND-001 | fixed | TC-160..TC-166 appear exactly once each, under `## Test Case Summary` after TC-159 (spec/tests.md:292-298). Every Functional Requirement Coverage `FR` row has four cells. The coverage rows at lines 68-74 cite only registered ids. |
 | FND-002 | fixed | A PLAT-866 note follows the IR-868 note and records the reversal for Python and TypeScript. |
+| FND-003 | fixed | The note now reads "PLAT-866 (target design)". The replacement bullet says the manifest still declares the comment forms until the replacement change. |
 
 ## New findings (disposition pass 1)
 

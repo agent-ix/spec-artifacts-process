@@ -99,9 +99,16 @@ scope:
 | FND-003 | fixed | A new bullet requires every structural pattern to match its complete candidate; AC-31 and AC-32 require `re.fullmatch` on the node text; AC-33 adds `@ix_trace_py.implements(...)` and `ixTrace.implementing(...)(...)` spellings. |
 | FND-004 | fixed | The Spellings bullet pins a closed set (`implements`, `ix_trace_py.implements`, `implementing`, `ixTrace.implementing`), names `ixTrace` as the documented namespace import of `@agent-ix/ix-trace-ts` (the package.json name), and says renamed imports bind nothing. The text agrees with quire-rs#628 @8407145, ix-trace-py#4 @81e8e85 and ix-trace-ts#8 @5c171f4. |
 | FND-005 | fixed | The bullet pins the form names, the order (decorator before wrapper) and the templates `@implements({ids})`, `@implementing({ids})` and `implementing({ids})`. |
+| FND-006 | fixed | The Spellings bullet requires every structural pattern to be anchored at the candidate start (`\A`). AC-31 and AC-32 and TC-160 and TC-161 require `re.search` over `@t.implements("X")`, `t.implementing("X")` and `@t.implementing("X")` to find nothing. quire-rs#628 @c7eadc1 FR-062-AC-25 states the same start-anchored rule. |
 
 ## New findings (disposition pass 1)
 
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-006 | low | Under quire-rs FR-062, a renamed namespace wrapper (`t.implementing("FR-1")(fn)`) has the inner-call candidate `t.implementing("FR-1")`. A wrapper pattern that is not anchored at the candidate start still matches its proper substring `implementing("FR-1")`. The engine then emits `partial-implements-syntax-match`, which contradicts the quire-rs#628 Spellings text ("yields no finding because it matches no pattern"). AC-32 checks rejection with `re.fullmatch`, so it cannot detect this. Require the wrapper pattern to be anchored at the candidate start (or reject a preceding `.`/identifier character), and test that `re.search` finds nothing on a renamed spelling. | spec/functional/FR-004-traceability-declaration.md:237 |
+
+## New findings (disposition pass 2)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | low | The structural-forms bullet still says "The first templated form of a language is the text the quire-rs advisory names". quire-rs#628 @c7eadc1 (FR-062-AC-26, amended FR-051-AC-22) now selects the advisory's form by the symbol's language and syntax position: `@implementing(...)` for a TypeScript class or method, `implementing(...)` for a const-bound function, and the kind alone for a `function` declaration. The FR-004 sentence describes the superseded first-form rule. Replace it with a reference to FR-062-AC-26's position-based selection. The pinned order and templates can stay. | spec/functional/FR-004-traceability-declaration.md:162-165 |
