@@ -4,7 +4,7 @@ version: 0.2.1
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
-  name: ADR
+  name: Architecture Decision Record
   doc_backed: true
   supports_membership: false
   composition:
@@ -14,14 +14,14 @@ archetypes:
     - superseded
     - rejected
 - kind: plan
-  name: Plan
+  name: Project Plan
   doc_backed: true
   supports_membership: true
   composition:
     expected_artifacts:
     - Task
 - kind: review
-  name: Review
+  name: Review Report
   doc_backed: true
   supports_membership: true
   composition:
@@ -31,7 +31,7 @@ archetypes:
       top_level: true
       order: 12
 - kind: spec-review
-  name: SpecReview
+  name: Spec Review
   doc_backed: true
   supports_membership: false
   composition:
@@ -43,7 +43,7 @@ archetypes:
   doc_backed: true
   supports_membership: false
 - kind: standard
-  name: Standard
+  name: Standard Definition
   doc_backed: true
   supports_membership: false
 grammars:
@@ -597,21 +597,11 @@ doc_kinds:
 - feedback
 object_types:
 - name: standard
-  data_schema:
-    type: object
-    properties:
-      code:
-        type: string
-      name:
-        type: string
-      description:
-        type: string
-      guide:
-        type: string
-      link:
-        type: string
-    required:
-    - code
+  # No `data_schema`: the declaration record a document yields holds only
+  # section-sourced keys (fields, clauses, operations, relations), never a
+  # frontmatter field, so a record schema requiring `code` could never be
+  # satisfied by any `object: standard` document. The locator below is the
+  # contract: `code` is `required: true` there, and it is read from frontmatter.
   body_extraction:
     yield_pattern:
       match:

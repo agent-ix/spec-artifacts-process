@@ -110,13 +110,40 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
 
 
 @pytest.mark.trace("TC-096")
-def test_the_standard_object_type_keeps_its_inline_schema(manifest):
+def test_the_standard_object_type_is_governed_by_its_locator(manifest):
     """`Standard` (artifact type) and `standard` (object type) are two
     declarations. A document is dispatched on frontmatter `type:`, so
     `type: Standard` resolves to the artifact type; the object type is reached
-    only through `object: standard`."""
+    only through `object: standard`. The declaration record never holds a
+    frontmatter field, so the object type carries no record schema, and its
+    locator reads and requires `code` from frontmatter."""
     now = by_name(manifest["object_types"])["standard"]
-    assert "properties" in now["data_schema"], "the object type keeps the INLINE form"
+    assert "data_schema" not in now
+    code = now["body_extraction"]["yield_pattern"]["match"]["code"]
+    assert code["from"] == "frontmatter_field"
+    assert code["path"] == ["code"]
+    assert code["required"] is True
+    standard = by_name(manifest["artifact_types"])["Standard"]
+    assert standard["data_schema"] == {"schema": "schemas/Standard.json"}
+
+
+@pytest.mark.trace("TC-167")
+def test_archetype_names_are_not_repeated_and_none_is_inline(manifest):
+    """Quire loads `archetypes`, `artifact_types` and `object_types` into one
+    registry, so a name declared in two sections is `DuplicateArchetype`."""
+    names = [
+        entry["name"]
+        for section in ("archetypes", "artifact_types", "object_types")
+        for entry in manifest[section]
+    ]
+    assert len(names) == len(set(names))
+    inline = [
+        entry["name"]
+        for section in ("artifact_types", "object_types")
+        for entry in manifest[section]
+        if "data_schema" in entry and "schema" not in entry["data_schema"]
+    ]
+    assert inline == []
 
 
 @pytest.mark.trace("TC-128")

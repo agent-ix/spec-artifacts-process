@@ -36,7 +36,7 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     manifest = load_yaml_strict(MANIFEST_PATH.read_text())
 
     names = {a["name"] for a in manifest["archetypes"]}
-    assert "SpecReview" in names, "SpecReview archetype must be registered"
+    assert "Spec Review" in names, "SpecReview archetype must be registered"
 
     sr = next(t for t in manifest["artifact_types"] if t["name"] == "SpecReview")
     assert sr["frontmatter_schema_ref"] == "schemas/spec-review-frontmatter.schema.json"
