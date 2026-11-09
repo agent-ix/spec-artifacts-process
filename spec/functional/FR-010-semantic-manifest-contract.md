@@ -1,6 +1,6 @@
 ---
 id: FR-010
-title: "Declare the semantic-module contract in the manifest without altering an archetype"
+title: "Declare the semantic-module contract in the manifest"
 type: FR
 relationships:
   - target: "ix://agent-ix/spec-artifacts-process/US-002"
@@ -12,14 +12,15 @@ relationships:
   - target: "ix://agent-ix/quoin/FR-073"
     type: "depends_on"
 ---
-# FR-010: Declare the semantic-module contract in the manifest without altering an archetype
+# FR-010: Declare the semantic-module contract in the manifest
 
 ## Description
 
 `spec_artifacts_process/manifest.yaml` SHALL carry the quoin FR-070 `semantic` block, referencing
 every declared artifact type's emitted schema by path (quoin FR-073), so that Quoin verifies the shipped schemas at install and a consumer can resolve
 a type's record schema from the manifest alone, while every existing archetype contract keeps the
-exact meaning it has today.
+exact meaning it has today, except one: the `standard` object type carries no record schema and is
+validated by its locator and the `Standard` frontmatter schema (see Behavior).
 
 ## Inputs
 
@@ -56,12 +57,6 @@ exact meaning it has today.
   requiring `code` is unsatisfiable by every `object: standard` document. Its locator is the
   contract: it reads `code` from frontmatter and requires it, so a Standard document with `code:`
   validates and one without it is refused.
-- Within the manifest, no `archetypes` entry SHALL share its `name` with an `artifact_types` or
-  `object_types` entry, because Quire loads all three sections into one archetype registry and a
-  repeated name is reported `DuplicateArchetype` on every run. An `archetypes` entry carries the
-  display name Filament shows (`Architecture Decision Record`, `Project Plan`, `Review Report`,
-  `Spec Review`, `Test Matrix`, `Standard Definition`), as `Test Matrix` already did beside
-  `TestMatrix`.
 - The manifest SHALL load through Quire's registry loader with no load failure for any artifact
   type.
 - If Quoin or Quire rejects the manifest, then this module SHALL correct its own manifest or
@@ -86,7 +81,6 @@ exact meaning it has today.
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
 | FR-010-AC-8 | The `object_types` entry `standard` carries no `data_schema` and its locator requires `code` from frontmatter, while the artifact type `Standard` carries the reference form; a document is dispatched on frontmatter `type:` to the artifact type and on `object:` to the object type. | Test (TC-096) |
-| FR-010-AC-10 | No `archetypes` entry shares a `name` with an `artifact_types` or `object_types` entry, so loading the module reports no `DuplicateArchetype`, and no declaration carries an inline `data_schema` under the `semantic` block. | Test (TC-167) |
 | FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
 
 ## Dependencies

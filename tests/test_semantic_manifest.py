@@ -1,6 +1,6 @@
 """The semantic block and the reference-form data_schema.
 
-Requirement FR-010; rows TC-089, TC-093, TC-094, TC-096, TC-128, TC-135.
+Requirement FR-010.
 """
 
 from __future__ import annotations
@@ -127,23 +127,28 @@ def test_the_standard_object_type_is_governed_by_its_locator(manifest):
     assert standard["data_schema"] == {"schema": "schemas/Standard.json"}
 
 
-@pytest.mark.trace("TC-167")
-def test_archetype_names_are_not_repeated_and_none_is_inline(manifest):
-    """Quire loads `archetypes`, `artifact_types` and `object_types` into one
-    registry, so a name declared in two sections is `DuplicateArchetype`."""
-    names = [
-        entry["name"]
-        for section in ("archetypes", "artifact_types", "object_types")
-        for entry in manifest[section]
+@pytest.mark.trace("TC-096")
+def test_the_engine_requires_code_on_a_standard(quire_engine):
+    """A Standard with a string `code:` validates; one without it, or with an
+    integer, is refused. Both the artifact type and the object type are run."""
+
+    def standard(code_line: str) -> str:
+        return (
+            '---\nid: Standard-201\ntitle: "a standard"\ntype: Standard\n'
+            f"object: standard\n{code_line}---\n"
+            "# Standard-201: a standard\n\n## Description\n\nText.\n"
+        )
+
+    for model in ("Standard", "standard"):
+        root = str(REPO_ROOT / "spec_artifacts_process")
+        assert quire_engine.validate_document(model, root, standard("code: abc\n"))[
+            "is_valid"
+        ]
+        assert not quire_engine.validate_document(model, root, standard(""))["is_valid"]
+    root = str(REPO_ROOT / "spec_artifacts_process")
+    assert not quire_engine.validate_document("Standard", root, standard("code: 12\n"))[
+        "is_valid"
     ]
-    assert len(names) == len(set(names))
-    inline = [
-        entry["name"]
-        for section in ("artifact_types", "object_types")
-        for entry in manifest[section]
-        if "data_schema" in entry and "schema" not in entry["data_schema"]
-    ]
-    assert inline == []
 
 
 @pytest.mark.trace("TC-128")

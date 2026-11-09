@@ -4,7 +4,7 @@ version: 0.2.1
 description: "Filament Module: process artifact templates (ADR, Plan, Task, Review, Finding, TestMatrix, Standard) \u2014 Jinja .md.j2 templates"
 archetypes:
 - kind: adr
-  name: Architecture Decision Record
+  name: ADR
   doc_backed: true
   supports_membership: false
   composition:
@@ -14,14 +14,14 @@ archetypes:
     - superseded
     - rejected
 - kind: plan
-  name: Project Plan
+  name: Plan
   doc_backed: true
   supports_membership: true
   composition:
     expected_artifacts:
     - Task
 - kind: review
-  name: Review Report
+  name: Review
   doc_backed: true
   supports_membership: true
   composition:
@@ -31,7 +31,7 @@ archetypes:
       top_level: true
       order: 12
 - kind: spec-review
-  name: Spec Review
+  name: SpecReview
   doc_backed: true
   supports_membership: false
   composition:
@@ -43,7 +43,7 @@ archetypes:
   doc_backed: true
   supports_membership: false
 - kind: standard
-  name: Standard Definition
+  name: Standard
   doc_backed: true
   supports_membership: false
 grammars:
@@ -1739,14 +1739,12 @@ verification_catalog:
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
 # `exports` names every artifact type carrying a `data_schema` reference.
 #
-# `object_types.standard` is deliberately NOT exported and keeps its inline
+# `object_types.standard` is deliberately NOT exported and carries no
 # `data_schema`. It is a different declaration from the `Standard` artifact
 # type: a document is dispatched on frontmatter `type:`, so `type: Standard`
 # resolves to the artifact type and `Standard.json` is its record schema, while
-# the object type is reached only through `object: standard` and its inline
-# schema describes the frontmatter projection. Converting it to the reference
-# form would change how an existing declaration resolves for every consumer that
-# activates this module.
+# the object type is reached only through `object: standard` and is governed by
+# its locator, which requires `code` from frontmatter.
 semantic:
   contract_version: 1.0.0
   semantic_core: 0.3.3

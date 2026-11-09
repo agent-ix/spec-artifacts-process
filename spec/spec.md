@@ -90,7 +90,7 @@ The requirement classes that make up this specification trace as follows:
 FR-001 activates the manifest against filament-core; FR-002 through FR-008 declare the archetypes,
 the traceability model, the evidence layer and the verification catalog. The semantic-module
 contract sits on top of those: FR-009 emits one JSON Schema per declared artifact type from a
-TypeSpec source, FR-010 declares the contract in the manifest without altering an archetype,
+TypeSpec source, FR-010 declares the contract in the manifest,
 FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
 
