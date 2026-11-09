@@ -82,6 +82,7 @@ def test_spec_review_archetype_registered_with_findings_validation() -> None:
     ]
 
 
+@pytest.mark.trace("TC-027", "FR-002-AC-6")
 def test_spec_review_analysis_admits_both_review_families() -> None:
     """TC-027 (FR-002-AC-6): the `analysis` enum covers analyses *of a spec* and
     reviews of an *implementation against its spec*. A review with no fitting
@@ -111,6 +112,7 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
     assert len(analysis) == len(set(analysis)), "enum values must be unique"
 
 
+@pytest.mark.trace("FR-003")
 def test_testmatrix_body_extraction_contract() -> None:
     """FR-003: the TestMatrix contract is manifest data — required coverage +
     summary tables, the Test ID pattern, and the Type/Priority/Status/Traces To
@@ -224,6 +226,7 @@ def test_testmatrix_body_extraction_contract() -> None:
         )
 
 
+@pytest.mark.trace("TC-017", "FR-003-AC-9")
 def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     """TC-017 (FR-003-AC-9): the contract is additive. The TestMatrix
     frontmatter schema is untouched, and no other archetype gained or lost a
@@ -292,6 +295,7 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
     assert tm["defaults"]["id_pattern"] == "TestMatrix-{next:03d}"
 
 
+@pytest.mark.trace("TC-069", "FR-003-AC-5")
 def test_column_vocabularies_have_one_source() -> None:
     """TC-069 (FR-003-AC-5, CR-015/CR-016/CR-031): the traceability model owns
     the column vocabularies, and the body_extraction contract must not drift
@@ -363,6 +367,7 @@ def test_repo_test_matrix_self_validates() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+@pytest.mark.trace("TC-037", "FR-005-AC-1")
 def test_task_schema_declares_track_property() -> None:
     """TC-037 (FR-005-AC-1/AC-2): the `track` label 230 task files already carry
     is a declared, optional string — not a key that passes because
@@ -395,6 +400,7 @@ def test_task_schema_declares_track_property() -> None:
         ), f"track={bad!r} should fail (FR-005-AC-2)"
 
 
+@pytest.mark.trace("TC-038", "FR-005-AC-3")
 def test_track_stays_a_task_property_not_an_archetype() -> None:
     """TC-038 (FR-005-AC-3): scope guard. FR-005 declares a property and nothing
     else — no `Track` document type, and the Task artifact type is otherwise
@@ -438,6 +444,7 @@ def _findings_assert() -> dict:
     ]["assert"]
 
 
+@pytest.mark.trace("TC-060", "FR-008-AC-1")
 def test_tc060_escape_cause_is_an_optional_findings_column() -> None:
     """TC-060 (FR-008-AC-1).
 
@@ -450,6 +457,7 @@ def test_tc060_escape_cause_is_an_optional_findings_column() -> None:
     assert assert_["optional_columns"] == ["Escape Cause"]
 
 
+@pytest.mark.trace("TC-061", "FR-008-AC-2", "FR-008-AC-3")
 def test_tc061_escape_cause_and_severity_stay_independent() -> None:
     """TC-061 (FR-008-AC-2, FR-008-AC-3).
 
@@ -462,6 +470,7 @@ def test_tc061_escape_cause_and_severity_stay_independent() -> None:
     assert choices["Severity"] == ["low", "medium", "high"]
 
 
+@pytest.mark.trace("TC-062", "FR-008-AC-6")
 def test_tc062_skeleton_documents_the_column_and_every_cause() -> None:
     """TC-062 (FR-008-AC-6).
 
@@ -473,6 +482,7 @@ def test_tc062_skeleton_documents_the_column_and_every_cause() -> None:
         assert cause in text, f"skeleton documents the {cause!r} cause"
 
 
+@pytest.mark.trace("TC-063", "FR-008-AC-4")
 def test_tc063_finding_id_validates_and_does_not_collide() -> None:
     """TC-063 (FR-008-AC-4).
 
@@ -508,6 +518,7 @@ def test_tc063_finding_id_validates_and_does_not_collide() -> None:
     )
 
 
+@pytest.mark.trace("TC-064", "FR-008-AC-5")
 def test_tc064_finding_declares_no_body_contract() -> None:
     """TC-064 (FR-008-AC-5).
 
@@ -566,6 +577,7 @@ def _source_exclude_violation(pattern: str) -> str | None:
     return None
 
 
+@pytest.mark.trace("TC-070", "FR-004-AC-1")
 def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> None:
     """TC-070 (FR-004-AC-1, CR-032): `traceability.source_exclude` is exactly
     the three fixture-anchored globs, and none of them is a forbidden form.
@@ -607,6 +619,7 @@ def test_tc070_source_exclude_pins_the_globs_and_guards_the_evidence_tree() -> N
         assert _source_exclude_violation(good) is None, f"guard must admit {good!r}"
 
 
+@pytest.mark.trace("TC-076", "FR-003-AC-12")
 def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
     """TC-076 (FR-003-AC-12, CR-039): a repository past a certain size has a
     matrix TREE, and the archetype modelled only the leaf.

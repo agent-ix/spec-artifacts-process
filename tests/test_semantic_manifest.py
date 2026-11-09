@@ -54,7 +54,7 @@ def test_the_module_loads_with_every_declared_archetype(quire_engine):
     assert set(artifact_type_names()) <= set(current)
 
 
-@pytest.mark.trace("TC-094")
+@pytest.mark.trace("TC-094", "FR-010-AC-6")
 def test_an_unknown_key_is_refused(quire_engine, tmp_path):
     """FR-010-AC-6: the refusal happens. Whether it *names* the offender is
     TC-135, which is a strict expected failure."""

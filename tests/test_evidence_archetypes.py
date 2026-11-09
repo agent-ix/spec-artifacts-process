@@ -73,6 +73,7 @@ def assert_invalid(fixture: str, *, mentions: str = "") -> None:
 # ── Manifest data (FR-006-AC-1..AC-4) ───────────────────────────────────────
 
 
+@pytest.mark.trace("TC-040", "FR-006-AC-1")
 def test_tc040_suite_registry_archetype_declared() -> None:
     """TC-040 (FR-006-AC-1)."""
     at = _archetype("SuiteRegistry")
@@ -89,6 +90,7 @@ def test_tc040_suite_registry_archetype_declared() -> None:
     assert facet["id_pattern"] == r"^SUITE-\d+$"
 
 
+@pytest.mark.trace("TC-041", "FR-006-AC-2")
 def test_tc041_inspections_archetype_declared() -> None:
     """TC-041 (FR-006-AC-2)."""
     at = _archetype("Inspections")
@@ -111,6 +113,7 @@ def test_tc041_inspections_archetype_declared() -> None:
     assert facet["column_choices"]["Verdict"] == ["Pass", "Fail", "Waived"]
 
 
+@pytest.mark.trace("TC-042", "FR-006-AC-3")
 def test_tc042_evidence_kind_is_the_declared_test_type_vocabulary() -> None:
     """TC-042 (FR-006-AC-3): one vocabulary, three uses (CR-015).
 
@@ -131,6 +134,7 @@ def test_tc042_evidence_kind_is_the_declared_test_type_vocabulary() -> None:
     assert matrix_types == declared
 
 
+@pytest.mark.trace("TC-043", "FR-006-AC-4")
 def test_tc043_suite_and_inspection_are_trace_targets() -> None:
     """TC-043 (FR-006-AC-4): declaring them as targets is what makes SUITE-N and
     INSP-N referenceable id classes, so FR-049's dangling-reference check covers
@@ -172,6 +176,7 @@ def test_tc043_suite_and_inspection_are_trace_targets() -> None:
 
 
 @needs_quire
+@pytest.mark.trace("TC-044", "FR-006-AC-5")
 def test_tc044_suite_registry_contract_is_enforced() -> None:
     """TC-044 (FR-006-AC-5)."""
     assert_valid("suites-valid.md")
@@ -186,6 +191,7 @@ def test_tc044_suite_registry_contract_is_enforced() -> None:
 
 
 @needs_quire
+@pytest.mark.trace("TC-045", "FR-006-AC-6")
 def test_tc045_inspection_contract_is_enforced() -> None:
     """TC-045 (FR-006-AC-6)."""
     assert_valid("inspections-valid.md")
@@ -195,6 +201,7 @@ def test_tc045_inspection_contract_is_enforced() -> None:
 
 
 @needs_quire
+@pytest.mark.trace("TC-046", "FR-006-AC-7")
 def test_tc046_shipped_skeletons_validate() -> None:
     """TC-046 (FR-006-AC-7): the shipped authoring path produces a conformant
     document. A skeleton that does not validate against its own archetype sends
@@ -215,6 +222,7 @@ def test_tc046_shipped_skeletons_validate() -> None:
 
 
 @needs_quire
+@pytest.mark.trace("TC-047", "FR-006-AC-8")
 def test_tc047_adoption_is_optional(tmp_path: pathlib.Path) -> None:
     """TC-047 (FR-006-AC-8): a repository that declares neither document is
     unaffected. Adding archetypes must not make an existing corpus incomplete."""

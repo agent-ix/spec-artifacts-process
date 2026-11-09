@@ -118,7 +118,7 @@ def test_the_totality_walk_terminates_on_the_cyclic_bundle(mappings):
     assert len(seen) >= len(mappings["models"])
 
 
-@pytest.mark.trace("TC-099")
+@pytest.mark.trace("TC-099", "FR-011-CON-1")
 def test_every_named_section_and_column_is_declared_by_the_manifest(mappings, manifest):
     """FR-011-CON-1: the mapping asserts no contract the manifest does not."""
     locators = {

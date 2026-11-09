@@ -69,17 +69,20 @@ def assert_invalid(fixture: str, *, reason: str, mentions: str = "") -> None:
 # ── TC-001 / TC-016: required tables present, records extracted ──
 
 
+@pytest.mark.trace("TC-001", "FR-003-AC-1", "FR-003-AC-8")
 def test_conforming_matrix_validates() -> None:
     """TC-001 (FR-003-AC-1, FR-003-AC-8): a full matrix with every coverage
     table, a mixed vocabulary, and several test-case rows validates."""
     assert_valid("conforming.md")
 
 
+@pytest.mark.trace("TC-014", "FR-003-AC-7")
 def test_optional_tables_omitted_still_validates() -> None:
     """TC-014 (FR-003-AC-7): the StR/US/NFR coverage tables are optional."""
     assert_valid("optional-tables-omitted.md")
 
 
+@pytest.mark.trace("TC-015", "FR-003-AC-7")
 def test_optional_table_with_renamed_column_fails() -> None:
     """TC-015 (FR-003-AC-7): optional means "absent is fine", not "anything
     goes" — a present optional table still has its columns asserted."""
@@ -89,11 +92,13 @@ def test_optional_table_with_renamed_column_fails() -> None:
 # ── TC-002 / TC-003 / TC-016: structural drift ──
 
 
+@pytest.mark.trace("TC-002", "FR-003-AC-2")
 def test_missing_test_case_summary_fails() -> None:
     """TC-002 (FR-003-AC-2)."""
     assert_invalid("missing-test-case-summary.md", reason="missing")
 
 
+@pytest.mark.trace("TC-003", "FR-003-AC-1")
 def test_missing_functional_coverage_fails() -> None:
     """TC-003 (FR-003-AC-1)."""
     assert_invalid("missing-fr-coverage.md", reason="missing")
@@ -102,6 +107,7 @@ def test_missing_functional_coverage_fails() -> None:
 @pytest.mark.parametrize(
     "fixture", ["header-only-summary.md", "header-only-fr-coverage.md"]
 )
+@pytest.mark.trace("TC-016", "FR-003-AC-1", "FR-003-AC-2")
 def test_header_only_table_fails_min_rows(fixture: str) -> None:
     """TC-016 (FR-003-AC-1, FR-003-AC-2): a header-only table is not a table —
     both required extractions demand at least one row."""
@@ -111,6 +117,7 @@ def test_header_only_table_fails_min_rows(fixture: str) -> None:
 # ── TC-004 / TC-005: Type vocabulary ──
 
 
+@pytest.mark.trace("TC-004", "FR-003-AC-3")
 def test_type_vocabulary_permutation_validates() -> None:
     """TC-004 (FR-003-AC-3, CR-016): every core evidence value is accepted —
     Unit, Integration, E2E, Property, Fuzz, Benchmark, Static, Compile,
@@ -120,6 +127,7 @@ def test_type_vocabulary_permutation_validates() -> None:
     assert_valid("type-vocabulary.md")
 
 
+@pytest.mark.trace("TC-005", "FR-003-AC-3")
 def test_type_outside_vocabulary_fails() -> None:
     """TC-005 (FR-003-AC-3): a value in neither the core set nor the module's
     declared extensions still fails."""
@@ -129,6 +137,7 @@ def test_type_outside_vocabulary_fails() -> None:
 # ── TC-006 / TC-007: Test ID shapes ──
 
 
+@pytest.mark.trace("TC-006", "FR-003-AC-4")
 def test_test_id_shapes_validate() -> None:
     """TC-006 (FR-003-AC-4, CR-016, CR-019): the template forms plus the
     segmented ones the ecosystem authors — `TC-060-01`, `TC-SB-001`,
@@ -148,6 +157,7 @@ def test_test_id_shapes_validate() -> None:
         "test-id-undeclared-prefix.md",
     ],
 )
+@pytest.mark.trace("TC-007", "FR-003-AC-4")
 def test_malformed_test_id_fails(fixture: str) -> None:
     """TC-007 (FR-003-AC-4): widening the shape must not admit an id carrying
     trailing prose — `TC-020 SPIRE` is still malformed."""
@@ -157,6 +167,7 @@ def test_malformed_test_id_fails(fixture: str) -> None:
 # ── TC-008 / TC-009: Status markers ──
 
 
+@pytest.mark.trace("TC-008", "FR-003-AC-5")
 def test_status_marker_permutation_validates() -> None:
     """TC-008 (FR-003-AC-5, CR-016, CR-031): the four markers, bare or carrying
     the note that says why (`🚧 scale evidence deferred`). Decorated statuses
@@ -165,6 +176,7 @@ def test_status_marker_permutation_validates() -> None:
     assert_valid("status-vocabulary.md")
 
 
+@pytest.mark.trace("TC-008", "FR-003-AC-5")
 def test_retired_warning_marker_fails() -> None:
     """TC-008 (FR-003-AC-5, CR-031): `⚠️` is retired and no longer admitted.
 
@@ -177,6 +189,7 @@ def test_retired_warning_marker_fails() -> None:
     assert_invalid("status-retired-marker.md", reason="assert", mentions="Status")
 
 
+@pytest.mark.trace("TC-009", "FR-003-AC-5")
 def test_status_without_leading_marker_fails() -> None:
     """TC-009 (FR-003-AC-5): a word status still fails — the cell must be
     *headed* by a marker."""
@@ -186,11 +199,13 @@ def test_status_without_leading_marker_fails() -> None:
 # ── TC-010 / TC-011: Priority vocabulary ──
 
 
+@pytest.mark.trace("TC-010", "FR-003-AC-10")
 def test_priority_vocabulary_permutation_validates() -> None:
     """TC-010 (FR-003-AC-10): P0..P4."""
     assert_valid("priority-vocabulary.md")
 
 
+@pytest.mark.trace("TC-025", "FR-003-AC-10")
 def test_priority_column_may_be_omitted_entirely() -> None:
     """TC-025 (FR-003-AC-10, CR-018): a matrix that never authored a priority
     validates. Many ecosystem matrices are in exactly this shape — real
@@ -201,6 +216,7 @@ def test_priority_column_may_be_omitted_entirely() -> None:
 
 
 @pytest.mark.parametrize("fixture", ["priority-invalid.md", "priority-word.md"])
+@pytest.mark.trace("TC-011", "FR-003-AC-10")
 def test_priority_outside_vocabulary_fails(fixture: str) -> None:
     """TC-011 (FR-003-AC-10): `P5` and `High` are both out."""
     assert_invalid(fixture, reason="assert", mentions="Priority")
@@ -209,6 +225,7 @@ def test_priority_outside_vocabulary_fails(fixture: str) -> None:
 # ── TC-012 / TC-013 / TC-018: Traces To tokens ──
 
 
+@pytest.mark.trace("TC-012", "FR-003-AC-6")
 def test_traces_to_token_permutation_validates() -> None:
     """TC-012 (FR-003-AC-6, CR-016): any `<KIND>-<N>` token with an optional
     sub-id — including `NFR-003-VR-1`, whose `VR` kind the contract never
@@ -225,11 +242,13 @@ def test_traces_to_token_permutation_validates() -> None:
         "traces-to-trailing-comma.md",
     ],
 )
+@pytest.mark.trace("TC-013", "FR-003-AC-6")
 def test_malformed_traces_to_fails(fixture: str) -> None:
     """TC-013 (FR-003-AC-6)."""
     assert_invalid(fixture, reason="assert", mentions="Traces To")
 
 
+@pytest.mark.trace("TC-013", "FR-003-AC-6")
 def test_test_case_token_is_no_longer_rejected_syntactically() -> None:
     """TC-013 (FR-003-AC-6, CR-016) — documented regression. The contract used
     to enumerate the legal kinds and so rejected a `TC-nnn` token in `Traces
@@ -246,6 +265,7 @@ def test_test_case_token_is_no_longer_rejected_syntactically() -> None:
     assert result.returncode == 0
 
 
+@pytest.mark.trace("TC-018", "FR-003-AC-6")
 def test_empty_traces_to_fails() -> None:
     """TC-018 (FR-003-AC-6): an empty cell traces to nothing, which the
     pattern rejects — a row with no trace is the drift the matrix exists to
@@ -256,6 +276,7 @@ def test_empty_traces_to_fails() -> None:
 # ── TC-026: declared archetypes decide which id prefixes are legal ──
 
 
+@pytest.mark.trace("TC-026", "FR-003-AC-4")
 def test_id_prefix_must_name_a_declared_archetype() -> None:
     """TC-026 (FR-003-AC-4, CR-019): the discriminating pair. `IT-` validates
     *because* spec-artifacts-iso declares an IT archetype; `BENCH-001` fails
@@ -284,6 +305,7 @@ def test_id_prefix_must_name_a_declared_archetype() -> None:
     ),
     strict=True,
 )
+@pytest.mark.trace("TC-024", "FR-003-AC-11")
 def test_duplicate_test_id_fails() -> None:
     """TC-024 (FR-003-AC-11) — ⚠️ blocked, see the xfail reason."""
     assert_invalid("duplicate-test-id.md", reason="assert")

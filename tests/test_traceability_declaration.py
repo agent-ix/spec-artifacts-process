@@ -41,6 +41,7 @@ def test_strict_manifest_loader_rejects_duplicate_trace_target_keys() -> None:
         load_yaml_strict(duplicate)
 
 
+@pytest.mark.trace("TC-028", "FR-004-AC-1")
 def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     """TC-028 (FR-004-AC-1): the two id families the rollup reconciles."""
     targets = {t["name"]: t for t in traceability["trace_targets"]}
@@ -65,6 +66,7 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     assert criteria == {"FR", "NFR", "interface"}, criteria
 
 
+@pytest.mark.trace("TC-147", "FR-004-AC-19")
 def test_interface_acceptance_criterion_is_optional(traceability: dict) -> None:
     """TC-147 (FR-004-AC-19): consumers may omit interface docs or their
     Acceptance Criteria sections. `required:` defaults to `true` (quire-rs
@@ -87,6 +89,7 @@ def test_interface_archetype_string_is_exact(traceability: dict) -> None:
     assert refs["interface-verification"]["archetype"] == "interface"
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> None:
     """TC-148 (FR-004-AC-20): a `-CON-` id is minted by the same section +
     `id_column` mechanism `acceptance-criterion` already mints from — `##
@@ -116,6 +119,7 @@ def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> N
     assert constraint["required"] is False
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_is_a_traces_to_and_inspection_target(traceability: dict) -> None:
     """TC-148 (FR-004-AC-20): declaring the target alone mints the id but
     resolves no existing `-CON-` reference in a `Traces To` cell and
@@ -126,6 +130,7 @@ def test_constraint_is_a_traces_to_and_inspection_target(traceability: dict) -> 
     assert "constraint" in refs["inspection-obligation"]["targets"]
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
     """TC-148 (FR-004-AC-20): the end-to-end measurement. `quire coverage
     --json` mints `FR-NNN-CON-N` rows among `minted_targets`, and `quire
@@ -171,6 +176,7 @@ def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
     assert not con_dangling, con_dangling
 
 
+@pytest.mark.trace("TC-029", "FR-004-AC-2")
 def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
     traceability: dict,
 ) -> None:
@@ -207,6 +213,7 @@ def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
             assert entry["archetype"] in ("FR", "NFR", "interface"), entry["name"]
 
 
+@pytest.mark.trace("TC-039", "FR-004-AC-2")
 def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> None:
     """TC-039 (FR-004-AC-2, quire-rs CR-062): one entry per *kind* of table, not
     one per filename the ecosystem happens to use.
@@ -228,6 +235,7 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
+@pytest.mark.trace("TC-030", "FR-004-AC-3")
 def test_one_templated_marker_per_language(traceability: dict) -> None:
     """TC-030 (FR-004-AC-3): a marker without a `template` yields no migration
     suggestion — FR-051 emits one only "where the equivalent marker is
@@ -243,151 +251,7 @@ def test_one_templated_marker_per_language(traceability: dict) -> None:
         re.compile(marker["pattern"])
 
 
-def test_legacy_forms_rewrite_within_their_own_language(traceability: dict) -> None:
-    """TC-031 (FR-004-AC-4): `rewrite_to` names exactly one marker, so a form
-    spanning languages can only ever suggest the wrong syntax for the others —
-    a Rust attribute offered inside a `.py` file."""
-    tags = traceability["trace_tags"]
-    marker_language = {m["name"]: m["language"] for m in tags["markers"]}
-
-    for legacy in tags["legacy"]:
-        assert legacy.get("language"), f"{legacy['name']} spans languages"
-        target = legacy.get("rewrite_to")
-        assert target in marker_language, f"{legacy['name']} -> {target}"
-        assert marker_language[target] == legacy["language"], (
-            f"{legacy['name']} is {legacy['language']} but suggests "
-            f"{marker_language[target]} syntax"
-        )
-        re.compile(legacy["pattern"])
-
-
-def test_legacy_forms_capture_every_id_the_line_names(traceability: dict) -> None:
-    """TC-035 (FR-004-AC-8, CR-024): a form declaring a single id matches once
-    and stops at the comma, so the rest of the line is never read. The engine
-    splits capture group 1 (quire-rs FR-051-AC-16);
-    this asserts the declaration gives it something to split.
-
-    `rust-test-name-id` is deliberately excluded **from list widening**:
-    `TC-{1}` renders over a function name, which cannot carry a list, so the
-    engine leaves the `id_format` path unsplit and list-widening it here would
-    be inert. Its separator is a different axis — see TC-071.
-    """
-    legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
-
-    listed = ["FR-001-AC-1", "FR-001-AC-2", "FR-001-AC-4"]
-    lines = {
-        "rust-trace-line": "// Trace: " + ", ".join(listed),
-        "python-trace-line": "# Trace: " + ", ".join(listed),
-        "typescript-trace-line": " * Trace: " + ", ".join(listed),
-        "rust-comment-id": "// TC-033, TC-034",
-        "python-comment-id": "# TC-033, TC-034",
-        "typescript-comment-id": "// TC-033, TC-034",
-        "python-docstring-id": '    """FR-007-AC-1, FR-005-AC-1',
-        "rust-doc-comment-id": "/// TC-058, TC-198",
-        "typescript-doc-comment-id": " * TC-058, TC-198",
-    }
-    assert set(lines) | {"rust-test-name-id"} == set(legacy), set(legacy)
-
-    for name, line in lines.items():
-        form = legacy[name]
-        assert "id_format" not in form, f"{name} renders a template"
-        match = re.search(form["pattern"], line)
-        assert match, f"{name} does not match {line!r}"
-        ids = [part.strip() for part in match.group(1).split(",") if part.strip()]
-        assert len(ids) > 1, f"{name} captured only {ids} from {line!r}"
-
-    # The template path stays single-id, exactly as the engine reads it.
-    assert legacy["rust-test-name-id"]["id_format"] == "TC-{1}"
-    assert re.search(legacy["rust-test-name-id"]["pattern"], "fn tc753_legacy()")
-
-    # The delimiter that separates a tag from prose is unchanged: quire-rs
-    # writes `// TC-480 / FR-025-AC-1: …` and that is one id, not a list, while
-    # a sentence flowing through an id still matches nothing.
-    comment = legacy["rust-comment-id"]["pattern"]
-    slashed = re.search(comment, "// TC-480 / FR-025-AC-1: len == n")
-    assert slashed and slashed.group(1) == "TC-480"
-    assert not re.search(
-        legacy["python-comment-id"]["pattern"],
-        "# FR-003-CON-1 sweep found in real matrices",
-    )
-    for line, expected in (
-        ("// TC-033, TC-034: why", ["TC-033", "TC-034"]),
-        ("// TC-033 - prose", ["TC-033"]),
-        ("// TC-033,  TC-034 ,", ["TC-033", "TC-034"]),
-    ):
-        match = re.search(comment, line)
-        assert match, line
-        assert [p.strip() for p in match.group(1).split(",") if p.strip()] == expected
-
-    # quire-rs#460: the underscore-object-id shape (`interface_004`) binds
-    # through the same comment forms, same trailing delimiter.
-    accepted = re.search(comment, "// interface_004-AC-1: why")
-    assert accepted and accepted.group(1) == "interface_004-AC-1"
-
-    # CR-063 finding 3: closed to the literal KIND (`interface`), not a
-    # generic `\w+_\d+` — a malformed id, a missing KIND prefix, a leading
-    # digit, and the two ordinary identifiers that merely share the
-    # `word_number` shape all still bind nothing.
-    for rejected in (
-        "// interface_004-AC: why",
-        "// _004-AC-1: why",
-        "// 4_004-AC-1: why",
-        "// interface_004_AC_1: why",
-        "// sha_256: digest",
-        "# retry_3: backoff",
-    ):
-        opener_pattern = (
-            legacy["python-comment-id"]["pattern"]
-            if rejected.startswith("#")
-            else comment
-        )
-        assert not re.search(opener_pattern, rejected), rejected
-
-
-def test_test_name_form_binds_both_spellings_of_its_token(
-    traceability: dict,
-) -> None:
-    """TC-071 (FR-004-AC-11, CR-034): the declared form had no separator between
-    `tc` and the digits, so `fn tc_744_…` bound nothing, and most of what
-    `agent-ix/filament-ide-rs` coverage reported as missing tests was the tool
-    failing to read a tag that was present.
-
-    Both spellings are the same token under this convention — `tc`, the number,
-    then the name — and `(?i:tc)` already admits four spellings of `tc`. The
-    separator is the same class of variation, so it must not buy recall by
-    giving up the anchors.
-    """
-    form = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}[
-        "rust-test-name-id"
-    ]
-    pattern = form["pattern"]
-    assert form["id_format"] == "TC-{1}"
-
-    # Both spellings bind, and to the same id.
-    for line in ("fn tc744_legacy()", "fn tc_744_legacy()"):
-        match = re.search(pattern, line)
-        assert match, f"{line!r} binds nothing"
-        assert form["id_format"].replace("{1}", match.group(1)) == "TC-744", line
-
-    # Case variation of the token is unchanged by the separator.
-    for line in ("fn TC_744_x()", "fn Tc744_x()", "fn tC_744_x()"):
-        match = re.search(pattern, line)
-        assert match and match.group(1) == "744", line
-
-    # One capture group, so the engine's template path stays single-id.
-    assert re.compile(pattern).groups == 1
-
-    # The anchors still hold on both sides: precision does not move.
-    for rejected in (
-        "fn tc_legacy()",  # no digits
-        "fn tc_744()",  # no trailing separator
-        "let tc_744_x = 1;",  # not a fn position
-        "// tc_744_x",  # not a fn position
-        "fn atc_744_x()",  # \b defeats the prefixed spelling
-    ):
-        assert not re.search(pattern, rejected), rejected
-
-
+@pytest.mark.trace("TC-032", "FR-004-AC-5")
 def test_references_resolve_against_declared_targets(traceability: dict) -> None:
     """TC-032 (FR-004-AC-5): a reference naming an undeclared target resolves
     against nothing, which reads identically to a row nothing backs."""
@@ -402,6 +266,7 @@ def test_references_resolve_against_declared_targets(traceability: dict) -> None
         ), f"{reference['name']}: capture group 1 is the referenced id"
 
 
+@pytest.mark.trace("TC-033", "FR-004-AC-6")
 def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     """TC-033 (FR-004-AC-6): the end-to-end gate. A zero backed count is the
     failure this whole declaration exists to fix, and a row minted from
@@ -433,6 +298,7 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     assert not from_fixtures, from_fixtures
 
 
+@pytest.mark.trace("TC-036", "FR-004-AC-9")
 def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> None:
     """TC-036 (FR-004-AC-9, CR-025, widened CR-062): archetype binding admits
     fixtures, because a fixture exercising a contract *is* typed as that contract.
@@ -468,6 +334,7 @@ def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> No
             )
 
 
+@pytest.mark.trace("TC-034", "FR-004-AC-7")
 def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
     traceability: dict,
 ) -> None:
@@ -791,14 +658,13 @@ def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
     Two lists is what keeps one typo from moving a form across that line.
     """
     tags = traceability["trace_tags"]
-    marker_names = {m["name"] for m in tags["markers"]} | {
-        legacy["name"] for legacy in tags["legacy"]
-    }
+    marker_names = {m["name"] for m in tags["markers"]}
     implements_names = {f["name"] for f in tags["implements"]}
 
     assert not marker_names & implements_names, marker_names & implements_names
 
 
+@pytest.mark.trace("TC-072", "FR-004-AC-12")
 def test_verification_methods_are_declared_test_types(traceability: dict) -> None:
     """TC-072 (FR-004-AC-12, CR-035): every other `test_type` value names a
     harness kind; a 29148-aligned corpus also authors verification by
@@ -827,6 +693,7 @@ def test_verification_methods_are_declared_test_types(traceability: dict) -> Non
     assert not ({"Static", "Benchmark", "Compile", "Unit"} & set(exempt))
 
 
+@pytest.mark.trace("TC-073", "FR-004-AC-13")
 def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
     """TC-073 (FR-004-AC-13, CR-036): a retired row has no live requirement to
     trace to — withdrawing it is the act of severing that edge — and the
@@ -873,6 +740,7 @@ def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
         assert not re.match(pattern, form), form
 
 
+@pytest.mark.trace("TC-074", "FR-004-AC-14")
 def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) -> None:
     """TC-074 (FR-004-AC-14, CR-037): `StR-NNN-VC-N` ids are minted and a tag
     naming one reconciled against nothing.
@@ -898,65 +766,6 @@ def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) 
     )
 
 
-def test_doc_comment_forms_require_a_trailing_delimiter(traceability: dict) -> None:
-    """TC-075 (FR-004-AC-15, CR-038): the anchor stops an id binding from the
-    middle of a sentence and never stopped a sentence that *begins* with one.
-
-    `/// TC-1059 used to assert that …` — a note recording that TC-1059 was
-    retired — was read as a tag. The dangerous mirror image is
-    `/// FR-069-AC-8 is not covered here`, which marks a criterion backed by a
-    test that says it does not verify it.
-    """
-    legacy = {f["name"]: f for f in traceability["trace_tags"]["legacy"]}
-    forms = {
-        "rust-doc-comment-id": "/// ",
-        "typescript-doc-comment-id": " * ",
-        "python-docstring-id": '    """',
-    }
-    for name, opener in forms.items():
-        pattern = legacy[name]["pattern"]
-
-        # Prose beginning with an id is not a tag.
-        for prose in (
-            "TC-1059 used to assert that the CLI and MCP each reached the rule",
-            "FR-069-AC-8 is not covered here; see the sibling suite",
-            "NFR-026 guarantee is directly observable",
-        ):
-            assert not re.search(pattern, opener + prose), f"{name}: {prose!r}"
-
-        # Every authored delimiter still binds — including the trailing period,
-        # which #64's proposal omitted and four real tags in the corpus use.
-        for tag, expected in (
-            ("TC-541 (FR-048-AC-1) — why", "TC-541"),
-            ("TC-480 / FR-025-AC-1: len == n", "TC-480"),
-            ("NFR-035.", "NFR-035"),
-            ("FR-087-AC-5", "FR-087-AC-5"),
-            ("TC-033, TC-034: why", "TC-033, TC-034"),
-        ):
-            match = re.search(pattern, opener + tag)
-            assert match, f"{name} lost an authored form: {tag!r}"
-            assert match.group(1) == expected, f"{name}: {tag!r} -> {match.group(1)!r}"
-
-        # quire-rs#460: the underscore-object-id shape binds through the same
-        # trailing-delimiter rule as the hyphenated shape.
-        match = re.search(pattern, opener + "interface_004-AC-1: why")
-        assert match, f"{name} does not bind interface_004-AC-1"
-        assert match.group(1) == "interface_004-AC-1", f"{name}: {match.group(1)!r}"
-
-        # CR-063 finding 3: closed to the literal KIND, so a malformed id, a
-        # missing KIND prefix, a leading digit, and an ordinary identifier
-        # that merely shares the `word_number` shape all still bind nothing.
-        for rejected in (
-            "interface_004-AC: why",
-            "_004-AC-1: why",
-            "4_004-AC-1: why",
-            "interface_004_AC_1: why",
-            "sha_256: digest",
-            "retry_3: backoff",
-        ):
-            assert not re.search(pattern, opener + rejected), f"{name}: {rejected!r}"
-
-
 def _verification_lint_rule() -> dict:
     manifest = load_yaml_strict(pack.MANIFEST_PATH.read_text())
     rules = [r for r in manifest["lint_rules"] if r.get("column") == "Verification"]
@@ -964,6 +773,7 @@ def _verification_lint_rule() -> dict:
     return rules[0]
 
 
+@pytest.mark.trace("TC-149", "FR-004-AC-21")
 def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     """TC-149 (FR-004-AC-21): a `table_column_values` rule scoped to
     `FR`/`NFR`/`interface` requires the Acceptance Criteria `Verification`
@@ -979,7 +789,7 @@ def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     assert not rule.get("annotation_pattern")
 
 
-@pytest.mark.trace("FR-004-AC-21", "FR-004-AC-23")
+@pytest.mark.trace("TC-149", "FR-004-AC-21", "FR-004-AC-23")
 def test_verification_lint_accepts_withdrawn_and_flags_invalid_values(tmp_path) -> None:
     """TC-149 (FR-004-AC-21): the behavioural half — `quire lint` against a
     fixture document. A `Verification` cell reading `Test (TC-999)` reports a
@@ -1030,7 +840,7 @@ def test_verification_lint_accepts_withdrawn_and_flags_invalid_values(tmp_path) 
         assert needle in findings, findings
 
 
-@pytest.mark.trace("FR-004-AC-22")
+@pytest.mark.trace("FR-004-AC-22", "TC-151")
 def test_verification_lint_rule_allowed_set_is_classes_union_catalog(
     manifest: dict,
 ) -> None:

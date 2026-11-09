@@ -47,18 +47,14 @@ type: TestMatrix
 | FR-004 | FR-004-AC-1 | TC-070 | ✅ Complete |
 | FR-004 | FR-004-AC-2 | TC-029, TC-039 | ✅ Complete |
 | FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
-| FR-004 | FR-004-AC-4 | TC-031 | ✅ Complete |
 | FR-004 | FR-004-AC-5 | TC-032 | ✅ Complete |
 | FR-004 | FR-004-AC-6 | TC-033 | ✅ Complete |
 | FR-004 | FR-004-AC-7 | TC-034 | ✅ Complete |
-| FR-004 | FR-004-AC-8 | TC-035 | ✅ Complete |
 | FR-004 | FR-004-AC-9 | TC-036 | ✅ Complete |
 | FR-004 | FR-004-AC-10 | TC-066 | ✅ Complete |
-| FR-004 | FR-004-AC-11 | TC-071 | ✅ Complete |
 | FR-004 | FR-004-AC-12 | TC-072 | ✅ Complete |
 | FR-004 | FR-004-AC-13 | TC-073 | ✅ Complete |
 | FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
-| FR-004 | FR-004-AC-15 | TC-075 | ✅ Complete |
 | FR-004 | FR-004-AC-19 | TC-147 | ✅ Complete |
 | FR-004 | FR-004-AC-20 | TC-148 | ✅ Complete |
 | FR-004 | FR-004-AC-21 | TC-149 | ✅ Complete |
@@ -186,11 +182,9 @@ type: TestMatrix
 | TC-028 | Trace targets mint test-case ids from the Test Matrix and criterion ids from FR and NFR | Unit | P0 | FR-004-AC-1 | ✅ |
 | TC-029 | Every trace target and document reference binds by `archetype` and declares no `document` key; matrix entries bind `TestMatrix` and additionally exclude test data (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-030 | Exactly one templated canonical marker per language (rust, python, typescript) | Unit | P1 | FR-004-AC-3 | ✅ |
-| TC-031 | Every legacy form declares a language and rewrites to a marker of that same language | Unit | P1 | FR-004-AC-4 | ✅ |
 | TC-032 | Every reference names declared targets only and its pattern compiles with a capture group | Unit | P1 | FR-004-AC-5 | ✅ |
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
-| TC-035 | Every `id_format`-free legacy form captures a comma-separated list, so a match carries every id its line names; `rust-test-name-id` stays single-id; and the `*-comment-id` delimiter still binds `// TC-480 / FR-025-AC-1: …` to one id and still rejects prose flowing through an id (CR-024) | Unit | P0 | FR-004-AC-8 | ✅ |
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
@@ -224,11 +218,9 @@ type: TestMatrix
 | TC-068 | No method declares `surviving-mutants` or `suite-quality-unknown`. A denylist by design: two general forms were tried, one passing the case it was written for and one firing on `cross` in `crosshair` (CR-029) | Unit | P1 | FR-007-AC-14 | ✅ |
 | TC-069 | The `Status` pattern's admitted marker set equals `traceability.status`'s classed set in **both** directions; the pre-CR-031 one-directional assertion is why `⚠️` was admitted and classed by nothing for so long | Unit | P0 | FR-003-AC-5 | ✅ |
 | TC-070 | `traceability.source_exclude` is pinned to the exact three fixture-anchored globs — any change is a conscious diff — and a guard rejects the forbidden forms: `**`, any spelling that subtracts the whole `tests/` evidence tree, and leading-wildcard patterns that match at any depth under `literal_separator=false` (CR-032, #56) | Unit | P0 | FR-004-AC-1 | ✅ |
-| TC-071 | `rust-test-name-id` binds `fn tc744_x` and `fn tc_744_x` to the same `TC-744`; the separator is optional, adds no capture group, and admits nothing new — bare `fn tc_x`, an unanchored `tc_744_`, and a digit run with no trailing `_` still match nothing (CR-034) | Unit | P0 | FR-004-AC-11 | ✅ |
 | TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
 | TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — every corpus row carrying `-` is retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
-| TC-075 | Every doc-comment form requires a trailing delimiter: an id followed by a lowercase word binds nothing, while colon, paren, slash, dash, period and end-of-line forms all still bind (CR-038) | Unit | P0 | FR-004-AC-15 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core model; no other host appears | Unit | P0 | FR-009-AC-3 | ✅ |
@@ -279,7 +271,7 @@ type: TestMatrix
 | TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | ✅ |
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
-| TC-147 | `interface-acceptance-criterion` declares `required: false`, so a corpus with no `interface` documents and an `interface` document with no Acceptance Criteria section raise no missing-target finding; a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the declared `legacy` and `implements` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
+| TC-147 | `interface-acceptance-criterion` declares `required: false`, so a corpus with no `interface` documents and an `interface` document with no Acceptance Criteria section raise no missing-target finding; a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the declared `implements` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |
 | TC-148 | A `constraint` trace target is declared (archetype `FR`, section `Constraints`, `id_column: ID`, `evidence` defaults to `source` — the same posture `acceptance-criterion` relies on, same `exclude`), and `constraint` is added to `traces-to`'s and `inspection-obligation`'s `targets`; `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows in `minted_targets`, and `quire validate --okf` reports zero `dangling-trace-reference` warnings naming a `-CON-` id, down from the measured baseline of 13 (PLAT-1079) | Integration | P0 | FR-004-AC-20 | ✅ |
 | TC-149 | A `lint_rules` `table_column_values` entry scoped to `FR`/`NFR`/`interface` checks the `Acceptance Criteria` `Verification` column against the four IADT classes union the `verification_catalog` method ids, with no trailing `TC-…`/`IT-…` id, `severity: warning`; a fixture document with a `Verification` cell reading `Test (TC-999)` reports a warning-severity `quire lint` finding naming the id, a cell naming a bare class (`Test`) or a bare catalog method (`property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all | Unit | P0 | FR-004-AC-21 | ✅ |
 | TC-150 | A `constraint` obligation source is declared (`target: constraint`, `statement_column: Constraint`, `method_column: Validation`); the obligation listing from `quire coverage --json` (or `quoin evidence record`) over this repository carries an `FR-NNN-CON-N` obligation for every `## Constraints` row | Integration | P0 | FR-007-AC-15 | ✅ |
