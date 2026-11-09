@@ -242,6 +242,7 @@ def test_traces_to_token_permutation_validates() -> None:
         "traces-to-trailing-comma.md",
     ],
 )
+@pytest.mark.trace("TC-013", "FR-003-AC-6")
 def test_malformed_traces_to_fails(fixture: str) -> None:
     """TC-013 (FR-003-AC-6)."""
     assert_invalid(fixture, reason="assert", mentions="Traces To")

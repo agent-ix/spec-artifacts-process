@@ -74,3 +74,9 @@ scope:
   role: context_only
   excerpt: "an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does"
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | still-open | Round 1 (head 42249eb): 70 tests gained `@pytest.mark.trace(...)`. Every marker id appears in its docstring's head, none is invented, and each AC agrees with the TC's Traces To row. All 137 marker lines fully match the manifest's `pytest-trace-marker` pattern. Four ids the finding named are still bound by no marker. (1) TC-151: `test_verification_lint_rule_allowed_set_is_classes_union_catalog` (tests/test_traceability_declaration.py:843) carries only `FR-004-AC-22`, so the TC-151 row is unbacked. (2) `test_malformed_traces_to_fails` (tests/test_testmatrix_body_extraction.py:245, docstring "TC-013 (FR-003-AC-6)") has no marker at all. The review's own count missed it because a parametrize decorator containing "traces-to" read as a trace marker. (3) FR-010-AC-6, on `test_an_unknown_key_is_refused` (tests/test_semantic_manifest.py:57), which is marked only "TC-094". (4) FR-011-CON-1, on `test_every_named_section_and_column_is_declared_by_the_manifest` (tests/test_markdown_mappings.py:121), which is marked only "TC-099". Add TC-151 to the first marker, `@pytest.mark.trace("TC-013", "FR-003-AC-6")` to the second, and the docstring ids to the last two. |

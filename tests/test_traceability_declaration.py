@@ -840,7 +840,7 @@ def test_verification_lint_accepts_withdrawn_and_flags_invalid_values(tmp_path) 
         assert needle in findings, findings
 
 
-@pytest.mark.trace("FR-004-AC-22")
+@pytest.mark.trace("FR-004-AC-22", "TC-151")
 def test_verification_lint_rule_allowed_set_is_classes_union_catalog(
     manifest: dict,
 ) -> None:

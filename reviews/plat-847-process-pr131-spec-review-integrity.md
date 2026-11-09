@@ -85,3 +85,10 @@ scope:
   role: examined
   excerpt: "Functional Requirement Coverage rows FR-004-AC-1..AC-21 and Test Case Summary rows TC-028..TC-076, TC-147"
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head 42249eb): FR-004-AC-19 and the TC-147 row now read "the declared `implements` forms", with no `legacy`. The audit table row FR-004-AC-19 / TC-147 is unchanged and consistent. |
+| FND-002 | fixed | Round 1 (head 42249eb): the CR-034 and CR-024 notes are deleted, the interface note's bullet is reduced to the `implements` forms, and the dangling "(CR-024)" citation in the implements note is dropped. A grep of spec/, the manifest, tests/ and README finds no reference to AC-4/8/11/15, TC-031/035/071/075, CR-024/034 or a removed form. `quire validate` exits 0 with the same 5 warnings. |

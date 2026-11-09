@@ -61,3 +61,9 @@ scope:
   role: examined
   excerpt: "test_legacy_forms_rewrite_within_their_own_language, test_legacy_forms_capture_every_id_the_line_names, test_test_name_form_binds_both_spellings_of_its_token, test_doc_comment_forms_require_a_trailing_delimiter: all read traceability['trace_tags']['legacy'] only"
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head 42249eb): manifest.yaml:1118-1120 now reads "For line-comment forms, the `Implements:` prefix is the prose guard: a sentence naming a requirement matches nothing. Comma lists are accepted because authors already write them that way." No legacy reference remains in the manifest. |
