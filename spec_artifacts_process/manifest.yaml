@@ -1115,11 +1115,9 @@ traceability:
     # their language-appropriate line comments.
     # These forms mint scope, never verification evidence.
     #
-    # For line-comment forms, the `Implements:` prefix is the prose guard. The
-    # legacy `*-comment-id` forms bind a bare id after `//`, which is why
-    # they need a trailing-delimiter rule. Here the keyword carries that
-    # weight, and a sentence naming a requirement matches nothing. Comma
-    # lists use the same grammar as `Trace:` forms in the existing corpus.
+    # For line-comment forms, the `Implements:` prefix is the prose guard: a
+    # sentence naming a requirement matches nothing. Comma lists are accepted
+    # because authors already write them that way.
     # The Rust attribute instead takes one quoted literal per id. Both Rust
     # forms remain declared while consumers choose the attribute. The syntax
     # guard restricts this form to complete outer Rust attributes, using the

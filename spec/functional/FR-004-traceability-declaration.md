@@ -191,7 +191,7 @@ modules can version apart.
 | FR-004-AC-12 | `vocabularies.test_type` declares the three ISO 29148 verification methods — `Inspection`, `Analysis`, `Demonstration` — alongside the harness kinds, and `no_source_symbol` carries the two that mint no symbol (`Inspection`, `Analysis`) but not `Demonstration`, which is observed running. | Test (TC-072) |
 | FR-004-AC-13 | The `Traces To` column pattern admits a lone `-` as the explicit no-trace form for a row that traces to nothing, and still rejects prose, a bare word, and a malformed id. | Test (TC-073) |
 | FR-004-AC-14 | `trace_targets` declares a target minting StR validation-criterion ids from the `Validation Criteria` table, and declares none for IT or US — whose criteria are list items and headings, which a `section`+`id_column` target cannot mint. | Test (TC-074) |
-| FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, the declared `legacy` and `implements` forms, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
+| FR-004-AC-19 | The `interface-acceptance-criterion` target declares `required: false`, so a corpus with no `interface` documents or an `interface` document without an Acceptance Criteria section is healthy; and an `interface_NNN-AC-N` id resolves everywhere an `FR`/`NFR` acceptance-criterion id already does — `inspection-obligation`, `traces-to`, the `Traces To` column check, the declared `implements` forms, and a new `interface-verification` reference covering its own `Verification` column. | Test (TC-147) |
 | FR-004-AC-20 | A `constraint` trace target is declared: archetype `FR`, section `Constraints`, `id_column: ID`, the same `exclude` glob set and evidence posture (`source`, not `reference_only`) as `acceptance-criterion`. `constraint` is added to the `targets` of `traces-to` and `inspection-obligation`. `quire coverage --json` over this repository mints `FR-NNN-CON-N` rows among `minted_targets`, and every `-CON-` reference already authored in `spec/tests.md`'s `Traces To` column resolves rather than reporting `dangling-trace-reference`. | Test |
 | FR-004-AC-21 | A `lint_rules` entry (`table_column_values`, `severity: warning`) scoped to `FR`/`NFR`/`interface` requires the `Acceptance Criteria` table's `Verification` column to hold one of the four IADT classes (`Test`/`Inspection`/`Analysis`/`Demonstration`), a `verification_catalog` method id or an explicitly declared `vocabularies.retired` token, with no trailing `TC-…`/`IT-…` id. `quire lint --module <this module>` over a fixture document whose `Verification` cell reads `Test (TC-999)` reports a warning-severity finding naming the id; a cell naming a bare class or a bare catalog method id (e.g. `property-based-testing`) raises nothing; the rule is advisory, evaluated only by `quire lint`, and `quire validate` does not evaluate `lint_rules` at all. The `verification`/`nfr-verification`/`interface-verification` document references are unchanged. | Test |
 | FR-004-AC-22 | The lint rule's `allowed` set is exactly the four IADT classes union every key of the manifest's `verification_catalog` union the manifest's `traceability.vocabularies.retired` tokens — derived, not hand-maintained: a test loads both and asserts set equality, so an entry added to the catalog and the lint rule's `allowed` list cannot drift apart. `Eval` and `Manual` (`traceability.vocabularies.test_type` values, not catalog keys) are absent from `allowed`. | Test |
@@ -275,33 +275,6 @@ modules can version apart.
 > **PLAT-1081** (sweep) and **PLAT-1082** (promotion) — in place of "the
 > epic's own sweep ticket."
 
-> **CR-034 note (2026-08-22):** `rust-test-name-id` gains an optional separator
-> — `'\bfn (?i:tc)(\d+)_'` becomes `'\bfn (?i:tc)_?(\d+)_'`
-> (`agent-ix/spec-artifacts-process#59`, epic `agent-ix/quoin#197`).
->
-> **Why:** every tracking tag written in `agent-ix/filament-ide-rs`'s dominant
-> convention (`fn tc_NNN_`, with an underscore) bound nothing against the
-> declared spelling (`fn tcNNN_`), so most of its Test Matrix rows read as
-> unbacked. The justification does not depend on a count: **`fn tc744_x` and
-> `fn tc_744_x` are the same token under the declared convention** — `tc`, the
-> number, then the name — and `(?i:tc)` already admits four spellings of that
-> token, so the separator is the same class of variation. `_?` is anchored on
-> both sides and adds no capture group and no list, so precision does not move.
->
-> **The comment that appeared to forbid this** said `rust-test-name-id` is
-> "deliberately not widened". That is CR-024, and it is about **list support** —
-> the comma-separated-group widening applied to the `*-trace-line` and
-> `*-comment-id` forms, which cannot apply to a form rendering `TC-{1}` over a
-> function name. Orthogonal to the separator. Both notes now say which axis they
-> mean.
->
-> **Deliberately not fixed here:** the same repository writes `/// Tracing:` against
-> a declared `rust-trace-line` keyword of `Trace:`. **That one is bad corpus.**
-> Widening to `Trac(?:e|ing):` would read semicolon-separated lines carrying
-> `Task-NNN` ids, so the comma form would read ids that are not test-case
-> declarations: precision loss for marginal recall. The corpus is swept onto the
-> declared form instead (`agent-ix/filament-ide-rs#460`). FR-004-AC-11, TC-071.
-
 > **CR-032 note (2026-08-20):** this module now **declares**
 > `traceability.source_exclude` (quire-rs FR-050-AC-22 / CR-085,
 > `agent-ix/quire-rs#199`).
@@ -364,7 +337,7 @@ modules can version apart.
 > macro in every consuming crate, and the point is to annotate production code
 > that already exists. `attached_source` spans the leading comment block, so a
 > line above the item binds to it. Comma lists, same grammar as the `Trace:`
-> forms, because authors already write them that way (CR-024).
+> forms, because authors already write them that way.
 >
 > **Criterion ids are admitted** (`FR-001-AC-1`, not only `FR-001`). Scoping
 > truncates to the requirement trivially, whereas rejecting the shape would make
@@ -436,37 +409,6 @@ modules can version apart.
 > land. A declaration-level assertion holds in every consuming repository,
 > including ones this suite never runs in.
 
-> **CR-024 note (2026-08-14):** A legacy form declaring a single id matches once
-> and stops at the comma, so `// Trace: FR-001-AC-1, FR-001-AC-2` bound the
-> first id and the rest was never *read*. Ids written that way
-> bound to nothing under every shape declared here and all three languages.
->
-> **Both halves are required, and the filing said otherwise.**
-> agent-ix/quire-rs#68 stated that no module needs to re-declare anything.
-> Verified against real input, that is false: capture group 1 is *already* a
-> single id, so splitting it in the engine converts nothing. The engine splits
-> group 1 the way `marker_ids` splits a marker's argument list (quire-rs
-> FR-051-AC-16); this declaration widens the group so there
-> is something to split.
->
-> **`rust-test-name-id` is not list-widened.** It declares `id_format`, and
-> `TC-{1}` renders over a function name, which cannot carry a list. The engine
-> leaves the template path unsplit for the same reason, so list-widening it here
-> would be a declaration the engine ignores. This is a statement about **lists
-> only** — see CR-034, which changes the separator on a different axis.
->
-> **The delimiter still holds.** The `*-comment-id` forms admit `,` as an id
-> terminator, so a greedy list consumes the separators and the delimiter falls
-> through to the real terminator. Verified against `// TC-033, TC-034`,
-> `// TC-033, TC-034: why`, `// TC-033 - prose`, `// TC-033, TC-034,` and the
-> quire-rs `// TC-480 / FR-025-AC-1: …` convention, which is `/`-separated and
-> still binds `TC-480` alone. The prose guard CR-002's predecessor measured is
-> intact: `# FR-003-CON-1 sweep found in real matrices` still matches nothing.
->
-> **Ordering:** this cannot ship against an older engine.
-> A widened group there yields a single id of literally `"A, B"`, which resolves
-> to nothing — strictly worse than today.
-
 > **CR-002 note (2026-08-14):** A status lie is a row claiming evidence it does
 > not have. A row verified by an agent-behaviour eval or by a manual step cannot
 > have that evidence — neither produces a symbol a trace tag could attach to —
@@ -523,11 +465,8 @@ modules can version apart.
 > - The TestMatrix `Traces To` `column_patterns` check rejected
 >   `interface_004-AC-1` outright (anchored, hyphen-only KIND); widened the
 >   same way.
-> - The `legacy`/`implements` comment, docstring and `Implements:` forms admit
->   it too — the open forms (`*-trace-line`) by the same BASE alternation, the
->   closed-enum forms (`*-comment-id`, `*-docstring-id`, `*-doc-comment-id`,
->   `*-implements-line`) by adding the same alternative alongside their
->   `TC|IT|FR|NFR|StR|US` enum, since those forms already bind `FR` ids today.
+> - The `implements` comment and `Implements:` forms admit it too, by adding
+>   the same alternative alongside their `TC|IT|FR|NFR|StR|US` enum.
 > - `interface-verification` is new, mirroring `verification`/
 >   `nfr-verification`, so a stale `TC` id in an interface document's
 >   `Verification` cell is reported rather than silently unchecked.

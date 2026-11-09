@@ -41,6 +41,7 @@ def test_strict_manifest_loader_rejects_duplicate_trace_target_keys() -> None:
         load_yaml_strict(duplicate)
 
 
+@pytest.mark.trace("TC-028", "FR-004-AC-1")
 def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     """TC-028 (FR-004-AC-1): the two id families the rollup reconciles."""
     targets = {t["name"]: t for t in traceability["trace_targets"]}
@@ -65,6 +66,7 @@ def test_targets_mint_test_cases_and_criteria(traceability: dict) -> None:
     assert criteria == {"FR", "NFR", "interface"}, criteria
 
 
+@pytest.mark.trace("TC-147", "FR-004-AC-19")
 def test_interface_acceptance_criterion_is_optional(traceability: dict) -> None:
     """TC-147 (FR-004-AC-19): consumers may omit interface docs or their
     Acceptance Criteria sections. `required:` defaults to `true` (quire-rs
@@ -87,6 +89,7 @@ def test_interface_archetype_string_is_exact(traceability: dict) -> None:
     assert refs["interface-verification"]["archetype"] == "interface"
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> None:
     """TC-148 (FR-004-AC-20): a `-CON-` id is minted by the same section +
     `id_column` mechanism `acceptance-criterion` already mints from — `##
@@ -116,6 +119,7 @@ def test_constraint_target_mirrors_acceptance_criterion(traceability: dict) -> N
     assert constraint["required"] is False
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_is_a_traces_to_and_inspection_target(traceability: dict) -> None:
     """TC-148 (FR-004-AC-20): declaring the target alone mints the id but
     resolves no existing `-CON-` reference in a `Traces To` cell and
@@ -126,6 +130,7 @@ def test_constraint_is_a_traces_to_and_inspection_target(traceability: dict) -> 
     assert "constraint" in refs["inspection-obligation"]["targets"]
 
 
+@pytest.mark.trace("TC-148", "FR-004-AC-20")
 def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
     """TC-148 (FR-004-AC-20): the end-to-end measurement. `quire coverage
     --json` mints `FR-NNN-CON-N` rows among `minted_targets`, and `quire
@@ -171,6 +176,7 @@ def test_constraint_target_mints_and_dangling_con_references_resolve() -> None:
     assert not con_dangling, con_dangling
 
 
+@pytest.mark.trace("TC-029", "FR-004-AC-2")
 def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
     traceability: dict,
 ) -> None:
@@ -207,6 +213,7 @@ def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
             assert entry["archetype"] in ("FR", "NFR", "interface"), entry["name"]
 
 
+@pytest.mark.trace("TC-039", "FR-004-AC-2")
 def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> None:
     """TC-039 (FR-004-AC-2, quire-rs CR-062): one entry per *kind* of table, not
     one per filename the ecosystem happens to use.
@@ -228,6 +235,7 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
+@pytest.mark.trace("TC-030", "FR-004-AC-3")
 def test_one_templated_marker_per_language(traceability: dict) -> None:
     """TC-030 (FR-004-AC-3): a marker without a `template` yields no migration
     suggestion — FR-051 emits one only "where the equivalent marker is
@@ -243,6 +251,7 @@ def test_one_templated_marker_per_language(traceability: dict) -> None:
         re.compile(marker["pattern"])
 
 
+@pytest.mark.trace("TC-032", "FR-004-AC-5")
 def test_references_resolve_against_declared_targets(traceability: dict) -> None:
     """TC-032 (FR-004-AC-5): a reference naming an undeclared target resolves
     against nothing, which reads identically to a row nothing backs."""
@@ -257,6 +266,7 @@ def test_references_resolve_against_declared_targets(traceability: dict) -> None
         ), f"{reference['name']}: capture group 1 is the referenced id"
 
 
+@pytest.mark.trace("TC-033", "FR-004-AC-6")
 def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     """TC-033 (FR-004-AC-6): the end-to-end gate. A zero backed count is the
     failure this whole declaration exists to fix, and a row minted from
@@ -288,6 +298,7 @@ def test_rollup_backs_rows_and_ignores_fixtures() -> None:
     assert not from_fixtures, from_fixtures
 
 
+@pytest.mark.trace("TC-036", "FR-004-AC-9")
 def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> None:
     """TC-036 (FR-004-AC-9, CR-025, widened CR-062): archetype binding admits
     fixtures, because a fixture exercising a contract *is* typed as that contract.
@@ -323,6 +334,7 @@ def test_archetype_bound_entries_exclude_the_test_tree(traceability: dict) -> No
             )
 
 
+@pytest.mark.trace("TC-034", "FR-004-AC-7")
 def test_no_source_symbol_names_only_methods_that_cannot_be_tagged(
     traceability: dict,
 ) -> None:
@@ -652,6 +664,7 @@ def test_implements_is_a_separate_list_from_markers(traceability: dict) -> None:
     assert not marker_names & implements_names, marker_names & implements_names
 
 
+@pytest.mark.trace("TC-072", "FR-004-AC-12")
 def test_verification_methods_are_declared_test_types(traceability: dict) -> None:
     """TC-072 (FR-004-AC-12, CR-035): every other `test_type` value names a
     harness kind; a 29148-aligned corpus also authors verification by
@@ -680,6 +693,7 @@ def test_verification_methods_are_declared_test_types(traceability: dict) -> Non
     assert not ({"Static", "Benchmark", "Compile", "Unit"} & set(exempt))
 
 
+@pytest.mark.trace("TC-073", "FR-004-AC-13")
 def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
     """TC-073 (FR-004-AC-13, CR-036): a retired row has no live requirement to
     trace to — withdrawing it is the act of severing that edge — and the
@@ -726,6 +740,7 @@ def test_traces_to_admits_an_explicit_no_trace_form(traceability: dict) -> None:
         assert not re.match(pattern, form), form
 
 
+@pytest.mark.trace("TC-074", "FR-004-AC-14")
 def test_stakeholder_validation_criteria_are_a_trace_target(traceability: dict) -> None:
     """TC-074 (FR-004-AC-14, CR-037): `StR-NNN-VC-N` ids are minted and a tag
     naming one reconciled against nothing.
@@ -758,6 +773,7 @@ def _verification_lint_rule() -> dict:
     return rules[0]
 
 
+@pytest.mark.trace("TC-149", "FR-004-AC-21")
 def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     """TC-149 (FR-004-AC-21): a `table_column_values` rule scoped to
     `FR`/`NFR`/`interface` requires the Acceptance Criteria `Verification`

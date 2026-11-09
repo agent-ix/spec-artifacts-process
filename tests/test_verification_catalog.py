@@ -39,6 +39,7 @@ def _catalog() -> dict:
     return catalog
 
 
+@pytest.mark.trace("TC-048", "FR-007-AC-1")
 def test_tc048_catalog_covers_the_dispositioned_techniques() -> None:
     """TC-048 (FR-007-AC-1): the seed set is the full sweep.
 
@@ -91,6 +92,7 @@ def test_tc048_catalog_covers_the_dispositioned_techniques() -> None:
     assert {entry["class"] for entry in catalog.values()} == IADT
 
 
+@pytest.mark.trace("TC-049", "FR-007-AC-2")
 def test_tc049_every_entry_is_well_formed() -> None:
     """TC-049 (FR-007-AC-2)."""
     for method_id, entry in _catalog().items():
@@ -101,6 +103,7 @@ def test_tc049_every_entry_is_well_formed() -> None:
         ), f"{method_id} class `{entry['class']}` is not IADT"
 
 
+@pytest.mark.trace("TC-050", "FR-007-AC-3")
 def test_tc050_evidence_kinds_are_the_declared_test_type_vocabulary() -> None:
     """TC-050 (FR-007-AC-3): one vocabulary, several uses (CR-015).
 
@@ -119,6 +122,7 @@ def test_tc050_evidence_kinds_are_the_declared_test_type_vocabulary() -> None:
         )
 
 
+@pytest.mark.trace("TC-051", "FR-007-AC-4")
 def test_tc051_every_entry_is_selectable() -> None:
     """TC-051 (FR-007-AC-4): an entry no rule can ever select is a definition,
     not a catalog entry — the advisor would never reach it."""
@@ -140,6 +144,7 @@ def test_tc051_every_entry_is_selectable() -> None:
     shutil.which("quire") is None,
     reason="the `quire` CLI is required to load the manifest through the engine",
 )
+@pytest.mark.trace("TC-052", "FR-007-AC-5")
 def test_tc052_engine_loads_the_catalog() -> None:
     """TC-052 (FR-007-AC-5): the engine reads what this module declares.
 
@@ -162,6 +167,7 @@ def test_tc052_engine_loads_the_catalog() -> None:
         assert failure not in combined, f"the manifest failed to load: {combined}"
 
 
+@pytest.mark.trace("TC-053", "FR-007-AC-6")
 def test_tc053_derived_vocabularies_follow_the_catalog() -> None:
     """TC-053 (FR-007-AC-6): quire-rs derives `verification_method` and
     `verification_class` from the merged catalog rather than reading a second
@@ -186,6 +192,7 @@ def test_tc053_derived_vocabularies_follow_the_catalog() -> None:
         )
 
 
+@pytest.mark.trace("TC-054", "FR-007-AC-7")
 def test_tc054_symbol_free_methods_carry_a_no_source_symbol_kind() -> None:
     """TC-054 (FR-007-AC-7): inspection, demonstration and agent evaluation
     produce no source symbol, so a row verified that way can never carry a trace
@@ -223,6 +230,7 @@ def test_catalog_names_no_tool_outside_tooling() -> None:
             )
 
 
+@pytest.mark.trace("TC-055", "FR-007-AC-8")
 def test_tc055_obligation_sources_are_declared() -> None:
     """TC-055 (FR-007-AC-8): the engine's obligation machinery is inert until a
     module declares a source, so the declaration ships with the evidence layer
@@ -293,6 +301,7 @@ def test_tc055_obligation_sources_are_declared() -> None:
     assert constraint["method_column"] == "Validation"
 
 
+@pytest.mark.trace("TC-150", "FR-007-AC-15")
 def test_tc150_constraint_obligations_are_derived() -> None:
     """TC-150 (FR-007-AC-15): the end-to-end measurement. Before PLAT-1079 a
     `-CON-` row was a normative constraint excluded from the obligation set
@@ -415,6 +424,7 @@ def test_tc057_no_entry_names_a_tool_a_class_or_a_cadence() -> None:
             assert tool != (entry.get("evidence_kind") or "").lower()
 
 
+@pytest.mark.trace("FR-007")
 def test_tc065_a_declared_hazard_advises_fault_injection() -> None:
     """FR-007 CR-006 (TC-065): the presence of a safety object is an
     applicability signal for fault injection.
@@ -455,6 +465,7 @@ def test_tc065_a_declared_hazard_advises_fault_injection() -> None:
     assert advised == {"attack_surface", "threat", "hazard", "failure_mode"}, advised
 
 
+@pytest.mark.trace("TC-067", "FR-007-AC-13")
 def test_no_method_is_keyed_on_the_implementations_control_flow() -> None:
     """TC-067 (FR-007-AC-13, CR-029): the two retired values stay retired.
 
@@ -481,6 +492,7 @@ def test_no_method_is_keyed_on_the_implementations_control_flow() -> None:
     assert not offenders, offenders
 
 
+@pytest.mark.trace("TC-068", "FR-007-AC-14")
 def test_retired_characteristic_names_stay_retired() -> None:
     """TC-068 (FR-007-AC-14, CR-029): the two rejected names cannot return.
 
