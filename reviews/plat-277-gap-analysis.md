@@ -39,3 +39,10 @@ scope:
 - {id: TC-167, path: spec/tests.md, role: examined}
 - {id: FR-010, path: spec/functional/FR-010-semantic-manifest-contract.md, role: context_only}
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 46221a1 adds `test_the_engine_requires_code_on_a_standard` (trace TC-096). Through `quire_engine.validate_document` it checks, for both `Standard` and `standard`, that a document with `code:` validates and one without `code:` is refused, and that `Standard` refuses an integer `code`. It passes with quire 0.54.0 built from quire-rs main. Two mutations each turn it red: restoring the old inline schema, and setting the locator's `code` to `required: false`. |
+| FND-002 | fixed | Fixed by removal: 46221a1 drops FR-010-AC-10 and TC-167 along with the rename they covered. |

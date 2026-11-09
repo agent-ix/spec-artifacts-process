@@ -53,3 +53,12 @@ scope:
 - {id: TC-167, path: tests/test_semantic_manifest.py, role: examined}
 - {id: test_spec_review_archetype_registered_with_findings_validation, path: tests/test_manifest.py, role: examined}
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 46221a1 rewrites the `semantic` header comment: "`object_types.standard` is deliberately NOT exported and carries no `data_schema` ... governed by its locator, which requires `code` from frontmatter." |
+| FND-002 | fixed | Fixed by removal: 46221a1 reverts the five `archetypes:` renames, so the names match main and filament-core-service's `(kind, name)` upsert updates the existing rows. The rename moves to a quire-rs fix. |
+| FND-003 | fixed | Fixed by removal: with the renames reverted, the `archetypes:` entries share names with `artifact_types` and first-wins drops them, so no new permissive type names exist. The engine cause (compiling `archetypes:` entries as types) moves to quire-rs. The pre-existing `Test Matrix` entry is out of this PR's scope. |
+| FND-004 | fixed | 46221a1 reduces the docstring to "Requirement FR-010." |

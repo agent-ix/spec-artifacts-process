@@ -44,3 +44,12 @@ scope:
 - {id: spec.md Standard paragraph, path: spec/spec.md, role: examined}
 - {id: FR-010, path: spec/functional/FR-010-semantic-manifest-contract.md, role: examined}
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 46221a1 retitles FR-010 to "Declare the semantic-module contract in the manifest" (index.md and spec.md updated to match). The Description now reads "...keeps the exact meaning it has today, except one: the `standard` object type carries no record schema and is validated by its locator and the `Standard` frontmatter schema". With the renames reverted, that wording is true. |
+| FND-002 | fixed | Fixed by removal: FR-010-AC-10 is dropped. |
+| FND-003 | fixed | Fixed by removal: the rename Behavior bullet is dropped, and the engine cause moves to quire-rs. |
+| FND-004 | fixed | Fixed by removal: AC-10 no longer exists, so the table order is AC-1, 5, 6, 8, 9. |
