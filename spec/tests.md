@@ -238,7 +238,7 @@ type: TestMatrix
 | TC-089 | The loaded `semantic` block equals the nine admitted keys with the declared values, and `exports` equals the twelve declared artifact-type names | Unit | P0 | FR-010-AC-1, FR-010-CON-1 | ✅ |
 | TC-093 | `Registry.load_from` over the module directory lists every declared archetype and reports no load failure | Unit | P0 | FR-010-AC-5 | ✅ |
 | TC-094 | A `semantic` block gaining a key `foo` is refused naming `foo`, (expected failure: quire-rs#221 makes the refusal silent) | Unit | P0 | FR-010-AC-6 | ✅ |
-| TC-096 | The `object_types` entry `standard` carries its inline `data_schema` | Unit | P1 | FR-010-AC-8 | ✅ |
+| TC-096 | The `object_types` entry `standard` carries no `data_schema`, its locator requires `code`, and the engine validates a Standard with `code:` and refuses one without it or with a non-string `code` | Unit | P1 | FR-010-AC-8 | ✅ |
 | TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | ✅ |
 | TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | ✅ |
 | TC-099 | Every section and column `mappings.yaml` names is declared by that type's `body_extraction` | Unit | P0 | FR-011-AC-3, FR-011-CON-1 | ✅ |

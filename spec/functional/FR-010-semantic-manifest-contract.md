@@ -1,6 +1,6 @@
 ---
 id: FR-010
-title: "Declare the semantic-module contract in the manifest without altering an archetype"
+title: "Declare the semantic-module contract in the manifest"
 type: FR
 relationships:
   - target: "ix://agent-ix/spec-artifacts-process/US-002"
@@ -12,14 +12,15 @@ relationships:
   - target: "ix://agent-ix/quoin/FR-073"
     type: "depends_on"
 ---
-# FR-010: Declare the semantic-module contract in the manifest without altering an archetype
+# FR-010: Declare the semantic-module contract in the manifest
 
 ## Description
 
 `spec_artifacts_process/manifest.yaml` SHALL carry the quoin FR-070 `semantic` block, referencing
 every declared artifact type's emitted schema by path (quoin FR-073), so that Quoin verifies the shipped schemas at install and a consumer can resolve
 a type's record schema from the manifest alone, while every existing archetype contract keeps the
-exact meaning it has today.
+exact meaning it has today, except one: the `standard` object type carries no record schema and is
+validated by its locator and the `Standard` frontmatter schema (see Behavior).
 
 ## Inputs
 
@@ -51,10 +52,11 @@ exact meaning it has today.
   artifact type `Standard` with `Standard.json` as its record schema, while the object type
   `standard` is reached only through `object: standard`.
 - This change SHALL NOT alter which of the two declarations a given document resolves to.
-- The `object_types` entry `standard` SHALL keep its inline `data_schema`, because converting it
-  to the reference form would change how the engine resolves a declaration a consumer already
-  activates against, and the record shape it declares is the frontmatter projection rather than
-  the document record `Standard.json` describes.
+- The `object_types` entry `standard` SHALL carry no `data_schema`. The declaration record a
+  document yields holds only section-sourced keys, never a frontmatter field, so a record schema
+  requiring `code` is unsatisfiable by every `object: standard` document. Its locator is the
+  contract: it reads `code` from frontmatter and requires it, so a Standard document with `code:`
+  validates and one without it is refused.
 - The manifest SHALL load through Quire's registry loader with no load failure for any artifact
   type.
 - If Quoin or Quire rejects the manifest, then this module SHALL correct its own manifest or
@@ -78,7 +80,7 @@ exact meaning it has today.
 | FR-010-AC-1 | The loaded `semantic` block equals the nine admitted keys with the values above, and `exports` equals the set of `artifact_types[].name` — derived from the manifest, so the count in `spec.md` and the declared type list cannot drift apart. | Test (TC-089) |
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
-| FR-010-AC-8 | The `object_types` entry `standard` still carries its inline `data_schema`, the artifact type `Standard` carries the reference form, and a document is dispatched on frontmatter `type:` to the first and on `object:` to the second. | Test (TC-096) |
+| FR-010-AC-8 | The `object_types` entry `standard` carries no `data_schema` and its locator requires `code` from frontmatter, while the artifact type `Standard` carries the reference form; a document is dispatched on frontmatter `type:` to the artifact type and on `object:` to the object type. | Test (TC-096) |
 | FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
 
 ## Dependencies

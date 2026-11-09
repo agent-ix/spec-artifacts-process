@@ -1,6 +1,6 @@
 """The semantic block and the reference-form data_schema.
 
-Requirement FR-010; rows TC-089, TC-093, TC-094, TC-096, TC-128, TC-135.
+Requirement FR-010.
 """
 
 from __future__ import annotations
@@ -110,13 +110,45 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
 
 
 @pytest.mark.trace("TC-096")
-def test_the_standard_object_type_keeps_its_inline_schema(manifest):
+def test_the_standard_object_type_is_governed_by_its_locator(manifest):
     """`Standard` (artifact type) and `standard` (object type) are two
     declarations. A document is dispatched on frontmatter `type:`, so
     `type: Standard` resolves to the artifact type; the object type is reached
-    only through `object: standard`."""
+    only through `object: standard`. The declaration record never holds a
+    frontmatter field, so the object type carries no record schema, and its
+    locator reads and requires `code` from frontmatter."""
     now = by_name(manifest["object_types"])["standard"]
-    assert "properties" in now["data_schema"], "the object type keeps the INLINE form"
+    assert "data_schema" not in now
+    code = now["body_extraction"]["yield_pattern"]["match"]["code"]
+    assert code["from"] == "frontmatter_field"
+    assert code["path"] == ["code"]
+    assert code["required"] is True
+    standard = by_name(manifest["artifact_types"])["Standard"]
+    assert standard["data_schema"] == {"schema": "schemas/Standard.json"}
+
+
+@pytest.mark.trace("TC-096")
+def test_the_engine_requires_code_on_a_standard(quire_engine):
+    """A Standard with a string `code:` validates; one without it, or with an
+    integer, is refused. Both the artifact type and the object type are run."""
+
+    def standard(code_line: str) -> str:
+        return (
+            '---\nid: Standard-201\ntitle: "a standard"\ntype: Standard\n'
+            f"object: standard\n{code_line}---\n"
+            "# Standard-201: a standard\n\n## Description\n\nText.\n"
+        )
+
+    for model in ("Standard", "standard"):
+        root = str(REPO_ROOT / "spec_artifacts_process")
+        assert quire_engine.validate_document(model, root, standard("code: abc\n"))[
+            "is_valid"
+        ]
+        assert not quire_engine.validate_document(model, root, standard(""))["is_valid"]
+    root = str(REPO_ROOT / "spec_artifacts_process")
+    assert not quire_engine.validate_document("Standard", root, standard("code: 12\n"))[
+        "is_valid"
+    ]
 
 
 @pytest.mark.trace("TC-128")

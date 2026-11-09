@@ -597,21 +597,11 @@ doc_kinds:
 - feedback
 object_types:
 - name: standard
-  data_schema:
-    type: object
-    properties:
-      code:
-        type: string
-      name:
-        type: string
-      description:
-        type: string
-      guide:
-        type: string
-      link:
-        type: string
-    required:
-    - code
+  # No `data_schema`: the declaration record a document yields holds only
+  # section-sourced keys (fields, clauses, operations, relations), never a
+  # frontmatter field, so a record schema requiring `code` could never be
+  # satisfied by any `object: standard` document. The locator below is the
+  # contract: `code` is `required: true` there, and it is read from frontmatter.
   body_extraction:
     yield_pattern:
       match:
@@ -1749,14 +1739,12 @@ verification_catalog:
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
 # `exports` names every artifact type carrying a `data_schema` reference.
 #
-# `object_types.standard` is deliberately NOT exported and keeps its inline
+# `object_types.standard` is deliberately NOT exported and carries no
 # `data_schema`. It is a different declaration from the `Standard` artifact
 # type: a document is dispatched on frontmatter `type:`, so `type: Standard`
 # resolves to the artifact type and `Standard.json` is its record schema, while
-# the object type is reached only through `object: standard` and its inline
-# schema describes the frontmatter projection. Converting it to the reference
-# form would change how an existing declaration resolves for every consumer that
-# activates this module.
+# the object type is reached only through `object: standard` and is governed by
+# its locator, which requires `code` from frontmatter.
 semantic:
   contract_version: 1.0.0
   semantic_core: 0.3.3
