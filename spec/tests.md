@@ -327,7 +327,7 @@ mixed combination in one conforming document.
 | min_rows (SpecReview Findings) | Below Min | 0 data rows (header only) | TC-019 | Error (`assert`) |
 | FR-003-CON-1 | Process gate | enforcing module version published before ecosystem `tests.md` sweep + user sign-off | Inspection (plan gate, no TC) | violation |
 | FR-009-CON-3 | Determinism | two generator runs on one tree | TC-087 | byte-identical output |
-| FR-010-CON-1 | Closed key set | `semantic` block with a tenth key `foo` | TC-094 | Error (load refusal) |
+| FR-010-CON-1 | Closed key set | `semantic` block with a ninth key `foo` | TC-094 | Error (load refusal) |
 | FR-010-CON-3 | Status vocabulary | a `⚠️`-headed Status cell | TC-128 | Error (`assert`) — the marker stays retired |
 | FR-011-CON-1 | Mapping names a declared section | every section named in `mappings.yaml` | TC-099 | pass |
 | FR-011-CON-2 | Mapping totality | a model property with no mapping entry | TC-098 | Error (unmapped property) |

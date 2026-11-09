@@ -69,7 +69,7 @@ def load_manifest() -> dict[str, Any]:
 MODULE_BASE = "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/"
 SEMANTIC_CORE_BASE = (
     "https://schemas.agent-ix.org/semantic-core/"
-    f"{load_manifest()['semantic']['semantic_core']}/"
+    f"{json.loads((SEMANTIC_DIR / 'package.json').read_text())['dependencies']['@agent-ix/semantic-core']}/"
 )
 
 

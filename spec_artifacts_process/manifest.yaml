@@ -1772,7 +1772,6 @@ verification_catalog:
 # its locator, which requires `code` from frontmatter.
 semantic:
   contract_version: 1.0.0
-  semantic_core: 0.3.3
   package: agent-ix/spec-artifacts-process
   exports:
   - ADR

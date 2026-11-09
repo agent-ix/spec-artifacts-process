@@ -36,7 +36,7 @@ validated by its locator and the `Standard` frontmatter schema (see Behavior).
 ## Behavior
 
 - The `semantic` block SHALL carry exactly these keys and values: `contract_version: 1.0.0`,
-  `semantic_core` (the declared semantic-core pin), `package: agent-ix/spec-artifacts-process`, `exports` listing every
+  `package: agent-ix/spec-artifacts-process`, `exports` listing every
   artifact type that ships a schema, `imports: {}`, `targets: [json-schema, markdown]`,
   `mappings: [frontmatter, section, table, typed-table, sysml-fence, ocl-clause, list, token, provenance]`,
   `compatibility_posture: additive`, `legacy_forms: warning`.
@@ -70,14 +70,14 @@ validated by its locator and the `Standard` frontmatter schema (see Behavior).
 
 | ID | Constraint | Type | Validation |
 |----|------------|------|------------|
-| FR-010-CON-1 | The `semantic` block SHALL contain no key outside the nine admitted names. | Compatibility | Test |
+| FR-010-CON-1 | The `semantic` block SHALL contain no key outside the eight admitted names. | Compatibility | Test |
 | FR-010-CON-3 | `⚠️` SHALL NOT be admitted to the `Status` pattern; it was retired by CR-031 because every row carrying it was exempt from the status-lie check by construction, and the divergent `quoin:spec-matrix` skill is the defect (`agent-ix/quoin#337`). | Compatibility | Test |
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-010-AC-1 | The loaded `semantic` block equals the nine admitted keys with the values above, and `exports` equals the set of `artifact_types[].name` — derived from the manifest, so the count in `spec.md` and the declared type list cannot drift apart. | Test (TC-089) |
+| FR-010-AC-1 | The loaded `semantic` block equals the eight admitted keys with the values above, and `exports` equals the set of `artifact_types[].name` — derived from the manifest, so the count in `spec.md` and the declared type list cannot drift apart. | Test (TC-089) |
 | FR-010-AC-5 | `quire.Registry.load_from` over the module directory lists every declared archetype and reports no load failure. | Test (TC-093) |
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
 | FR-010-AC-8 | The `object_types` entry `standard` carries no `data_schema` and its locator requires `code` from frontmatter, while the artifact type `Standard` carries the reference form; a document is dispatched on frontmatter `type:` to the artifact type and on `object:` to the object type. | Test (TC-096) |

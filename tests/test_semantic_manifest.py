@@ -17,7 +17,6 @@ from conftest import (
 
 ADMITTED_SEMANTIC_KEYS = {
     "contract_version",
-    "semantic_core",
     "package",
     "exports",
     "imports",
