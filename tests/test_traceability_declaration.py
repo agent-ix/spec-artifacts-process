@@ -789,7 +789,7 @@ def test_verification_lint_rule_is_scoped_and_advisory() -> None:
     assert not rule.get("annotation_pattern")
 
 
-@pytest.mark.trace("FR-004-AC-21", "FR-004-AC-23")
+@pytest.mark.trace("TC-149", "FR-004-AC-21", "FR-004-AC-23")
 def test_verification_lint_accepts_withdrawn_and_flags_invalid_values(tmp_path) -> None:
     """TC-149 (FR-004-AC-21): the behavioural half — `quire lint` against a
     fixture document. A `Verification` cell reading `Test (TC-999)` reports a
