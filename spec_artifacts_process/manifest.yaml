@@ -1628,7 +1628,7 @@ verification_catalog:
     evidence_kind: Integration
     applicability:
       object_types: [attack_surface]
-      characteristics: [security, instrumented]
+      characteristics: [security]
     tooling: [Contrast, in-process agents]
 
   # ── Analysis: reasoning over the artifact without running it ──
