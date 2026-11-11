@@ -94,6 +94,7 @@ type: TestMatrix
 | FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
 | FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
 | FR-007 | FR-007-AC-14 | TC-068 | ✅ Complete |
+| FR-007 | FR-007-AC-16 | TC-167 | ✅ Complete |
 | FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
 | FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
 | FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
@@ -296,6 +297,7 @@ type: TestMatrix
 | TC-164 | A Quire coverage run binds nothing for a structural implements marker on a test or a trace marker on production code, in Python and TypeScript | Integration | P0 | FR-004-AC-35 | ✅ |
 | TC-165 | The Rust `Implements:` line-comment form requires the keyword and rejects prose naming an id | Unit | P0 | FR-004-AC-36 | ✅ |
 | TC-166 | The loaded manifest declares only the structural Python and TypeScript `implements` forms, in the pinned order with the pinned templates, and no Python or TypeScript line-comment form | Unit | P0 | FR-004-AC-37 | ✅ |
+| TC-167 | No method declares `instrumented` — a test-environment fact, not a property of the requirement; `iast` remains keyed on `security` and `attack_surface` | Unit | P1 | FR-007-AC-16 | ✅ |
 
 ## Option Permutation Matrix
 

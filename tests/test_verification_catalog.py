@@ -529,3 +529,18 @@ def test_retired_characteristic_names_stay_retired() -> None:
         if retired & set(entry.get("applicability", {}).get("characteristics", []))
     }
     assert not offenders, offenders
+
+
+@pytest.mark.trace("TC-167", "FR-007-AC-16")
+def test_no_method_declares_instrumented() -> None:
+    """TC-167 (FR-007-AC-16): `instrumented` names a test environment, not a
+    property of the requirement, and `iast` stays keyed on `security`."""
+    catalog = _catalog()
+    offenders = [
+        method_id
+        for method_id, entry in catalog.items()
+        if "instrumented" in entry.get("applicability", {}).get("characteristics", [])
+    ]
+    assert not offenders, offenders
+    assert "security" in catalog["iast"]["applicability"]["characteristics"]
+    assert "attack_surface" in catalog["iast"]["applicability"]["object_types"]
