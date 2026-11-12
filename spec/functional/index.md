@@ -20,3 +20,5 @@ description: "Index of artifacts in this directory."
 * [FR-011: Markdown mapping and round-trip policy for the process artifact records](./FR-011-markdown-record-mapping.md)
 * [FR-012: Executable typed skeletons and negative counterparts for every declared artifact type](./FR-012-executable-skeletons.md)
 * [FR-013: Authored process definitions are separated from execution occurrences](./FR-013-definitions-not-occurrences.md)
+* [FR-014: Anomaly archetype with a state lifecycle](./FR-014-anomaly-archetype-and-state-lifecycle.md)
+* [FR-015: Anomaly safety-impact assessment with resolving links](./FR-015-anomaly-safety-impact-assessment.md)
