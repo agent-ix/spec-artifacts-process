@@ -170,13 +170,11 @@
           }
         },
         "required": [
-          "safetyImpact"
+          "safetyImpact",
+          "assessment"
         ]
       },
       "then": {
-        "required": [
-          "assessment"
-        ],
         "properties": {
           "assessment": {
             "minItems": 1,
@@ -203,13 +201,11 @@
           }
         },
         "required": [
-          "safetyImpact"
+          "safetyImpact",
+          "assessment"
         ]
       },
       "then": {
-        "required": [
-          "assessment"
-        ],
         "properties": {
           "assessment": {
             "contains": {

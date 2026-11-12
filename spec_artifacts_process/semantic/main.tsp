@@ -252,10 +252,10 @@ enum AssessmentImpact {
 /**
  * A reference token authored in an assessment `Target` cell: an `FR`/`NFR`/
  * acceptance-criterion id or a hazard id. No hazard id pattern is assumed
- * (FR-015), so the shape is the loose id shape; existence and kind are the
- * engine's reference diagnostics, never part of the record.
+ * (FR-015), so the shape is any token without whitespace; existence and kind
+ * are the engine's reference diagnostics, never part of the record.
  */
-@pattern("^[A-Za-z][A-Za-z0-9_]*(-[A-Za-z0-9_]+)+$")
+@pattern("^\\S+$")
 scalar AssessmentTarget extends string;
 
 /**
@@ -712,15 +712,14 @@ model Feedback {
   // assessment required from assessed onward.
   #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
      `then`: #{ `required`: #["assessment"], `properties`: #{ `safetyImpact`: #{ `not`: #{ `const`: "unassessed" } } } } },
-  // none: exactly one None row with impact None.
-  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "none" } }, `required`: #["safetyImpact"] },
-     `then`: #{ `required`: #["assessment"],
-              `properties`: #{ `assessment`: #{ `minItems`: 1, `maxItems`: 1,
+  // none: exactly one None row with impact None. Applies when a table is
+  // present; its absence is reported once, by the status rule above.
+  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "none" } }, `required`: #["safetyImpact", "assessment"] },
+     `then`: #{ `properties`: #{ `assessment`: #{ `minItems`: 1, `maxItems`: 1,
                 `items`: #{ `properties`: #{ `kind`: #{ `const`: "None" }, `impact`: #{ `const`: "None" } } } } } } },
   // impacting: at least one Requirement or Hazard row whose impact is not Unaffected.
-  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "impacting" } }, `required`: #["safetyImpact"] },
-     `then`: #{ `required`: #["assessment"],
-              `properties`: #{ `assessment`: #{ `contains`: #{
+  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "impacting" } }, `required`: #["safetyImpact", "assessment"] },
+     `then`: #{ `properties`: #{ `assessment`: #{ `contains`: #{
                 `properties`: #{ `kind`: #{ `enum`: #["Requirement", "Hazard"] },
                                `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } }
 ])
