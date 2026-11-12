@@ -14,14 +14,26 @@ relationships:
 
 ## Description
 
-The module SHALL declare an **`Anomaly`** artifact type, one document per reported anomaly, whose
-recorded state changes are validated as a lifecycle, so that an anomaly record cannot claim a state
-it did not legally reach and cannot be closed without a named person standing behind it.
+The module SHALL declare an **`Anomaly`** artifact type, one document per reported anomaly,
+carrying its current `status`, how it ended (`resolution`) and who closed it (`closed_by`), so that
+an anomaly record cannot be closed without a resolution and a named closer.
+
+The record keeps no hand-typed history. Who changed the status, and when, is the git history of
+the file, which already records it and which a typed table could only duplicate or falsify.
+
+### Who owns which check
+
+| Check | Owner |
+|---|---|
+| Field vocabularies, required sections, table shapes | This module, through its manifest and the `assert` facet (quire-rs FR-033) |
+| Status-conditional presence (`resolution`, `closed_by`, the legal `status`/`resolution` pairs) | This module's emitted record schema (FR-009), run as record validation (quoin FR-073); the `assert` facet cannot express a condition on another field |
+| Transition legality, and re-assessment on reopen, judged over the git history of `status` | quoin [FR-136](ix://agent-ix/quoin/FR-136) |
 
 ## Inputs
 
-- An `Anomaly` document: frontmatter `id`, `title`, `type: Anomaly`, `status` and `safety_impact`
-  ([FR-015](./FR-015-anomaly-safety-impact-assessment.md)), and the body sections below.
+- An `Anomaly` document: frontmatter `id`, `title`, `type: Anomaly`, `status`, `resolution`,
+  `closed_by`, `safety_impact` ([FR-015](./FR-015-anomaly-safety-impact-assessment.md)), and a
+  `## Description` section.
 
 ## Outputs
 
@@ -31,25 +43,26 @@ it did not legally reach and cannot be closed without a named person standing be
 
 ## Behavior
 
-- The `status` frontmatter field SHALL be one of exactly `identified`, `assessed`, `resolved`, `closed`.
-- The document SHALL carry a `## Description` section and a `## History` section.
-- The `## History` section SHALL be a table with headers exactly `From | To | By | Date | Note`, at least one row, with
-  `Note` optional.
-- The first `## History` row SHALL have an empty `From` and `To` of `identified`.
-- Every later row's `From` SHALL equal the previous row's `To`.
-- The legal transitions SHALL be exactly: `identified` to `assessed`, `assessed` to `resolved`,
-  `resolved` to `closed`, and `resolved` to `assessed` (a resolution that did not hold). Every other
-  `From`/`To` pair SHALL fail validation, including any transition out of `closed`, any skip of a
-  state, and any row whose `From` equals its `To`.
-- The last row's `To` SHALL equal the frontmatter `status`.
-- Every row's `By` SHALL name a person. A `By` value that is empty or is
-  one of `n/a`, `none`, `unknown`, `tbd`, `-` (compared case-insensitively after trimming) SHALL
-  fail validation. This is checked for the row whose `To` is `closed` as the closing requirement,
-  and for every other row as the same attribution rule.
-- `Date` SHALL be an ISO 8601 calendar date.
+- The `status` field SHALL be one of exactly `identified`, `assessed`, `resolved`, `closed`.
+- The `resolution` field SHALL be one of exactly `fixed`, `not-a-defect`, `duplicate`, `wont-fix`,
+  and SHALL be present when `status` is `resolved` or `closed` and absent otherwise.
+- When `status` is `resolved`, `resolution` SHALL be `fixed`.
+- The legal status moves SHALL be exactly: `identified` to `assessed`, `assessed` to `resolved`,
+  `resolved` to `closed`, `resolved` to `assessed` (a fix that did not hold), and, for an anomaly
+  that was never fixed, `identified` to `closed` and `assessed` to `closed` with `resolution` one of
+  `not-a-defect`, `duplicate`, `wont-fix`. Every other move SHALL fail, including any move out of
+  `closed`, any move to `closed` with `resolution: fixed` that did not pass through `resolved`, and
+  any move that leaves `status` unchanged but is recorded as a transition. The check over moves is
+  owned by quoin FR-136.
+- When `status` is `closed`, `closed_by` SHALL be present. Its check is of shape only: non-empty
+  after trimming and not a placeholder (`n/a`, `none`, `unknown`, `tbd`, `-`, compared
+  case-insensitively). It does not establish that the value is a real person; the commit that sets
+  `closed` carries the author and, where commits are signed, the signature, and that is the
+  attribution of record.
+- When `status` is not `closed`, `closed_by` SHALL be absent.
 - The module SHALL ship the emitted schema for `Anomaly` and a skeleton that validates as authored,
-  with negative counterparts for an illegal transition, a status that disagrees with the history,
-  and a closure with no named person.
+  with negative counterparts for a closed anomaly with no `closed_by`, a placeholder `closed_by`,
+  a `resolved` anomaly with no `resolution`, and an `identified` anomaly carrying `closed_by`.
 - The type SHALL NOT be `required` of any repository; a repository that declares no `Anomaly`
   document is unaffected.
 
@@ -57,17 +70,16 @@ it did not legally reach and cannot be closed without a named person standing be
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-014-AC-1 | The manifest declares `Anomaly` with the four-member `status` vocabulary, the `## History` table of exactly the five columns with `Note` optional and `min_rows: 1`, and a `## Description` section. | Test |
+| FR-014-AC-1 | The manifest declares `Anomaly` with the four-member `status` vocabulary, the four-member `resolution` vocabulary, and a `## Description` section. | Test |
 | FR-014-AC-2 | The shipped skeleton validates as authored, and the `Anomaly` JSON Schema file exists beside the other emitted process-type schemas. | Test |
-| FR-014-AC-3 | A fixture walking `identified`, `assessed`, `resolved`, `closed` with a named person on every row validates; a fixture taking `resolved` back to `assessed` and onward to `resolved` and `closed` also validates. | Test |
-| FR-014-AC-4 | Fixtures with `identified` to `resolved`, `identified` to `closed`, `assessed` to `identified`, `closed` to anything, and a row with `From` equal to `To` each fail validation with a line-numbered diagnostic naming the row. | Test |
-| FR-014-AC-5 | A fixture whose first row has a non-empty `From` or a `To` other than `identified`, and a fixture whose row `From` differs from the previous row's `To`, each fail validation. | Test |
-| FR-014-AC-6 | A fixture whose frontmatter `status` differs from the last row's `To` fails validation. | Test |
-| FR-014-AC-7 | A fixture whose `closed` row has an empty `By`, or `By` of `TBD`, `unknown`, `n/a`, `none` or `-` in any letter case, fails validation; the same fixture with a person's name in `By` passes. | Test |
-| FR-014-AC-8 | A fixture with a `Date` that is not an ISO 8601 calendar date fails validation. | Test |
-| FR-014-AC-9 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
+| FR-014-AC-3 | Fixtures for `identified`, `assessed`, `resolved` with `fixed`, `closed` with `fixed`, and `closed` with `not-a-defect` each validate when their conditional fields are correct. | Test |
+| FR-014-AC-4 | Given a git history of a fixture's `status`, the moves `identified` to `resolved`, `identified` to `closed` with `fixed`, `assessed` to `closed` with `fixed`, `assessed` to `identified`, any move out of `closed`, and a recorded move whose `status` did not change each fail, and `identified` to `closed` with `duplicate`, `assessed` to `closed` with `wont-fix`, and `resolved` to `assessed` pass. The check is owned by quoin FR-136; this criterion is exercised there. | Test |
+| FR-014-AC-5 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Test |
+| FR-014-AC-6 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Test |
+| FR-014-AC-7 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
+| FR-014-AC-8 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
 
 ## Dependencies
 
-- **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md) (schema emission), [FR-012](./FR-012-executable-skeletons.md) (skeletons with negative counterparts), quire-rs FR-033 (the `assert` facet and its column keys)
-- **Downstream**: [FR-015](./FR-015-anomaly-safety-impact-assessment.md); quoin [FR-136](ix://agent-ix/quoin/FR-136) (record mapping of the type)
+- **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md), [FR-012](./FR-012-executable-skeletons.md), quire-rs FR-033 (the `assert` facet), quoin FR-073 (record validation)
+- **Downstream**: [FR-015](./FR-015-anomaly-safety-impact-assessment.md); quoin [FR-136](ix://agent-ix/quoin/FR-136) (history-based transition check and record mapping)
