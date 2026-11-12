@@ -449,16 +449,6 @@ def test_a_dangling_target_is_reported_naming_the_id_and_its_row(
         ("hazard-row-names-requirement", "FR-001", "Hazard"),
     ],
 )
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "kind-typed references do not exist in quire yet (PLAT-1471 spec, "
-        "PLAT-1472 implementation): a Requirement row naming a hazard, or a "
-        "Hazard row naming a requirement, resolves and produces no finding. "
-        "Turns green when the engine reports a kind mismatch naming the id "
-        "and the row. PLAT-1416 closes when PLAT-1472 lands."
-    ),
-)
 @pytest.mark.trace("FR-015-AC-6")
 def test_a_target_of_the_wrong_kind_is_reported_as_a_kind_mismatch(
     tmp_path: Path, name: str, target: str, kind: str
@@ -552,11 +542,10 @@ def test_fixture_c_empty_rationale_is_reported_once_with_its_line(tmp_path: Path
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "fixture (c) injects three defects. The dangling Requirement row and the "
-        "empty Rationale are reported (the first without a line); the "
-        "kind-mismatched Hazard row waits on kind-typed references (PLAT-1472), "
-        "and a bundle finding carries no document line. Turns green when all "
-        "three are reported, each with a line."
+        "fixture (c) injects three defects. Kind mismatch is now reported "
+        "(quire 0.41.0), but the dangling and kind-mismatched rows are bundle "
+        "findings that carry no document line. Owned by quire-rs PLAT-1476. "
+        "Turns green when all three are reported, each with a line."
     ),
 )
 @pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2")
@@ -580,8 +569,9 @@ def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
         "the conditional checks of fixtures (a) and (b) are run on the mapped "
         "record against Anomaly.json (quoin FR-073 record validation); "
         "`quire validate` runs the manifest asserts only, so it reports none of "
-        "their defects and none carries a line. Turns green when the record "
-        "checks are reported, each located at the `status` field."
+        "their defects and none carries a line. Owned by quire-rs PLAT-1476. "
+        "Turns green when the record checks are reported, each located at the "
+        "`status` field."
     ),
 )
 @pytest.mark.parametrize(

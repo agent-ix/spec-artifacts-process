@@ -1126,8 +1126,9 @@ traceability:
   # FR-015: an assessment row's `Target` must resolve to a requirement,
   # acceptance criterion or hazard that exists. A token that resolves to none
   # of them is a `dangling-trace-reference` (quire-rs FR-049). Whether the
-  # target is of the kind the row's `Kind` names is not expressible here and
-  # waits on kind-typed references in the engine (PLAT-1472).
+  # target is of the kind the row's `Kind` names is typed by `kind_column` and
+  # `kind_targets` (quire-rs FR-049-AC-10..18): a mismatch is a
+  # `reference-kind-mismatch`.
   - name: anomaly-assessment
     archetype: Anomaly
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1136,6 +1137,10 @@ traceability:
     row_id_column: Kind
     pattern: '([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*)'
     targets: [requirement-document, nfr-document, acceptance-criterion, nfr-acceptance-criterion, hazard-document]
+    kind_column: Kind
+    kind_targets:
+      Requirement: [requirement-document, nfr-document, acceptance-criterion, nfr-acceptance-criterion]
+      Hazard: [hazard-document]
     expand_ranges: false
     strip_annotations: false
   - name: functional-coverage
