@@ -52,7 +52,7 @@ the file, which already records it and which a typed table could only duplicate 
   `identified` to `closed` and `assessed` to `closed`. Closing without a fix is intended for
   `resolution` `not-a-defect`, `duplicate` or `wont-fix`; that intended use is not checked against
   the move.
-- A change of status between two commits SHALL be legal when the later status is reachable from the
+- A change of status between two successive recorded states (commits, or the last commit and the working tree) SHALL be legal when the later status is reachable from the
   earlier one by one or more legal moves, because squash-merged history can hide intermediate
   states; any other change SHALL fail; in effect `identified` is never re-entered and `closed` is final. The check is owned by
   quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here.
