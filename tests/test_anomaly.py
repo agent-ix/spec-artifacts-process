@@ -758,6 +758,7 @@ def test_quire_validate_reports_unassessed_at_the_safety_impact_line(name: str):
         ("impacting-only-impact-none", 1),
         ("impacting-row-impact-none", 2),
         ("none-with-affects", 1),
+        ("none-with-target", 1),
         ("none-with-hazard-row", 2),
     ],
 )

@@ -95,3 +95,10 @@ scope:
   role: context_only
   excerpt: "`BundleFinding` has an optional `line`; a `dangling-trace-reference` finding carries `Some(line)` ..."
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |

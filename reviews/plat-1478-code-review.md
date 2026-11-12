@@ -75,3 +75,19 @@ scope:
   role: examined
   excerpt: "strict xfail: the quire CLI's bundle output (0.42.0) prints no line for a bundle finding"
 ```
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-006 | low | One AnomalyFields.json mutant survives the round-1 suite. Loosening the `none` row pattern from `^None\t-\tNone\t` to `^None\t[^\t]*\tNone\t` lets a `none` row with a `Target` other than `-` pass, and no test fails. FR-015 says a `none` table's single row has `Target` `-`. A fixture such as `none-with-target` (`None \| FR-001 \| None \| ...`) asserted in `test_quire_validate_reports_the_assessment_row_rules_inside_the_table` would pin the rule. This does not block merge. | spec_artifacts_process/schemas/AnomalyFields.json:93-106; tests/test_anomaly.py |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |
+| FND-003 | fixed | - |
+| FND-004 | fixed | - |
+| FND-005 | fixed | - |
