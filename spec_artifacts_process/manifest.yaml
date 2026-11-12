@@ -74,6 +74,62 @@ artifact_types:
   - depends_on
   examples: []
   lint_rules_ref: []
+- name: Anomaly
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/anomaly-frontmatter.schema.json
+  data_schema:
+    schema: schemas/Anomaly.json
+  defaults:
+    id_pattern: AN-{next:03d}
+  allowed_links:
+  - references
+  - relates_to
+  examples: []
+  lint_rules_ref: []
+  # FR-014 / FR-015. Vocabularies and shapes are asserted here; the conditional
+  # checks (status against resolution and closed_by, assessment required from
+  # `assessed`, the shape of a `none` or `impacting` table) are the emitted
+  # record schema's, because the `assert` facet cannot express a condition on
+  # another field. Transition legality is quoin FR-136's, over git history.
+  # The type is required of no repository.
+  body_extraction:
+    yield_pattern:
+      match:
+        status:
+          from: frontmatter_field
+          path: [status]
+          required: true
+          assert:
+            choices: [identified, assessed, resolved, closed]
+        resolution:
+          from: frontmatter_field
+          path: [resolution]
+          required: false
+          assert:
+            choices: [fixed, not-a-defect, duplicate, wont-fix]
+        safety_impact:
+          from: frontmatter_field
+          path: [safety_impact]
+          required: true
+          assert:
+            choices: [unassessed, none, impacting]
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+        assessment:
+          from: table_row
+          under_section: Safety Impact Assessment
+          required: false
+          multiple: true
+          assert:
+            columns: [Kind, Target, Impact, Rationale]
+            min_rows: 1
+            column_choices:
+              Kind: [Requirement, Hazard, None]
+              Impact: [Affects, Mitigates, Introduces, Unaffected, None]
+            column_patterns:
+              Rationale: '\S'
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -794,6 +850,37 @@ traceability:
   # need no entry of their own: a matrix is reached by what it *is*, not by what
   # it is called.
   trace_targets:
+  # FR-015: the ids an anomaly's assessment `Target` can name. Requirement and
+  # hazard DOCUMENT ids are minted from each document's title heading
+  # (`# FR-001: ...`, `# [HAZ-001] ...`); acceptance-criterion ids come from the
+  # `acceptance-criterion` and `nfr-acceptance-criterion` targets below. All are
+  # `required: false`: a repository with no hazard documents is not defective.
+  # No hazard id pattern is assumed (FR-015): the hazard heading is read by its
+  # `[id]` bracket, which spec-objects-safety's skeleton authors, not by a shape.
+  - name: requirement-document
+    archetype: FR
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    from: heading
+    section: '*'
+    pattern: '^\[?(FR-\d+)\b'
+    required: false
+    evidence: reference-only
+  - name: nfr-document
+    archetype: NFR
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    from: heading
+    section: '*'
+    pattern: '^\[?(NFR-\d+)\b'
+    required: false
+    evidence: reference-only
+  - name: hazard-document
+    archetype: hazard
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    from: heading
+    section: '*'
+    pattern: '^\[([^\]\s]+)\]'
+    required: false
+    evidence: reference-only
   - name: test-case
     archetype: TestMatrix
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1036,6 +1123,21 @@ traceability:
     targets: [acceptance-criterion, nfr-acceptance-criterion, interface-acceptance-criterion, constraint]
     expand_ranges: true
     strip_annotations: true
+  # FR-015: an assessment row's `Target` must resolve to a requirement,
+  # acceptance criterion or hazard that exists. A token that resolves to none
+  # of them is a `dangling-trace-reference` (quire-rs FR-049). Whether the
+  # target is of the kind the row's `Kind` names is not expressible here and
+  # waits on kind-typed references in the engine (PLAT-1472).
+  - name: anomaly-assessment
+    archetype: Anomaly
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Safety Impact Assessment
+    column: Target
+    row_id_column: Kind
+    pattern: '([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*)'
+    targets: [requirement-document, nfr-document, acceptance-criterion, nfr-acceptance-criterion, hazard-document]
+    expand_ranges: false
+    strip_annotations: false
   - name: functional-coverage
     archetype: TestMatrix
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1775,6 +1877,7 @@ semantic:
   package: agent-ix/spec-artifacts-process
   exports:
   - ADR
+  - Anomaly
   - Plan
   - Task
   - Review

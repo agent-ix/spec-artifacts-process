@@ -264,6 +264,9 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
         # matrix tree, and modelling only the leaf left every root document
         # permanently `[missing]` on two tables it cannot honestly carry.
         "TestMatrixIndex",
+        # FR-014 / FR-015: the Anomaly archetype is new, so its vocabularies and
+        # assessment table are deliberate additions.
+        "Anomaly",
         # Per FR-012 in #78 `Standard` gains the typed declaration sections. Both
         # locators are `required: false`, which is the whole compatibility
         # story: every Standard document in every consuming repository
