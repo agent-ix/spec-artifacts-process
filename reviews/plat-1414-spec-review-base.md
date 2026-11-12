@@ -70,6 +70,8 @@ design and the error-path coverage of FR-014 and FR-015 are otherwise sound.
 | FND-007 | fixed | 656aca5 changes spec.md In Scope to 13 artifact types and adds `Anomaly` to the list. |
 | FND-008 | fixed | 0956b64 admits `Impact` `None` only on a `Kind` `None` row. FR-015-AC-7 adds the failing cases: an `impacting` anomaly whose only rows have `Impact` `None`, and a `Requirement` or `Hazard` row with `Impact` `None`. |
 | FND-009 | fixed | 0956b64 drops the old FR-014-AC-4. The move rule now says it is "owned by quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here", and FR-014-AC-4 to AC-7 are renumbered. |
+| FND-010 | fixed | 2d1eeab and ebaa537 delete the vacuous unchanged-status clause from FR-014. quoin#828 (79e9e3e9) FR-136-AC-3 now emits `anomaly.illegal-transition` for `assessed` then `identified`, `resolved` then `identified`, and `closed` then each of `identified`, `assessed` and `resolved`. It also states the squashed histories that pass. Under the reachability rule FR-014 now states, these are exactly the illegal changes. |
+
 
 ## New findings (disposition pass 1)
 
@@ -83,3 +85,9 @@ design and the error-path coverage of FR-014 and FR-015 are otherwise sound.
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-010 | medium | Now that FR-014-AC-4 is gone, FR-014 says its move rule is "verified by quoin FR-136-AC-3". FR-136-AC-3 on quoin#828 (f1ad73c0) tests only four histories: `identified` to `resolved`, `assessed` to `closed` with `fixed`, `identified` to `closed` with `duplicate`, and `resolved` to `assessed`. The cases the dropped criterion carried are now tested nowhere: any move out of `closed`, `assessed` to `identified`, `identified` to `closed` with `fixed`, and `assessed` to `closed` with `wont-fix`. FR-014's clause "any move that leaves `status` unchanged but is recorded as a transition" is also vacuous, because FR-136 builds `statusHistory` only from commits that changed `status`. Extend FR-136-AC-3 with the missing cases and delete the vacuous clause from FR-014. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:50-56 |
+
+## New findings (disposition pass 3)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-011 | low | Under the reachability rule (ebaa537), the six-move list and its qualifier "for an anomaly that was never fixed, `identified` to `closed` and `assessed` to `closed` with `resolution` one of `not-a-defect`, `duplicate`, `wont-fix`" never change an outcome. `closed` with `fixed` is reachable from `identified` and `assessed` through `resolved`, so FR-136-AC-3 accepts it. The enforced rule is just two constraints: `identified` is never re-entered, and `closed` is terminal. A reader will believe a fixed closure must pass through `resolved`, and nothing checks that. State the enforced rule directly, or say that the `resolution` qualifier describes intended use and is not checked. The rest of the lifecycle that US-003 relies on (assessment present before `resolved` and `closed`, `resolution` and `closed_by` on closure, reassessment on reopen) is checked against each document state or by FR-136, so it holds under squashed history. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:50-57 |
