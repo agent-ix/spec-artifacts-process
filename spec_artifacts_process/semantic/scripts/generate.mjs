@@ -29,6 +29,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isProjection } from "./projection.mjs";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const moduleRoot = resolve(packageRoot, "..");
@@ -163,11 +164,6 @@ function emit() {
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
-}
-
-/** Files under schemas/ that are not projections: the hand-authored frontmatter schemas. */
-function isProjection(name) {
-  return name.endsWith(".json") && !name.endsWith("-frontmatter.schema.json");
 }
 
 function main() {

@@ -25,7 +25,7 @@ does not exist or is of the wrong kind.
 | Check | Owner |
 |---|---|
 | `safety_impact` vocabulary, section table shape, `Kind` and `Impact` vocabularies | This module (manifest, `assert` facet, quire-rs FR-033) |
-| Section and rows required by `status` and `safety_impact` | This module's emitted record schema (FR-009), run as record validation (quoin FR-073) |
+| Section required by `status` and `safety_impact`, and the row rules (`none` admits one `None` row; `impacting` needs a `Requirement` or `Hazard` row that is not `Unaffected`; `Impact` `None` only on a `None` row) | This module's `record_validation` schema `AnomalyFields.json` over the YAML-extracted record (FR-014; quire-rs FR-069-AC-21..28), an absence reported at the `status` line and a row defect at the row's line; the emitted record schema `Anomaly.json` (FR-009) states the same rules for the mapped record (quoin FR-073) |
 | `Target` resolution against the corpus (dangling reference) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049), the `Target` column being a declared document reference of this module's traceability model; the finding is `dangling-trace-reference`, an error under the `Strict` posture and a warning under `Okf` |
 | Missing `spec-objects-safety` reported once per document | quoin [FR-136](ix://agent-ix/quoin/FR-136), as one `anomaly.missing-module` diagnostic alongside the engine's per-row reports |
 | `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) kind-typed references (`kind_column`, finding `reference-kind-mismatch`, FR-049-AC-10..18), typing the reference by the row's `Kind` rather than a per-row check written here. [FR-040](ix://agent-ix/quire-rs/FR-040) edge findings are warnings only and are not this check |
@@ -96,5 +96,5 @@ does not exist or is of the wrong kind.
 
 ## Dependencies
 
-- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and its kind-typed references (`kind_column`, FR-049-AC-10..18); requires quire-rs >= 0.57.0 (quire CLI >= 0.41.0), as older engines reject `kind_column`; quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
+- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and its kind-typed references (`kind_column`, FR-049-AC-10..18); requires quire-rs >= 0.58.0 (quire CLI >= 0.42.0), as older engines reject `kind_column` and `record_validation`; quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
 - **Downstream**: quoin [FR-136](ix://agent-ix/quoin/FR-136)

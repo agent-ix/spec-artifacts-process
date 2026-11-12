@@ -26,7 +26,7 @@ the file, which already records it and which a typed table could only duplicate 
 | Check | Owner |
 |---|---|
 | Field vocabularies, required sections, table shapes | This module, through its manifest and the `assert` facet (quire-rs FR-033) |
-| Status-conditional presence (`resolution`, `closed_by`, the legal `status`/`resolution` pairs) | This module's emitted record schema (FR-009), run as record validation (quoin FR-073); the `assert` facet cannot express a condition on another field |
+| Status-conditional presence (`resolution`, `closed_by`, the legal `status`/`resolution` pairs) | This module's `record_validation` schema `AnomalyFields.json`, run by the engine on the YAML-extracted record (quire-rs FR-069-AC-21..28) and reported as `semantic.record-invalid`; the `assert` facet cannot express a condition on another field. The emitted record schema `Anomaly.json` (FR-009) states the same rules for the mapped record (quoin FR-073) |
 | Transition legality, and re-assessment on reopen, judged over the git history of `status` | quoin [FR-136](ix://agent-ix/quoin/FR-136) |
 
 ## Inputs
@@ -73,6 +73,24 @@ the file, which already records it and which a typed table could only duplicate 
 - The module SHALL ship fixtures as part of its tests for the criteria below: one valid document per
   `status`, a `closed` document for each `resolution`, the negatives named above, and the
   negatives of FR-015. Quoin holds no copy of these documents.
+- The `Anomaly` archetype SHALL declare `record_validation: { schema: schemas/AnomalyFields.json, locate_absence_at: status }`
+  and a `closed_by` `frontmatter_field` locator (`required: false`) in its `yield_pattern.match`.
+  `AnomalyFields.json` is the module's own, hand-authored schema for the YAML-extracted record:
+  its property names are the `yield_pattern.match` keys verbatim (`closed_by`, `safety_impact`) and
+  it carries the conditional presence rules above as `if`/`then`, so that each is reported at the
+  `status` line. It is not the emitted record schema: `Anomaly.json` (camelCase keys, projected
+  from TypeSpec, FR-009) validates the mapped record and is unchanged by it. The schema generator
+  leaves `AnomalyFields.json` alone, as it does a frontmatter schema.
+- `AnomalyFields.json` SHALL also carry the assessment row rules the `assert` facet cannot express
+  (each table row is one tab-joined `Kind`, `Target`, `Impact`, `Rationale` string in the extracted
+  record): `none` admits exactly one row, `None` with `Target` `-` and `Impact` `None`; `impacting`
+  needs a `Requirement` or `Hazard` row whose `Impact` is `Affects`, `Mitigates` or `Introduces`;
+  `Impact` `None` is refused on a `Requirement` or `Hazard` row. A row defect is reported at the
+  row's line.
+- The status rules SHALL apply only to a status in the vocabulary, so a mistyped `status` yields the
+  `status` vocabulary finding and no other. The `closed_by` placeholder rule applies only to a
+  `closed` anomaly, so a non-closed anomaly carrying `closed_by` yields the one finding that it must
+  not.
 - The type SHALL NOT be `required` of any repository; a repository that declares no `Anomaly`
   document is unaffected.
 
@@ -88,8 +106,13 @@ the file, which already records it and which a typed table could only duplicate 
 | FR-014-AC-6 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
 | FR-014-AC-7 | The mapping lists `status`, `resolution`, `closedBy`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Test |
 | FR-014-AC-8 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
+| FR-014-AC-9 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`. | Test |
+| FR-014-AC-10 | The `Anomaly` `yield_pattern.match` carries a `closed_by` `frontmatter_field` locator with `required: false`. | Test |
+| FR-014-AC-11 | `AnomalyFields.json` ships in the package data beside the emitted schemas and is not counted as a projection by the schema generator. | Test |
+| FR-014-AC-12 | A `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field, both at the `status` line. | Test |
+| FR-014-AC-13 | An anomaly whose `status` is outside the vocabulary yields exactly one finding, at the `status` line. | Test |
 
 ## Dependencies
 
-- **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md), [FR-012](./FR-012-executable-skeletons.md), quire-rs FR-033 (the `assert` facet), quoin FR-073 (record validation)
+- **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md), [FR-012](./FR-012-executable-skeletons.md), quire-rs FR-033 (the `assert` facet), quire-rs FR-069-AC-21..28 (`record_validation`), quoin FR-073 (record validation)
 - **Downstream**: [FR-015](./FR-015-anomaly-safety-impact-assessment.md); quoin [FR-136](ix://agent-ix/quoin/FR-136) (history-based transition check and record mapping)

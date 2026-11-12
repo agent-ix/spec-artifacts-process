@@ -75,7 +75,10 @@ between the source and the shipped bytes fails the build.
   otherwise it SHALL exit zero.
 - The generator SHALL treat a file named `*-frontmatter.schema.json` as hand-authored, neither
   emitting, deleting, nor reporting it, because the frontmatter schemas predate this projection
-  and are referenced by `frontmatter_schema_ref`.
+  and are referenced by `frontmatter_schema_ref`. It SHALL treat the files named in its hand-authored
+  list (`scripts/projection.mjs`; today `AnomalyFields.json`) the same way: these are the
+  `record_validation` schemas of the YAML-extracted record (FR-014), not projections of a model. A
+  file is added to that list by name, never by a suffix.
 - `make lint` SHALL run `make schemas-check`, so a `main.tsp` edit that was never regenerated
   fails before push rather than at review.
 - The repository SHALL run `make schemas-check` as a local pre-push gate only, never as a
@@ -109,6 +112,7 @@ between the source and the shipped bytes fails the build.
 | FR-009-AC-8 | Running the generator twice over one tree produces byte-identical files. | Test (TC-087) |
 | FR-009-AC-10 | With the toolchain uninstalled, the generator exits non-zero naming the missing component and `make semantic-install`, and does not fail inside the compiler. | Test (TC-132) |
 | FR-009-AC-13 | Every test in the suite that asserts a property of all declared types derives the type list from `manifest.yaml` or from the emitted bundle; none carries a hard-coded list. | Inspection |
+| FR-009-AC-14 | `make schemas-check` neither reports nor removes `AnomalyFields.json`, and still reports a stale `Stale.json`. | Test (TC-193) |
 
 ## Dependencies
 

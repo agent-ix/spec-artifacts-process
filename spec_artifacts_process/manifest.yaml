@@ -79,6 +79,12 @@ artifact_types:
   frontmatter_schema_ref: schemas/anomaly-frontmatter.schema.json
   data_schema:
     schema: schemas/Anomaly.json
+  # The YAML-extracted yield record has its own schema (FR-014, FR-015): the
+  # conditional presence checks run on it and are reported at the `status` line.
+  # Anomaly.json above is the emitted (mapped) record's schema.
+  record_validation:
+    schema: schemas/AnomalyFields.json
+    locate_absence_at: status
   defaults:
     id_pattern: AN-{next:03d}
   allowed_links:
@@ -87,10 +93,10 @@ artifact_types:
   examples: []
   lint_rules_ref: []
   # FR-014 / FR-015. Vocabularies and shapes are asserted here; the conditional
-  # checks (status against resolution and closed_by, assessment required from
-  # `assessed`, the shape of a `none` or `impacting` table) are the emitted
-  # record schema's, because the `assert` facet cannot express a condition on
-  # another field. Transition legality is quoin FR-136's, over git history.
+  # presence checks (status against resolution and closed_by, assessment
+  # required from `assessed`) and the row rules of a `none` or `impacting`
+  # table are `record_validation`'s (AnomalyFields.json), because the `assert`
+  # facet cannot express a condition on another field. Transition legality is quoin FR-136's, over git history.
   # The type is required of no repository.
   body_extraction:
     yield_pattern:
@@ -113,6 +119,10 @@ artifact_types:
           required: true
           assert:
             choices: [unassessed, none, impacting]
+        closed_by:
+          from: frontmatter_field
+          path: [closed_by]
+          required: false
         description:
           from: section_body
           after_heading: Description

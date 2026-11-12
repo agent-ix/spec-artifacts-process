@@ -6,9 +6,13 @@ Three layers are exercised, each through the real artifact it ships:
 
 * **document** — `quire validate` against this module's manifest (vocabularies,
   required sections, table shape);
-* **record** — the document mapped by `mappings.yaml` and validated against the
-  emitted `Anomaly.json` (the status-conditional checks the `assert` facet
-  cannot express);
+* **extracted record** — the YAML record `yield_pattern.match` extracts, validated
+  by the engine against `schemas/AnomalyFields.json` (`record_validation`): the
+  status-conditional and row checks the `assert` facet cannot express, reported
+  by `quire validate` as `semantic.record-invalid`, an absence at the `status`
+  line and a present value at its own;
+* **mapped record** — the document mapped by `mappings.yaml` and validated against
+  the emitted `Anomaly.json` (the same rules over the camelCase record);
 * **reference** — whether an assessment `Target` resolves, and to what kind. The
   module owns none of that text: it is the engine's reference diagnostic.
 
@@ -18,6 +22,7 @@ quoin's tests; quoin holds no copy.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import shutil
 import subprocess
@@ -37,7 +42,7 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures" / "anomaly"
 CORPUS = FIXTURES / "corpus"
 VALID = sorted((FIXTURES / "valid").glob("*.md"))
 INVALID = {p.stem: p for p in sorted((FIXTURES / "invalid").glob("*.md"))}
-INSTALLED = Path.home() / ".ix" / "filament" / "modules"
+VALID_BY_NAME = {p.stem: p for p in VALID}
 
 PLACEHOLDERS = [
     "TBD",
@@ -97,6 +102,35 @@ def rule_index(error) -> int:
 def locator(manifest, name: str) -> dict:
     anomaly = next(a for a in manifest["artifact_types"] if a["name"] == "Anomaly")
     return anomaly["body_extraction"]["yield_pattern"]["match"][name]
+
+
+def line_of(path: Path, key: str) -> int:
+    """The line of a frontmatter key."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text.startswith(f"{key}:")
+    )
+
+
+def table_line(path: Path) -> int:
+    """The line of the assessment table header."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text.startswith("| Kind")
+    )
+
+
+def record_findings(path: Path) -> list[str]:
+    """The `semantic.record-invalid` findings `quire validate` reports on a document."""
+    return [
+        d for d in diagnostics(quire_validate(path)) if "semantic.record-invalid" in d
+    ]
+
+
+def finding_lines(findings: list[str]) -> list[int]:
+    return [int(f.split(": line ", 1)[1].split(":", 1)[0]) for f in findings]
 
 
 # -- FR-014 -------------------------------------------------------------------
@@ -360,6 +394,16 @@ def test_an_empty_rationale_and_an_impact_outside_the_vocabulary_fail_validation
     assert "Impact" in impact.stderr
 
 
+def installed_module(package: str) -> Path:
+    """The module tree of an installed Python package (a dev dependency)."""
+    spec = importlib.util.find_spec(package)
+    assert spec is not None and spec.origin, (
+        f"{package} is not installed: it is a dev dependency of this repo "
+        "(`poetry install`), not something to install into the home directory"
+    )
+    return Path(spec.origin).parent
+
+
 def bundle_validate(tmp_path: Path, anomaly: Path) -> subprocess.CompletedProcess:
     """Validate the fixture corpus plus one anomaly as a bundle.
 
@@ -368,9 +412,10 @@ def bundle_validate(tmp_path: Path, anomaly: Path) -> subprocess.CompletedProces
     finding as a warning, so a clean exit does not mean no finding: callers read
     the `[dangling-trace-reference]` lines.
     """
-    modules = [INSTALLED / "spec-artifacts-iso", INSTALLED / "spec-objects-safety"]
-    for module in modules:
-        assert module.is_dir(), f"{module} is not installed"
+    modules = [
+        installed_module("spec_artifacts_iso"),
+        installed_module("spec_objects_safety"),
+    ]
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     (corpus / "spec" / "anomalies").mkdir()
@@ -538,77 +583,227 @@ def test_fixture_b_reports_both_coexisting_record_defects_in_one_pass(
 
 
 @pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
-def test_fixture_c_empty_rationale_is_reported_once_with_its_line(tmp_path: Path):
+def test_fixture_c_empty_rationale_is_reported_once_with_its_line():
     path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
     found = diagnostics(quire_validate(path))
     assert len(found) == 1, found
     assert "Rationale" in found[0]
-    row = (
-        path.read_text()
-        .splitlines()
-        .index(
-            next(
-                line
-                for line in path.read_text().splitlines()
-                if line.endswith("| Affects |  |")
-            )
-        )
-        + 1
+    row = next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text.endswith("| Affects |  |")
     )
     assert f": line {row}:" in found[0]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "fixture (c) injects three defects. Kind mismatch is now reported "
-        "(quire 0.41.0), but the dangling and kind-mismatched rows are bundle "
-        "findings that carry no document line. Owned by quire-rs PLAT-1476. "
-        "Turns green when all three are reported, each with a line."
-    ),
-)
-@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
-def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
+def fixture_c_reported(tmp_path: Path) -> list[str]:
     path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
     located = diagnostics(quire_validate(path))
     bundle = bundle_validate(tmp_path, path)
-    reported = located + [
+    return located + [
         line
         for line in bundle.stderr.splitlines()
         if "AN-001.md" in line
         and ("[dangling-trace-reference]" in line or "mismatch" in line.lower())
     ]
-    assert len(reported) == 3, reported
-    assert all(": line " in line for line in reported), reported
+
+
+@pytest.mark.trace("NFR-001-AC-1", "TC-186")
+def test_fixture_c_reports_all_three_defects(tmp_path: Path):
+    assert len(fixture_c_reported(tmp_path)) == 3, fixture_c_reported(tmp_path)
 
 
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "the conditional checks of fixtures (a) and (b) are run on the mapped "
-        "record against Anomaly.json (quoin FR-073 record validation); "
-        "`quire validate` runs the manifest asserts only, so it reports none of "
-        "their defects and none carries a line. Owned by quire-rs PLAT-1476. "
-        "Turns green when the record checks are reported, each located at the "
-        "`status` field."
+        "the engine locates the dangling and kind-mismatched rows "
+        "(BundleFinding.line, quire-rs 0.58.0) but the quire CLI's bundle "
+        "output (0.42.0) prints no line for a bundle finding. Owned by "
+        "quire-cli; turns green when `quire validate --okf` prints it."
     ),
 )
+@pytest.mark.trace("NFR-001-AC-2", "TC-187")
+def test_fixture_c_every_defect_carries_a_line(tmp_path: Path):
+    reported = fixture_c_reported(tmp_path)
+    assert all(": line " in line for line in reported), reported
+
+
 @pytest.mark.parametrize(
-    "name,defects",
+    "name,at_status,at_safety_impact",
     [
-        ("nfr1-a-closed-no-closed-by-no-resolution", 2),
-        ("nfr1-b-assessed-unassessed-no-section", 2),
+        ("nfr1-a-closed-no-closed-by-no-resolution", 2, 0),
+        ("nfr1-b-assessed-unassessed-no-section", 1, 1),
     ],
 )
-@pytest.mark.trace("NFR-001-AC-2", "TC-187")
-def test_record_layer_defects_are_reported_at_the_status_line(name: str, defects: int):
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
+def test_record_layer_defects_are_located(
+    name: str, at_status: int, at_safety_impact: int
+):
+    """An absence is reported at the `status` line (`locate_absence_at`); a
+    present-but-invalid value, such as `safety_impact: unassessed`, at its own."""
     path = INVALID[name]
-    status_line = next(
-        i
-        for i, line in enumerate(path.read_text().splitlines(), 1)
-        if line.startswith("status:")
+    lines = path.read_text().splitlines()
+
+    def line_of(key: str) -> int:
+        return next(i for i, text in enumerate(lines, 1) if text.startswith(f"{key}:"))
+
+    found = diagnostics(quire_validate(path))
+
+    def at(key: str) -> list[str]:
+        return [d for d in found if f": line {line_of(key)}:" in d]
+
+    assert len(at("status")) == at_status, found
+    assert len(at("safety_impact")) == at_safety_impact, found
+    assert len(found) == at_status + at_safety_impact, found
+
+
+# -- extracted-record layer (`record_validation`, AnomalyFields.json) ---------
+
+
+def anomaly_type(manifest) -> dict:
+    return next(a for a in manifest["artifact_types"] if a["name"] == "Anomaly")
+
+
+@pytest.mark.trace("FR-014-AC-9", "TC-188")
+def test_the_anomaly_archetype_declares_record_validation(manifest):
+    assert anomaly_type(manifest)["record_validation"] == {
+        "schema": "schemas/AnomalyFields.json",
+        "locate_absence_at": "status",
+    }
+    assert "locate_absence_at" in anomaly_type(manifest)["record_validation"]
+    assert (
+        "status" in anomaly_type(manifest)["body_extraction"]["yield_pattern"]["match"]
     )
-    found = [
-        d for d in diagnostics(quire_validate(path)) if f": line {status_line}:" in d
-    ]
-    assert len(found) == defects, found
+
+
+@pytest.mark.trace("FR-014-AC-10", "TC-189")
+def test_the_closed_by_locator_is_optional_frontmatter(manifest):
+    assert locator(manifest, "closed_by") == {
+        "from": "frontmatter_field",
+        "path": ["closed_by"],
+        "required": False,
+    }
+
+
+@pytest.mark.trace("FR-014-AC-11", "FR-009-AC-14", "TC-190", "TC-193")
+def test_the_record_schema_ships_and_the_generator_leaves_it_alone():
+    schema = json.loads((SCHEMAS_DIR / "AnomalyFields.json").read_text())
+    assert schema["$id"].endswith("/spec-artifacts-process/AnomalyFields.json")
+    assert (
+        "spec_artifacts_process/schemas/**/*.json"
+        in (REPO_ROOT / "pyproject.toml").read_text()
+    )
+    probe = (
+        'import("./projection.mjs").then(m => console.log(JSON.stringify('
+        '["AnomalyFields.json", "Anomaly.json", "Stale.json"].map(m.isProjection))))'
+    )
+    result = subprocess.run(
+        ["node", "-e", probe],
+        cwd=PACKAGE_ROOT / "semantic" / "scripts",
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == [False, True, True]
+
+
+@pytest.mark.parametrize(
+    "name,at",
+    [
+        ("closed-no-closed-by", "status"),
+        ("closed-no-resolution", "status"),
+        ("resolved-no-resolution", "status"),
+        ("identified-with-resolution", "status"),
+        ("assessed-with-resolution", "status"),
+        ("identified-with-closed-by", "status"),
+        ("assessed-with-closed-by", "status"),
+        ("resolved-not-fixed", "resolution"),
+        ("closed-closed-by-tbd", "closed_by"),
+        ("closed-closed-by-unknown-lower", "closed_by"),
+        ("closed-closed-by-na", "closed_by"),
+        ("closed-closed-by-none-upper", "closed_by"),
+        ("closed-closed-by-dash", "closed_by"),
+        ("closed-closed-by-empty", "closed_by"),
+    ],
+)
+@pytest.mark.trace(
+    "FR-014-AC-4", "FR-014-AC-5", "FR-014-AC-6", "TC-171", "TC-172", "TC-173"
+)
+def test_quire_validate_reports_each_status_conditional_defect_once_located(
+    name: str, at: str
+):
+    path = INVALID[name]
+    found = record_findings(path)
+    assert finding_lines(found) == [line_of(path, at)], found
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "closed-no-section",
+        "resolved-no-section",
+        "identified-impacting-no-section",
+        "identified-none-no-section",
+    ],
+)
+@pytest.mark.trace("FR-015-AC-3", "FR-015-AC-7", "TC-178", "TC-182")
+def test_quire_validate_reports_a_missing_section_at_the_status_line(name: str):
+    path = INVALID[name]
+    assert finding_lines(record_findings(path)) == [line_of(path, "status")]
+
+
+@pytest.mark.parametrize(
+    "name", ["closed-unassessed", "resolved-unassessed", "assessed-unassessed"]
+)
+@pytest.mark.trace("FR-015-AC-3", "TC-178")
+def test_quire_validate_reports_unassessed_at_the_safety_impact_line(name: str):
+    path = INVALID[name]
+    assert finding_lines(record_findings(path)) == [line_of(path, "safety_impact")]
+
+
+@pytest.mark.parametrize(
+    "name,count",
+    [
+        ("impacting-only-unaffected", 1),
+        ("impacting-only-impact-none", 1),
+        ("impacting-row-impact-none", 2),
+        ("none-with-affects", 1),
+        ("none-with-target", 1),
+        ("none-with-hazard-row", 2),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
+def test_quire_validate_reports_the_assessment_row_rules_inside_the_table(
+    name: str, count: int
+):
+    path = INVALID[name]
+    lines = finding_lines(record_findings(path))
+    assert len(lines) == count, lines
+    assert all(line > table_line(path) for line in lines), lines
+
+
+@pytest.mark.parametrize("name", ["none", "impacting-all-targets", "two-hazards"])
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
+def test_quire_validate_accepts_the_valid_assessment_shapes(name: str):
+    assert record_findings(FIXTURES / "valid" / f"{name}.md") == []
+
+
+@pytest.mark.trace("FR-014-AC-13", "TC-192")
+def test_a_mistyped_status_is_one_defect_not_three(tmp_path: Path):
+    source = VALID_BY_NAME["closed-fixed"]
+    path = tmp_path / "AN-001.md"
+    path.write_text(source.read_text().replace("status: closed", "status: open"))
+    found = diagnostics(quire_validate(path, scope=tmp_path))
+    assert len(found) == 1, found
+    assert "[assert]" in found[0] and "status" in found[0]
+    assert finding_lines(found) == [line_of(path, "status")]
+
+
+@pytest.mark.trace("FR-014-AC-12", "TC-191")
+def test_a_closed_anomaly_missing_both_fields_is_reported_once_per_field():
+    path = INVALID["nfr1-a-closed-no-closed-by-no-resolution"]
+    found = record_findings(path)
+    assert sorted(finding_lines(found)) == [line_of(path, "status")] * 2, found
+    assert any("closed_by" in f for f in found)
+    assert any("resolution" in f for f in found)

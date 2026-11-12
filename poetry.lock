@@ -932,17 +932,17 @@ files = [
 
 [[package]]
 name = "quire"
-version = "0.57.0"
+version = "0.58.0"
 description = "Python bindings for quire-rs: parse, corpus load, and whole-spec queries (FR-023)."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "quire-0.57.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:d502ad53865aabfbdb0b66973689689cc4babd0d3cd901c0d8234f70a7b9f1ec"},
-    {file = "quire-0.57.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:b1676772c989b13853defd20169d939e61416ad815c84a8b73897eda3da8a2c3"},
-    {file = "quire-0.57.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b8474caa0153b1e789376d8d2c962204b91fe422ac6afa9d56e69967f00a098b"},
-    {file = "quire-0.57.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cde1affed527645070e3e74193248209cc5400344bedf7dfe30fad5055ff50e9"},
-    {file = "quire-0.57.0-cp39-abi3-win_amd64.whl", hash = "sha256:e370b64b4401fe5d44f9d37579090523abf3def8c075d9c098619874d6abab78"},
+    {file = "quire-0.58.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f5fbb30f06e318df2d16dec15e19025e304e933a51f1910f64b554a0cde567ef"},
+    {file = "quire-0.58.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:d813529a4710fd810fdbca07ae1bb25f0605f7f08cc594c8824174f97d590c82"},
+    {file = "quire-0.58.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b5427e3e8cd86a09fb3efd65911e6468f761274310bced19dc77ccad88f65aa8"},
+    {file = "quire-0.58.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:11576973110bea98cf127a8a8a218ad2e4aaccb07f773e954ffe451492650945"},
+    {file = "quire-0.58.0-cp39-abi3-win_amd64.whl", hash = "sha256:61aab5f85d7e4edd3c47027cd0e8e54ec250dade890c96cda6929080474723e2"},
 ]
 
 [package.source]
@@ -1143,6 +1143,40 @@ test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.18.*)", "pytest-mypy"]
 
 [[package]]
+name = "spec-artifacts-iso"
+version = "0.22.1"
+description = "Filament Module: ISO-style spec artifacts (FR/NFR/StR/US/IT/TC/AC/CON) — unified-shape archetypes + authoring skeletons + frontmatter JSON Schemas + iso-spec-core grammar, validated by quire-rs (no render templates)"
+optional = false
+python-versions = ">=3.13,<3.14"
+groups = ["dev"]
+files = [
+    {file = "spec_artifacts_iso-0.22.1-py3-none-any.whl", hash = "sha256:a2ab969c8ca1f11b8281d2c134f4d72942928c15c3244cca822268cc723e769f"},
+    {file = "spec_artifacts_iso-0.22.1.tar.gz", hash = "sha256:dd23204fe4ffe92564b70efcda2e265a4863964031938e491afafd8e134d590a"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
+reference = "internal-pypi"
+
+[[package]]
+name = "spec-objects-safety"
+version = "0.7.0"
+description = "Filament Module: safety ObjectTypes (hazard, failure_mode) — IEC 61508 / ISO 26262 / FMEA"
+optional = false
+python-versions = ">=3.13,<3.14"
+groups = ["dev"]
+files = [
+    {file = "spec_objects_safety-0.7.0-py3-none-any.whl", hash = "sha256:91f3c6e0af9d063faf2866507a491d29e47080749ba0ccb91ea20f738717319e"},
+    {file = "spec_objects_safety-0.7.0.tar.gz", hash = "sha256:68c4a3669b0e13164f6a4fd4424bf9016bf8039718afe6443c4e18f3c21be39e"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
+reference = "internal-pypi"
+
+[[package]]
 name = "tomlkit"
 version = "0.15.0"
 description = "Style preserving TOML library"
@@ -1157,4 +1191,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "6470965a529c955757d38e30abaca8d48e1a6e797e5a7b595240d5b2a4e7cd17"
+content-hash = "e26f920f75eb8364381d6bf0f2bdbdf0d21dddff3c098fc2404106e2c7a133d2"
