@@ -41,3 +41,18 @@ FAIL. Three medium findings: the lifecycle and conditional checks have no
 upstream that can express them, the reference-resolution dependency names the
 wrong FR, and the hazard dependency rests on an id class that does not exist.
 Resolve these before implementation is scheduled.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | 656aca5 adds a "Who owns which check" table to FR-014. Vocabularies and shapes go to this module's manifest and FR-033. Conditional presence goes to the emitted record schema, validated per quoin FR-073 ("Quire SHALL validate ... the archetype's extracted record against the referenced `<Name>.json`"). Transition legality goes to quoin FR-136. |
+| FND-002 | fixed | 656aca5 re-points FR-015 to quire-rs FR-026 for dangling references and FR-040 `allowed_links` for kind typing, drops FR-050, and states that both diagnostics are the engine's. |
+| FND-003 | fixed | 656aca5 identifies a hazard by `type: hazard` and `object: hazard`, with no id pattern assumed. It adds one missing-module diagnostic, with no per-row dangling diagnostic, when the hazard type is not installed (FR-015-AC-9). |
+| FND-004 | fixed | 656aca5 changes the relationship target to `ix://agent-ix/spec-objects-safety/FR-001`. That FR exists on spec-objects-safety main and declares the `hazard` object type. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | low | FR-015's ownership table assigns `Target` resolution to quire-rs FR-026, which reports each unresolved `Hazard` row as dangling. The new missing-module rule (one diagnostic per document, and no per-row dangling diagnostic) has no owner in that table, and FR-026 does not provide the suppression. Add a row naming who emits the missing-module diagnostic and suppresses the per-row ones. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:23-31; spec/functional/FR-015-anomaly-safety-impact-assessment.md:61-63 |

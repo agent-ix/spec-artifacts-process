@@ -53,7 +53,7 @@ the file, which already records it and which a typed table could only duplicate 
   `not-a-defect`, `duplicate`, `wont-fix`. Every other move SHALL fail, including any move out of
   `closed`, any move to `closed` with `resolution: fixed` that did not pass through `resolved`, and
   any move that leaves `status` unchanged but is recorded as a transition. The check over moves is
-  owned by quoin FR-136.
+  owned by quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here.
 - When `status` is `closed`, `closed_by` SHALL be present. Its check is of shape only: non-empty
   after trimming and not a placeholder (`n/a`, `none`, `unknown`, `tbd`, `-`, compared
   case-insensitively). It does not establish that the value is a real person; the commit that sets
@@ -63,6 +63,14 @@ the file, which already records it and which a typed table could only duplicate 
 - The module SHALL ship the emitted schema for `Anomaly` and a skeleton that validates as authored,
   with negative counterparts for a closed anomaly with no `closed_by`, a placeholder `closed_by`,
   a `resolved` anomaly with no `resolution`, and an `identified` anomaly carrying `closed_by`.
+- The module SHALL publish the `Anomaly` record mapping in `mappings.yaml` ([FR-011](./FR-011-markdown-record-mapping.md)),
+  naming the record keys `status`, `resolution`, `closedBy` (from frontmatter `closed_by`) and
+  `safetyImpact`, each a `frontmatter` mapping carried verbatim, and the key `assessment`
+  ([FR-015](./FR-015-anomaly-safety-impact-assessment.md)). The key `statusHistory` is not
+  authored anywhere: quoin FR-136 derives it from git.
+- The module SHALL ship fixtures as part of its tests for the criteria below: one valid document per
+  `status`, a `closed` document for each `resolution`, the negatives named above, and the
+  negatives of FR-015. Quoin holds no copy of these documents.
 - The type SHALL NOT be `required` of any repository; a repository that declares no `Anomaly`
   document is unaffected.
 
@@ -73,10 +81,10 @@ the file, which already records it and which a typed table could only duplicate 
 | FR-014-AC-1 | The manifest declares `Anomaly` with the four-member `status` vocabulary, the four-member `resolution` vocabulary, and a `## Description` section. | Test |
 | FR-014-AC-2 | The shipped skeleton validates as authored, and the `Anomaly` JSON Schema file exists beside the other emitted process-type schemas. | Test |
 | FR-014-AC-3 | Fixtures for `identified`, `assessed`, `resolved` with `fixed`, `closed` with `fixed`, and `closed` with `not-a-defect` each validate when their conditional fields are correct. | Test |
-| FR-014-AC-4 | Given a git history of a fixture's `status`, the moves `identified` to `resolved`, `identified` to `closed` with `fixed`, `assessed` to `closed` with `fixed`, `assessed` to `identified`, any move out of `closed`, and a recorded move whose `status` did not change each fail, and `identified` to `closed` with `duplicate`, `assessed` to `closed` with `wont-fix`, and `resolved` to `assessed` pass. The check is owned by quoin FR-136; this criterion is exercised there. | Test |
-| FR-014-AC-5 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Test |
-| FR-014-AC-6 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Test |
-| FR-014-AC-7 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
+| FR-014-AC-4 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Test |
+| FR-014-AC-5 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Test |
+| FR-014-AC-6 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
+| FR-014-AC-7 | The mapping lists `status`, `resolution`, `closedBy`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Test |
 | FR-014-AC-8 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
 
 ## Dependencies

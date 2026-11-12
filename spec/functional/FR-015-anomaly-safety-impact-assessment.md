@@ -27,6 +27,7 @@ does not exist or is of the wrong kind.
 | `safety_impact` vocabulary, section table shape, `Kind` and `Impact` vocabularies | This module (manifest, `assert` facet, quire-rs FR-033) |
 | Section and rows required by `status` and `safety_impact` | This module's emitted record schema (FR-009), run as record validation (quoin FR-073) |
 | `Target` resolution against the corpus (dangling reference) | quire-rs [FR-026](ix://agent-ix/quire-rs/FR-026), the `Target` column being a declared document reference |
+| Missing `spec-objects-safety` reported once per document, not per `Hazard` row | quoin [FR-136](ix://agent-ix/quoin/FR-136); the engine's reference diagnostics (FR-026) do not suppress per-row reports, so this module cannot |
 | `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs [FR-040](ix://agent-ix/quire-rs/FR-040), typing the reference by `Kind` through `allowed_links` rather than a per-row check written here |
 
 ## Inputs
@@ -51,7 +52,8 @@ does not exist or is of the wrong kind.
   and the document SHALL carry a `## Safety Impact Assessment` section; otherwise validation fails.
 - The section SHALL be a table with headers exactly `Kind | Target | Impact | Rationale` and at
   least one row. `Kind` is one of `Requirement`, `Hazard`, `None`. `Impact` is one of `Affects`,
-  `Mitigates`, `Introduces`, `Unaffected`, `None`. `Rationale` SHALL be non-empty.
+  `Mitigates`, `Introduces`, `Unaffected`, `None`; `None` is admitted only on a row of `Kind`
+  `None`. `Rationale` SHALL be non-empty.
 - A `Requirement` row's `Target` SHALL be the id of an `FR` or `NFR` artifact, or of one of its
   acceptance criteria, that exists in the validated corpus. A `Hazard` row's `Target` SHALL be the
   id of a hazard artifact that exists in the validated corpus. Validation SHALL fail a `Target` that
@@ -60,12 +62,21 @@ does not exist or is of the wrong kind.
   text written by this module.
 - When a `Hazard` row is present and the `hazard` object type is not installed, validation SHALL
   report one missing-module diagnostic naming `spec-objects-safety` for the document, and SHALL NOT
-  report each `Hazard` row as dangling.
+  report each `Hazard` row as dangling. The owner of this rule is quoin FR-136, verified there by
+  FR-136-AC-10.
 - When `safety_impact` is `impacting`, the table SHALL hold at least one `Requirement` or `Hazard`
   row whose `Impact` is not `Unaffected`.
 - When `safety_impact` is `none`, the table SHALL hold exactly one row, of `Kind` `None`, with
   `Target` `-`, `Impact` `None` and a non-empty `Rationale`, and validation SHALL fail a `none`
   anomaly that also carries a `Requirement` or `Hazard` row.
+- The module SHALL map the section's rows to the record key `assessment` as a `typed-table` mapping
+  ([FR-011](./FR-011-markdown-record-mapping.md)), one entry per row with `kind`, `target`, `impact`
+  and `rationale` carried as authored; `target` is the authored reference token (an `FR`, `NFR` or
+  acceptance-criterion id, or a hazard id) and is absent for a `None` row whose `Target` is `-`.
+  Whether a token resolves is not part of the record; it is reported as a diagnostic.
+- The module SHALL ship, as fixtures for the criteria below, a corpus holding an `FR`, one of its
+  acceptance criteria and a hazard, the valid anomalies of AC-4 and AC-7, and the negatives of
+  AC-3, AC-5, AC-6, AC-7 and AC-8. Quoin holds no copy of these documents.
 - The assessment SHALL be a statement of an engineer's judgement, not a computed risk acceptance;
   this requirement SHALL NOT add any risk-acceptance or sign-off field.
 
@@ -79,9 +90,9 @@ does not exist or is of the wrong kind.
 | FR-015-AC-4 | In a corpus containing `FR-001` with criterion `FR-001-AC-1`, and a hazard document with `type: hazard` and `object: hazard`, an `impacting` anomaly whose rows target `FR-001`, `FR-001-AC-1` and the hazard validates. | Test |
 | FR-015-AC-5 | The same anomaly with a `Requirement` row targeting `FR-999` or `FR-001-AC-99`, or a `Hazard` row targeting an id no document carries, fails validation with a dangling-reference diagnostic naming the id and its row. | Test |
 | FR-015-AC-6 | A `Requirement` row whose `Target` is the hazard's id, and a `Hazard` row whose `Target` is `FR-001`, each fail validation as a kind mismatch. | Test |
-| FR-015-AC-7 | An `impacting` anomaly whose only rows are `Unaffected` fails validation; a `none` anomaly with one `None` row, `Target` `-`, `Impact` `None` and a rationale validates; a `none` anomaly with a `None` row whose `Impact` is `Affects`, or that also carries a `Hazard` row, fails validation. | Test |
+| FR-015-AC-7 | An `impacting` anomaly whose only rows are `Unaffected` fails validation; a `none` anomaly with one `None` row, `Target` `-`, `Impact` `None` and a rationale validates; a `none` anomaly with a `None` row whose `Impact` is `Affects`, or that also carries a `Hazard` row, fails validation; an `impacting` anomaly whose only rows have `Impact` `None`, or a `Requirement` or `Hazard` row with `Impact` `None`, fails validation. | Test |
 | FR-015-AC-8 | A row with an empty `Rationale`, or with an `Impact` outside the vocabulary, fails validation. | Test |
-| FR-015-AC-9 | With `spec-objects-safety` not installed, an anomaly with two `Hazard` rows yields exactly one missing-module diagnostic and no per-row dangling-reference diagnostic. | Test |
+| FR-015-AC-9 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Test |
 | FR-015-AC-10 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Test |
 
 ## Dependencies

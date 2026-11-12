@@ -37,3 +37,11 @@ gaps are the paths the lifecycle does not have.
 PASS WITH FINDINGS. One medium finding (no honest closure path for a
 non-defect) should be fixed in this PR. The reopen design is accepted as
 written.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | 656aca5 adds `resolution` (`fixed`, `not-a-defect`, `duplicate`, `wont-fix`) and the moves `identified` to `closed` and `assessed` to `closed` for a non-`fixed` resolution. FR-014-AC-3 and AC-4 test them. |
+| FND-002 | fixed | 656aca5 assigns re-assessment on reopen to quoin FR-136 (FR-014 ownership table). quoin FR-136-AC-5, on the open quoin#828, reports a reassessment-missing diagnostic when the assessment section is unchanged across a reopen. |
+| FND-003 | fixed | 656aca5 lists `assessed` to `closed` with `fixed` among the failing moves in FR-014-AC-4. |

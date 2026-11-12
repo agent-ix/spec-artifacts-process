@@ -56,3 +56,22 @@ FAIL. Two high findings (the hand-maintained History ledger and an NFR
 measurement that cannot be carried out) and three medium findings must be
 fixed before the spec is ready for implementation. The FR-015 assessment
 design and the error-path coverage of FR-014 and FR-015 are otherwise sound.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | 656aca5 drops the `## History` table. FR-014 now says the record keeps no hand-typed history, and that who changed `status`, and when, is the git history of the file. |
+| FND-002 | fixed | 656aca5 replaces `By` with `closed_by`, required only when `closed`. FR-014 states the check is shape-only and that the closing commit is the attribution of record. FR-014-AC-5 and AC-7 test presence, the placeholders and absence. |
+| FND-003 | fixed | 656aca5 measures NFR-001 over three fixtures of defects that can coexist, and defines the line of an absence as the `status` line. |
+| FND-004 | fixed | 656aca5 adds NFR-001-AC-1 and AC-2. `quire matrix` now mints NFR-001-AC-1, AC-2, M-1 and M-2 with no `section-matches-nothing` warning. |
+| FND-005 | fixed | 656aca5 requires `Impact` `None` on the `None` row. FR-015-AC-7 tests both the accepting case and the `Affects` case. |
+| FND-006 | fixed | 656aca5 adds `FR-001-AC-1` to FR-015-AC-4 and `FR-001-AC-99` to AC-5. |
+| FND-007 | fixed | 656aca5 changes spec.md In Scope to 13 artifact types and adds `Anomaly` to the list. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-008 | medium | 656aca5 adds `None` to the `Impact` vocabulary for every row kind, but the `impacting` rule excludes only `Unaffected` ("at least one `Requirement` or `Hazard` row whose `Impact` is not `Unaffected`"). An `impacting` anomaly whose only rows are `Requirement` or `Hazard` rows with `Impact` `None` therefore passes, which is the very case FR-015-AC-7 exists to reject. Restrict `Impact` `None` to `Kind` `None` rows (and the reverse), or exclude `None` from the `impacting` test, and add the case to FR-015-AC-7. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:53-54; spec/functional/FR-015-anomaly-safety-impact-assessment.md:64-65; spec/functional/FR-015-anomaly-safety-impact-assessment.md:82 |
+| FND-009 | low | FR-014-AC-4 is "owned by quoin FR-136; this criterion is exercised there". A test in quoin cannot carry a trace tag in this repo's matrix, so FR-014-AC-4 stays `untagged` permanently. quoin FR-136-AC-3 already states the same moves. Drop FR-014-AC-4 here and point to FR-136-AC-3, or keep the legal-move table only as the statement that FR-136 checks against. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:76 |
