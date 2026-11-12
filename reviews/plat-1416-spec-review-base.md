@@ -33,3 +33,9 @@ which component it versions, or that it is a minimum the module needs.
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | low | "implemented in quire 0.41.0" sits in a sentence about quire-rs FR-049, but 0.41.0 is the quire CLI version. The engine that adds the feature is quire-rs 0.57.0, and the Python `quire` wheel is versioned with the engine. The text also does not say that this is a floor: engines below 0.57.0 reject the whole manifest, because `DocumentReference` denies unknown fields. Write it once in Upstream as "requires quire-rs >= 0.57.0 (quire CLI >= 0.41.0); older engines reject `kind_column`". Line 31 can then drop its version. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:31; spec/functional/FR-015-anomaly-safety-impact-assessment.md:99 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 9c1de24: l.31 drops the version; Upstream reads "requires quire-rs >= 0.57.0 (quire CLI >= 0.41.0), as older engines reject `kind_column`". |

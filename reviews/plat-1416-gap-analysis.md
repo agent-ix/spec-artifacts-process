@@ -49,3 +49,16 @@ untested Behavior branch and pre-existing matrix bookkeeping. Neither blocks thi
 | --- | --- | --- | --- |
 | FND-001 | low | FR-015 Behavior says a `Requirement` row may name an NFR or one of its criteria. The fixture corpus has no NFR, so dropping `nfr-document` or `nfr-acceptance-criterion` from `kind_targets.Requirement` survives every test. A probe shows the current mapping behaves correctly. Adding an NFR to the corpus and a `Requirement` row naming it to the AC-4 valid fixture would cover it. | tests/fixtures/anomaly/corpus/spec; spec_artifacts_process/manifest.yaml:1140-1143 |
 | FND-002 | low | `spec/tests.md` has no rows for FR-014, FR-015 or NFR-001, so the computed matrix reports FR-015-AC-6 and every other Anomaly criterion as untagged, although tagged tests exist. This predates PR 141, and PLAT-1416, the ticket that owns these criteria, is the place to close it. | spec/tests.md; spec/functional/FR-015-anomaly-safety-impact-assessment.md:86-95 |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | medium | The new matrix rows for TC-186 (NFR-001-AC-1) and TC-187 (NFR-001-AC-2) read `✅ Complete` and `✅`. NFR-001-AC-2, and NFR-001-AC-1 for fixture (c), are backed only by strict xfails that PLAT-1476 owns: no passing test shows the three fixture (c) defects in one run, and no passing test shows the lines. The repo marks such rows as blocked, for example TC-135 `❌ strict expected failure: quire-rs#221` and FR-010-AC-9 `❌ blocked on quire-rs#221`. Mark both TC-186 and TC-187 as blocked on PLAT-1476. | spec/tests.md:175-176; spec/tests.md:339-340 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 9c1de24 adds corpus NFR-002 with NFR-002-AC-1, valid/requirement-rows-name-nfr.md and invalid/hazard-row-names-nfr.md, with two new tests. Mutation results: dropping `nfr-acceptance-criterion` from Requirement, or adding the nfr targets to Hazard, fails a test. Dropping `nfr-document` alone survives, but that mutant is equivalent: under quire-rs FR-049 the resolution set of `nfr-acceptance-criterion` (archetype NFR) already holds the NFR document ids, so behaviour does not change. |
+| FND-002 | fixed | 9c1de24 adds TC-168..175, TC-176..185 and TC-186..187 to the coverage and summary tables of spec/tests.md. None of these ids exists on main, and each has exactly one summary row. Every Anomaly trace marker now carries its TC id. `quire matrix` shows all 20 FR-014/FR-015/NFR-001 criteria `tagged`, with zero `criterion-tagged-outside-row`. |

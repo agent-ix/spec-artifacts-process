@@ -52,3 +52,16 @@ the whole module, not only the Anomaly declaration.
 | --- | --- | --- | --- |
 | FND-001 | high | `DocumentReference` is `#[serde(deny_unknown_fields)]` in every quire-rs release before v0.57.0, and `kind_column` first appears in v0.57.0 (f608780). The repo's declared engine is `quire = "^0.55.0"` (Poetry caret on 0.x means >=0.55.0,<0.56.0), and `poetry.lock` holds 0.55.0. That engine rejects the manifest, so `Registry.load_from(REPO_ROOT)` fails in the locked environment. The installed 0.53 wheel already fails the same way on an earlier unknown field, which shows the wheel parses `traceability` strictly. A consumer on quire CLI 0.40.0 (engine 0.56.0) also fails to load the whole module. Fix: raise the constraint to `^0.57.0` and relock. If internal-pypi lacks the wheel, use a git or path dependency on quire-rs. | pyproject.toml:39; poetry.lock:934-935; spec_artifacts_process/manifest.yaml:1140-1143 |
 | FND-002 | low | The AC-6 test filters on the substrings `mismatch`, the target and the kind word, not on the engine's finding code. Its sibling test uses the `reference_findings(result, kind)` helper with `[dangling-trace-reference]`. Using `reference_findings(result, "reference-kind-mismatch")` plus `(row '<kind>')` would pin the exact code and row and match AC-5's test. | tests/test_anomaly.py:456-466 |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | medium | The repo provisions its own quire CLI through `spec_artifacts_process/semantic/package.json` (`"@agent-ix/quire-cli": "0.38.2"`), and `pytest_sessionstart` in `tests/conftest.py` puts `semantic/node_modules/.bin` first on PATH. After `make semantic-install`, every CLI-driven test therefore runs quire 0.38.2. That version rejects the manifest (`unknown field 'from'`, l.863, already the case on main), and it predates `kind_column`. Measured on this head with the repo's own provisioning: 23 failed, 44 passed and 3 xfailed in tests/test_anomaly.py. This contradicts the floor the PR just wrote into FR-015 (quire CLI >= 0.41.0). Fix: bump the devDependency to 0.41.0, which is published on npmjs, and update package-lock.json. | spec_artifacts_process/semantic/package.json:17; tests/conftest.py:58-62 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | 9c1de24: pyproject `quire = { version = "^0.57.0", source = "internal-pypi" }`; poetry.lock moves quire 0.55.0 -> 0.57.0 (five wheel entries + content-hash only, no other package churn). `poetry install` from internal-pypi resolves quire 0.57.0 and `Registry.load_from` accepts the manifest. |
+| FND-002 | fixed | 9c1de24: AC-6 test now uses `reference_findings(..., "reference-kind-mismatch")`, asserts exactly one, the id and `(row '<kind>')`. |
