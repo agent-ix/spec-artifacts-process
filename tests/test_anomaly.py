@@ -613,15 +613,6 @@ def test_fixture_c_reports_all_three_defects(tmp_path: Path):
     assert len(fixture_c_reported(tmp_path)) == 3, fixture_c_reported(tmp_path)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "the engine locates the dangling and kind-mismatched rows "
-        "(BundleFinding.line, quire-rs 0.58.0) but the quire CLI's bundle "
-        "output (0.42.0) prints no line for a bundle finding. Owned by "
-        "quire-cli; turns green when `quire validate --okf` prints it."
-    ),
-)
 @pytest.mark.trace("NFR-001-AC-2", "TC-187")
 def test_fixture_c_every_defect_carries_a_line(tmp_path: Path):
     reported = fixture_c_reported(tmp_path)

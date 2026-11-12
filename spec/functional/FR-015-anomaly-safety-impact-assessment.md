@@ -96,5 +96,5 @@ does not exist or is of the wrong kind.
 
 ## Dependencies
 
-- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and its kind-typed references (`kind_column`, FR-049-AC-10..18); requires quire-rs >= 0.58.0 (quire CLI >= 0.42.0), as older engines reject `kind_column` and `record_validation`; quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
+- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and its kind-typed references (`kind_column`, FR-049-AC-10..18); requires quire-rs >= 0.58.0 (quire CLI >= 0.43.0), as older engines reject `kind_column` and `record_validation`; quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
 - **Downstream**: quoin [FR-136](ix://agent-ix/quoin/FR-136)

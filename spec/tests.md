@@ -179,7 +179,7 @@ type: TestMatrix
 | FR-015 | FR-015-AC-9 | TC-184 | ✅ Complete |
 | FR-015 | FR-015-AC-10 | TC-185 | ✅ Complete |
 | NFR-001 | NFR-001-AC-1 | TC-186 | ✅ Complete |
-| NFR-001 | NFR-001-AC-2 | TC-187 | ❌ blocked: quire CLI prints no line for a bundle finding |
+| NFR-001 | NFR-001-AC-2 | TC-187 | ✅ Complete |
 
 
 ## Test Case Summary
@@ -343,7 +343,7 @@ type: TestMatrix
 | TC-184 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Unit | P1 | FR-015-AC-9 | ✅ |
 | TC-185 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Unit | P1 | FR-015-AC-10 | ✅ |
 | TC-186 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Unit | P1 | NFR-001-AC-1 | ✅ |
-| TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ❌ blocked: quire CLI prints no line for a bundle finding |
+| TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ✅ |
 | TC-188 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`, `status` being a `yield_pattern.match` key. | Unit | P1 | FR-014-AC-9 | ✅ |
 | TC-189 | The `yield_pattern.match` of `Anomaly` has a `closed_by` locator, `from: frontmatter_field`, `path: [closed_by]`, `required: false`. | Unit | P1 | FR-014-AC-10 | ✅ |
 | TC-190 | `AnomalyFields.json` is in the package-data glob with the module `$id`, and the generator's projection test does not count it. | Unit | P1 | FR-014-AC-11 | ✅ |
