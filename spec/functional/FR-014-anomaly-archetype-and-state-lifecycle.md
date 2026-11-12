@@ -80,7 +80,17 @@ the file, which already records it and which a typed table could only duplicate 
   it carries the conditional presence rules above as `if`/`then`, so that each is reported at the
   `status` line. It is not the emitted record schema: `Anomaly.json` (camelCase keys, projected
   from TypeSpec, FR-009) validates the mapped record and is unchanged by it. The schema generator
-  leaves a file named `*Fields.json` alone, as it does a frontmatter schema.
+  leaves `AnomalyFields.json` alone, as it does a frontmatter schema.
+- `AnomalyFields.json` SHALL also carry the assessment row rules the `assert` facet cannot express
+  (each table row is one tab-joined `Kind`, `Target`, `Impact`, `Rationale` string in the extracted
+  record): `none` admits exactly one row, `None` with `Target` `-` and `Impact` `None`; `impacting`
+  needs a `Requirement` or `Hazard` row whose `Impact` is `Affects`, `Mitigates` or `Introduces`;
+  `Impact` `None` is refused on a `Requirement` or `Hazard` row. A row defect is reported at the
+  row's line.
+- The status rules SHALL apply only to a status in the vocabulary, so a mistyped `status` yields the
+  `status` vocabulary finding and no other. The `closed_by` placeholder rule applies only to a
+  `closed` anomaly, so a non-closed anomaly carrying `closed_by` yields the one finding that it must
+  not.
 - The type SHALL NOT be `required` of any repository; a repository that declares no `Anomaly`
   document is unaffected.
 
@@ -96,7 +106,11 @@ the file, which already records it and which a typed table could only duplicate 
 | FR-014-AC-6 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
 | FR-014-AC-7 | The mapping lists `status`, `resolution`, `closedBy`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Test |
 | FR-014-AC-8 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
-| FR-014-AC-9 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`, with a `closed_by` locator; the schema file ships beside the emitted schemas and is not removed by the schema generator; a `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field at the `status` line. | Test |
+| FR-014-AC-9 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`. | Test |
+| FR-014-AC-10 | The `Anomaly` `yield_pattern.match` carries a `closed_by` `frontmatter_field` locator with `required: false`. | Test |
+| FR-014-AC-11 | `AnomalyFields.json` ships in the package data beside the emitted schemas and is not counted as a projection by the schema generator. | Test |
+| FR-014-AC-12 | A `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field, both at the `status` line. | Test |
+| FR-014-AC-13 | An anomaly whose `status` is outside the vocabulary yields exactly one finding, at the `status` line. | Test |
 
 ## Dependencies
 

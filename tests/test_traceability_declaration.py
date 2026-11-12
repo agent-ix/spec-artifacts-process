@@ -230,9 +230,9 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
         if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
     ]
     expected = ["functional-coverage", "test-case", "traces-to"]
-    assert sorted(matrix_entries) == expected, (
-        f"one entry per table kind, not per filename: {matrix_entries}"
-    )
+    assert (
+        sorted(matrix_entries) == expected
+    ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
 @pytest.mark.trace("TC-030", "FR-004-AC-3")
@@ -278,9 +278,9 @@ def test_references_resolve_against_declared_targets(traceability: dict) -> None
         assert reference["targets"], reference["name"]
         unknown = set(reference["targets"]) - declared
         assert not unknown, f"{reference['name']} names undeclared {unknown}"
-        assert re.compile(reference["pattern"]).groups >= 1, (
-            f"{reference['name']}: capture group 1 is the referenced id"
-        )
+        assert (
+            re.compile(reference["pattern"]).groups >= 1
+        ), f"{reference['name']}: capture group 1 is the referenced id"
 
 
 @pytest.mark.trace("TC-033", "FR-004-AC-6")

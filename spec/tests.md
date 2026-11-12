@@ -113,6 +113,7 @@ type: TestMatrix
 | FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
 | FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
 | FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
+| FR-009 | FR-009-AC-14 | TC-193 | ✅ Complete |
 | FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
 | FR-010 | FR-010-AC-5 | TC-093 | ✅ Complete |
 | FR-010 | FR-010-AC-6 | TC-094 | ✅ Complete |
@@ -162,8 +163,11 @@ type: TestMatrix
 | FR-014 | FR-014-AC-6 | TC-173 | ✅ Complete |
 | FR-014 | FR-014-AC-7 | TC-174 | ✅ Complete |
 | FR-014 | FR-014-AC-8 | TC-175 | ✅ Complete |
-| TC-188 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`, with a `closed_by` locator; the schema file ships beside the emitted schemas and is not removed by the schema generator; a `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field at the `status` line. | Unit | P1 | FR-014-AC-9 | ✅ |
 | FR-014 | FR-014-AC-9 | TC-188 | ✅ Complete |
+| FR-014 | FR-014-AC-10 | TC-189 | ✅ Complete |
+| FR-014 | FR-014-AC-11 | TC-190 | ✅ Complete |
+| FR-014 | FR-014-AC-12 | TC-191 | ✅ Complete |
+| FR-014 | FR-014-AC-13 | TC-192 | ✅ Complete |
 | FR-015 | FR-015-AC-1 | TC-176 | ✅ Complete |
 | FR-015 | FR-015-AC-2 | TC-177 | ✅ Complete |
 | FR-015 | FR-015-AC-3 | TC-178 | ✅ Complete |
@@ -340,6 +344,12 @@ type: TestMatrix
 | TC-185 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Unit | P1 | FR-015-AC-10 | ✅ |
 | TC-186 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Unit | P1 | NFR-001-AC-1 | ✅ |
 | TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ❌ blocked: quire CLI prints no line for a bundle finding |
+| TC-188 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`, `status` being a `yield_pattern.match` key. | Unit | P1 | FR-014-AC-9 | ✅ |
+| TC-189 | The `yield_pattern.match` of `Anomaly` has a `closed_by` locator, `from: frontmatter_field`, `path: [closed_by]`, `required: false`. | Unit | P1 | FR-014-AC-10 | ✅ |
+| TC-190 | `AnomalyFields.json` is in the package-data glob with the module `$id`, and the generator's projection test does not count it. | Unit | P1 | FR-014-AC-11 | ✅ |
+| TC-191 | A `closed` anomaly with no `closed_by` and no `resolution` yields one `semantic.record-invalid` finding per missing field, both at the `status` line. | Unit | P1 | FR-014-AC-12 | ✅ |
+| TC-192 | A `closed` fixture with `status: open` yields exactly one finding, the `status` vocabulary finding at the `status` line. | Unit | P1 | FR-014-AC-13 | ✅ |
+| TC-193 | The generator's projection test counts `Anomaly.json` and `Stale.json` as projections and `AnomalyFields.json` and `*-frontmatter.schema.json` files as hand-authored. | Unit | P1 | FR-009-AC-14 | ✅ |
 
 ## Option Permutation Matrix
 

@@ -94,9 +94,9 @@ artifact_types:
   lint_rules_ref: []
   # FR-014 / FR-015. Vocabularies and shapes are asserted here; the conditional
   # presence checks (status against resolution and closed_by, assessment
-  # required from `assessed`) are `record_validation`'s, and the shape of a
-  # `none` or `impacting` table is the emitted record schema's, because the `assert` facet cannot express a condition on
-  # another field. Transition legality is quoin FR-136's, over git history.
+  # required from `assessed`) and the row rules of a `none` or `impacting`
+  # table are `record_validation`'s (AnomalyFields.json), because the `assert`
+  # facet cannot express a condition on another field. Transition legality is quoin FR-136's, over git history.
   # The type is required of no repository.
   body_extraction:
     yield_pattern:
