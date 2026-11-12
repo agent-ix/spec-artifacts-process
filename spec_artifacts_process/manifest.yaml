@@ -74,6 +74,62 @@ artifact_types:
   - depends_on
   examples: []
   lint_rules_ref: []
+- name: Anomaly
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/anomaly-frontmatter.schema.json
+  data_schema:
+    schema: schemas/Anomaly.json
+  defaults:
+    id_pattern: AN-{next:03d}
+  allowed_links:
+  - references
+  - relates_to
+  examples: []
+  lint_rules_ref: []
+  # FR-014 / FR-015. Vocabularies and shapes are asserted here; the conditional
+  # checks (status against resolution and closed_by, assessment required from
+  # `assessed`, the shape of a `none` or `impacting` table) are the emitted
+  # record schema's, because the `assert` facet cannot express a condition on
+  # another field. Transition legality is quoin FR-136's, over git history.
+  # The type is required of no repository.
+  body_extraction:
+    yield_pattern:
+      match:
+        status:
+          from: frontmatter_field
+          path: [status]
+          required: true
+          assert:
+            choices: [identified, assessed, resolved, closed]
+        resolution:
+          from: frontmatter_field
+          path: [resolution]
+          required: false
+          assert:
+            choices: [fixed, not-a-defect, duplicate, wont-fix]
+        safety_impact:
+          from: frontmatter_field
+          path: [safety_impact]
+          required: true
+          assert:
+            choices: [unassessed, none, impacting]
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+        assessment:
+          from: table_row
+          under_section: Safety Impact Assessment
+          required: false
+          multiple: true
+          assert:
+            columns: [Kind, Target, Impact, Rationale]
+            min_rows: 1
+            column_choices:
+              Kind: [Requirement, Hazard, None]
+              Impact: [Affects, Mitigates, Introduces, Unaffected, None]
+            column_patterns:
+              Rationale: '\S'
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -1775,6 +1831,7 @@ semantic:
   package: agent-ix/spec-artifacts-process
   exports:
   - ADR
+  - Anomaly
   - Plan
   - Task
   - Review

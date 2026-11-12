@@ -458,6 +458,10 @@ class ReferenceMapper:
                 if cell == "":
                     continue
                 row[name] = cell
+            elif parse == "reference":
+                if cell in ("", "-"):
+                    continue
+                row[name] = cell
             elif parse == "id":
                 pattern = asserts.get("id_pattern")
                 if pattern and not re.fullmatch(pattern, cell):

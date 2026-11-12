@@ -113,8 +113,8 @@
       "properties": {
         "property": { "type": "string", "minLength": 1 },
         "parse": {
-          "enum": ["text", "id", "status-marker", "trace-tokens", "enum", "line"],
-          "description": "`text` carries the trimmed cell; `id` checks it against the locator's id_pattern; `status-marker` splits marker from note; `trace-tokens` expands the two shorthands and the lone `-`; `enum` checks a declared vocabulary."
+          "enum": ["text", "id", "status-marker", "trace-tokens", "enum", "line", "reference"],
+          "description": "`text` carries the trimmed cell; `id` checks it against the locator's id_pattern; `status-marker` splits marker from note; `trace-tokens` expands the two shorthands and the lone `-`; `enum` checks a declared vocabulary; `reference` carries the authored reference token and yields no value for the lone `-`."
         }
       }
     }

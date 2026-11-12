@@ -210,6 +210,63 @@ enum AdrState {
   rejected,
 }
 
+/** Anomaly lifecycle status; the legal moves between members are judged over git history by quoin, not by this model. */
+enum AnomalyStatus {
+  identified,
+  assessed,
+  resolved,
+  closed,
+}
+
+/** How a resolved or closed anomaly ended. */
+enum AnomalyResolution {
+  fixed,
+  `not-a-defect`,
+  duplicate,
+  `wont-fix`,
+}
+
+/** Whether the anomaly's safety impact has been assessed, and with what outcome. */
+enum SafetyImpact {
+  unassessed,
+  none,
+  impacting,
+}
+
+/** What an assessment row points at. */
+enum AssessmentKind {
+  Requirement,
+  Hazard,
+  None,
+}
+
+/** How the anomaly bears on the row's target. `None` is admitted only on a row of kind `None`. */
+enum AssessmentImpact {
+  Affects,
+  Mitigates,
+  Introduces,
+  Unaffected,
+  None,
+}
+
+/**
+ * A reference token authored in an assessment `Target` cell: an `FR`/`NFR`/
+ * acceptance-criterion id or a hazard id. No hazard id pattern is assumed
+ * (FR-015), so the shape is the loose id shape; existence and kind are the
+ * engine's reference diagnostics, never part of the record.
+ */
+@pattern("^[A-Za-z][A-Za-z0-9_]*(-[A-Za-z0-9_]+)+$")
+scalar AssessmentTarget extends string;
+
+/**
+ * A `closed_by` value that is a named person in shape: non-empty after
+ * trimming and not one of the placeholders `n/a`, `none`, `unknown`, `tbd`,
+ * `-`, compared case-insensitively. Whether the name is a real person is the
+ * commit author's attribution, not this pattern's.
+ */
+@pattern("^(?![ \\t]*([nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)[ \\t]*$)[ \\t]*\\S")
+scalar ClosedBy extends string;
+
 /** A relationship verb from the module's `allowed_links` registries. */
 @pattern("^[a-z][a-z0-9_]*$")
 scalar EdgeVerb extends string;
@@ -311,6 +368,25 @@ model TraceCell {
   noTrace: boolean;
   /** free text: a trailing parenthesised remark, verbatim. */
   note?: string;
+}
+
+/**
+ * One `## Safety Impact Assessment` row (`Kind | Target | Impact | Rationale`).
+ * `target` is the authored reference token and is absent for a `None` row whose
+ * `Target` is `-`. Whether a token resolves is a diagnostic, not part of the record.
+ */
+@extension("allOf", #[
+  #{ `if`: #{ `properties`: #{ `kind`: #{ `const`: "None" } }, `required`: #["kind"] },
+     `then`: #{ `not`: #{ `required`: #["target"] } },
+     `else`: #{ `required`: #["target"], `properties`: #{ `impact`: #{ `not`: #{ `const`: "None" } } } } }
+])
+model AssessmentRow {
+  kind: AssessmentKind;
+  target?: AssessmentTarget;
+  impact: AssessmentImpact;
+  /** free text: the engineer's judgement. */
+  rationale: NonEmptyText;
+  line: LineNumber;
 }
 
 /** One `## Findings` row of a SpecReview (`ID | Severity | Summary | Refs | Escape Cause`). */
@@ -612,6 +688,57 @@ model Feedback {
   relationships?: Relationship[];
   provenance: Provenance;
   comment: Section;
+}
+
+/**
+ * Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle
+ * status, how it ended, who closed it and its safety-impact assessment
+ * (FR-014, FR-015). The conditional rules below are the status-conditional
+ * checks the module owns; the legality of a status move is judged over git
+ * history by quoin and is not representable in a record. The record holds no
+ * history, no author and no date.
+ */
+@extension("allOf", #[
+  // `resolution`: present exactly when resolved or closed; `fixed` when resolved.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["resolved", "closed"] } }, `required`: #["status"] },
+     `then`: #{ `required`: #["resolution"] },
+     `else`: #{ `not`: #{ `required`: #["resolution"] } } },
+  #{ `if`: #{ `properties`: #{ `status`: #{ `const`: "resolved" } }, `required`: #["status"] },
+     `then`: #{ `properties`: #{ `resolution`: #{ `const`: "fixed" } } } },
+  // closed_by: present exactly when closed.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `const`: "closed" } }, `required`: #["status"] },
+     `then`: #{ `required`: #["closedBy"] },
+     `else`: #{ `not`: #{ `required`: #["closedBy"] } } },
+  // assessment required from assessed onward.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
+     `then`: #{ `required`: #["assessment"], `properties`: #{ `safetyImpact`: #{ `not`: #{ `const`: "unassessed" } } } } },
+  // none: exactly one None row with impact None.
+  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "none" } }, `required`: #["safetyImpact"] },
+     `then`: #{ `required`: #["assessment"],
+              `properties`: #{ `assessment`: #{ `minItems`: 1, `maxItems`: 1,
+                `items`: #{ `properties`: #{ `kind`: #{ `const`: "None" }, `impact`: #{ `const`: "None" } } } } } } },
+  // impacting: at least one Requirement or Hazard row whose impact is not Unaffected.
+  #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "impacting" } }, `required`: #["safetyImpact"] },
+     `then`: #{ `required`: #["assessment"],
+              `properties`: #{ `assessment`: #{ `contains`: #{
+                `properties`: #{ `kind`: #{ `enum`: #["Requirement", "Hazard"] },
+                               `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } }
+])
+model Anomaly {
+  id: UpperDocId;
+  title: NonEmptyText;
+  type: "Anomaly";
+  status: AnomalyStatus;
+  resolution?: AnomalyResolution;
+  closedBy?: ClosedBy;
+  safetyImpact: SafetyImpact;
+  object?: ObjectTypeName;
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
+  provenance: Provenance;
+  description: Section;
+  /** Absent while the anomaly is `identified` and unassessed; required from `assessed` onward by the conditionals above. */
+  @minItems(1) assessment?: AssessmentRow[];
 }
 
 /**

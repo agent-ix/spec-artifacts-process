@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/AssessmentTarget.json",
+  "type": "string",
+  "pattern": "^[A-Za-z][A-Za-z0-9_]*(-[A-Za-z0-9_]+)+$",
+  "description": "A reference token authored in an assessment `Target` cell: an `FR`/`NFR`/\nacceptance-criterion id or a hazard id. No hazard id pattern is assumed\n(FR-015), so the shape is the loose id shape; existence and kind are the\nengine's reference diagnostics, never part of the record."
+}

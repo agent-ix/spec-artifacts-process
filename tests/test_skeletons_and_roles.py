@@ -39,6 +39,7 @@ EXPECTED_ROLES = {
     "SpecReview": "definition",
     "Finding": "definition",
     "Feedback": "definition",
+    "Anomaly": "definition",
     "TestMatrixIndex": "definition",
     "TestMatrix": "definition",
     "Standard": "definition",
@@ -109,7 +110,7 @@ def test_every_required_section_is_present_in_its_skeleton(manifest, model: str)
         line.lstrip("#").strip() for line in text.split("\n") if line.startswith("#")
     }
     for name, locator in locators.items():
-        if not locator.get("required"):
+        if not locator.get("required") or locator.get("from") == "frontmatter_field":
             continue
         heading = locator.get("under_section") or locator.get("after_heading")
         assert (
