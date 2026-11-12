@@ -51,8 +51,7 @@ the file, which already records it and which a typed table could only duplicate 
   `resolved` to `closed`, `resolved` to `assessed` (a fix that did not hold), and, for an anomaly
   that was never fixed, `identified` to `closed` and `assessed` to `closed` with `resolution` one of
   `not-a-defect`, `duplicate`, `wont-fix`. Every other move SHALL fail, including any move out of
-  `closed`, any move to `closed` with `resolution: fixed` that did not pass through `resolved`, and
-  any move that leaves `status` unchanged but is recorded as a transition. The check over moves is
+  `closed`, and any move to `closed` with `resolution: fixed` that did not pass through `resolved`. The check over moves is
   owned by quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here.
 - When `status` is `closed`, `closed_by` SHALL be present. Its check is of shape only: non-empty
   after trimming and not a placeholder (`n/a`, `none`, `unknown`, `tbd`, `-`, compared

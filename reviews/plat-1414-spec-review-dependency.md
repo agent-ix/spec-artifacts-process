@@ -50,6 +50,8 @@ Resolve these before implementation is scheduled.
 | FND-002 | fixed | 656aca5 re-points FR-015 to quire-rs FR-026 for dangling references and FR-040 `allowed_links` for kind typing, drops FR-050, and states that both diagnostics are the engine's. |
 | FND-003 | fixed | 656aca5 identifies a hazard by `type: hazard` and `object: hazard`, with no id pattern assumed. It adds one missing-module diagnostic, with no per-row dangling diagnostic, when the hazard type is not installed (FR-015-AC-9). |
 | FND-004 | fixed | 656aca5 changes the relationship target to `ix://agent-ix/spec-objects-safety/FR-001`. That FR exists on spec-objects-safety main and declares the `hazard` object type. |
+| FND-005 | still-open | 0956b64 makes quoin FR-136 the owner of the one-per-document missing-module report (`anomaly.missing-module`, FR-136-AC-10), but only for `quoin anomaly check`. FR-015 still says validation "SHALL NOT report each `Hazard` row as dangling". Its own ownership row admits that FR-026 does not suppress the per-row reports, and FR-136-AC-10 checks only that one `anomaly.missing-module` appears. So `quire validate` still reports every `Hazard` row as dangling, and the "SHALL NOT" clause has no owner and no criterion. Drop the clause (one quoin diagnostic alongside quire's per-row diagnostics), or route the suppression to quire-rs. |
+
 
 ## New findings (disposition pass 1)
 

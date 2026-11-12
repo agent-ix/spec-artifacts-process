@@ -68,6 +68,8 @@ design and the error-path coverage of FR-014 and FR-015 are otherwise sound.
 | FND-005 | fixed | 656aca5 requires `Impact` `None` on the `None` row. FR-015-AC-7 tests both the accepting case and the `Affects` case. |
 | FND-006 | fixed | 656aca5 adds `FR-001-AC-1` to FR-015-AC-4 and `FR-001-AC-99` to AC-5. |
 | FND-007 | fixed | 656aca5 changes spec.md In Scope to 13 artifact types and adds `Anomaly` to the list. |
+| FND-008 | fixed | 0956b64 admits `Impact` `None` only on a `Kind` `None` row. FR-015-AC-7 adds the failing cases: an `impacting` anomaly whose only rows have `Impact` `None`, and a `Requirement` or `Hazard` row with `Impact` `None`. |
+| FND-009 | fixed | 0956b64 drops the old FR-014-AC-4. The move rule now says it is "owned by quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here", and FR-014-AC-4 to AC-7 are renumbered. |
 
 ## New findings (disposition pass 1)
 
@@ -75,3 +77,9 @@ design and the error-path coverage of FR-014 and FR-015 are otherwise sound.
 | --- | --- | --- | --- |
 | FND-008 | medium | 656aca5 adds `None` to the `Impact` vocabulary for every row kind, but the `impacting` rule excludes only `Unaffected` ("at least one `Requirement` or `Hazard` row whose `Impact` is not `Unaffected`"). An `impacting` anomaly whose only rows are `Requirement` or `Hazard` rows with `Impact` `None` therefore passes, which is the very case FR-015-AC-7 exists to reject. Restrict `Impact` `None` to `Kind` `None` rows (and the reverse), or exclude `None` from the `impacting` test, and add the case to FR-015-AC-7. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:53-54; spec/functional/FR-015-anomaly-safety-impact-assessment.md:64-65; spec/functional/FR-015-anomaly-safety-impact-assessment.md:82 |
 | FND-009 | low | FR-014-AC-4 is "owned by quoin FR-136; this criterion is exercised there". A test in quoin cannot carry a trace tag in this repo's matrix, so FR-014-AC-4 stays `untagged` permanently. quoin FR-136-AC-3 already states the same moves. Drop FR-014-AC-4 here and point to FR-136-AC-3, or keep the legal-move table only as the statement that FR-136 checks against. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:76 |
+
+## New findings (disposition pass 2)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-010 | medium | Now that FR-014-AC-4 is gone, FR-014 says its move rule is "verified by quoin FR-136-AC-3". FR-136-AC-3 on quoin#828 (f1ad73c0) tests only four histories: `identified` to `resolved`, `assessed` to `closed` with `fixed`, `identified` to `closed` with `duplicate`, and `resolved` to `assessed`. The cases the dropped criterion carried are now tested nowhere: any move out of `closed`, `assessed` to `identified`, `identified` to `closed` with `fixed`, and `assessed` to `closed` with `wont-fix`. FR-014's clause "any move that leaves `status` unchanged but is recorded as a transition" is also vacuous, because FR-136 builds `statusHistory` only from commits that changed `status`. Extend FR-136-AC-3 with the missing cases and delete the vacuous clause from FR-014. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:50-56 |

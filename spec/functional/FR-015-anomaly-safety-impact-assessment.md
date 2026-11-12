@@ -27,7 +27,7 @@ does not exist or is of the wrong kind.
 | `safety_impact` vocabulary, section table shape, `Kind` and `Impact` vocabularies | This module (manifest, `assert` facet, quire-rs FR-033) |
 | Section and rows required by `status` and `safety_impact` | This module's emitted record schema (FR-009), run as record validation (quoin FR-073) |
 | `Target` resolution against the corpus (dangling reference) | quire-rs [FR-026](ix://agent-ix/quire-rs/FR-026), the `Target` column being a declared document reference |
-| Missing `spec-objects-safety` reported once per document, not per `Hazard` row | quoin [FR-136](ix://agent-ix/quoin/FR-136); the engine's reference diagnostics (FR-026) do not suppress per-row reports, so this module cannot |
+| Missing `spec-objects-safety` reported once per document | quoin [FR-136](ix://agent-ix/quoin/FR-136), as one `anomaly.missing-module` diagnostic alongside the engine's per-row reports |
 | `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs [FR-040](ix://agent-ix/quire-rs/FR-040), typing the reference by `Kind` through `allowed_links` rather than a per-row check written here |
 
 ## Inputs
@@ -60,10 +60,9 @@ does not exist or is of the wrong kind.
   resolves to nothing as a dangling reference, and SHALL fail one that resolves to an artifact of
   the other kind as a kind mismatch. Both diagnostics are the engine's reference diagnostics, not
   text written by this module.
-- When a `Hazard` row is present and the `hazard` object type is not installed, validation SHALL
-  report one missing-module diagnostic naming `spec-objects-safety` for the document, and SHALL NOT
-  report each `Hazard` row as dangling. The owner of this rule is quoin FR-136, verified there by
-  FR-136-AC-10.
+- When a `Hazard` row is present and the `hazard` object type is not installed, quoin FR-136 SHALL
+  report one missing-module diagnostic naming `spec-objects-safety` for the document, in addition to
+  the engine's per-row reference diagnostics (FR-136-AC-10).
 - When `safety_impact` is `impacting`, the table SHALL hold at least one `Requirement` or `Hazard`
   row whose `Impact` is not `Unaffected`.
 - When `safety_impact` is `none`, the table SHALL hold exactly one row, of `Kind` `None`, with
@@ -75,7 +74,7 @@ does not exist or is of the wrong kind.
   acceptance-criterion id, or a hazard id) and is absent for a `None` row whose `Target` is `-`.
   Whether a token resolves is not part of the record; it is reported as a diagnostic.
 - The module SHALL ship, as fixtures for the criteria below, a corpus holding an `FR`, one of its
-  acceptance criteria and a hazard, the valid anomalies of AC-4 and AC-7, and the negatives of
+  acceptance criteria and a hazard, the valid anomalies of AC-4 and AC-7, an anomaly with two `Hazard` rows, a hazard that no anomaly names, and the negatives of
   AC-3, AC-5, AC-6, AC-7 and AC-8. Quoin holds no copy of these documents.
 - The assessment SHALL be a statement of an engineer's judgement, not a computed risk acceptance;
   this requirement SHALL NOT add any risk-acceptance or sign-off field.
