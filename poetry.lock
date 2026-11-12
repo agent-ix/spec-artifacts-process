@@ -1143,6 +1143,40 @@ test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.18.*)", "pytest-mypy"]
 
 [[package]]
+name = "spec-artifacts-iso"
+version = "0.22.1"
+description = "Filament Module: ISO-style spec artifacts (FR/NFR/StR/US/IT/TC/AC/CON) — unified-shape archetypes + authoring skeletons + frontmatter JSON Schemas + iso-spec-core grammar, validated by quire-rs (no render templates)"
+optional = false
+python-versions = ">=3.13,<3.14"
+groups = ["dev"]
+files = [
+    {file = "spec_artifacts_iso-0.22.1-py3-none-any.whl", hash = "sha256:a2ab969c8ca1f11b8281d2c134f4d72942928c15c3244cca822268cc723e769f"},
+    {file = "spec_artifacts_iso-0.22.1.tar.gz", hash = "sha256:dd23204fe4ffe92564b70efcda2e265a4863964031938e491afafd8e134d590a"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
+reference = "internal-pypi"
+
+[[package]]
+name = "spec-objects-safety"
+version = "0.7.0"
+description = "Filament Module: safety ObjectTypes (hazard, failure_mode) — IEC 61508 / ISO 26262 / FMEA"
+optional = false
+python-versions = ">=3.13,<3.14"
+groups = ["dev"]
+files = [
+    {file = "spec_objects_safety-0.7.0-py3-none-any.whl", hash = "sha256:91f3c6e0af9d063faf2866507a491d29e47080749ba0ccb91ea20f738717319e"},
+    {file = "spec_objects_safety-0.7.0.tar.gz", hash = "sha256:68c4a3669b0e13164f6a4fd4424bf9016bf8039718afe6443c4e18f3c21be39e"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://us-west1-python.pkg.dev/agent-ix/internal-pypi/simple"
+reference = "internal-pypi"
+
+[[package]]
 name = "tomlkit"
 version = "0.15.0"
 description = "Style preserving TOML library"
@@ -1157,4 +1191,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "44c76df1ebe8d9503849adaac2b7d607d869aa053b4125677813eb9376ae647c"
+content-hash = "e26f920f75eb8364381d6bf0f2bdbdf0d21dddff3c098fc2404106e2c7a133d2"

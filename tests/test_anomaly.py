@@ -22,6 +22,7 @@ quoin's tests; quoin holds no copy.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import shutil
 import subprocess
@@ -42,7 +43,6 @@ CORPUS = FIXTURES / "corpus"
 VALID = sorted((FIXTURES / "valid").glob("*.md"))
 INVALID = {p.stem: p for p in sorted((FIXTURES / "invalid").glob("*.md"))}
 VALID_BY_NAME = {p.stem: p for p in VALID}
-INSTALLED = Path.home() / ".ix" / "filament" / "modules"
 
 PLACEHOLDERS = [
     "TBD",
@@ -394,6 +394,16 @@ def test_an_empty_rationale_and_an_impact_outside_the_vocabulary_fail_validation
     assert "Impact" in impact.stderr
 
 
+def installed_module(package: str) -> Path:
+    """The module tree of an installed Python package (a dev dependency)."""
+    spec = importlib.util.find_spec(package)
+    assert spec is not None and spec.origin, (
+        f"{package} is not installed: it is a dev dependency of this repo "
+        "(`poetry install`), not something to install into the home directory"
+    )
+    return Path(spec.origin).parent
+
+
 def bundle_validate(tmp_path: Path, anomaly: Path) -> subprocess.CompletedProcess:
     """Validate the fixture corpus plus one anomaly as a bundle.
 
@@ -402,9 +412,10 @@ def bundle_validate(tmp_path: Path, anomaly: Path) -> subprocess.CompletedProces
     finding as a warning, so a clean exit does not mean no finding: callers read
     the `[dangling-trace-reference]` lines.
     """
-    modules = [INSTALLED / "spec-artifacts-iso", INSTALLED / "spec-objects-safety"]
-    for module in modules:
-        assert module.is_dir(), f"{module} is not installed"
+    modules = [
+        installed_module("spec_artifacts_iso"),
+        installed_module("spec_objects_safety"),
+    ]
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     (corpus / "spec" / "anomalies").mkdir()
