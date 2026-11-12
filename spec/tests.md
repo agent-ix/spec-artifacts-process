@@ -154,6 +154,26 @@ type: TestMatrix
 | FR-013 | FR-013-AC-5 | TC-124 | ✅ Complete |
 | FR-013 | FR-013-AC-6 | TC-125 | ✅ Complete |
 | FR-013 | FR-013-AC-8 | TC-143 | ✅ Complete |
+| FR-014 | FR-014-AC-1 | TC-168 | ✅ Complete |
+| FR-014 | FR-014-AC-2 | TC-169 | ✅ Complete |
+| FR-014 | FR-014-AC-3 | TC-170 | ✅ Complete |
+| FR-014 | FR-014-AC-4 | TC-171 | ✅ Complete |
+| FR-014 | FR-014-AC-5 | TC-172 | ✅ Complete |
+| FR-014 | FR-014-AC-6 | TC-173 | ✅ Complete |
+| FR-014 | FR-014-AC-7 | TC-174 | ✅ Complete |
+| FR-014 | FR-014-AC-8 | TC-175 | ✅ Complete |
+| FR-015 | FR-015-AC-1 | TC-176 | ✅ Complete |
+| FR-015 | FR-015-AC-2 | TC-177 | ✅ Complete |
+| FR-015 | FR-015-AC-3 | TC-178 | ✅ Complete |
+| FR-015 | FR-015-AC-4 | TC-179 | ✅ Complete |
+| FR-015 | FR-015-AC-5 | TC-180 | ✅ Complete |
+| FR-015 | FR-015-AC-6 | TC-181 | ✅ Complete |
+| FR-015 | FR-015-AC-7 | TC-182 | ✅ Complete |
+| FR-015 | FR-015-AC-8 | TC-183 | ✅ Complete |
+| FR-015 | FR-015-AC-9 | TC-184 | ✅ Complete |
+| FR-015 | FR-015-AC-10 | TC-185 | ✅ Complete |
+| NFR-001 | NFR-001-AC-1 | TC-186 | ❌ blocked on PLAT-1476 |
+| NFR-001 | NFR-001-AC-2 | TC-187 | ❌ blocked on PLAT-1476 |
 
 
 ## Test Case Summary
@@ -298,6 +318,26 @@ type: TestMatrix
 | TC-165 | The Rust `Implements:` line-comment form requires the keyword and rejects prose naming an id | Unit | P0 | FR-004-AC-36 | ✅ |
 | TC-166 | The loaded manifest declares only the structural Python and TypeScript `implements` forms, in the pinned order with the pinned templates, and no Python or TypeScript line-comment form | Unit | P0 | FR-004-AC-37 | ✅ |
 | TC-167 | No method declares `instrumented` — a test-environment fact, not a property of the requirement; `iast` remains keyed on `security` and `attack_surface` | Unit | P1 | FR-007-AC-16 | ✅ |
+| TC-168 | The manifest declares `Anomaly` with the four-member `status` vocabulary, the four-member `resolution` vocabulary, and a `## Description` section. | Unit | P1 | FR-014-AC-1 | ✅ |
+| TC-169 | The shipped skeleton validates as authored, and the `Anomaly` JSON Schema file exists beside the other emitted process-type schemas. | Unit | P1 | FR-014-AC-2 | ✅ |
+| TC-170 | Fixtures for `identified`, `assessed`, `resolved` with `fixed`, `closed` with `fixed`, and `closed` with `not-a-defect` each validate when their conditional fields are correct. | Unit | P1 | FR-014-AC-3 | ✅ |
+| TC-171 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Unit | P1 | FR-014-AC-4 | ✅ |
+| TC-172 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Unit | P1 | FR-014-AC-5 | ✅ |
+| TC-173 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Unit | P1 | FR-014-AC-6 | ✅ |
+| TC-174 | The mapping lists `status`, `resolution`, `closedBy`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Unit | P1 | FR-014-AC-7 | ✅ |
+| TC-175 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Unit | P1 | FR-014-AC-8 | ✅ |
+| TC-176 | The manifest declares `safety_impact` with exactly the three-member vocabulary, and the section table with exactly the four columns, `min_rows: 1`, and the `Kind` and `Impact` vocabularies above. | Unit | P1 | FR-015-AC-1 | ✅ |
+| TC-177 | An `identified` anomaly with `safety_impact: unassessed` and no section validates. | Unit | P1 | FR-015-AC-2 | ✅ |
+| TC-178 | For each of `assessed`, `resolved` and `closed`, a fixture with no `## Safety Impact Assessment` section fails validation, and a fixture with `safety_impact: unassessed` fails validation. | Unit | P1 | FR-015-AC-3 | ✅ |
+| TC-179 | In a corpus containing `FR-001` with criterion `FR-001-AC-1`, and a hazard document with `type: hazard` and `object: hazard`, an `impacting` anomaly whose rows target `FR-001`, `FR-001-AC-1` and the hazard validates. | Unit | P1 | FR-015-AC-4 | ✅ |
+| TC-180 | The same anomaly with a `Requirement` row targeting `FR-999` or `FR-001-AC-99`, or a `Hazard` row targeting an id no document carries, fails validation with a dangling-reference diagnostic naming the id and its row. | Unit | P1 | FR-015-AC-5 | ✅ |
+| TC-181 | A `Requirement` row whose `Target` is the hazard's id, and a `Hazard` row whose `Target` is `FR-001`, each fail validation as a kind mismatch. | Unit | P1 | FR-015-AC-6 | ✅ |
+| TC-182 | An `impacting` anomaly whose only rows are `Unaffected` fails validation; a `none` anomaly with one `None` row, `Target` `-`, `Impact` `None` and a rationale validates; a `none` anomaly with a `None` row whose `Impact` is `Affects`, or that also carries a `Hazard` row, fails validation; an `impacting` anomaly whose only rows have `Impact` `None`, or a `Requirement` or `Hazard` row with `Impact` `None`, fails validation. | Unit | P1 | FR-015-AC-7 | ✅ |
+| TC-183 | A row with an empty `Rationale`, or with an `Impact` outside the vocabulary, fails validation. | Unit | P1 | FR-015-AC-8 | ✅ |
+| TC-184 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Unit | P1 | FR-015-AC-9 | ✅ |
+| TC-185 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Unit | P1 | FR-015-AC-10 | ✅ |
+| TC-186 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Unit | P1 | NFR-001-AC-1 | ❌ blocked on PLAT-1476 |
+| TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ❌ blocked on PLAT-1476 |
 
 ## Option Permutation Matrix
 

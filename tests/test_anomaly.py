@@ -102,7 +102,7 @@ def locator(manifest, name: str) -> dict:
 # -- FR-014 -------------------------------------------------------------------
 
 
-@pytest.mark.trace("FR-014-AC-1")
+@pytest.mark.trace("FR-014-AC-1", "TC-168")
 def test_the_manifest_declares_anomaly_with_both_vocabularies(manifest):
     assert locator(manifest, "status")["assert"]["choices"] == [
         "identified",
@@ -121,7 +121,7 @@ def test_the_manifest_declares_anomaly_with_both_vocabularies(manifest):
     assert description["required"] is True
 
 
-@pytest.mark.trace("FR-014-AC-2")
+@pytest.mark.trace("FR-014-AC-2", "TC-169")
 def test_the_skeleton_validates_as_authored_and_the_schema_is_emitted():
     result = quire_validate(SKELETONS_DIR / "Anomaly.md", scope=REPO_ROOT)
     assert result.returncode == 0, result.stderr
@@ -130,7 +130,7 @@ def test_the_skeleton_validates_as_authored_and_the_schema_is_emitted():
 
 
 @pytest.mark.parametrize("path", VALID, ids=lambda p: p.stem)
-@pytest.mark.trace("FR-014-AC-3")
+@pytest.mark.trace("FR-014-AC-3", "TC-170")
 def test_every_valid_fixture_validates_at_document_and_record_layer(
     mapper, schema_registry, path: Path
 ):
@@ -154,7 +154,7 @@ def test_there_is_a_valid_fixture_per_status_and_closed_resolution():
     } <= seen
 
 
-@pytest.mark.trace("FR-014-AC-4")
+@pytest.mark.trace("FR-014-AC-4", "TC-171")
 def test_a_closed_anomaly_with_no_closed_by_fails(mapper, schema_registry):
     errors = record_errors(mapper, schema_registry, INVALID["closed-no-closed-by"])
     assert [e.validator for e in errors] == ["required"]
@@ -165,7 +165,7 @@ def test_a_closed_anomaly_with_no_closed_by_fails(mapper, schema_registry):
     "name",
     [n for n in INVALID if n.startswith("closed-closed-by-")],
 )
-@pytest.mark.trace("FR-014-AC-4")
+@pytest.mark.trace("FR-014-AC-4", "TC-171")
 def test_a_placeholder_closed_by_fails_in_any_letter_case(
     mapper, schema_registry, name: str
 ):
@@ -174,7 +174,7 @@ def test_a_placeholder_closed_by_fails_in_any_letter_case(
 
 
 @pytest.mark.parametrize("value", PLACEHOLDERS)
-@pytest.mark.trace("FR-014-AC-4")
+@pytest.mark.trace("FR-014-AC-4", "TC-171")
 def test_the_placeholder_set_is_rejected_and_a_name_is_accepted(
     schema_registry, value: str
 ):
@@ -189,7 +189,7 @@ def test_the_placeholder_set_is_rejected_and_a_name_is_accepted(
 
 
 @pytest.mark.parametrize("name", ["resolved-no-resolution", "closed-no-resolution"])
-@pytest.mark.trace("FR-014-AC-5")
+@pytest.mark.trace("FR-014-AC-5", "TC-172")
 def test_a_resolved_or_closed_anomaly_needs_a_resolution(
     mapper, schema_registry, name: str
 ):
@@ -198,7 +198,7 @@ def test_a_resolved_or_closed_anomaly_needs_a_resolution(
     assert "'resolution'" in errors[0].message
 
 
-@pytest.mark.trace("FR-014-AC-5")
+@pytest.mark.trace("FR-014-AC-5", "TC-172")
 def test_a_resolved_anomaly_must_be_fixed(mapper, schema_registry):
     errors = record_errors(mapper, schema_registry, INVALID["resolved-not-fixed"])
     assert signature(errors) == [("const", ["resolution"])]
@@ -207,7 +207,7 @@ def test_a_resolved_anomaly_must_be_fixed(mapper, schema_registry):
 @pytest.mark.parametrize(
     "name", ["identified-with-resolution", "assessed-with-resolution"]
 )
-@pytest.mark.trace("FR-014-AC-5")
+@pytest.mark.trace("FR-014-AC-5", "TC-172")
 def test_an_identified_or_assessed_anomaly_carries_no_resolution(
     mapper, schema_registry, name: str
 ):
@@ -218,13 +218,13 @@ def test_an_identified_or_assessed_anomaly_carries_no_resolution(
 @pytest.mark.parametrize(
     "name", ["identified-with-closed-by", "assessed-with-closed-by"]
 )
-@pytest.mark.trace("FR-014-AC-6")
+@pytest.mark.trace("FR-014-AC-6", "TC-173")
 def test_closed_by_on_a_non_closed_anomaly_fails(mapper, schema_registry, name: str):
     errors = record_errors(mapper, schema_registry, INVALID[name])
     assert [(e.validator, rule_index(e)) for e in errors] == [("not", 2)]
 
 
-@pytest.mark.trace("FR-014-AC-7", "FR-015-AC-9")
+@pytest.mark.trace("FR-014-AC-7", "FR-015-AC-9", "TC-174", "TC-184")
 def test_the_mapping_names_each_key_once_and_the_golden_record_validates(
     mappings, schema_registry
 ):
@@ -237,7 +237,7 @@ def test_the_mapping_names_each_key_once_and_the_golden_record_validates(
     assert list(schema_registry("Anomaly").iter_errors(golden)) == []
 
 
-@pytest.mark.trace("FR-015-AC-9")
+@pytest.mark.trace("FR-015-AC-9", "TC-184")
 def test_assessment_entries_carry_the_target_as_authored(mapper):
     path = FIXTURES / "valid" / "assessed.md"
     rows = mapper.build("Anomaly", path.read_text(), path.name)["assessment"]
@@ -247,7 +247,7 @@ def test_assessment_entries_carry_the_target_as_authored(mapper):
     assert row["kind"] == "None" and "target" not in row
 
 
-@pytest.mark.trace("FR-014-AC-8")
+@pytest.mark.trace("FR-014-AC-8", "TC-175")
 def test_a_repository_with_no_anomaly_is_unaffected(manifest):
     anomaly = next(a for a in manifest["artifact_types"] if a["name"] == "Anomaly")
     assert "required" not in anomaly
@@ -261,7 +261,7 @@ def test_a_repository_with_no_anomaly_is_unaffected(manifest):
 # -- FR-015 -------------------------------------------------------------------
 
 
-@pytest.mark.trace("FR-015-AC-1")
+@pytest.mark.trace("FR-015-AC-1", "TC-176")
 def test_the_manifest_declares_safety_impact_and_the_assessment_table(manifest):
     assert locator(manifest, "safety_impact")["assert"]["choices"] == [
         "unassessed",
@@ -278,7 +278,7 @@ def test_the_manifest_declares_safety_impact_and_the_assessment_table(manifest):
     }
 
 
-@pytest.mark.trace("FR-015-AC-2")
+@pytest.mark.trace("FR-015-AC-2", "TC-177")
 def test_an_identified_unassessed_anomaly_without_a_section_validates(
     mapper, schema_registry
 ):
@@ -289,7 +289,7 @@ def test_an_identified_unassessed_anomaly_without_a_section_validates(
 
 
 @pytest.mark.parametrize("status", ["assessed", "resolved", "closed"])
-@pytest.mark.trace("FR-015-AC-3")
+@pytest.mark.trace("FR-015-AC-3", "TC-178")
 def test_assessed_or_later_needs_a_section_and_a_judged_impact(
     mapper, schema_registry, status: str
 ):
@@ -303,7 +303,7 @@ def test_assessed_or_later_needs_a_section_and_a_judged_impact(
 @pytest.mark.parametrize(
     "name", ["identified-impacting-no-section", "identified-none-no-section"]
 )
-@pytest.mark.trace("FR-015-AC-3", "FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-3", "FR-015-AC-7", "TC-178", "TC-182")
 def test_an_identified_none_or_impacting_anomaly_still_needs_its_table(
     mapper, schema_registry, name: str
 ):
@@ -316,7 +316,7 @@ def test_an_identified_none_or_impacting_anomaly_still_needs_its_table(
     "name",
     ["impacting-only-unaffected", "impacting-only-impact-none"],
 )
-@pytest.mark.trace("FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
 def test_an_impacting_anomaly_needs_a_row_that_is_not_unaffected(
     mapper, schema_registry, name: str
 ):
@@ -324,7 +324,7 @@ def test_an_impacting_anomaly_needs_a_row_that_is_not_unaffected(
     assert signature(errors) == [("contains", ["assessment"])]
 
 
-@pytest.mark.trace("FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
 def test_impact_none_is_admitted_only_on_a_none_row(mapper, schema_registry):
     errors = record_errors(
         mapper, schema_registry, INVALID["impacting-row-impact-none"]
@@ -332,25 +332,25 @@ def test_impact_none_is_admitted_only_on_a_none_row(mapper, schema_registry):
     assert ("not", ["assessment", 0, "impact"]) in signature(errors)
 
 
-@pytest.mark.trace("FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
 def test_a_none_anomaly_row_must_carry_impact_none(mapper, schema_registry):
     errors = record_errors(mapper, schema_registry, INVALID["none-with-affects"])
     assert signature(errors) == [("const", ["assessment", 0, "impact"])]
 
 
-@pytest.mark.trace("FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
 def test_a_none_anomaly_holds_exactly_one_row(mapper, schema_registry):
     errors = record_errors(mapper, schema_registry, INVALID["none-with-hazard-row"])
     assert ("maxItems", ["assessment"]) in signature(errors)
 
 
-@pytest.mark.trace("FR-015-AC-7")
+@pytest.mark.trace("FR-015-AC-7", "TC-182")
 def test_a_none_anomaly_with_one_none_row_validates(mapper, schema_registry):
     path = FIXTURES / "valid" / "none.md"
     assert record_errors(mapper, schema_registry, path) == []
 
 
-@pytest.mark.trace("FR-015-AC-8")
+@pytest.mark.trace("FR-015-AC-8", "TC-183")
 def test_an_empty_rationale_and_an_impact_outside_the_vocabulary_fail_validation():
     rationale = quire_validate(INVALID["empty-rationale"])
     assert rationale.returncode != 0
@@ -404,7 +404,7 @@ def dangling_findings(result: subprocess.CompletedProcess) -> list[str]:
     return reference_findings(result, "dangling-trace-reference")
 
 
-@pytest.mark.trace("FR-015-AC-4")
+@pytest.mark.trace("FR-015-AC-4", "TC-179")
 def test_the_impacting_anomaly_validates_in_a_corpus_that_supplies_its_links(
     tmp_path: Path, mapper, schema_registry
 ):
@@ -429,7 +429,7 @@ def test_the_impacting_anomaly_validates_in_a_corpus_that_supplies_its_links(
         ("dangling-hazard", "HAZ-999", "Hazard"),
     ],
 )
-@pytest.mark.trace("FR-015-AC-5")
+@pytest.mark.trace("FR-015-AC-5", "TC-180")
 def test_a_dangling_target_is_reported_naming_the_id_and_its_row(
     tmp_path: Path, name: str, target: str, kind: str
 ):
@@ -449,33 +449,42 @@ def test_a_dangling_target_is_reported_naming_the_id_and_its_row(
         ("hazard-row-names-requirement", "FR-001", "Hazard"),
     ],
 )
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "kind-typed references do not exist in quire yet (PLAT-1471 spec, "
-        "PLAT-1472 implementation): a Requirement row naming a hazard, or a "
-        "Hazard row naming a requirement, resolves and produces no finding. "
-        "Turns green when the engine reports a kind mismatch naming the id "
-        "and the row. PLAT-1416 closes when PLAT-1472 lands."
-    ),
-)
-@pytest.mark.trace("FR-015-AC-6")
+@pytest.mark.trace("FR-015-AC-6", "TC-181")
 def test_a_target_of_the_wrong_kind_is_reported_as_a_kind_mismatch(
     tmp_path: Path, name: str, target: str, kind: str
 ):
-    result = bundle_validate(tmp_path, INVALID[name])
-    found = [
-        line
-        for line in result.stderr.splitlines()
-        if "AN-001.md" in line
-        and "mismatch" in line.lower()
-        and f"'{target}'" in line
-        and kind in line
-    ]
-    assert len(found) == 1, result.stderr
+    found = reference_findings(
+        bundle_validate(tmp_path, INVALID[name]), "reference-kind-mismatch"
+    )
+    assert len(found) == 1, found
+    assert f"'{target}'" in found[0]
+    assert f"(row '{kind}')" in found[0]
 
 
-@pytest.mark.trace("FR-015-AC-10", "FR-014-AC-2")
+@pytest.mark.trace("FR-015-AC-4", "FR-015-AC-6", "TC-179", "TC-181")
+def test_a_requirement_row_may_name_an_nfr_and_its_criterion(tmp_path: Path):
+    result = bundle_validate(
+        tmp_path, FIXTURES / "valid" / "requirement-rows-name-nfr.md"
+    )
+    assert result.returncode == 0, result.stderr
+    assert dangling_findings(result) == [], result.stderr
+    assert reference_findings(result, "reference-kind-mismatch") == [], result.stderr
+
+
+@pytest.mark.trace("FR-015-AC-6", "TC-181")
+def test_a_hazard_row_naming_an_nfr_or_its_criterion_is_a_kind_mismatch(
+    tmp_path: Path,
+):
+    result = bundle_validate(tmp_path, INVALID["hazard-row-names-nfr"])
+    found = reference_findings(result, "reference-kind-mismatch")
+    assert len(found) == 2, result.stderr
+    assert dangling_findings(result) == []
+    for target in ("NFR-002", "NFR-002-AC-1"):
+        assert sum(f"'{target}'" in line for line in found) == 1, found
+    assert all("(row 'Hazard')" in line for line in found), found
+
+
+@pytest.mark.trace("FR-015-AC-10", "FR-014-AC-2", "TC-169", "TC-185")
 def test_the_negative_counterparts_exist_for_every_named_defect():
     required = {
         # FR-014
@@ -505,7 +514,7 @@ def test_the_negative_counterparts_exist_for_every_named_defect():
 # -- NFR-001 ------------------------------------------------------------------
 
 
-@pytest.mark.trace("NFR-001-AC-1")
+@pytest.mark.trace("NFR-001-AC-1", "TC-186")
 def test_fixture_a_reports_both_coexisting_record_defects_in_one_pass(
     mapper, schema_registry
 ):
@@ -518,7 +527,7 @@ def test_fixture_a_reports_both_coexisting_record_defects_in_one_pass(
     ]
 
 
-@pytest.mark.trace("NFR-001-AC-1")
+@pytest.mark.trace("NFR-001-AC-1", "TC-186")
 def test_fixture_b_reports_both_coexisting_record_defects_in_one_pass(
     mapper, schema_registry
 ):
@@ -528,7 +537,7 @@ def test_fixture_b_reports_both_coexisting_record_defects_in_one_pass(
     assert signature(errors) == [("required", []), ("not", ["safetyImpact"])]
 
 
-@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2")
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
 def test_fixture_c_empty_rationale_is_reported_once_with_its_line(tmp_path: Path):
     path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
     found = diagnostics(quire_validate(path))
@@ -552,14 +561,13 @@ def test_fixture_c_empty_rationale_is_reported_once_with_its_line(tmp_path: Path
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "fixture (c) injects three defects. The dangling Requirement row and the "
-        "empty Rationale are reported (the first without a line); the "
-        "kind-mismatched Hazard row waits on kind-typed references (PLAT-1472), "
-        "and a bundle finding carries no document line. Turns green when all "
-        "three are reported, each with a line."
+        "fixture (c) injects three defects. Kind mismatch is now reported "
+        "(quire 0.41.0), but the dangling and kind-mismatched rows are bundle "
+        "findings that carry no document line. Owned by quire-rs PLAT-1476. "
+        "Turns green when all three are reported, each with a line."
     ),
 )
-@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2")
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
 def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
     path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
     located = diagnostics(quire_validate(path))
@@ -580,8 +588,9 @@ def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
         "the conditional checks of fixtures (a) and (b) are run on the mapped "
         "record against Anomaly.json (quoin FR-073 record validation); "
         "`quire validate` runs the manifest asserts only, so it reports none of "
-        "their defects and none carries a line. Turns green when the record "
-        "checks are reported, each located at the `status` field."
+        "their defects and none carries a line. Owned by quire-rs PLAT-1476. "
+        "Turns green when the record checks are reported, each located at the "
+        "`status` field."
     ),
 )
 @pytest.mark.parametrize(
@@ -591,7 +600,7 @@ def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
         ("nfr1-b-assessed-unassessed-no-section", 2),
     ],
 )
-@pytest.mark.trace("NFR-001-AC-2")
+@pytest.mark.trace("NFR-001-AC-2", "TC-187")
 def test_record_layer_defects_are_reported_at_the_status_line(name: str, defects: int):
     path = INVALID[name]
     status_line = next(
