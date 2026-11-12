@@ -301,6 +301,18 @@ def test_assessed_or_later_needs_a_section_and_a_judged_impact(
 
 
 @pytest.mark.parametrize(
+    "name", ["identified-impacting-no-section", "identified-none-no-section"]
+)
+@pytest.mark.trace("FR-015-AC-3", "FR-015-AC-7")
+def test_an_identified_none_or_impacting_anomaly_still_needs_its_table(
+    mapper, schema_registry, name: str
+):
+    errors = record_errors(mapper, schema_registry, INVALID[name])
+    assert signature(errors) == [("required", [])]
+    assert "'assessment'" in errors[0].message
+
+
+@pytest.mark.parametrize(
     "name",
     ["impacting-only-unaffected", "impacting-only-impact-none"],
 )
@@ -421,6 +433,9 @@ def test_the_impacting_anomaly_validates_in_a_corpus_that_supplies_its_links(
 def test_a_dangling_target_is_reported_naming_the_id_and_its_row(
     tmp_path: Path, name: str, target: str, kind: str
 ):
+    # Only the diagnostic is asserted: bundle validation under `--okf` reports
+    # it as a warning and exits 0. FR-015 names the Strict posture as the one
+    # that fails, and no quire command here runs a bundle under Strict.
     found = dangling_findings(bundle_validate(tmp_path, INVALID[name]))
     assert len(found) == 1, found
     assert f"'{target}'" in found[0]

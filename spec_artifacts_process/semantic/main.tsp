@@ -712,6 +712,10 @@ model Feedback {
   // assessment required from assessed onward.
   #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
      `then`: #{ `required`: #["assessment"], `properties`: #{ `safetyImpact`: #{ `not`: #{ `const`: "unassessed" } } } } },
+  // identified: the section may be absent only while safety_impact is unassessed;
+  // none and impacting hold rows. assessed and later are covered by the rule above.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `const`: "identified" }, `safetyImpact`: #{ `enum`: #["none", "impacting"] } }, `required`: #["status", "safetyImpact"] },
+     `then`: #{ `required`: #["assessment"] } },
   // none: exactly one None row with impact None. Applies when a table is
   // present; its absence is reported once, by the status rule above.
   #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "none" } }, `required`: #["safetyImpact", "assessment"] },

@@ -28,7 +28,7 @@ does not exist or is of the wrong kind.
 | Section and rows required by `status` and `safety_impact` | This module's emitted record schema (FR-009), run as record validation (quoin FR-073) |
 | `Target` resolution against the corpus (dangling reference) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049), the `Target` column being a declared document reference of this module's traceability model; the finding is `dangling-trace-reference`, an error under the `Strict` posture and a warning under `Okf` |
 | Missing `spec-objects-safety` reported once per document | quoin [FR-136](ix://agent-ix/quoin/FR-136), as one `anomaly.missing-module` diagnostic alongside the engine's per-row reports |
-| `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs kind-typed references (PLAT-1471, implemented by PLAT-1472), typing the reference by the row's `Kind` rather than a per-row check written here. [FR-040](ix://agent-ix/quire-rs/FR-040) edge findings are warnings only and are not this check |
+| `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) kind-typed references (`kind_column`, finding `reference-kind-mismatch`, FR-049-AC-12; implementation tracked by PLAT-1472), typing the reference by the row's `Kind` rather than a per-row check written here. [FR-040](ix://agent-ix/quire-rs/FR-040) edge findings are warnings only and are not this check |
 
 ## Inputs
 
@@ -96,5 +96,5 @@ does not exist or is of the wrong kind.
 
 ## Dependencies
 
-- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and kind-typed references (PLAT-1472); quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
+- **Upstream**: [FR-014](./FR-014-anomaly-archetype-and-state-lifecycle.md); quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) (document-reference resolution) and its kind-typed references (`kind_column`, FR-049-AC-12; implementation tracked by PLAT-1472); quire-rs FR-033; [FR-009](./FR-009-emitted-json-schemas.md); `agent-ix/spec-objects-safety` [FR-001](ix://agent-ix/spec-objects-safety/FR-001) (the `hazard` object type)
 - **Downstream**: quoin [FR-136](ix://agent-ix/quoin/FR-136)

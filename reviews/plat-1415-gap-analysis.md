@@ -50,3 +50,11 @@ FR-014 are minor.
 | FND-001 | medium | NFR-001-AC-2 requires that every diagnostic from fixtures (a), (b) and (c) carries a line, and that the `status` line is used for an absence. Fixtures (a) and (b) are checked only at the record layer, where jsonschema errors carry no line, and their tests assert no line at all. The PR body defers this to quoin's record validation. NFR-001 assigns no such ownership, and there is no strict xfail or follow-up ticket, so the AC is uncovered for (a) and (b) without any marker of that. | tests/test_anomaly.py:415-434; spec/non-functional/NFR-001-anomaly-diagnostics-in-one-pass.md |
 | FND-002 | low | FR-014 Behavior requires fixtures for "a `closed` document for each `resolution`". The valid fixtures cover closed+fixed and closed+not-a-defect only, with no closed+duplicate or closed+wont-fix. A probe shows the schema accepts both, so the gap is in the fixtures only. | tests/fixtures/anomaly/valid/ |
 | FND-003 | low | FR-014-AC-5's clause "a fixture with `status` of ... `assessed` and a `resolution` fails" has no fixture or test. Only `identified-with-resolution` exists. A probe confirms the schema rejects assessed+resolution, so the behaviour is right and untested. | tests/test_anomaly.py:180-191; tests/fixtures/anomaly/invalid/ |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head aa3ef43): `test_record_layer_defects_are_reported_at_the_status_line` is a strict xfail over fixtures (a) and (b). It asserts 2 diagnostics at the `status` line each. Leaving the NFR-001 text unedited is acceptable, because the NFR states the target behaviour and the strict xfail now marks the gap. Who owns record-layer line attribution (this module or quoin FR-073) is still undecided and should go to a ticket. The xfail reason names none. |
+| FND-002 | fixed | Round 1: `valid/closed-duplicate.md` and `valid/closed-wont-fix.md` were added and validate at the document and record layers through the parametrised valid-fixture test. |
+| FND-003 | fixed | Round 1: `invalid/assessed-with-resolution.md` was added. `test_an_identified_or_assessed_anomaly_carries_no_resolution` asserts `[("not", 0)]`. |
