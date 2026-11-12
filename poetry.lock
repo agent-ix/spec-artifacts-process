@@ -932,17 +932,17 @@ files = [
 
 [[package]]
 name = "quire"
-version = "0.55.0"
+version = "0.57.0"
 description = "Python bindings for quire-rs: parse, corpus load, and whole-spec queries (FR-023)."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "quire-0.55.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f78095e4eb9232eb09b35b785b048da95fbf71ec8a4b086574aee9702ee65557"},
-    {file = "quire-0.55.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:7f2ce880e1ce1d318f8635d4647fdc7bd81d3939026a24e791549118e576afc7"},
-    {file = "quire-0.55.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:52bbdea792becebe6fea61cf46b27b2cbac3f691413d18c5ca0dbd7b652b7a77"},
-    {file = "quire-0.55.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:11273d781dd2d5a2ecab3d8d64a587b1a38cb47ad7114bf15014f0428bf86cf5"},
-    {file = "quire-0.55.0-cp39-abi3-win_amd64.whl", hash = "sha256:03fae35427857145bcfb5995300f49bd72a7c1ed1ea08f8b75ebf5402fc15613"},
+    {file = "quire-0.57.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:d502ad53865aabfbdb0b66973689689cc4babd0d3cd901c0d8234f70a7b9f1ec"},
+    {file = "quire-0.57.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:b1676772c989b13853defd20169d939e61416ad815c84a8b73897eda3da8a2c3"},
+    {file = "quire-0.57.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b8474caa0153b1e789376d8d2c962204b91fe422ac6afa9d56e69967f00a098b"},
+    {file = "quire-0.57.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cde1affed527645070e3e74193248209cc5400344bedf7dfe30fad5055ff50e9"},
+    {file = "quire-0.57.0-cp39-abi3-win_amd64.whl", hash = "sha256:e370b64b4401fe5d44f9d37579090523abf3def8c075d9c098619874d6abab78"},
 ]
 
 [package.source]
@@ -1157,4 +1157,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "b56400e88ef40dd1e9f52d3344c4610b4f2df697be12cead34567e06593b86a7"
+content-hash = "6470965a529c955757d38e30abaca8d48e1a6e797e5a7b595240d5b2a4e7cd17"
