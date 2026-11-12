@@ -162,6 +162,8 @@ type: TestMatrix
 | FR-014 | FR-014-AC-6 | TC-173 | ✅ Complete |
 | FR-014 | FR-014-AC-7 | TC-174 | ✅ Complete |
 | FR-014 | FR-014-AC-8 | TC-175 | ✅ Complete |
+| TC-188 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`, with a `closed_by` locator; the schema file ships beside the emitted schemas and is not removed by the schema generator; a `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field at the `status` line. | Unit | P1 | FR-014-AC-9 | ✅ |
+| FR-014 | FR-014-AC-9 | TC-188 | ✅ Complete |
 | FR-015 | FR-015-AC-1 | TC-176 | ✅ Complete |
 | FR-015 | FR-015-AC-2 | TC-177 | ✅ Complete |
 | FR-015 | FR-015-AC-3 | TC-178 | ✅ Complete |
@@ -172,8 +174,8 @@ type: TestMatrix
 | FR-015 | FR-015-AC-8 | TC-183 | ✅ Complete |
 | FR-015 | FR-015-AC-9 | TC-184 | ✅ Complete |
 | FR-015 | FR-015-AC-10 | TC-185 | ✅ Complete |
-| NFR-001 | NFR-001-AC-1 | TC-186 | ❌ blocked on PLAT-1476 |
-| NFR-001 | NFR-001-AC-2 | TC-187 | ❌ blocked on PLAT-1476 |
+| NFR-001 | NFR-001-AC-1 | TC-186 | ✅ Complete |
+| NFR-001 | NFR-001-AC-2 | TC-187 | ❌ blocked: quire CLI prints no line for a bundle finding |
 
 
 ## Test Case Summary
@@ -336,8 +338,8 @@ type: TestMatrix
 | TC-183 | A row with an empty `Rationale`, or with an `Impact` outside the vocabulary, fails validation. | Unit | P1 | FR-015-AC-8 | ✅ |
 | TC-184 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Unit | P1 | FR-015-AC-9 | ✅ |
 | TC-185 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Unit | P1 | FR-015-AC-10 | ✅ |
-| TC-186 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Unit | P1 | NFR-001-AC-1 | ❌ blocked on PLAT-1476 |
-| TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ❌ blocked on PLAT-1476 |
+| TC-186 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Unit | P1 | NFR-001-AC-1 | ✅ |
+| TC-187 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Unit | P1 | NFR-001-AC-2 | ❌ blocked: quire CLI prints no line for a bundle finding |
 
 ## Option Permutation Matrix
 

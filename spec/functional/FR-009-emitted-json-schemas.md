@@ -75,7 +75,9 @@ between the source and the shipped bytes fails the build.
   otherwise it SHALL exit zero.
 - The generator SHALL treat a file named `*-frontmatter.schema.json` as hand-authored, neither
   emitting, deleting, nor reporting it, because the frontmatter schemas predate this projection
-  and are referenced by `frontmatter_schema_ref`.
+  and are referenced by `frontmatter_schema_ref`. It SHALL treat a file named `*Fields.json` the
+  same way: these are the `record_validation` schemas of the YAML-extracted record (FR-014), not
+  projections of a model.
 - `make lint` SHALL run `make schemas-check`, so a `main.tsp` edit that was never regenerated
   fails before push rather than at review.
 - The repository SHALL run `make schemas-check` as a local pre-push gate only, never as a

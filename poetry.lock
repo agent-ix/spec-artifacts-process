@@ -932,17 +932,17 @@ files = [
 
 [[package]]
 name = "quire"
-version = "0.57.0"
+version = "0.58.0"
 description = "Python bindings for quire-rs: parse, corpus load, and whole-spec queries (FR-023)."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "quire-0.57.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:d502ad53865aabfbdb0b66973689689cc4babd0d3cd901c0d8234f70a7b9f1ec"},
-    {file = "quire-0.57.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:b1676772c989b13853defd20169d939e61416ad815c84a8b73897eda3da8a2c3"},
-    {file = "quire-0.57.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b8474caa0153b1e789376d8d2c962204b91fe422ac6afa9d56e69967f00a098b"},
-    {file = "quire-0.57.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cde1affed527645070e3e74193248209cc5400344bedf7dfe30fad5055ff50e9"},
-    {file = "quire-0.57.0-cp39-abi3-win_amd64.whl", hash = "sha256:e370b64b4401fe5d44f9d37579090523abf3def8c075d9c098619874d6abab78"},
+    {file = "quire-0.58.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f5fbb30f06e318df2d16dec15e19025e304e933a51f1910f64b554a0cde567ef"},
+    {file = "quire-0.58.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:d813529a4710fd810fdbca07ae1bb25f0605f7f08cc594c8824174f97d590c82"},
+    {file = "quire-0.58.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b5427e3e8cd86a09fb3efd65911e6468f761274310bced19dc77ccad88f65aa8"},
+    {file = "quire-0.58.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:11576973110bea98cf127a8a8a218ad2e4aaccb07f773e954ffe451492650945"},
+    {file = "quire-0.58.0-cp39-abi3-win_amd64.whl", hash = "sha256:61aab5f85d7e4edd3c47027cd0e8e54ec250dade890c96cda6929080474723e2"},
 ]
 
 [package.source]
@@ -1157,4 +1157,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "6470965a529c955757d38e30abaca8d48e1a6e797e5a7b595240d5b2a4e7cd17"
+content-hash = "44c76df1ebe8d9503849adaac2b7d607d869aa053b4125677813eb9376ae647c"

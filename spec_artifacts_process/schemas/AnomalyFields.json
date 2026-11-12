@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/AnomalyFields.json",
+  "type": "object",
+  "properties": {
+    "status": {
+      "enum": ["identified", "assessed", "resolved", "closed"]
+    },
+    "resolution": {
+      "enum": ["fixed", "not-a-defect", "duplicate", "wont-fix"]
+    },
+    "closed_by": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/ClosedBy.json"
+    },
+    "safety_impact": {
+      "enum": ["unassessed", "none", "impacting"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "assessment": {
+      "type": "array",
+      "minItems": 1
+    }
+  },
+  "required": ["status", "safety_impact", "description"],
+  "description": "The Anomaly archetype's YAML-extracted yield record (record_validation, FR-014, FR-015): the values of `yield_pattern.match`, keyed by the match key names verbatim (`closed_by`, `safety_impact`). It holds the status-conditional presence rules the `assert` facet cannot express; the engine reports each at the `status` line (`locate_absence_at`). It is the module's own schema for the extracted record and is not the emitted record schema: `Anomaly.json` (camelCase keys, the mapped record) is projected from TypeSpec and is untouched by it.",
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "enum": ["resolved", "closed"] } },
+        "required": ["status"]
+      },
+      "then": { "required": ["resolution"] },
+      "else": { "not": { "required": ["resolution"] } }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "resolved" } },
+        "required": ["status"]
+      },
+      "then": { "properties": { "resolution": { "const": "fixed" } } }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "closed" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["closed_by"] },
+      "else": { "not": { "required": ["closed_by"] } }
+    },
+    {
+      "if": {
+        "properties": { "status": { "enum": ["assessed", "resolved", "closed"] } },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["assessment"],
+        "properties": { "safety_impact": { "not": { "const": "unassessed" } } }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "identified" },
+          "safety_impact": { "enum": ["none", "impacting"] }
+        },
+        "required": ["status", "safety_impact"]
+      },
+      "then": { "required": ["assessment"] }
+    }
+  ]
+}

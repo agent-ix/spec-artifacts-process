@@ -165,9 +165,16 @@ function emit() {
   }
 }
 
-/** Files under schemas/ that are not projections: the hand-authored frontmatter schemas. */
+/**
+ * Files under schemas/ that are not projections: the hand-authored frontmatter
+ * schemas and the hand-authored `*Fields.json` extracted-record schemas.
+ */
 function isProjection(name) {
-  return name.endsWith(".json") && !name.endsWith("-frontmatter.schema.json");
+  return (
+    name.endsWith(".json") &&
+    !name.endsWith("-frontmatter.schema.json") &&
+    !name.endsWith("Fields.json")
+  );
 }
 
 function main() {

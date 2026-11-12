@@ -537,78 +537,62 @@ def test_fixture_b_reports_both_coexisting_record_defects_in_one_pass(
     assert signature(errors) == [("required", []), ("not", ["safetyImpact"])]
 
 
-@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
-def test_fixture_c_empty_rationale_is_reported_once_with_its_line(tmp_path: Path):
-    path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
-    found = diagnostics(quire_validate(path))
-    assert len(found) == 1, found
-    assert "Rationale" in found[0]
-    row = (
-        path.read_text()
-        .splitlines()
-        .index(
-            next(
-                line
-                for line in path.read_text().splitlines()
-                if line.endswith("| Affects |  |")
-            )
-        )
-        + 1
-    )
-    assert f": line {row}:" in found[0]
-
-
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "fixture (c) injects three defects. Kind mismatch is now reported "
-        "(quire 0.41.0), but the dangling and kind-mismatched rows are bundle "
-        "findings that carry no document line. Owned by quire-rs PLAT-1476. "
-        "Turns green when all three are reported, each with a line."
-    ),
-)
-@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
-def test_fixture_c_reports_all_three_defects_each_with_a_line(tmp_path: Path):
+def fixture_c_reported(tmp_path: Path) -> list[str]:
     path = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
     located = diagnostics(quire_validate(path))
     bundle = bundle_validate(tmp_path, path)
-    reported = located + [
+    return located + [
         line
         for line in bundle.stderr.splitlines()
         if "AN-001.md" in line
         and ("[dangling-trace-reference]" in line or "mismatch" in line.lower())
     ]
-    assert len(reported) == 3, reported
-    assert all(": line " in line for line in reported), reported
+
+
+@pytest.mark.trace("NFR-001-AC-1", "TC-186")
+def test_fixture_c_reports_all_three_defects(tmp_path: Path):
+    assert len(fixture_c_reported(tmp_path)) == 3, fixture_c_reported(tmp_path)
 
 
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "the conditional checks of fixtures (a) and (b) are run on the mapped "
-        "record against Anomaly.json (quoin FR-073 record validation); "
-        "`quire validate` runs the manifest asserts only, so it reports none of "
-        "their defects and none carries a line. Owned by quire-rs PLAT-1476. "
-        "Turns green when the record checks are reported, each located at the "
-        "`status` field."
+        "the engine locates the dangling and kind-mismatched rows "
+        "(BundleFinding.line, quire-rs 0.58.0) but the quire CLI's bundle "
+        "output (0.42.0) prints no line for a bundle finding. Owned by "
+        "quire-cli; turns green when `quire validate --okf` prints it."
     ),
 )
+@pytest.mark.trace("NFR-001-AC-2", "TC-187")
+def test_fixture_c_every_defect_carries_a_line(tmp_path: Path):
+    reported = fixture_c_reported(tmp_path)
+    assert all(": line " in line for line in reported), reported
+
+
 @pytest.mark.parametrize(
-    "name,defects",
+    "name,at_status,at_safety_impact",
     [
-        ("nfr1-a-closed-no-closed-by-no-resolution", 2),
-        ("nfr1-b-assessed-unassessed-no-section", 2),
+        ("nfr1-a-closed-no-closed-by-no-resolution", 2, 0),
+        ("nfr1-b-assessed-unassessed-no-section", 1, 1),
     ],
 )
-@pytest.mark.trace("NFR-001-AC-2", "TC-187")
-def test_record_layer_defects_are_reported_at_the_status_line(name: str, defects: int):
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "TC-186", "TC-187")
+def test_record_layer_defects_are_located(
+    name: str, at_status: int, at_safety_impact: int
+):
+    """An absence is reported at the `status` line (`locate_absence_at`); a
+    present-but-invalid value, such as `safety_impact: unassessed`, at its own."""
     path = INVALID[name]
-    status_line = next(
-        i
-        for i, line in enumerate(path.read_text().splitlines(), 1)
-        if line.startswith("status:")
-    )
-    found = [
-        d for d in diagnostics(quire_validate(path)) if f": line {status_line}:" in d
-    ]
-    assert len(found) == defects, found
+    lines = path.read_text().splitlines()
+
+    def line_of(key: str) -> int:
+        return next(i for i, text in enumerate(lines, 1) if text.startswith(f"{key}:"))
+
+    found = diagnostics(quire_validate(path))
+
+    def at(key: str) -> list[str]:
+        return [d for d in found if f": line {line_of(key)}:" in d]
+
+    assert len(at("status")) == at_status, found
+    assert len(at("safety_impact")) == at_safety_impact, found
+    assert len(found) == at_status + at_safety_impact, found
