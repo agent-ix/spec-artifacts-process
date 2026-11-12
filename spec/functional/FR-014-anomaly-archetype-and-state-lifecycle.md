@@ -47,12 +47,14 @@ the file, which already records it and which a typed table could only duplicate 
 - The `resolution` field SHALL be one of exactly `fixed`, `not-a-defect`, `duplicate`, `wont-fix`,
   and SHALL be present when `status` is `resolved` or `closed` and absent otherwise.
 - When `status` is `resolved`, `resolution` SHALL be `fixed`.
-- The legal status moves SHALL be exactly: `identified` to `assessed`, `assessed` to `resolved`,
-  `resolved` to `closed`, `resolved` to `assessed` (a fix that did not hold), and, for an anomaly
-  that was never fixed, `identified` to `closed` and `assessed` to `closed` with `resolution` one of
-  `not-a-defect`, `duplicate`, `wont-fix`. Every other move SHALL fail, including any move out of
-  `closed`, and any move to `closed` with `resolution: fixed` that did not pass through `resolved`. The check over moves is
-  owned by quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here.
+- The single legal status moves SHALL be exactly: `identified` to `assessed`, `assessed` to
+  `resolved`, `resolved` to `closed`, `resolved` to `assessed` (a fix that did not hold), and, for an
+  anomaly that was never fixed, `identified` to `closed` and `assessed` to `closed` with
+  `resolution` one of `not-a-defect`, `duplicate`, `wont-fix`.
+- A change of status between two commits SHALL be legal when the later status is reachable from the
+  earlier one by one or more legal moves, because squash-merged history can hide intermediate
+  states; any other change, including any move out of `closed`, SHALL fail. The check is owned by
+  quoin FR-136 and verified by quoin FR-136-AC-3, not by a criterion here.
 - When `status` is `closed`, `closed_by` SHALL be present. Its check is of shape only: non-empty
   after trimming and not a placeholder (`n/a`, `none`, `unknown`, `tbd`, `-`, compared
   case-insensitively). It does not establish that the value is a real person; the commit that sets
