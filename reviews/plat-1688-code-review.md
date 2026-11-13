@@ -35,3 +35,19 @@ The criticality key is on the right sources. It sits on the two criterion source
 | FND-003 | medium | The new tests resolve spec-objects-architecture and spec-artifacts-iso from the ambient `~/.ix/filament/modules` store, and `quire` from `PATH`. Neither is a declared dependency. With this machine's installed module set, whose architecture module has no `realizes_requirement`, TC-225 fails (measured: 1 failed, 10 passed). With the installed quire 0.44.0, the new manifest keys are rejected. Fix: resolve module directories from declared dev dependencies (spec-artifacts-iso already is one; add spec-objects-architecture), or have `make test` set the path explicitly. | tests/test_adr_links.py:69, tests/test_criticality_field.py:15 |
 | FND-004 | low | The `IX_FILAMENT_MODULES_PATH` / `~/.ix/filament/modules` resolution is duplicated in both new test files. Move it to `conftest.py`. | tests/test_adr_links.py:69, tests/test_criticality_field.py:15 |
 | FND-005 | low | FR-017's `## Outputs` still reads only "`realizes_requirement` in the `ADR` `allowed_links`". It does not mention the `FR`/`NFR` target list or the `"*"` targets that the amended Behavior now requires. | spec/functional/FR-017-adr-design-realization-verb.md:26 |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-006 | high | The repository's declared quire CLI is still `@agent-ix/quire-cli` 0.43.0 (spec_artifacts_process/semantic/package.json and its lock). `pytest_sessionstart` puts `semantic/node_modules/.bin` first on PATH whenever `make semantic-install` has run, and `make lint` needs that install for `schemas-check`. quire-cli 0.43.0 rejects this manifest (`traceability.obligations[0]: unknown field criticality_field`), and the iso module's `carried_fields` with it. Measured with 0.43.0 first on PATH: 6 of the 11 rows fail, including the existing TC-218 and TC-219, so every CLI-backed row in the suite is expected to fail too. `QUIRE_CLI_REQUIRED = "0.45.0"` appears only in the `shutil.which` failure message, so a 0.43.0 on PATH passes that check. Fix: bump `@agent-ix/quire-cli` to 0.45.0 in semantic/package.json and its lock, and drop the unchecked constant. | spec_artifacts_process/semantic/package.json:17, tests/conftest.py:60, tests/conftest.py:77 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | deferred | Engine limitation, deferred to PLAT-1689 (quire-rs) by the coordinator's ruling. The FR-017 SHALL at fd3cd8b now says honestly that only targets which declare an object type are checked, and that an `ADR` target is not, citing PLAT-1689. |
+| FND-002 | deferred | Deferred to PLAT-1689 by the coordinator's ruling. FR-017-AC-7 and TC-223 now say the finding is an advisory warning that leaves the exit status unchanged, and the test pins the `warning:` prefix. The spec no longer claims a failure. Ticket AC 2's wrong-kind half moves to PLAT-1689. |
+| FND-003 | still-open | fd3cd8b moves the lookup to conftest and improves the failure messages, but the sibling modules still come from the ambient store, and the CLI from PATH. Measured at fd3cd8b with the default `IX_FILAMENT_MODULES_PATH`: TC-225 fails (1 failed, 10 passed). The CLI the repository does declare is 0.43.0 (FND-006). |
+| FND-004 | fixed | `MODULES_ROOT`, `ix_module` and `run_quire` live once in tests/conftest.py, and both test files import `run_quire`. |
+| FND-005 | fixed | Outputs now reads: "`realizes_requirement` in the `ADR` `allowed_links` with the target list `FR`, `NFR`, and the four earlier verbs ... each with the target `\"*\"`." |

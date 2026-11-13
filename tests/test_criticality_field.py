@@ -21,6 +21,8 @@ def test_requirement_criterion_sources_declare_the_criticality_field() -> None:
     declared = sources()
     for name in ("acceptance-criterion", "nfr-acceptance-criterion"):
         assert declared[name]["criticality_field"] == "criticality"
+    for name in ("constraint", "nfr-metric", "configuration-matrix"):
+        assert "criticality_field" not in declared[name]
 
 
 @pytest.mark.trace("TC-226", "FR-007-AC-17")

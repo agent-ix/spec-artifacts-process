@@ -72,10 +72,6 @@ MODULES_ROOT = pathlib.Path(
     or pathlib.Path.home() / ".ix" / "filament" / "modules"
 )
 
-#: The criterion obligation sources' `criticality_field` key and the
-#: `realizes_requirement` target lists load only in this release or later.
-QUIRE_CLI_REQUIRED = "0.45.0"
-
 
 def ix_module(name: str) -> str:
     """Directory of the installed sibling module `name`, or fail the row."""
@@ -83,8 +79,10 @@ def ix_module(name: str) -> str:
     assert (path / "manifest.yaml").is_file(), (
         f"{name} is not installed under {MODULES_ROOT} (set "
         "IX_FILAMENT_MODULES_PATH); the rows that load it fail rather than "
-        "skip, because a skipped row is not coverage. spec-objects-architecture "
-        "must be a release that declares `realizes_requirement`."
+        "skip, because a skipped row is not coverage. The sibling modules "
+        "spec-artifacts-iso and spec-objects-architecture must be installed; "
+        "spec-objects-architecture must be a release that declares "
+        "`realizes_requirement` (its FR-010)."
     )
     return str(path)
 
@@ -94,9 +92,9 @@ def run_quire(
 ) -> subprocess.CompletedProcess:
     """Run `quire <args>` with the named sibling modules and this module loaded."""
     assert shutil.which("quire"), (
-        f"the `quire` CLI is not on PATH; quire-cli {QUIRE_CLI_REQUIRED} or later "
-        "is required (older releases reject the manifest keys). The row fails "
-        "rather than skips."
+        "the `quire` CLI is not on PATH; run `make semantic-install` (it installs "
+        "the quire-cli the semantic package pins, which loads the manifest "
+        "keys). The row fails rather than skips."
     )
     modules: list[str] = []
     for name in siblings:
