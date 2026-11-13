@@ -25,3 +25,9 @@ Measured on the final head with quire 0.44.0: the `realizes_requirement` fixture
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | medium | The ADR skeleton's authoring-contract comment lists `allowed_links` as supersedes, superseded_by, relates_to and depends_on, without `realizes_requirement`, so it now contradicts the manifest. The golden record copies the same stale text. Fix: restore the comment edit from e769098 and update the record's `body.text` (and `endLine`, if the line count changes) to match. | spec_artifacts_process/skeletons/ADR.md:17, spec_artifacts_process/examples/ADR.record.json |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | edab19a restores the skeleton comment (`allowed_links`: supersedes \| superseded_by \| relates_to \| depends_on \| realizes_requirement). ADR.record.json changes only `body.text`, `endLine` 53 to 54 and `provenance.digest`. The digest equals sha256 of skeletons/ADR.md, and the golden-record test (TC-142, deep equality against the mapper build) passes for ADR. |

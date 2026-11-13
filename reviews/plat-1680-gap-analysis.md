@@ -23,3 +23,9 @@ Ticket: PLAT-1680. Planless gap analysis over FR-017. Plan completion: not asses
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | low | FR-017 Behavior says the existing `ADR` verbs SHALL stay listed, but no AC states this and no test asserts it. A later edit that drops `supersedes` or `depends_on` passes the suite. Fix: add the clause to FR-017-AC-1 (or a new AC) and assert that the four existing verbs are a subset of the ADR `allowed_links` in the test. | spec/functional/FR-017-adr-design-realization-verb.md:34, tests/test_adr_links.py:33-44 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The new FR-017-AC-4 / TC-220 is tagged on `test_adr_keeps_its_previous_verbs`, which asserts that the four prior verbs are a subset of the ADR `allowed_links`. `quoin matrix` shows AC-1..4 tagged. |

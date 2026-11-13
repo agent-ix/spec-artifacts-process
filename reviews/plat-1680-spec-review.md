@@ -26,3 +26,12 @@ Ticket: PLAT-1680. Spec review of the new FR-017, covering EARS and integrity. T
 | FND-002 | low | FR-017-AC-1 is compound: it bundles three independent outcomes (forward verb clean, inverse flagged, unlisted verb flagged) into one criterion, so a failure cannot be attributed to one of them. | spec/functional/FR-017-adr-design-realization-verb.md:40 |
 | FND-003 | low | The third Behavior bullet carries two SHALLs (existing verbs stay listed, and an unlisted verb still draws the finding). quire reports `ears:non-singular`. Split it into two statements. | spec/functional/FR-017-adr-design-realization-verb.md:34 |
 | FND-004 | low | The TC-217 description omits the inverse-verb negative (`requirement_realized_by` draws the finding), which both FR-017-AC-1 and the test assert. | spec/tests.md:199 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | AC-1..3 are now worded as whether quire validate reports a `disallowed-edge-type` finding, which matches the measured exit-0 advisory behaviour. |
+| FND-002 | fixed | AC-1 is split into AC-1..4, one outcome each, with one tagged test per AC. |
+| FND-003 | fixed | The Behavior bullet is split into two single-SHALL lines, and quire validate no longer reports `ears:non-singular` on FR-017. |
+| FND-004 | fixed | TC-218 covers the inverse-verb negative, and TC-217..220 mirror AC-1..4. |
