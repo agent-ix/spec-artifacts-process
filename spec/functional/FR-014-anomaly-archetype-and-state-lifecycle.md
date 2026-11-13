@@ -78,7 +78,7 @@ the file, which already records it and which a typed table could only duplicate 
 - The module SHALL publish the `Anomaly` record mapping in `mappings.yaml` ([FR-011](./FR-011-markdown-record-mapping.md)),
   naming the record keys `status`, `resolution`, `closedBy` (from frontmatter `closed_by`), `severity`
   and `safetyImpact`, each a `frontmatter` mapping carried verbatim, and the keys `assessment`, `verification` and `releaseRationale`
-  ([FR-015](./FR-015-anomaly-safety-impact-assessment.md)). The key `statusHistory` is not
+  ([FR-015](./FR-015-anomaly-safety-impact-assessment.md) for the first two, [FR-016](./FR-016-anomaly-release-rationale.md) for `releaseRationale`). The key `statusHistory` is not
   authored anywhere: quoin FR-136 derives it from git.
 - The module SHALL ship fixtures as part of its tests for the criteria below: one valid document per
   `status`, a `closed` document for each `resolution`, the negatives named above, and the
@@ -130,4 +130,4 @@ the file, which already records it and which a typed table could only duplicate 
 ## Dependencies
 
 - **Upstream**: [FR-009](./FR-009-emitted-json-schemas.md), [FR-012](./FR-012-executable-skeletons.md), quire-rs FR-033 (the `assert` facet), quire-rs FR-069-AC-21..28 (`record_validation`), quoin FR-073 (record validation)
-- **Downstream**: [FR-015](./FR-015-anomaly-safety-impact-assessment.md); quoin [FR-136](ix://agent-ix/quoin/FR-136) (history-based transition check and record mapping)
+- **Downstream**: [FR-015](./FR-015-anomaly-safety-impact-assessment.md), [FR-016](./FR-016-anomaly-release-rationale.md); quoin [FR-136](ix://agent-ix/quoin/FR-136) (history-based transition check and record mapping)

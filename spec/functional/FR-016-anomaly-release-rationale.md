@@ -37,7 +37,7 @@ history of the file, which quoin FR-163 reads, as it reads the history of `statu
 |---|---|
 | Section table shape, column names, row presence, `Author` and `Rationale` non-empty and not a placeholder, the section absent while `status` is `closed` with a `resolution` of `fixed`, `not-a-defect` or `duplicate` | This module (manifest, `assert` facet, `AnomalyFields.json`), as for FR-014 and FR-015 |
 | The same rules stated for the mapped record | The emitted record schema `Anomaly.json` (FR-009), as FR-014 and FR-015 state theirs (quoin FR-073) |
-| Whether an open anomaly needs a rationale, and whether the rationale is the author's own | Not this module: quoin FR-164 decides the first; the second is a person's attestation recorded by git, not a check |
+| Whether a carried anomaly needs a rationale, and whether the rationale is the author's own | Not this module: quoin FR-164 decides the first; the second is a person's attestation recorded by git, not a check |
 
 ## Inputs
 
@@ -74,7 +74,7 @@ history of the file, which quoin FR-163 reads, as it reads the history of `statu
 - The section SHALL NOT change the validity of any other part of the document: an `impacting`
   anomaly validates with and without it.
 - The emitted record schema `Anomaly.json` SHALL state the same rules for the mapped record: the `releaseRationale` entry shape, the non-empty and placeholder rules for `author` and `rationale`, and the closed-status rule.
-- The module SHALL ship, as fixtures for the criteria below, valid `impacting` anomalies at `identified`, `assessed` and `resolved` that carry the section, each with a counterpart identical but for the section (AC-10), and a valid `closed` `wont-fix` anomaly that carries a `closed_by` and the section.
+- The module SHALL ship, as fixtures for the criteria below, valid `impacting` anomalies at `identified`, `assessed` and `resolved` that carry the section, each with a counterpart identical but for the section (AC-10), and a valid `impacting` `closed` `wont-fix` anomaly that carries a `closed_by` and the section, with a counterpart identical but for the section (quoin FR-164-AC-5).
 - The `closed_by` of the shipped `closed` `wont-fix` fixture SHALL differ from the `Author` of every row of its section, so that a reader can tell the typed rationale author from the closer (quoin FR-163-AC-4).
 - The module SHALL ship the negatives of AC-2 to AC-6. Quoin holds no copy of these documents.
 
@@ -92,6 +92,7 @@ history of the file, which quoin FR-163 reads, as it reads the history of `statu
 | FR-016-AC-8 | The shipped skeleton contains no `## Release Rationale` section, the manifest, mapping and `AnomalyFields.json` define no default for any of its cells, and no schema, locator or mapping computes a cell from another field. | Test |
 | FR-016-AC-9 | No field or table column of the `Anomaly` type holds a date, commit hash, release identifier, signature or sign-off of the rationale, or marks an anomaly accepted. | Inspection |
 | FR-016-AC-10 | Two fixtures identical except for the presence of the section validate the same on every other finding. | Test |
+| FR-016-AC-11 | The `Anomaly` `yield_pattern.match` carries a `release_rationale` locator with `required: false`, and `AnomalyFields.json` names the property `release_rationale`. | Test |
 
 ## Dependencies
 

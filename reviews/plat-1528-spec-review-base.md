@@ -36,3 +36,22 @@ Checked and clean: the closed-anomaly rule itself is consistent across Behavior,
 
 Examined (role examined): FR-016, FR-016-AC-1, FR-016-AC-2, FR-016-AC-3, FR-016-AC-4, FR-016-AC-5, FR-016-AC-6, FR-016-AC-7, FR-016-AC-8, FR-016-AC-9, FR-016-AC-10.
 Context only: FR-014, FR-015, quoin/FR-163-AC-4, quoin/FR-164.
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | medium | quoin FR-164-AC-5 (quoin#857) needs an `impacting` anomaly `closed` as `wont-fix` with no rationale (fails unjustified-impacting) and the same with a rationale (passes), and quoin FR-162-AC-12 requires those documents to be this module's. FR-016 ships one `closed` `wont-fix` fixture with the section, does not say it is `impacting`, and gives it no section-less counterpart (AC-10 counterparts cover only identified, assessed and resolved). Require the `closed` `wont-fix` fixture to be `impacting` and to have a counterpart identical but for the section. | spec/functional/FR-016-anomaly-release-rationale.md:77 |
+| FND-008 | low | The FR-014 amendment cites FR-015 for all three table keys, `releaseRationale` included, and FR-014's Downstream still names only FR-015. Cite FR-016 for `releaseRationale` and add FR-016 to Downstream. | spec/functional/FR-014-anomaly-archetype-and-state-lifecycle.md:78-81, 133 |
+| FND-009 | low | The ownership row still says FR-164 decides whether an 'open' anomaly needs a rationale, but FR-164 and the amended Description use 'carried' (not closed, or closed as `wont-fix`). Say 'carried'. | spec/functional/FR-016-anomaly-release-rationale.md:40 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Fixed in f5b30a4; after-text: - The closed-status rule SHALL apply only to a `resolution` present and in the FR-014 vocabulary, so a `closed` anomaly with no `resolution`, or one outside it, yields the finding FR-014 reports and no finding for the section. `AnomalyFields.json` SHALL encode the rule with a condition that requires `resolution` to be present and one of those three values, so that it does not hold vacuously on an absent key. |
+| FND-002 | fixed | Fixed in f5b30a4; after-text: - The module SHALL ship, as fixtures for the criteria below, valid `impacting` anomalies at `identified`, `assessed` and `resolved` that carry the section, each with a counterpart identical but for the section (AC-10), and a valid `closed` `wont-fix` anomaly that carries a `closed_by` and the section. |
+| FND-003 | fixed | Fixed in f5b30a4; after-text: - The emitted record schema `Anomaly.json` SHALL state the same rules for the mapped record: the `releaseRationale` entry shape, the non-empty and placeholder rules for `author` and `rationale`, and the closed-status rule. |
+| FND-004 | fixed | Fixed in f5b30a4; after-text: - The `closed_by` of the shipped `closed` `wont-fix` fixture SHALL differ from the `Author` of every row of its section, so that a reader can tell the typed rationale author from the closer (quoin FR-163-AC-4). |
+| FND-005 | fixed | Fixed in f5b30a4; after-text: - The `Anomaly` archetype SHALL declare a `release_rationale` locator (`required: false`) for the section in its `yield_pattern.match`, and `AnomalyFields.json` carries the section rules over that property. / FR-014: and `safetyImpact`, each a `frontmatter` mapping carried verbatim, and the keys `assessment`, `verification` and `releaseRationale` |
+| FND-006 | fixed | Fixed in f5b30a4; after-text: title: "Anomaly release rationale: a human-authored, named reason for releasing with an anomaly not fixed" |
