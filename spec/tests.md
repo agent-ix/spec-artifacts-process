@@ -199,7 +199,12 @@ type: TestMatrix
 | TC-217 | `quire validate` of an `ADR` that authors `realizes_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-1 | ✅ |
 | TC-218 | `quire validate` of an `ADR` that authors the inverse verb `requirement_realized_by` reports a `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-2 | ✅ |
 | TC-219 | `quire validate` of an `ADR` that authors a verb outside the `ADR` `allowed_links` reports a `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-3 | ✅ |
-| TC-220 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`. | Unit | P1 | FR-017-AC-4 | ✅ |
+| TC-220 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`, each accepting any target. | Unit | P1 | FR-017-AC-4 | ✅ |
+| TC-221 | The `ADR` `allowed_links` lists `realizes_requirement` with exactly the targets `FR` and `NFR`. | Unit | P1 | FR-017-AC-5 | ✅ |
+| TC-222 | `quire validate --okf` of an `ADR` that authors `realizes_requirement` toward an `FR` and one toward an `NFR` reports neither `disallowed-edge-type` nor `disallowed-edge-target` for either. | Unit | P1 | FR-017-AC-6 | ✅ |
+| TC-223 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward a part reports `disallowed-edge-target` naming the `ADR`, the part and its object type. | Unit | P1 | FR-017-AC-7 | ✅ |
+| TC-224 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward an id no document has fails with `dangling-reference` naming the `ADR` file and the id. | Unit | P1 | FR-017-AC-8 | ✅ |
+| TC-225 | Over a corpus holding an `FR` and an `NFR` each realized by an `ADR`, `quire relations --json` reports each as `covered` with that `ADR` in `linked`. | Unit | P1 | FR-017-AC-9 | ✅ |
 
 ## Option Permutation Matrix
 

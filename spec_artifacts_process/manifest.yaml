@@ -68,11 +68,11 @@ artifact_types:
   defaults:
     id_pattern: ADR-{next:03d}
   allowed_links:
-  - supersedes
-  - superseded_by
-  - relates_to
-  - depends_on
-  - realizes_requirement
+    supersedes: ["*"]
+    superseded_by: ["*"]
+    relates_to: ["*"]
+    depends_on: ["*"]
+    realizes_requirement: [FR, NFR]
   examples: []
   lint_rules_ref: []
 - name: Anomaly
