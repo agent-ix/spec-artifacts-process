@@ -148,6 +148,22 @@ artifact_types:
               Impact: [Affects, Mitigates, Introduces, Unaffected, None]
             column_patterns:
               Rationale: '\S'
+        # FR-015: required when `resolution` is `fixed` (AnomalyFields.json). The
+        # `Target` pattern requires an id token, because a cell matching no
+        # reference pattern produces no reference and `-` would otherwise pass.
+        fix_verification:
+          from: table_row
+          under_section: Fix Verification
+          required: false
+          multiple: true
+          assert:
+            columns: [Kind, Target, Rationale]
+            min_rows: 1
+            column_choices:
+              Kind: [Criterion, Test]
+            column_patterns:
+              Target: '^[A-Za-z0-9]'
+              Rationale: '\S'
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -1122,6 +1138,24 @@ traceability:
     kind_targets:
       Requirement: [requirement-document, nfr-document, acceptance-criterion, nfr-acceptance-criterion]
       Hazard: [hazard-document]
+    expand_ranges: false
+    strip_annotations: false
+  # FR-015: a fix-verification row's `Target` must resolve to the criterion or
+  # test case its `Kind` names. An id resolves only against `targets`, so the
+  # requirement and hazard documents are listed to make a wrong-kind id a
+  # `reference-kind-mismatch` rather than a `dangling-trace-reference`.
+  - name: anomaly-fix-verification
+    archetype: Anomaly
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Fix Verification
+    column: Target
+    row_id_column: Kind
+    pattern: '([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*)'
+    targets: [acceptance-criterion, nfr-acceptance-criterion, test-case, requirement-document, nfr-document, hazard-document]
+    kind_column: Kind
+    kind_targets:
+      Criterion: [acceptance-criterion, nfr-acceptance-criterion]
+      Test: [test-case]
     expand_ranges: false
     strip_annotations: false
 

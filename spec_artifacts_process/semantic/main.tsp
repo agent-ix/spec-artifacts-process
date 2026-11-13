@@ -233,6 +233,12 @@ enum AnomalySeverity {
   critical,
 }
 
+/** What a fix-verification row points at: an acceptance criterion or a test case. */
+enum VerificationKind {
+  Criterion,
+  Test,
+}
+
 /** Whether the anomaly's safety impact has been assessed, and with what outcome. */
 enum SafetyImpact {
   unassessed,
@@ -273,6 +279,15 @@ scalar AssessmentTarget extends string;
  */
 @pattern("^(?![ \\t]*([nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)[ \\t]*$)[ \\t]*\\S")
 scalar ClosedBy extends string;
+
+/**
+ * A fix-verification `Target` token: an acceptance-criterion id or a test-case
+ * id, beginning with a letter or digit so that `-` and an empty cell are not
+ * references (FR-015). Existence and kind are the engine's reference
+ * diagnostics, never part of the record.
+ */
+@pattern("^[A-Za-z0-9]\\S*$")
+scalar VerificationTarget extends string;
 
 /** A relationship verb from the module's `allowed_links` registries. */
 @pattern("^[a-z][a-z0-9_]*$")
@@ -392,6 +407,20 @@ model AssessmentRow {
   target?: AssessmentTarget;
   impact: AssessmentImpact;
   /** free text: the engineer's judgement. */
+  rationale: NonEmptyText;
+  line: LineNumber;
+}
+
+/**
+ * One `## Fix Verification` row (`Kind | Target | Rationale`). `target` is the
+ * authored reference token; whether it resolves, and to what kind, is a
+ * diagnostic, not part of the record. No field names the fixing change or holds
+ * a verdict: the change is the git history of the file (FR-015).
+ */
+model VerificationRow {
+  kind: VerificationKind;
+  target: VerificationTarget;
+  /** free text: the engineer's statement of how the fix is demonstrated. */
   rationale: NonEmptyText;
   line: LineNumber;
 }
@@ -648,8 +677,8 @@ model Feedback {
 
 /**
  * Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle
- * status, how it ended, who closed it, its severity and its safety-impact
- * assessment (FR-014, FR-015). The conditional rules below are the status-conditional
+ * status, how it ended, who closed it, its severity, its safety-impact
+ * assessment and the verification of its fix (FR-014, FR-015). The conditional rules below are the status-conditional
  * checks the module owns; the legality of a status move is judged over git
  * history by quoin and is not representable in a record. The record holds no
  * history, no author and no date.
@@ -685,6 +714,9 @@ model Feedback {
   // severity (FR-014): required from assessed onward, optional while identified.
   #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
      `then`: #{ `required`: #["severity"] } },
+  // fix verification (FR-015): required when the resolution is fixed.
+  #{ `if`: #{ `properties`: #{ `resolution`: #{ `const`: "fixed" } }, `required`: #["resolution"] },
+     `then`: #{ `required`: #["verification"] } },
 ])
 model Anomaly {
   id: UpperDocId;
@@ -703,6 +735,8 @@ model Anomaly {
   description: Section;
   /** Absent while the anomaly is `identified` and unassessed; required from `assessed` onward by the conditionals above. */
   @minItems(1) assessment?: AssessmentRow[];
+  /** Absent unless the resolution is `fixed`, which requires it by the conditionals above. */
+  @minItems(1) verification?: VerificationRow[];
 }
 
 /**

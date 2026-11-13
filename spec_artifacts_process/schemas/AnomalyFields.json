@@ -25,10 +25,15 @@
         "type": "string",
         "not": { "pattern": "^(Requirement|Hazard)\\t[^\\t]*\\tNone\\t" }
       }
+    },
+    "fix_verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
     }
   },
   "required": ["status", "safety_impact", "description"],
-  "description": "The Anomaly archetype's YAML-extracted yield record (record_validation, FR-014, FR-015): the values of `yield_pattern.match`, keyed by the match key names verbatim (`closed_by`, `safety_impact`). A table row is one tab-joined string `Kind<TAB>Target<TAB>Impact<TAB>Rationale`. It holds the status-conditional presence rules and the row rules the `assert` facet cannot express; the engine reports an absence at the `status` line (`locate_absence_at`) and a present value at its own line. The status rules are guarded on a known status, so a mistyped status yields only the status finding. It is the module's own schema for the extracted record and is not the emitted record schema: `Anomaly.json` (camelCase keys, the mapped record) is projected from TypeSpec and is untouched by it. Severity is person-assigned: it has no default and is derived from nothing (FR-014).",
+  "description": "The Anomaly archetype's YAML-extracted yield record (record_validation, FR-014, FR-015): the values of `yield_pattern.match`, keyed by the match key names verbatim (`closed_by`, `safety_impact`). A table row is one tab-joined string `Kind<TAB>Target<TAB>Impact<TAB>Rationale`. It holds the status-conditional presence rules and the row rules the `assert` facet cannot express; the engine reports an absence at the `status` line (`locate_absence_at`) and a present value at its own line. The status rules are guarded on a known status, so a mistyped status yields only the status finding. It is the module's own schema for the extracted record and is not the emitted record schema: `Anomaly.json` (camelCase keys, the mapped record) is projected from TypeSpec and is untouched by it. Severity is person-assigned: it has no default and is derived from nothing (FR-014). `fix_verification` (FR-015) holds the rows of the `## Fix Verification` section.",
   "allOf": [
     {
       "if": {
@@ -129,6 +134,13 @@
         "required": ["status"]
       },
       "then": { "required": ["severity"] }
+    },
+    {
+      "if": {
+        "properties": { "resolution": { "const": "fixed" } },
+        "required": ["resolution"]
+      },
+      "then": { "required": ["fix_verification"] }
     }
   ]
 }

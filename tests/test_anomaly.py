@@ -259,6 +259,9 @@ def test_the_placeholder_set_is_rejected_and_a_name_is_accepted(
         "status": "closed",
         "resolution": "fixed",
         "closedBy": value,
+        "verification": [
+            {"kind": "Test", "target": "TC-001", "rationale": "Passes.", "line": 1}
+        ],
     }
     validator = schema_registry("Anomaly")
     assert any(
@@ -316,6 +319,7 @@ def test_the_mapping_names_each_key_once_and_the_golden_record_validates(
         "severity",
         "safetyImpact",
         "assessment",
+        "verification",
     ):
         assert key in properties
     assert "statusHistory" not in properties
@@ -599,6 +603,8 @@ def test_the_negative_counterparts_exist_for_every_named_defect():
         # FR-014 severity, FR-015 fix verification, FR-016 release rationale
         "assessed-no-severity",
         "severity-outside-high",
+        "resolved-fixed-no-verification",
+        "verification-dangling-criterion",
     }
     assert required <= set(INVALID)
     assert (FIXTURES / "valid" / "two-hazards.md").is_file()
@@ -941,3 +947,200 @@ def test_severity_is_not_computed_from_another_field(tmp_path: Path, mapper, map
         "kind": "frontmatter",
         "path": ["severity"],
     }
+
+
+# -- FR-015: fix verification (PLAT-1583) --------------------------------------
+
+
+def fix_verification_reference(manifest) -> dict:
+    return next(
+        t
+        for t in manifest["traceability"]["document_references"]
+        if t["name"] == "anomaly-fix-verification"
+    )
+
+
+@pytest.mark.trace("FR-015-AC-11", "TC-199")
+def test_the_manifest_declares_the_fix_verification_table_and_its_reference(manifest):
+    assert locator(manifest, "fix_verification") == {
+        "from": "table_row",
+        "under_section": "Fix Verification",
+        "required": False,
+        "multiple": True,
+        "assert": {
+            "columns": ["Kind", "Target", "Rationale"],
+            "min_rows": 1,
+            "column_choices": {"Kind": ["Criterion", "Test"]},
+            "column_patterns": {"Target": "^[A-Za-z0-9]", "Rationale": "\\S"},
+        },
+    }
+    reference = fix_verification_reference(manifest)
+    assert reference["archetype"] == "Anomaly"
+    assert reference["section"] == "Fix Verification"
+    assert reference["column"] == "Target"
+    assert reference["kind_column"] == "Kind"
+    assert sorted(reference["targets"]) == sorted(
+        [
+            "acceptance-criterion",
+            "nfr-acceptance-criterion",
+            "test-case",
+            "requirement-document",
+            "nfr-document",
+            "hazard-document",
+        ]
+    )
+    assert reference["kind_targets"] == {
+        "Criterion": ["acceptance-criterion", "nfr-acceptance-criterion"],
+        "Test": ["test-case"],
+    }
+
+
+@pytest.mark.parametrize("status", ["resolved", "closed"])
+@pytest.mark.trace("FR-015-AC-12", "TC-200")
+def test_a_fixed_anomaly_without_a_fix_verification_fails_at_the_status_line(
+    mapper, schema_registry, status: str
+):
+    path = INVALID[f"{status}-fixed-no-verification"]
+    found = record_findings(path)
+    assert finding_lines(found) == [line_of(path, "status")], found
+    assert "fix_verification" in found[0]
+    errors = record_errors(mapper, schema_registry, path)
+    assert signature(errors) == [("required", [])]
+    assert "'verification'" in errors[0].message
+
+
+@pytest.mark.parametrize(
+    "name", ["closed-not-a-defect", "closed-duplicate", "closed-wont-fix"]
+)
+@pytest.mark.trace("FR-015-AC-12", "TC-200")
+def test_a_closed_anomaly_that_is_not_fixed_needs_no_fix_verification(name: str):
+    path = VALID_BY_NAME[name]
+    assert "Fix Verification" not in path.read_text()
+    assert quire_validate(path).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "resolved-fixed",
+        "closed-fixed",
+        "closed-fixed-test-only",
+        "closed-fixed-criterion-only",
+    ],
+)
+@pytest.mark.trace("FR-015-AC-13", "TC-201")
+def test_a_fixed_anomaly_linking_a_criterion_and_a_test_validates(
+    tmp_path: Path, mapper, schema_registry, name: str
+):
+    path = VALID_BY_NAME[name]
+    result = bundle_validate(tmp_path, path)
+    assert result.returncode == 0, result.stderr
+    assert dangling_findings(result) == [], result.stderr
+    assert reference_findings(result, "reference-kind-mismatch") == [], result.stderr
+    assert record_errors(mapper, schema_registry, path) == []
+
+
+@pytest.mark.parametrize(
+    "name,target,kind",
+    [
+        ("verification-dangling-criterion", "FR-001-AC-99", "Criterion"),
+        ("verification-dangling-test", "TC-999", "Test"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-14", "TC-202")
+def test_a_dangling_verification_target_names_the_id_and_its_row(
+    tmp_path: Path, name: str, target: str, kind: str
+):
+    found = dangling_findings(bundle_validate(tmp_path, INVALID[name]))
+    assert len(found) == 1, found
+    assert f"'{target}'" in found[0]
+    assert f"(row '{kind}')" in found[0]
+
+
+@pytest.mark.parametrize(
+    "name,target,kind",
+    [
+        pytest.param(
+            "verification-criterion-names-requirement",
+            "FR-001",
+            "Criterion",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "engine (quire-rs FR-049, engine 0.58/0.59): the id of a "
+                    "requirement document resolves under every target bound to "
+                    "its archetype, `acceptance-criterion` included, so a "
+                    "`Criterion` row naming `FR-001` raises no kind mismatch. "
+                    "The manifest declares exactly the targets FR-015-AC-11 "
+                    "names; turns green when the engine types document ids."
+                ),
+            ),
+        ),
+        ("verification-criterion-names-hazard", "HAZ-001", "Criterion"),
+        ("verification-test-names-criterion", "FR-001-AC-1", "Test"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-15", "TC-203")
+def test_a_verification_target_of_the_wrong_kind_is_a_kind_mismatch(
+    tmp_path: Path, name: str, target: str, kind: str
+):
+    result = bundle_validate(tmp_path, INVALID[name])
+    found = reference_findings(result, "reference-kind-mismatch")
+    assert len(found) == 1, found
+    assert f"'{target}'" in found[0]
+    assert f"(row '{kind}')" in found[0]
+    assert dangling_findings(result) == []
+
+
+@pytest.mark.parametrize(
+    "name,message,row",
+    [
+        ("verification-empty-rationale", "Rationale", "| Test |"),
+        ("verification-kind-outside", "Kind", "| Review |"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-16", "TC-204")
+def test_a_verification_row_with_no_rationale_or_a_foreign_kind_fails_at_the_row(
+    name: str, message: str, row: str
+):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert message in found[0]
+    assert finding_lines(found) == [row_line(path, row)]
+
+
+@pytest.mark.trace("FR-015-AC-17", "TC-205")
+def test_verification_entries_carry_kind_target_and_rationale_as_authored(mapper):
+    path = VALID_BY_NAME["closed-fixed"]
+    rows = mapper.build("Anomaly", path.read_text(), path.name)["verification"]
+    assert [(r["kind"], r["target"], r["rationale"]) for r in rows] == [
+        (
+            "Criterion",
+            "FR-001-AC-1",
+            "The criterion now rejects a mismatching checksum.",
+        ),
+        (
+            "Test",
+            "TC-001",
+            "The regression test fails without the fix and passes with it.",
+        ),
+    ]
+    assert (
+        mapper.build("Anomaly", VALID_BY_NAME["assessed"].read_text(), "x").get(
+            "verification"
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize(
+    "name", ["verification-target-dash", "verification-target-empty"]
+)
+@pytest.mark.trace("FR-015-AC-19", "TC-206")
+def test_a_verification_row_with_no_id_token_fails_at_the_row(name: str):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert "Target" in found[0]
+    assert finding_lines(found) == [row_line(path, "| Test |")]

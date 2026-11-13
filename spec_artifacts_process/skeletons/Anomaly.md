@@ -30,7 +30,12 @@ severity: major
        acceptance-criterion id; a Hazard row's Target is a hazard id.
        safety_impact: none takes exactly one row: Kind None, Target -, Impact None.
        safety_impact: impacting takes at least one Requirement or Hazard row
-       whose Impact is not Unaffected. -->
+       whose Impact is not Unaffected.
+     - ## Fix Verification: required when resolution is fixed, otherwise omit
+       it. A table with headers Kind | Target | Rationale and at least one row.
+       Kind ∈ Criterion|Test; a Criterion row's Target is an FR or NFR
+       acceptance-criterion id, a Test row's Target is a test-case id of a
+       TestMatrix. This skeleton is an assessed anomaly, so it carries none. -->
 # [AN-001] <short summary of the anomaly>
 
 ## Description

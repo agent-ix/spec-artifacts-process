@@ -154,7 +154,7 @@ type: TestMatrix
 | TC-171 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Unit | P1 | FR-014-AC-4 | ✅ |
 | TC-172 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Unit | P1 | FR-014-AC-5 | ✅ |
 | TC-173 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Unit | P1 | FR-014-AC-6 | ✅ |
-| TC-174 | The mapping lists `status`, `resolution`, `closedBy`, `severity`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Unit | P1 | FR-014-AC-7 | ✅ |
+| TC-174 | The mapping lists `status`, `resolution`, `closedBy`, `severity`, `safetyImpact`, `assessment` and `verification` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Unit | P1 | FR-014-AC-7 | ✅ |
 | TC-175 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Unit | P1 | FR-014-AC-8 | ✅ |
 | TC-176 | The manifest declares `safety_impact` with exactly the three-member vocabulary, and the section table with exactly the four columns, `min_rows: 1`, and the `Kind` and `Impact` vocabularies above. | Unit | P1 | FR-015-AC-1 | ✅ |
 | TC-177 | An `identified` anomaly with `safety_impact: unassessed` and no section validates. | Unit | P1 | FR-015-AC-2 | ✅ |
@@ -178,6 +178,14 @@ type: TestMatrix
 | TC-196 | For each of `assessed`, `resolved` and `closed`, a fixture with no `severity` fails, reported at the `status` line; an `identified` fixture with no `severity` validates. | Unit | P1 | FR-014-AC-15 | ✅ |
 | TC-197 | A fixture whose `severity` is outside the vocabulary (including `high`, `Major` and the empty string) fails with exactly one finding, at the `severity` line. | Unit | P1 | FR-014-AC-16 | ✅ |
 | TC-198 | Two fixtures identical except for one differing field (`safety_impact`, or the assessment rows) validate with the same `severity`, and no schema, locator or mapping of the `Anomaly` type computes `severity` from another field. | Unit | P1 | FR-014-AC-17 | ✅ |
+| TC-199 | The manifest declares the `## Fix Verification` table with exactly the columns `Kind`, `Target`, `Rationale`, `min_rows: 1` and the `Kind` vocabulary `Criterion`, `Test`, and declares a document reference `anomaly-fix-verification` with `column` `Target`, `kind_column` `Kind`, `targets` listing `acceptance-criterion`, `nfr-acceptance-criterion`, `test-case`, `requirement-document`, `nfr-document` and `hazard-document`, and `kind_targets` `Criterion` to the acceptance-criterion targets and `Test` to `test-case`; and it declares a `column_patterns` rule on `Target` requiring an id token. | Unit | P1 | FR-015-AC-11 | ✅ |
+| TC-200 | A `resolved` anomaly and a `closed` anomaly with `resolution` `fixed` each fail validation, at the `status` line, with no `## Fix Verification` section; a `closed` anomaly with `resolution` `not-a-defect`, `duplicate` or `wont-fix` and no section validates. | Unit | P1 | FR-015-AC-12 | ✅ |
+| TC-201 | In the corpus of AC-4 plus a `TestMatrix` test case `TC-001`, a `fixed` anomaly with a `Criterion` row targeting `FR-001-AC-1` and a `Test` row targeting `TC-001` validates. | Unit | P1 | FR-015-AC-13 | ✅ |
+| TC-202 | In that corpus, a `Criterion` row targeting `FR-001-AC-99` and a `Test` row targeting `TC-999` each fail as a dangling reference naming the id and its row. | Unit | P1 | FR-015-AC-14 | ✅ |
+| TC-203 | In that corpus, a `Criterion` row targeting `FR-001` (a requirement document), a `Criterion` row targeting the hazard, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. | Unit | P1 | FR-015-AC-15 | ✅ |
+| TC-204 | A row with an empty `Rationale` or a `Kind` outside the vocabulary fails validation. | Unit | P1 | FR-015-AC-16 | ✅ |
+| TC-205 | The mapping yields `verification` entries with `kind`, `target` and `rationale` as authored. | Unit | P1 | FR-015-AC-17 | ✅ |
+| TC-206 | A `fixed` anomaly whose only row is `Test`, `-`, `verified`, and one whose only row has an empty `Target`, each fail validation at the row. | Unit | P1 | FR-015-AC-19 | ✅ |
 
 ## Option Permutation Matrix
 
