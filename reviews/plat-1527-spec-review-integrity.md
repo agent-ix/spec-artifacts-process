@@ -42,3 +42,9 @@ list are recorded in the base review (SR-20261112181938 FND-006), not
 repeated here.
 
 ## Dispositions
+
+Disposition pass 1 (4526bbf).
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |

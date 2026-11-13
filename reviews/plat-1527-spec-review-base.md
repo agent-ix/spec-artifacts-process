@@ -78,4 +78,25 @@ the review severity scale. The no-hash, no-verdict and no-compatibility-layer
 choices are also sound, and quoin FR-136 deriving the fixing change from git
 history is the right owner for it.
 
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-008 | medium | The `anomaly-fix-verification` declaration is specified by `column`, `kind_column` and `kind_targets` only (FR-015 Behavior and AC-11), with no union `targets`. In quire-rs FR-049 an id resolves only against the declaration's `targets`, and a kind mismatch fires only for an id that resolves in that union but outside the row's kind subset. An implementation that sets `targets` to the kind targets alone (`acceptance-criterion`, `nfr-acceptance-criterion`, `test-case`) satisfies AC-11, but then a `Criterion` row targeting `FR-001` or the hazard is a `dangling-trace-reference`, not the kind mismatch FR-015-AC-15 requires. State that `targets` also lists `requirement-document`, `nfr-document` and `hazard-document`, and add it to AC-11. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:103-109; spec/functional/FR-015-anomaly-safety-impact-assessment.md:136; spec/functional/FR-015-anomaly-safety-impact-assessment.md:140 |
+| FND-009 | medium | The fix round dropped the empty-`Target` case (old FR-015-AC-14), and nothing replaces it. A `Target` cell that matches no pattern (`-`, empty) extracts no id and yields no reference and no finding (quire-rs FR-049-AC-14), and the table assert constrains only `Rationale`. So a `fixed` anomaly whose only row is `Test \| - \| verified` validates. That is exactly the unlinked fix the section exists to catch, and it contradicts the Behavior bullets that a `Target` SHALL be an existing criterion or test-case id. Add a `column_patterns` constraint on `Target` that requires an id token (not `\S`, which `-` passes), and a criterion that an empty and a `-` `Target` each fail. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:99-102; spec/functional/FR-015-anomaly-safety-impact-assessment.md:141 |
+
 ## Dispositions
+
+Disposition pass 1 (4526bbf).
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |
+| FND-003 | fixed | - |
+| FND-004 | fixed | - |
+| FND-005 | fixed | - |
+| FND-006 | fixed | - |
+| FND-007 | fixed | - |
+
+Disposition pass 1 verdict: FAIL, not mergeable. All seven review-pass findings are fixed. New FND-008 and FND-009 (both medium) are open.

@@ -38,3 +38,10 @@ PASS with two low findings. The statements are testable and name their
 subject. The two findings are wording, not behaviour.
 
 ## Dispositions
+
+Disposition pass 1 (4526bbf).
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | - |
+| FND-002 | fixed | - |

@@ -101,12 +101,18 @@ is authored anywhere in the record.
 - A `Test` row's `Target` SHALL be the id of a test case (a `Test ID` of a `TestMatrix` document)
   that exists in the validated corpus.
 - The manifest SHALL declare a document reference for the section (name `anomaly-fix-verification`,
-  `column` `Target`, `kind_column` `Kind`) with `kind_targets` `Criterion` to
+  `column` `Target`, `kind_column` `Kind`, and `targets` listing `acceptance-criterion`,
+  `nfr-acceptance-criterion`, `test-case`, `requirement-document`, `nfr-document` and
+  `hazard-document`, because an id resolves only against `targets`) with `kind_targets` `Criterion` to
   `acceptance-criterion` and `nfr-acceptance-criterion`, and `Test` to `test-case`, so that
   resolution and kind checking are the engine's (quire-rs FR-049): validation SHALL fail a `Target`
   that resolves to nothing as a dangling reference, and one that resolves to an artifact of the
   other kind (including a requirement document such as `FR-001`) as a kind mismatch. Both
   diagnostics are the engine's, not text written by this module.
+- The manifest SHALL declare, for the `Target` column of the section, a `column_patterns` rule
+  requiring an id token (a value that begins with a letter or digit), because a cell matching no
+  reference pattern produces no reference and no finding (quire-rs FR-049-AC-14) and `-` would
+  otherwise pass; an empty `Target` and a `-` `Target` SHALL each fail validation.
 - The module SHALL map the rows to the record key `verification` as a `typed-table` mapping
   ([FR-011](./FR-011-markdown-record-mapping.md)), one entry per row with `kind`, `target` and
   `rationale` carried as authored.
@@ -133,7 +139,7 @@ is authored anywhere in the record.
 | FR-015-AC-8 | A row with an empty `Rationale`, or with an `Impact` outside the vocabulary, fails validation. | Test |
 | FR-015-AC-9 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Test |
 | FR-015-AC-10 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Test |
-| FR-015-AC-11 | The manifest declares the `## Fix Verification` table with exactly the columns `Kind`, `Target`, `Rationale`, `min_rows: 1` and the `Kind` vocabulary `Criterion`, `Test`, and declares a document reference `anomaly-fix-verification` with `column` `Target`, `kind_column` `Kind` and `kind_targets` `Criterion` to the acceptance-criterion targets and `Test` to `test-case`. | Test |
+| FR-015-AC-11 | The manifest declares the `## Fix Verification` table with exactly the columns `Kind`, `Target`, `Rationale`, `min_rows: 1` and the `Kind` vocabulary `Criterion`, `Test`, and declares a document reference `anomaly-fix-verification` with `column` `Target`, `kind_column` `Kind` `targets` listing `acceptance-criterion`, `nfr-acceptance-criterion`, `test-case`, `requirement-document`, `nfr-document` and `hazard-document`, and `kind_targets` `Criterion` to the acceptance-criterion targets and `Test` to `test-case`; and it declares a `column_patterns` rule on `Target` requiring an id token. | Test |
 | FR-015-AC-12 | A `resolved` anomaly and a `closed` anomaly with `resolution` `fixed` each fail validation, at the `status` line, with no `## Fix Verification` section; a `closed` anomaly with `resolution` `not-a-defect`, `duplicate` or `wont-fix` and no section validates. | Test |
 | FR-015-AC-13 | In the corpus of AC-4 plus a `TestMatrix` test case `TC-001`, a `fixed` anomaly with a `Criterion` row targeting `FR-001-AC-1` and a `Test` row targeting `TC-001` validates. | Test |
 | FR-015-AC-14 | In that corpus, a `Criterion` row targeting `FR-001-AC-99` and a `Test` row targeting `TC-999` each fail as a dangling reference naming the id and its row. | Test |
@@ -141,6 +147,7 @@ is authored anywhere in the record.
 | FR-015-AC-16 | A row with an empty `Rationale` or a `Kind` outside the vocabulary fails validation. | Test |
 | FR-015-AC-17 | The mapping yields `verification` entries with `kind`, `target` and `rationale` as authored. | Test |
 | FR-015-AC-18 | No field or table column of the `Anomaly` type holds a commit hash, author or date of the fix, a field naming the fixing change, or a verdict or sign-off on the verification. | Inspection |
+| FR-015-AC-19 | A `fixed` anomaly whose only row is `Test`, `-`, `verified`, and one whose only row has an empty `Target`, each fail validation at the row. | Test |
 
 ## Dependencies
 
