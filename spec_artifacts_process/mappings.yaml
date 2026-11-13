@@ -197,6 +197,7 @@ models:
       - "`resolution` and `closedBy` are carried verbatim and are absent when the document omits them; the status-conditional checks are the emitted Anomaly schema's."
       - "`severity` is carried verbatim and is absent when the document omits it; it is person-assigned and nothing here computes it from another field."
       - "`verification` is absent while the `## Fix Verification` section is absent; each `target` is the authored reference token, and whether it resolves, and to what kind, is a diagnostic, not part of the record. The fixing change is not recorded: quoin derives it from git."
+      - "`releaseRationale` is absent while the `## Release Rationale` section is absent. Each entry carries `author` and `rationale` as authored; no date, commit, signature or sign-off is authored or defaulted."
       - "`assessment` is absent while the section is absent. A `target` is the authored reference token and is absent for a row whose Target is `-`; whether it resolves is a diagnostic, not part of the record."
     dropped_frontmatter_keys: []
     properties:
@@ -228,6 +229,13 @@ models:
         fields:
           Kind: {property: kind, parse: enum}
           Target: {property: target, parse: reference}
+          Rationale: {property: rationale, parse: text}
+      releaseRationale:
+        kind: typed-table
+        heading: Release Rationale
+        columns: [Author, Rationale]
+        fields:
+          Author: {property: author, parse: text}
           Rationale: {property: rationale, parse: text}
 
   TestMatrixIndex:

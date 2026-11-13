@@ -164,6 +164,26 @@ artifact_types:
             column_patterns:
               Target: '^[A-Za-z0-9]'
               Rationale: '\S'
+        # FR-016: optional at any status. The rows are checked against the table
+        # shape here; the non-empty and placeholder rules of both cells and the
+        # closed-status rule are AnomalyFields.json's, so that they report in the
+        # same run as each other (NFR-001: the engine runs `record_validation`
+        # only when the `assert` facet found nothing). No default for any cell.
+        release_rationale:
+          from: table_row
+          under_section: Release Rationale
+          required: false
+          multiple: true
+          assert:
+            columns: [Author, Rationale]
+            min_rows: 1
+        # The same section as one body, present or absent: it carries the
+        # closed-status rule, which the engine then reports at the section
+        # heading line rather than at a row.
+        release_rationale_section:
+          from: section_body
+          after_heading: Release Rationale
+          required: false
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json

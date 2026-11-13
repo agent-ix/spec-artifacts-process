@@ -35,7 +35,13 @@ severity: major
        it. A table with headers Kind | Target | Rationale and at least one row.
        Kind ∈ Criterion|Test; a Criterion row's Target is an FR or NFR
        acceptance-criterion id, a Test row's Target is a test-case id of a
-       TestMatrix. This skeleton is an assessed anomaly, so it carries none. -->
+       TestMatrix. This skeleton is an assessed anomaly, so it carries none.
+     - ## Release Rationale: optional, only on an anomaly that is not closed or
+       is closed as wont-fix. A table with headers Author | Rationale and at
+       least one row; each cell is non-empty and not a placeholder (n/a, none,
+       unknown, tbd, -). It is a person's written reason for releasing with the
+       anomaly not fixed; it is never filled in for you, so it is not in this
+       skeleton. -->
 # [AN-001] <short summary of the anomaly>
 
 ## Description

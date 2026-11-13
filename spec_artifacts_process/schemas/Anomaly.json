@@ -60,6 +60,14 @@
       },
       "minItems": 1,
       "description": "Absent unless the resolution is `fixed`, which requires it by the conditionals above."
+    },
+    "releaseRationale": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/ReleaseRationaleRow.json"
+      },
+      "minItems": 1,
+      "description": "Absent when the section is absent; an engineer's written reason, never filled in by a tool (FR-016)."
     }
   },
   "required": [
@@ -74,7 +82,7 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle\nstatus, how it ended, who closed it, its severity, its safety-impact\nassessment and the verification of its fix (FR-014, FR-015). The conditional rules below are the status-conditional\nchecks the module owns; the legality of a status move is judged over git\nhistory by quoin and is not representable in a record. The record holds no\nhistory, no author and no date.",
+  "description": "Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle\nstatus, how it ended, who closed it, its severity, its safety-impact\nassessment, the verification of its fix and, optionally, the rationale for\nreleasing with it not fixed (FR-014, FR-015, FR-016). The conditional rules below are the status-conditional\nchecks the module owns; the legality of a status move is judged over git\nhistory by quoin and is not representable in a record. The record holds no\nhistory, no author and no date.",
   "allOf": [
     {
       "if": {
@@ -302,6 +310,33 @@
         "required": [
           "verification"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "closed"
+          },
+          "resolution": {
+            "enum": [
+              "fixed",
+              "not-a-defect",
+              "duplicate"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "resolution"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "releaseRationale"
+          ]
+        }
       }
     }
   ]

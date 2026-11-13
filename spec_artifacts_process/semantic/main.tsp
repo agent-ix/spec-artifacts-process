@@ -289,6 +289,15 @@ scalar ClosedBy extends string;
 @pattern("^[A-Za-z0-9]\\S*$")
 scalar VerificationTarget extends string;
 
+/**
+ * A release-rationale cell that is written text in shape: non-empty after
+ * trimming and not one of the placeholders `n/a`, `none`, `unknown`, `tbd`,
+ * `-`, compared case-insensitively (the `closed_by` rule, FR-014). Whether the
+ * author is a real person is the commit author's attribution, not this pattern's.
+ */
+@pattern("^(?![ \\t]*([nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)[ \\t]*$)[ \\t]*\\S")
+scalar NamedText extends string;
+
 /** A relationship verb from the module's `allowed_links` registries. */
 @pattern("^[a-z][a-z0-9_]*$")
 scalar EdgeVerb extends string;
@@ -422,6 +431,17 @@ model VerificationRow {
   target: VerificationTarget;
   /** free text: the engineer's statement of how the fix is demonstrated. */
   rationale: NonEmptyText;
+  line: LineNumber;
+}
+
+/**
+ * One `## Release Rationale` row (`Author | Rationale`): a named person's
+ * written reason for releasing with the anomaly not fixed (FR-016). It holds no
+ * date, commit, release identifier, signature or sign-off.
+ */
+model ReleaseRationaleRow {
+  author: NamedText;
+  rationale: NamedText;
   line: LineNumber;
 }
 
@@ -678,7 +698,8 @@ model Feedback {
 /**
  * Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle
  * status, how it ended, who closed it, its severity, its safety-impact
- * assessment and the verification of its fix (FR-014, FR-015). The conditional rules below are the status-conditional
+ * assessment, the verification of its fix and, optionally, the rationale for
+ * releasing with it not fixed (FR-014, FR-015, FR-016). The conditional rules below are the status-conditional
  * checks the module owns; the legality of a status move is judged over git
  * history by quoin and is not representable in a record. The record holds no
  * history, no author and no date.
@@ -717,6 +738,11 @@ model Feedback {
   // fix verification (FR-015): required when the resolution is fixed.
   #{ `if`: #{ `properties`: #{ `resolution`: #{ `const`: "fixed" } }, `required`: #["resolution"] },
      `then`: #{ `required`: #["verification"] } },
+  // release rationale (FR-016): refused on a closed anomaly whose resolution is
+  // present and fixed, not-a-defect or duplicate. A closed wont-fix anomaly (a
+  // defect deliberately shipped) and any non-closed anomaly may carry it.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `const`: "closed" }, `resolution`: #{ `enum`: #["fixed", "not-a-defect", "duplicate"] } }, `required`: #["status", "resolution"] },
+     `then`: #{ `not`: #{ `required`: #["releaseRationale"] } } }
 ])
 model Anomaly {
   id: UpperDocId;
@@ -737,6 +763,8 @@ model Anomaly {
   @minItems(1) assessment?: AssessmentRow[];
   /** Absent unless the resolution is `fixed`, which requires it by the conditionals above. */
   @minItems(1) verification?: VerificationRow[];
+  /** Absent when the section is absent; an engineer's written reason, never filled in by a tool (FR-016). */
+  @minItems(1) releaseRationale?: ReleaseRationaleRow[];
 }
 
 /**
