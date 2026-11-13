@@ -80,3 +80,11 @@ scope:
   role: examined
   excerpt: Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field.
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | still-open | Round 1 (head a4141f7): Partly fixed at a4141f7. A bare heading and a heading followed by prose now fail at the heading (probed). Two things remain. (1) A pipe table with no delimiter row (`\| Author \| Rationale \|` then `\| TBD \| n/a \|`) is not a table, so it has no row, and it still validates with no diagnostic, hiding two placeholder cells. `(?m)^[ \t]*\\|` only checks for a line that starts with a pipe. The exact rule is `if: {required: [release_rationale_section], not: {required: [release_rationale]}}, then: {properties: {release_rationale_section: false}}`. It is still reported at the heading line. (2) No test references `rationale-bare-heading` or `rationale-heading-prose`, so nothing asserts the fix. Add both, plus a no-delimiter fixture, to the FR-016-AC-5 / TC-211 parametrize. |
+| FND-002 | fixed | Round 1 (head a4141f7): for rule in fields["allOf"]:     then = rule.get("then", {}).get("properties", {})     assert "release_rationale" not in then     assert then.get("release_rationale_section") in (None, False) assert "default" not in json.dumps(fields["allOf"]) |
+| FND-003 | fixed | Round 1 (head a4141f7): @pytest.mark.trace("FR-016-AC-8", "TC-214") |

@@ -62,3 +62,15 @@ scope:
   role: examined
   excerpt: A `fixed` anomaly whose only row is `Test`, `-`, `verified`, and one whose only row has an empty `Target`, each fail validation at the row.
 ```
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-002 | low | The FR-015 amendment drops the 'Criterion row naming FR-001' case and the test no longer uses this fixture. It still sits under `invalid/`, but the amended spec accepts it: in the corpus it raises no finding. Quoin reads these fixtures in place, so a valid document under `invalid/` misleads. Delete it. | tests/fixtures/anomaly/invalid/verification-criterion-names-requirement.md:1-28 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head a4141f7): The xfail parameter and its reason string are removed. The case list is now ("verification-criterion-names-hazard", "HAZ-001", "Criterion"), ("verification-criterion-names-test-case", "TC-001", "Criterion"), ("verification-test-names-criterion", "FR-001-AC-1", "Test"), |

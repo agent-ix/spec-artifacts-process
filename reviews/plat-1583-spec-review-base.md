@@ -122,3 +122,15 @@ scope:
   role: examined
   excerpt: 'The `Anomaly` `yield_pattern.match` carries a `release_rationale` locator with `required: false`, and `AnomalyFields.json` names the property `release_rationale`.'
 ```
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-002 | low | The amendment to a merged spec adds a `**CR note.**` paragraph: 'An earlier text had ... The clause is dropped'. That is change history, which git already holds, and no other spec in this repo has a CR note. Its one useful sentence is a target-state limit, and it names only requirement documents. An NFR document (`Criterion \| NFR-002`) is accepted for the same FR-049 reason. Replace the note with a Behavior bullet: 'A `Criterion` row naming an `FR` or `NFR` document resolves (quire-rs FR-049) and is not reported as a kind mismatch.' Otherwise the amendment is sound. AC-15 and the Behavior clause now agree with quire-rs FR-049, TC-203 restates the new AC exactly, and no quoin spec cites the dropped clause. | spec/functional/FR-015-anomaly-safety-impact-assessment.md:128-132 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head a4141f7): \| TC-203 \| In that corpus, a `Criterion` row targeting the hazard, a `Criterion` row targeting `TC-001`, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. \| Unit \| P1 \| FR-015-AC-15 \| ✅ \| |

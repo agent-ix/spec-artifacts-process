@@ -167,9 +167,11 @@
       "then": { "properties": { "release_rationale_section": false } }
     },
     {
-      "properties": {
-        "release_rationale_section": { "pattern": "(?m)^[ \\t]*\\|" }
-      }
+      "if": {
+        "required": ["release_rationale_section"],
+        "not": { "required": ["release_rationale"] }
+      },
+      "then": { "properties": { "release_rationale_section": false } }
     }
   ]
 }

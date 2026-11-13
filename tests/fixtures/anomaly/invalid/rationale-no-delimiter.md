@@ -1,13 +1,12 @@
 ---
 id: AN-001
-title: "Fixture verification-criterion-names-requirement"
+title: "Fixture rationale assessed"
 type: Anomaly
-status: resolved
-resolution: fixed
+status: assessed
 safety_impact: impacting
 severity: major
 ---
-# [AN-001] Fixture verification-criterion-names-requirement
+# [AN-001] Fixture rationale assessed
 
 ## Description
 
@@ -21,8 +20,7 @@ The importer accepted a file whose checksum did not match.
 | Requirement | FR-001-AC-1 | Affects | The criterion is not met. |
 | Hazard | HAZ-001 | Introduces | A corrupt artifact is accepted. |
 
-## Fix Verification
+## Release Rationale
 
-| Kind | Target | Rationale |
-|------|--------|-----------|
-| Criterion | FR-001 | The fix is demonstrated here. |
+| Author | Rationale |
+| TBD | n/a |

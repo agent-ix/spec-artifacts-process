@@ -62,3 +62,9 @@ scope:
   role: examined
   excerpt: A `fixed` anomaly whose only row is `Test`, `-`, `verified`, and one whose only row has an empty `Target`, each fail validation at the row.
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head a4141f7): \| FR-015-AC-15 \| In that corpus, a `Criterion` row targeting the hazard, a `Criterion` row targeting `TC-001`, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. \| Test \| |

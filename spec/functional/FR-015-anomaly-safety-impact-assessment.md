@@ -109,6 +109,7 @@ is authored anywhere in the record.
   that resolves to nothing as a dangling reference, and one that resolves to an artifact of the
   other kind as a kind mismatch. Both
   diagnostics are the engine's, not text written by this module.
+- A `Criterion` row naming an `FR` or `NFR` document resolves (quire-rs FR-049) and is not reported as a kind mismatch.
 - The manifest SHALL declare, for the `Target` column of the section, a `column_patterns` rule
   requiring an id token (a value that begins with a letter or digit), because a cell matching no
   reference pattern produces no reference and no finding (quire-rs FR-049-AC-14) and `-` would
@@ -124,12 +125,6 @@ is authored anywhere in the record.
   criteria.
 - The assessment SHALL be a statement of an engineer's judgement, not a computed risk acceptance;
   this requirement SHALL NOT add any risk-acceptance or sign-off field.
-
-**CR note.** An earlier text had a `Criterion` row naming a requirement document (`FR-001`) fail as a
-kind mismatch. quire-rs FR-049 resolves the id of every document of an archetype under each target
-bound to that archetype, so `FR-001` resolves under `acceptance-criterion` and no engine following
-FR-049 can raise the mismatch. The clause is dropped; a `Criterion` row naming a requirement document
-is not checked by this module.
 
 ## Acceptance Criteria
 
