@@ -77,7 +77,7 @@ the file, which already records it and which a typed table could only duplicate 
   an `assessed` anomaly with no `severity`, a `severity` outside the vocabulary, a `resolved` anomaly with no `resolution`, and an `identified` anomaly carrying `closed_by`.
 - The module SHALL publish the `Anomaly` record mapping in `mappings.yaml` ([FR-011](./FR-011-markdown-record-mapping.md)),
   naming the record keys `status`, `resolution`, `closedBy` (from frontmatter `closed_by`), `severity`
-  and `safetyImpact`, each a `frontmatter` mapping carried verbatim, and the keys `assessment` and `verification`
+  and `safetyImpact`, each a `frontmatter` mapping carried verbatim, and the keys `assessment`, `verification` and `releaseRationale`
   ([FR-015](./FR-015-anomaly-safety-impact-assessment.md)). The key `statusHistory` is not
   authored anywhere: quoin FR-136 derives it from git.
 - The module SHALL ship fixtures as part of its tests for the criteria below: one valid document per
@@ -86,7 +86,7 @@ the file, which already records it and which a typed table could only duplicate 
 - The `Anomaly` archetype SHALL declare `record_validation: { schema: schemas/AnomalyFields.json, locate_absence_at: status }`
   and a `closed_by` `frontmatter_field` locator (`required: false`) in its `yield_pattern.match`.
   `AnomalyFields.json` is the module's own, hand-authored schema for the YAML-extracted record:
-  its property names are the `yield_pattern.match` keys verbatim (`closed_by`, `severity`, `safety_impact`) and
+  its property names are the `yield_pattern.match` keys verbatim (`closed_by`, `severity`, `safety_impact`, `release_rationale`) and
   it carries the conditional presence rules above as `if`/`then`, so that each is reported at the
   `status` line. It is not the emitted record schema: `Anomaly.json` (camelCase keys, projected
   from TypeSpec, FR-009) validates the mapped record and is unchanged by it. The schema generator
@@ -114,7 +114,7 @@ the file, which already records it and which a typed table could only duplicate 
 | FR-014-AC-4 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Test |
 | FR-014-AC-5 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Test |
 | FR-014-AC-6 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Test |
-| FR-014-AC-7 | The mapping lists `status`, `resolution`, `closedBy`, `severity`, `safetyImpact`, `assessment` and `verification` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Test |
+| FR-014-AC-7 | The mapping lists `status`, `resolution`, `closedBy`, `severity`, `safetyImpact`, `assessment`, `verification` and `releaseRationale` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Test |
 | FR-014-AC-8 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Test |
 | FR-014-AC-9 | The `Anomaly` archetype declares `record_validation` with schema `schemas/AnomalyFields.json` and `locate_absence_at: status`. | Test |
 | FR-014-AC-10 | The `Anomaly` `yield_pattern.match` carries a `closed_by` `frontmatter_field` locator with `required: false`. | Test |

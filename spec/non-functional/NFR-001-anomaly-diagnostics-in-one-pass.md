@@ -36,17 +36,17 @@ cannot be reported together, so the measure is taken over fixtures that group on
 
 | Metric | Target | Threshold | Method |
 |--------|--------|-----------|--------|
-| Fraction of injected defects reported in one run, over three fixtures: (a) `closed` with no `closed_by` and no `resolution`; (b) `assessed` with `safety_impact: unassessed` and no assessment section; (c) `impacting` with a dangling `Requirement` row, a kind-mismatched `Hazard` row and an empty `Rationale` | 100% | 100% | Test |
+| Fraction of injected defects reported in one run, over four fixtures: (a) `closed` with no `closed_by` and no `resolution`; (b) `assessed` with `safety_impact: unassessed` and no assessment section; (c) `impacting` with a dangling `Requirement` row, a kind-mismatched `Hazard` row and an empty `Rationale`; (d) a `closed` `fixed` anomaly with a `## Release Rationale` section whose `Author` is a placeholder and whose `Rationale` is empty (FR-016-AC-6) | 100% | 100% | Test |
 | Fraction of reported defects carrying a line (the `status` line for an absence) | 100% | 100% | Test |
 
 ## Verification
 
-Each of the three fixtures is validated once; the test asserts one diagnostic per injected defect
+Each of the four fixtures is validated once; the test asserts one diagnostic per injected defect
 and that each carries a line.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| NFR-001-AC-1 | Validating fixture (a), (b) or (c) yields exactly one diagnostic per injected defect in that fixture. | Test |
+| NFR-001-AC-1 | Validating fixture (a), (b), (c) or (d) yields exactly one diagnostic per injected defect in that fixture. | Test |
 | NFR-001-AC-2 | Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field. | Test |
