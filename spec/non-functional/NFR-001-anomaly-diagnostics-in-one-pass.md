@@ -8,6 +8,8 @@ relationships:
     type: "constrains"
   - target: "ix://agent-ix/spec-artifacts-process/FR-015"
     type: "constrains"
+  - target: "ix://agent-ix/spec-artifacts-process/FR-016"
+    type: "constrains"
 ---
 # NFR-001: Anomaly validation reports every coexisting defect in one pass, located
 
@@ -19,7 +21,7 @@ of the offending field, row or section heading.
 
 ## Scope
 
-- Applies to: the checks of FR-014 and FR-015 on one document.
+- Applies to: the checks of FR-014, FR-015 and FR-016 on one document.
 - A defect that is an absence (a missing section, a missing field) has no line of its own. Its
   diagnostic carries the line of the frontmatter `status` field, which is what makes the absence a
   defect.
