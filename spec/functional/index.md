@@ -22,3 +22,4 @@ description: "Index of artifacts in this directory."
 * [FR-013: Authored process definitions are separated from execution occurrences](./FR-013-definitions-not-occurrences.md)
 * [FR-014: Anomaly archetype with a state lifecycle](./FR-014-anomaly-archetype-and-state-lifecycle.md)
 * [FR-015: Anomaly safety-impact assessment with resolving links](./FR-015-anomaly-safety-impact-assessment.md)
+* [FR-016: Anomaly release rationale: a human-authored, named reason for releasing with an anomaly open](./FR-016-anomaly-release-rationale.md)
