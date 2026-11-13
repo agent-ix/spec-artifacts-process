@@ -1062,23 +1062,8 @@ def test_a_dangling_verification_target_names_the_id_and_its_row(
 @pytest.mark.parametrize(
     "name,target,kind",
     [
-        pytest.param(
-            "verification-criterion-names-requirement",
-            "FR-001",
-            "Criterion",
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason=(
-                    "engine (quire-rs FR-049, engine 0.58/0.59): the id of a "
-                    "requirement document resolves under every target bound to "
-                    "its archetype, `acceptance-criterion` included, so a "
-                    "`Criterion` row naming `FR-001` raises no kind mismatch. "
-                    "The manifest declares exactly the targets FR-015-AC-11 "
-                    "names; turns green when the engine types document ids."
-                ),
-            ),
-        ),
         ("verification-criterion-names-hazard", "HAZ-001", "Criterion"),
+        ("verification-criterion-names-test-case", "TC-001", "Criterion"),
         ("verification-test-names-criterion", "FR-001-AC-1", "Test"),
     ],
 )
@@ -1351,7 +1336,7 @@ def test_the_mapping_and_the_emitted_schema_carry_the_release_rationale(
     ), "a releaseRationale on a closed `fixed` anomaly is rejected"
 
 
-@pytest.mark.trace("FR-016-AC-8", "FR-014-AC-14", "TC-214")
+@pytest.mark.trace("FR-016-AC-8", "TC-214")
 def test_the_skeleton_has_no_release_rationale_and_nothing_defaults_or_computes_it(
     manifest, mappings
 ):
@@ -1370,9 +1355,10 @@ def test_the_skeleton_has_no_release_rationale_and_nothing_defaults_or_computes_
     ):
         assert keys_named(tree, "default") == []
     for rule in fields["allOf"]:
-        assert "release_rationale" not in rule.get("then", {}).get(
-            "properties", {}
-        ) or (rule["then"]["properties"].get("release_rationale_section") is False)
+        then = rule.get("then", {}).get("properties", {})
+        assert "release_rationale" not in then
+        assert then.get("release_rationale_section") in (None, False)
+    assert "default" not in json.dumps(fields["allOf"])
 
 
 @pytest.mark.parametrize("status", RATIONALE_PAIRS)

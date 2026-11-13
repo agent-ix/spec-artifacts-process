@@ -182,7 +182,7 @@ type: TestMatrix
 | TC-200 | A `resolved` anomaly and a `closed` anomaly with `resolution` `fixed` each fail validation, at the `status` line, with no `## Fix Verification` section; a `closed` anomaly with `resolution` `not-a-defect`, `duplicate` or `wont-fix` and no section validates. | Unit | P1 | FR-015-AC-12 | ✅ |
 | TC-201 | In the corpus of AC-4 plus a `TestMatrix` test case `TC-001`, a `fixed` anomaly with a `Criterion` row targeting `FR-001-AC-1` and a `Test` row targeting `TC-001` validates. | Unit | P1 | FR-015-AC-13 | ✅ |
 | TC-202 | In that corpus, a `Criterion` row targeting `FR-001-AC-99` and a `Test` row targeting `TC-999` each fail as a dangling reference naming the id and its row. | Unit | P1 | FR-015-AC-14 | ✅ |
-| TC-203 | In that corpus, a `Criterion` row targeting `FR-001` (a requirement document), a `Criterion` row targeting the hazard, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. | Unit | P1 | FR-015-AC-15 | ✅ |
+| TC-203 | In that corpus, a `Criterion` row targeting the hazard, a `Criterion` row targeting `TC-001`, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. | Unit | P1 | FR-015-AC-15 | ✅ |
 | TC-204 | A row with an empty `Rationale` or a `Kind` outside the vocabulary fails validation. | Unit | P1 | FR-015-AC-16 | ✅ |
 | TC-205 | The mapping yields `verification` entries with `kind`, `target` and `rationale` as authored. | Unit | P1 | FR-015-AC-17 | ✅ |
 | TC-206 | A `fixed` anomaly whose only row is `Test`, `-`, `verified`, and one whose only row has an empty `Target`, each fail validation at the row. | Unit | P1 | FR-015-AC-19 | ✅ |
