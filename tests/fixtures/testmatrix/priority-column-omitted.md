@@ -5,32 +5,6 @@ type: TestMatrix
 ---
 # TM-002: Matrix with no Priority column
 
-## Requirements Traceability
-
-### Stakeholder Requirement Coverage
-
-| Stakeholder Req | Trace to US/FR | Test/Validation | Status |
-|-----------------|----------------|-----------------|-----------------|
-| StR-001 | US-001, FR-003 | Review | ✅ Complete |
-
-### User Story Coverage
-
-| User Story | Acceptance Criteria | Test Cases | Status |
-|------------|---------------------|------------|-----------------|
-| US-001 | US-001-EX-1 | TC-001 | 🚧 Planned |
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-003 | FR-003-AC-1 | TC-001 | 🚧 Planned |
-
-### Non-Functional Requirement Coverage
-
-| Non-Functional Req | Verification Method | Evidence/Test Cases | Status |
-|--------------------|---------------------|---------------------|--------|
-| NFR-001 | Inspection | TC-001 | 🚧 |
-
 ## Test Case Summary
 
 | Test ID | Title | Type | Traces To | Status |

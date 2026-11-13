@@ -7,14 +7,6 @@ because: "⚠️ was retired by CR-031: traceability.status classed it as nothin
 ---
 # TM-900: negative — a Status cell carrying the retired warning marker
 
-## Requirements Traceability
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 | TC-001 | ✅ |
-
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |

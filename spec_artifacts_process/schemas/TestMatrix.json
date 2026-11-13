@@ -26,40 +26,12 @@
     "provenance": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Provenance.json"
     },
-    "functionalCoverage": {
-      "type": "array",
-      "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FunctionalCoverageRow.json"
-      },
-      "minItems": 1
-    },
     "testCases": {
       "type": "array",
       "items": {
         "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TestCaseRow.json"
       },
       "minItems": 1
-    },
-    "stakeholderCoverage": {
-      "type": "array",
-      "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/StakeholderCoverageRow.json"
-      },
-      "description": "Optional: a bundle with no StR artifacts cannot truthfully populate it."
-    },
-    "userStoryCoverage": {
-      "type": "array",
-      "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/UserStoryCoverageRow.json"
-      },
-      "description": "Optional, for the same reason."
-    },
-    "nonFunctionalCoverage": {
-      "type": "array",
-      "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonFunctionalCoverageRow.json"
-      },
-      "description": "Optional, for the same reason."
     }
   },
   "required": [
@@ -67,7 +39,6 @@
     "title",
     "type",
     "provenance",
-    "functionalCoverage",
     "testCases"
   ],
   "unevaluatedProperties": {

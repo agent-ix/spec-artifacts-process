@@ -1,35 +1,13 @@
 {
-  "functionalCoverage": [
-    {
-      "acceptanceCriteria": "FR-001-AC-1",
-      "functionalReq": "FR-001",
-      "line": 49,
-      "status": {
-        "marker": "\u2705",
-        "note": "Complete"
-      },
-      "testCases": "TC-001"
-    },
-    {
-      "acceptanceCriteria": "FR-001-AC-2",
-      "functionalReq": "FR-001",
-      "line": 50,
-      "status": {
-        "marker": "\u2705",
-        "note": "Complete"
-      },
-      "testCases": "TC-002"
-    }
-  ],
   "id": "TM-001",
   "provenance": {
-    "digest": "sha256:6d07fcc30a52a918eca5102f6359fb1032c157db64fdb33c3cb08907ed107a2f",
+    "digest": "sha256:a28bbafd5eb825ce95d714766bf9b1ff641cdab949aee67095b51a5a56951b20",
     "path": "skeletons/TestMatrix.md"
   },
   "testCases": [
     {
       "id": "TC-001",
-      "line": 56,
+      "line": 46,
       "priority": "P0",
       "status": {
         "marker": "\u2705"
@@ -45,7 +23,7 @@
     },
     {
       "id": "TC-002",
-      "line": 57,
+      "line": 47,
       "priority": "P0",
       "status": {
         "marker": "\u2705"
@@ -61,7 +39,7 @@
     },
     {
       "id": "TC-003",
-      "line": 58,
+      "line": 48,
       "priority": "P2",
       "status": {
         "marker": "\ud83d\udea7",
@@ -78,7 +56,7 @@
     },
     {
       "id": "TC-004",
-      "line": 59,
+      "line": 49,
       "priority": "P1",
       "status": {
         "marker": "\u26d4",

@@ -7,14 +7,14 @@
         "Risk Level": "Low"
       },
       "id": "GAP-001",
-      "line": 49
+      "line": 51
     }
   ],
   "id": "TM-000",
   "integrationMatrix": [
     {
       "id": "INT-001",
-      "line": 43,
+      "line": 45,
       "purpose": "Import writes through to the object store",
       "status": {
         "marker": "\u2705"
@@ -25,28 +25,18 @@
     }
   ],
   "provenance": {
-    "digest": "sha256:65558d8c9defeb4117c42d1b376ee6d48a2247b5f6dc4fbd9d49a057b63a414a",
+    "digest": "sha256:2d9e6422156477ec5100dbbb1ca479e1e5c94eec90964e1d83524ddb1eacb3ed",
     "path": "skeletons/TestMatrixIndex.md"
   },
   "subsystemIndex": [
     {
-      "line": 36,
+      "line": 38,
       "localMatrix": "[import](./import/tests.md)",
-      "requirements": "FR-001..FR-004",
-      "status": {
-        "marker": "\u2705",
-        "note": "Complete"
-      },
       "subsystem": "Import"
     },
     {
-      "line": 37,
+      "line": 39,
       "localMatrix": "[storage](./storage/tests.md)",
-      "requirements": "FR-005..FR-009",
-      "status": {
-        "marker": "\ud83d\udea7",
-        "note": "two criteria unbacked"
-      },
       "subsystem": "Storage"
     }
   ],

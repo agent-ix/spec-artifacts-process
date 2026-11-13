@@ -7,14 +7,6 @@ because: "a semicolon is not the declared separator; an ambiguous separator make
 ---
 # TM-901: negative — a Traces To cell the pattern rejects
 
-## Requirements Traceability
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 | TC-001 | ✅ |
-
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |

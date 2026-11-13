@@ -122,18 +122,6 @@ def test_testmatrix_body_extraction_contract() -> None:
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
     match = tm["body_extraction"]["yield_pattern"]["match"]
 
-    coverage = match["functional_coverage"]
-    assert coverage["from"] == "table_row"
-    assert coverage["under_section"] == "Functional Requirement Coverage"
-    assert coverage["required"] is True
-    assert coverage["assert"]["columns"] == [
-        "Functional Req",
-        "Acceptance Criteria",
-        "Test Cases",
-        "Status",
-    ]
-    assert coverage["assert"]["min_rows"] == 1
-
     cases = match["test_cases"]
     assert cases["required"] is True
     assert cases["multiple"] is True, "one record per test-case row (FR-003-AC-8)"
@@ -211,19 +199,19 @@ def test_testmatrix_body_extraction_contract() -> None:
     for cell in ["", "—", "Future Task 13", "FR-002 error path", "-AC-1"]:
         assert not traces.match(cell), f"should stay rejected: {cell!r}"
 
-    # The three optional coverage tables: absent is fine, present is asserted.
-    for key, section in [
-        ("stakeholder_coverage", "Stakeholder Requirement Coverage"),
-        ("user_story_coverage", "User Story Coverage"),
-        ("non_functional_coverage", "Non-Functional Requirement Coverage"),
-    ]:
-        assert match[key]["required"] is False
-        assert match[key]["under_section"] == section
-        assert match[key]["assert"]["columns"]
-        assert "min_rows" not in match[key]["assert"], (
-            "an optional table must not require rows — a bundle without those "
-            "artifacts would have to fabricate them (FR-003-AC-7)"
-        )
+
+@pytest.mark.trace("TC-017", "FR-003-AC-9", "FR-003-AC-15")
+def test_testmatrix_declares_only_the_test_case_summary() -> None:
+    """TC-017 (FR-003-AC-15): the TestMatrix match declares the Test Case
+    Summary extraction only; no functional, stakeholder, user-story or
+    non-functional coverage table is extracted, required or optional."""
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
+    tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
+    match = tm["body_extraction"]["yield_pattern"]["match"]
+    assert list(match) == ["test_cases"]
+    assert not any(
+        "Coverage" in str(entry.get("under_section")) for entry in match.values()
+    )
 
 
 @pytest.mark.trace("TC-017", "FR-003-AC-9")
@@ -647,21 +635,17 @@ def test_tc076_testmatrix_index_is_the_index_half_of_the_matrix_layer() -> None:
     subsystems = match["subsystem_index"]
     assert subsystems["required"] is True
     assert subsystems["under_section"] == "Requirements Traceability"
-    assert subsystems["assert"]["columns"] == [
-        "Subsystem",
-        "Requirements",
-        "Local Matrix",
-        "Status",
-    ]
+    assert subsystems["assert"]["columns"] == ["Subsystem", "Local Matrix"]
+    assert (
+        "column_patterns" not in subsystems["assert"]
+    ), "the index carries no Status rollup column (FR-003-AC-12)"
     assert subsystems["assert"]["min_rows"] == 1
 
     # An index requires NEITHER leaf table — that is the whole defect.
     assert "test_cases" not in match
-    assert "functional_coverage" not in match
-    # …and the leaf still requires both, so this widened nothing.
+    # …and the leaf still requires its test cases, so this widened nothing.
     leaf_match = leaf["body_extraction"]["yield_pattern"]["match"]
     assert leaf_match["test_cases"]["required"] is True
-    assert leaf_match["functional_coverage"]["required"] is True
 
     # Optional where the corpus genuinely is: a repository whose subsystems do
     # not integrate has no INT- rows, and an absent gap register and an empty

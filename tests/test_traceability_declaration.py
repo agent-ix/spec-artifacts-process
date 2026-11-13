@@ -202,7 +202,7 @@ def test_every_entry_binds_by_archetype_and_matrices_exclude_test_data(
         )
         assert entry.get("archetype"), f"{entry['name']} declares no archetype"
 
-        if entry["section"] in ("Test Case Summary", "Functional Requirement Coverage"):
+        if entry["section"] == "Test Case Summary":
             assert entry["archetype"] == "TestMatrix", entry["name"]
             excluded = entry.get("exclude") or []
             assert any(pattern.startswith("tests/") for pattern in excluded), (
@@ -224,12 +224,8 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     reached by what it *is*, not by what it is called.
     """
     entries = traceability["trace_targets"] + traceability["document_references"]
-    matrix_entries = [
-        e["name"]
-        for e in entries
-        if e["section"] in ("Test Case Summary", "Functional Requirement Coverage")
-    ]
-    expected = ["functional-coverage", "test-case", "traces-to"]
+    matrix_entries = [e["name"] for e in entries if e["section"] == "Test Case Summary"]
+    expected = ["test-case", "traces-to"]
     assert (
         sorted(matrix_entries) == expected
     ), f"one entry per table kind, not per filename: {matrix_entries}"

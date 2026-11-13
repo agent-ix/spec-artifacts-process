@@ -7,8 +7,3 @@ type: TestMatrix
 
 ## Requirements Traceability
 
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-003 | FR-003-AC-1 | TC-001 | 🚧 Planned |

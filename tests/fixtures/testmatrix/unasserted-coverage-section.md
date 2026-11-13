@@ -1,16 +1,17 @@
 ---
-id: TM-005
-title: "Header-only FR coverage"
+id: TM-008
+title: "Legacy coverage section with arbitrary columns"
 type: TestMatrix
 ---
-# TM-005: Header-only FR coverage
+# TM-008: Legacy coverage section with arbitrary columns
 
 ## Requirements Traceability
 
 ### Functional Requirement Coverage
 
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
+| Requirement | Whatever | Anything |
+|-------------|----------|----------|
+| FR-003 | nothing is asserted here | free text |
 
 ## Test Case Summary
 

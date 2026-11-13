@@ -5,177 +5,13 @@ type: TestMatrix
 ---
 # TM-001: spec-artifacts-process test matrix
 
-## Requirements Traceability
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-2 .. FR-001-AC-4 | IT-001 | 🚧 Specified |
-| FR-002 | FR-002-AC-1 | TC-019 | 🚧 Planned |
-| FR-002 | FR-002-AC-2 | TC-020 | 🚧 Planned |
-| FR-002 | FR-002-AC-3 | TC-021 | 🚧 Planned |
-| FR-002 | FR-002-AC-4 | TC-022 | 🚧 Planned |
-| FR-002 | FR-002-AC-5 | TC-023 | 🚧 Planned |
-| FR-002 | FR-002-AC-6 | TC-027 | ✅ Complete |
-| FR-003 | FR-003-AC-1 | TC-001, TC-003, TC-016 | ✅ Complete |
-| FR-003 | FR-003-AC-2 | TC-002, TC-016 | ✅ Complete |
-| FR-003 | FR-003-AC-3 | TC-004, TC-005 | ✅ Complete |
-| FR-003 | FR-003-AC-4 | TC-006, TC-007, TC-026 | ✅ Complete |
-| FR-003 | FR-003-AC-5 | TC-008, TC-009, TC-069 | ✅ Complete |
-| FR-003 | FR-003-AC-6 | TC-012, TC-013, TC-018 | ✅ Complete |
-| FR-003 | FR-003-AC-7 | TC-014, TC-015 | ✅ Complete |
-| FR-003 | FR-003-AC-8 | TC-001 | ✅ Complete |
-| FR-003 | FR-003-AC-9 | TC-017 (+ Inspection) | ✅ Complete |
-| FR-003 | FR-003-AC-10 | TC-010, TC-011, TC-025 | ✅ Complete |
-| FR-003 | FR-003-AC-11 | TC-024 (blocked: no quire-rs uniqueness assert) | 🚧 Blocked |
-| FR-003 | FR-003-AC-12 | TC-076 | ✅ Complete |
-| FR-004 | FR-004-AC-1 | TC-028 | ✅ Complete |
-| FR-004 | FR-004-AC-1 | TC-070 | ✅ Complete |
-| FR-004 | FR-004-AC-2 | TC-029, TC-039 | ✅ Complete |
-| FR-004 | FR-004-AC-3 | TC-030 | ✅ Complete |
-| FR-004 | FR-004-AC-5 | TC-032 | ✅ Complete |
-| FR-004 | FR-004-AC-6 | TC-033 | ✅ Complete |
-| FR-004 | FR-004-AC-7 | TC-034 | ✅ Complete |
-| FR-004 | FR-004-AC-9 | TC-036 | ✅ Complete |
-| FR-004 | FR-004-AC-10 | TC-066 | ✅ Complete |
-| FR-004 | FR-004-AC-12 | TC-072 | ✅ Complete |
-| FR-004 | FR-004-AC-13 | TC-073 | ✅ Complete |
-| FR-004 | FR-004-AC-14 | TC-074 | ✅ Complete |
-| FR-004 | FR-004-AC-19 | TC-147 | ✅ Complete |
-| FR-004 | FR-004-AC-20 | TC-148 | ✅ Complete |
-| FR-004 | FR-004-AC-21 | TC-149 | ✅ Complete |
-| FR-004 | FR-004-AC-22 | TC-151 | ✅ Complete |
-| FR-004 | FR-004-AC-25 | TC-154 | ✅ Complete |
-| FR-004 | FR-004-AC-26 | TC-155 | ⛔ Retired |
-| FR-004 | FR-004-AC-27 | TC-156 | ✅ Complete |
-| FR-004 | FR-004-AC-28 | TC-157 | ✅ Complete |
-| FR-004 | FR-004-AC-29 | TC-158 | ✅ Complete |
-| FR-004 | FR-004-AC-30 | TC-159 | ✅ Complete |
-| FR-004 | FR-004-AC-31 | TC-160 | ✅ Complete |
-| FR-004 | FR-004-AC-32 | TC-161 | ✅ Complete |
-| FR-004 | FR-004-AC-33 | TC-162 | ✅ Complete |
-| FR-004 | FR-004-AC-34 | TC-163 | ✅ Complete |
-| FR-004 | FR-004-AC-35 | TC-164 | ✅ Complete |
-| FR-004 | FR-004-AC-36 | TC-165 | ✅ Complete |
-| FR-004 | FR-004-AC-37 | TC-166 | ✅ Complete |
-| FR-005 | FR-005-AC-1 | TC-037 | ✅ Complete |
-| FR-005 | FR-005-AC-2 | TC-037 | ✅ Complete |
-| FR-005 | FR-005-AC-3 | TC-038 | ✅ Complete |
-| FR-006 | FR-006-AC-1 | TC-040 | ✅ Complete |
-| FR-006 | FR-006-AC-2 | TC-041 | ✅ Complete |
-| FR-006 | FR-006-AC-3 | TC-042 | ✅ Complete |
-| FR-006 | FR-006-AC-4 | TC-043 | ✅ Complete |
-| FR-006 | FR-006-AC-5 | TC-044 | ✅ Complete |
-| FR-006 | FR-006-AC-6 | TC-045 | ✅ Complete |
-| FR-006 | FR-006-AC-7 | TC-046 | ✅ Complete |
-| FR-006 | FR-006-AC-8 | TC-047 | ✅ Complete |
-| FR-007 | FR-007-AC-1 | TC-048 | ✅ Complete |
-| FR-007 | FR-007-AC-2 | TC-049 | ✅ Complete |
-| FR-007 | FR-007-AC-3 | TC-050 | ✅ Complete |
-| FR-007 | FR-007-AC-4 | TC-051 | ✅ Complete |
-| FR-007 | FR-007-AC-5 | TC-052 | ✅ Complete |
-| FR-007 | FR-007-AC-6 | TC-053 | ✅ Complete |
-| FR-007 | FR-007-AC-7 | TC-054 | ✅ Complete |
-| FR-007 | FR-007-AC-8 | TC-055 | ✅ Complete |
-| FR-007 | FR-007-AC-12 | TC-055 | ✅ Complete |
-| FR-007 | FR-007-AC-13 | TC-067 | ✅ Complete |
-| FR-007 | FR-007-AC-14 | TC-068 | ✅ Complete |
-| FR-007 | FR-007-AC-16 | TC-167 | ✅ Complete |
-| FR-007 | FR-007-AC-9 | TC-056 | ✅ Complete |
-| FR-007 | FR-007-AC-10 | TC-057 | ✅ Complete |
-| FR-007 | FR-007-AC-11 | TC-065 | ✅ Complete |
-| FR-007 | FR-007-AC-15 | TC-150 | ✅ Complete |
-| FR-008 | FR-008-AC-1 | TC-060 | ✅ Complete |
-| FR-008 | FR-008-AC-2 | TC-061 | ✅ Complete |
-| FR-008 | FR-008-AC-3 | TC-061 | ✅ Complete |
-| FR-008 | FR-008-AC-4 | TC-063 | ✅ Complete |
-| FR-008 | FR-008-AC-5 | TC-064 | ✅ Complete |
-| FR-008 | FR-008-AC-6 | TC-062 | ✅ Complete |
-| FR-009 | FR-009-AC-2 | TC-081 | ✅ Complete |
-| FR-009 | FR-009-AC-3 | TC-082 | ✅ Complete |
-| FR-009 | FR-009-AC-4 | TC-083 | ✅ Complete |
-| FR-009 | FR-009-AC-6 | TC-085 | ✅ Complete |
-| FR-009 | FR-009-AC-7 | TC-086 | ✅ Complete |
-| FR-009 | FR-009-AC-8 | TC-087 | ✅ Complete |
-| FR-009 | FR-009-AC-10 | TC-132 | ✅ Complete |
-| FR-009 | FR-009-AC-13 | Inspection (FR-009-CON-6, no TC) | ✅ Complete |
-| FR-009 | FR-009-AC-14 | TC-193 | ✅ Complete |
-| FR-010 | FR-010-AC-1 | TC-089 | ✅ Complete |
-| FR-010 | FR-010-AC-5 | TC-093 | ✅ Complete |
-| FR-010 | FR-010-AC-6 | TC-094 | ✅ Complete |
-| FR-010 | FR-010-AC-8 | TC-096 | ✅ Complete |
-| FR-010 | FR-010-AC-9 | TC-135 | ❌ blocked on quire-rs#221 |
-| FR-011 | FR-011-AC-1 | TC-097 | ✅ Complete |
-| FR-011 | FR-011-AC-2 | TC-098 | ✅ Complete |
-| FR-011 | FR-011-AC-3 | TC-099 | ✅ Complete |
-| FR-011 | FR-011-AC-4 | TC-100 | ✅ Complete |
-| FR-011 | FR-011-AC-5 | TC-101 | ✅ Complete |
-| FR-011 | FR-011-AC-6 | TC-102 | ✅ Complete |
-| FR-011 | FR-011-AC-7 | TC-103 | ✅ Complete |
-| FR-011 | FR-011-AC-8 | TC-104 | ✅ Complete |
-| FR-011 | FR-011-AC-9 | TC-105 | ✅ Complete |
-| FR-011 | FR-011-AC-10 | TC-106 | ✅ Complete |
-| FR-011 | FR-011-AC-11 | TC-107 | ✅ Complete |
-| FR-011 | FR-011-AC-12 | TC-108 | ✅ Complete |
-| FR-011 | FR-011-AC-13 | TC-109 | ✅ Complete |
-| FR-011 | FR-011-AC-14 | TC-110 | ✅ Complete |
-| FR-011 | FR-011-AC-15 | TC-137 | ✅ Complete |
-| FR-011 | FR-011-AC-16 | TC-138 | ✅ Complete |
-| FR-011 | FR-011-AC-17 | TC-139 | ✅ Complete |
-| FR-011 | FR-011-AC-18 | TC-140 | ✅ Complete |
-| FR-012 | FR-012-AC-1 | TC-111 | ✅ Complete |
-| FR-012 | FR-012-AC-2 | TC-112 | ✅ Complete |
-| FR-012 | FR-012-AC-3 | TC-113 | ✅ Complete |
-| FR-012 | FR-012-AC-4 | TC-114 | ✅ Complete |
-| FR-012 | FR-012-AC-5 | TC-115 | ✅ Complete |
-| FR-012 | FR-012-AC-6 | TC-116 | ✅ Complete |
-| FR-012 | FR-012-AC-7 | TC-117 | ✅ Complete |
-| FR-012 | FR-012-AC-8 | TC-118 | ✅ Complete |
-| FR-012 | FR-012-AC-9 | TC-119 | ✅ Complete |
-| FR-012 | FR-012-AC-10 | TC-141 | ✅ Complete |
-| FR-012 | FR-012-AC-11 | TC-142 | ✅ Complete |
-| FR-013 | FR-013-AC-1 | TC-120 | ✅ Complete |
-| FR-013 | FR-013-AC-2 | TC-121 | ✅ Complete |
-| FR-013 | FR-013-AC-3 | TC-122 | ✅ Complete |
-| FR-013 | FR-013-AC-4 | TC-123 | ✅ Complete |
-| FR-013 | FR-013-AC-5 | TC-124 | ✅ Complete |
-| FR-013 | FR-013-AC-6 | TC-125 | ✅ Complete |
-| FR-013 | FR-013-AC-8 | TC-143 | ✅ Complete |
-| FR-014 | FR-014-AC-1 | TC-168 | ✅ Complete |
-| FR-014 | FR-014-AC-2 | TC-169 | ✅ Complete |
-| FR-014 | FR-014-AC-3 | TC-170 | ✅ Complete |
-| FR-014 | FR-014-AC-4 | TC-171 | ✅ Complete |
-| FR-014 | FR-014-AC-5 | TC-172 | ✅ Complete |
-| FR-014 | FR-014-AC-6 | TC-173 | ✅ Complete |
-| FR-014 | FR-014-AC-7 | TC-174 | ✅ Complete |
-| FR-014 | FR-014-AC-8 | TC-175 | ✅ Complete |
-| FR-014 | FR-014-AC-9 | TC-188 | ✅ Complete |
-| FR-014 | FR-014-AC-10 | TC-189 | ✅ Complete |
-| FR-014 | FR-014-AC-11 | TC-190 | ✅ Complete |
-| FR-014 | FR-014-AC-12 | TC-191 | ✅ Complete |
-| FR-014 | FR-014-AC-13 | TC-192 | ✅ Complete |
-| FR-015 | FR-015-AC-1 | TC-176 | ✅ Complete |
-| FR-015 | FR-015-AC-2 | TC-177 | ✅ Complete |
-| FR-015 | FR-015-AC-3 | TC-178 | ✅ Complete |
-| FR-015 | FR-015-AC-4 | TC-179 | ✅ Complete |
-| FR-015 | FR-015-AC-5 | TC-180 | ✅ Complete |
-| FR-015 | FR-015-AC-6 | TC-181 | ✅ Complete |
-| FR-015 | FR-015-AC-7 | TC-182 | ✅ Complete |
-| FR-015 | FR-015-AC-8 | TC-183 | ✅ Complete |
-| FR-015 | FR-015-AC-9 | TC-184 | ✅ Complete |
-| FR-015 | FR-015-AC-10 | TC-185 | ✅ Complete |
-| NFR-001 | NFR-001-AC-1 | TC-186 | ✅ Complete |
-| NFR-001 | NFR-001-AC-2 | TC-187 | ✅ Complete |
-
-
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
 | TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
 | TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
-| TC-003 | A `TestMatrix` doc validates with no `Functional Requirement Coverage` section, and with one carrying any column set, since the contract declares no functional-coverage extraction (PLAT-1499) | Unit | P1 | FR-003-AC-13 | 🚧 |
+| TC-003 | A `TestMatrix` doc validates with no `Functional Requirement Coverage` section, and with one carrying any column set, since the contract declares no functional-coverage extraction (PLAT-1499) | Unit | P1 | FR-003-AC-13 | ✅ |
 | TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |
 | TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
 | TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
@@ -186,8 +22,8 @@ type: TestMatrix
 | TC-011 | Priority cell outside the vocabulary (`P5`, `High`) fails via `column_choices` | Unit | P0 | FR-003-AC-10 | ✅ |
 | TC-012 | Traces To valid-token permutation: each token kind (StR/US/FR/NFR bare, -AC-, -CON-, IT, IT-SC) alone and comma-separated | Unit | P1 | FR-003-AC-6 | ✅ |
 | TC-013 | Malformed Traces To rejected: semicolon separator, space-before-comma, TC token, truncated `FR--AC-1`, trailing comma | Unit | P0 | FR-003-AC-6 | ✅ |
-| TC-014 | A doc with no StR/US/NFR coverage section validates | Unit | P1 | FR-003-AC-7 | 🚧 |
-| TC-015 | A doc carrying a StR, US or NFR coverage section with any column set validates: no such section is asserted (PLAT-1499) | Unit | P1 | FR-003-AC-7 | 🚧 |
+| TC-014 | A doc with no StR/US/NFR coverage section validates | Unit | P1 | FR-003-AC-7 | ✅ |
+| TC-015 | A doc carrying a StR, US or NFR coverage section with any column set validates: no such section is asserted (PLAT-1499) | Unit | P1 | FR-003-AC-7 | ✅ |
 | TC-016 | `min_rows` boundary: a `Test Case Summary` with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-2 | ✅ |
 | TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion), and the TestMatrix entry declares `test_cases` as its only extraction: no functional, stakeholder, user-story or non-functional coverage match | Unit | P2 | FR-003-AC-9, FR-003-AC-15 | ✅ |
 | TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | ✅ |
@@ -242,7 +78,7 @@ type: TestMatrix
 | TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
 | TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — every corpus row carrying `-` is retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
-| TC-194 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section and its authoring comment names `quire matrix` as the source of requirement-to-criterion coverage (PLAT-1499) | Unit | P1 | FR-003-AC-14 | 🚧 |
+| TC-194 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section and its authoring comment names `quire matrix` as the source of requirement-to-criterion coverage (PLAT-1499) | Unit | P1 | FR-003-AC-14 | ✅ |
 | TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires `test_cases`; the integration matrix and gap register are optional; the index table asserts `Subsystem` and `Local Matrix` only, and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core model; no other host appears | Unit | P0 | FR-009-AC-3 | ✅ |
