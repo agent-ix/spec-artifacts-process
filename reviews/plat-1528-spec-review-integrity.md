@@ -49,3 +49,4 @@ Context only: FR-014, FR-015.
 | FND-002 | fixed | Fixed in f5b30a4; after-text:   - target: "ix://agent-ix/spec-artifacts-process/FR-009"     type: "depends_on"   - target: "ix://agent-ix/spec-artifacts-process/FR-012"     type: "depends_on" |
 | FND-003 | fixed | Fixed in f5b30a4; after-text: A row whose `Rationale` is empty, or `TBD`, `unknown`, `n/a`, `none` or `-` in any letter case, fails validation, at the row's line; the same row with a non-placeholder `Rationale` passes. |
 | FND-004 | fixed | Fixed in f5b30a4; after-text: A section whose headers are not exactly `Author \| Rationale`, or that has no row, fails validation, at the section heading line. |
+| FND-005 | fixed | Fixed in e3e4bb8; after-text: \| FR-016-AC-11 \| The `Anomaly` `yield_pattern.match` carries a `release_rationale` locator with `required: false`, and `AnomalyFields.json` names the property `release_rationale`. \| Test \| |
