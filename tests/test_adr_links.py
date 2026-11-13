@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import json
-import os
-import pathlib
 import subprocess
 
 import pytest
-from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT
+from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT, run_quire
 from support.strict_yaml import load_yaml_strict
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "adr"
@@ -63,37 +61,20 @@ def test_adr_keeps_its_previous_verbs() -> None:
         assert links[verb] == ["*"]
 
 
-# The realizing verb and the design relations are declared by
-# spec-objects-architecture; the FR and NFR archetypes by spec-artifacts-iso.
-# Both are resolved from the installed filament modules.
-MODULES_ROOT = pathlib.Path(
-    os.environ.get("IX_FILAMENT_MODULES_PATH")
-    or pathlib.Path.home() / ".ix" / "filament" / "modules"
-)
 CORPUS = REPO_ROOT / "tests" / "fixtures" / "design_edges"
 MEMBER = "agent-ix/design-fixture"
+SIBLINGS = ("spec-artifacts-iso", "spec-objects-architecture")
 
 
-def quire(*args: str) -> subprocess.CompletedProcess:
-    modules = []
-    for name in ("spec-artifacts-iso", "spec-objects-architecture"):
-        assert (MODULES_ROOT / name / "manifest.yaml").is_file(), (
-            f"{name} is not installed under {MODULES_ROOT}; the rows that load "
-            "it fail rather than skip, because a skipped row is not coverage"
-        )
-        modules += ["--module", str(MODULES_ROOT / name)]
-    modules += ["--module", str(PACKAGE_ROOT)]
-    return subprocess.run(
-        ["quire", *args, *modules],
-        capture_output=True,
-        text=True,
-        check=False,
+def bundle(kind: str, *extra: str) -> subprocess.CompletedProcess:
+    return run_quire(
+        "validate",
+        "--okf",
+        *extra,
+        "--repo",
+        f"{MEMBER}={CORPUS / kind}",
+        siblings=SIBLINGS,
     )
-
-
-def bundle(kind: str, *extra: str) -> list[str]:
-    result = quire("validate", "--okf", *extra, "--repo", f"{MEMBER}={CORPUS / kind}")
-    return result.stderr.splitlines()
 
 
 @pytest.mark.trace("FR-017-AC-5", "TC-221")
@@ -103,37 +84,50 @@ def test_realizes_requirement_targets_are_fr_and_nfr() -> None:
 
 @pytest.mark.trace("FR-017-AC-6", "TC-222")
 def test_adr_realizing_fr_and_nfr_draws_no_disallowed_edge() -> None:
-    lines = bundle("valid")
+    # The engine does not check an artifact-type target's kind (PLAT-1689), so
+    # this row cannot fail through the target list; TC-221 guards the list.
+    lines = bundle("valid").stderr.splitlines()
     for doc in ("ADR-001", "ADR-002"):
         assert not [ln for ln in lines if doc in ln and "disallowed-edge" in ln]
 
 
 @pytest.mark.trace("FR-017-AC-7", "TC-223")
-def test_adr_realizing_a_part_names_source_target_and_type() -> None:
-    wrong = [
-        ln for ln in bundle("invalid", "--strict") if "disallowed-edge-target" in ln
-    ]
+def test_adr_realizing_a_part_draws_the_advisory_finding_naming_the_ids() -> None:
+    result = bundle("invalid", "--strict")
+    wrong = [ln for ln in result.stderr.splitlines() if "disallowed-edge-target" in ln]
     assert len(wrong) == 1
+    assert wrong[0].startswith("warning:")
     assert "ADR-004" in wrong[0]
     assert "scoring_engine" in wrong[0]
     assert "'part'" in wrong[0]
 
 
 @pytest.mark.trace("FR-017-AC-8", "TC-224")
-def test_adr_realizing_a_missing_id_is_a_located_dangling_reference() -> None:
-    dangling = [
+def test_adr_realizing_a_missing_id_fails_strict_with_a_located_error() -> None:
+    result = bundle(
+        "invalid", "--strict", "--severity", "trace:unowned-quality-characteristic=off"
+    )
+    assert result.returncode == 3, result.stderr
+    errors = [
         ln
-        for ln in bundle("invalid", "--strict")
-        if "dangling-reference" in ln and "'realizes_requirement'" in ln
+        for ln in result.stderr.splitlines()
+        if ln.startswith("[") and "[dangling-reference]" in ln
     ]
-    assert len(dangling) == 1
-    assert "ADR-003.md" in dangling[0]
-    assert "FR-999" in dangling[0]
+    assert errors
+    assert all("ADR-003.md" in ln and "FR-999" in ln for ln in errors)
+    assert any("'realizes_requirement'" in ln for ln in errors)
+    assert f"{len(errors)} OKF bundle validation error(s)" in result.stderr
 
 
 @pytest.mark.trace("FR-017-AC-9", "TC-225")
 def test_relations_report_the_adr_as_realizing_fr_and_nfr() -> None:
-    result = quire("relations", "--json", "--repo", f"{MEMBER}={CORPUS / 'valid'}")
+    result = run_quire(
+        "relations",
+        "--json",
+        "--repo",
+        f"{MEMBER}={CORPUS / 'valid'}",
+        siblings=SIBLINGS,
+    )
     assert result.returncode == 0, result.stderr
     rows = {
         (rel["name"], row["document"]["id"]): row

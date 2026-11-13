@@ -3,22 +3,12 @@
 from __future__ import annotations
 
 import json
-import os
-import pathlib
-import subprocess
 
 import pytest
-from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT
+from conftest import MANIFEST_PATH, REPO_ROOT, run_quire
 from support.strict_yaml import load_yaml_strict
 
 SCOPE = REPO_ROOT / "tests" / "fixtures" / "criticality"
-ISO = (
-    pathlib.Path(
-        os.environ.get("IX_FILAMENT_MODULES_PATH")
-        or pathlib.Path.home() / ".ix" / "filament" / "modules"
-    )
-    / "spec-artifacts-iso"
-)
 
 
 def sources() -> dict[str, dict]:
@@ -35,22 +25,8 @@ def test_requirement_criterion_sources_declare_the_criticality_field() -> None:
 
 @pytest.mark.trace("TC-226", "FR-007-AC-17")
 def test_coverage_obligations_carry_the_document_rating_and_never_default() -> None:
-    assert (ISO / "manifest.yaml").is_file(), f"spec-artifacts-iso is not in {ISO}"
-    result = subprocess.run(
-        [
-            "quire",
-            "coverage",
-            "--module",
-            str(ISO),
-            "--module",
-            str(PACKAGE_ROOT),
-            "--scope",
-            str(SCOPE),
-            "--json",
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
+    result = run_quire(
+        "coverage", "--scope", str(SCOPE), "--json", siblings=("spec-artifacts-iso",)
     )
     assert result.returncode == 0, result.stderr
     rated = {
