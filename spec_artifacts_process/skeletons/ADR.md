@@ -14,8 +14,7 @@ relationships:
        ships, not a validated contract: adding one to the manifest would make
        every existing ADR in every consuming repository fail, which the
        module's compatibility posture forbids.
-     - `allowed_links`: supersedes | superseded_by | relates_to | depends_on |
-       realizes_requirement.
+     - `allowed_links`: supersedes | superseded_by | relates_to | depends_on.
      - The archetype's `composition.states` are proposed | accepted |
        superseded | rejected; record the current one under `## Status`. -->
 # ADR-001: Bind emitted schemas by digest rather than by version
