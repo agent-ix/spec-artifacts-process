@@ -13,7 +13,7 @@ When an artifact is imported, the importer SHALL verify its checksum.
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-001-AC-1 | A mismatching checksum rejects the import. | Test |
+| FR-001-AC-1 | A mismatching checksum rejects the import. | Test (TC-001) |
 
 ## Dependencies
 
