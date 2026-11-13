@@ -9,7 +9,7 @@ type: TestMatrix
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
-| TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
+| TC-001 | Conforming TestMatrix validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
 | TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
 | TC-003 | A `TestMatrix` doc validates with no `Functional Requirement Coverage` section, and with one carrying any column set, since the contract declares no functional-coverage extraction (PLAT-1499) | Unit | P1 | FR-003-AC-13 | ✅ |
 | TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |

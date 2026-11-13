@@ -224,7 +224,7 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     reached by what it *is*, not by what it is called.
     """
     entries = traceability["trace_targets"] + traceability["document_references"]
-    matrix_entries = [e["name"] for e in entries if e["section"] == "Test Case Summary"]
+    matrix_entries = [e["name"] for e in entries if e["archetype"] == "TestMatrix"]
     expected = ["test-case", "traces-to"]
     assert (
         sorted(matrix_entries) == expected

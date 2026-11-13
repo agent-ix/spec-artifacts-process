@@ -86,8 +86,9 @@ def test_no_coverage_section_of_any_kind_is_required() -> None:
 
 @pytest.mark.trace("TC-015", "FR-003-AC-7")
 def test_a_present_coverage_section_is_not_asserted() -> None:
-    """TC-015 (FR-003-AC-7): a coverage section a matrix still carries is
-    neither required nor column-asserted, whatever its columns."""
+    """TC-015 (FR-003-AC-7): functional, stakeholder, user-story and
+    non-functional coverage sections a matrix still carries are neither
+    required nor column-asserted, whatever their columns."""
     assert_valid("unasserted-coverage-section.md")
 
 

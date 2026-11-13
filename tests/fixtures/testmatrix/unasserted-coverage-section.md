@@ -13,6 +13,24 @@ type: TestMatrix
 |-------------|----------|----------|
 | FR-003 | nothing is asserted here | free text |
 
+### Stakeholder Requirement Coverage
+
+| Who | What |
+|-----|------|
+| StR-001 | free text |
+
+### User Story Coverage
+
+| Story | Notes |
+|-------|-------|
+| US-001 | free text |
+
+### Non-Functional Requirement Coverage
+
+| Concern | Evidence |
+|---------|----------|
+| NFR-001 | free text |
+
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |
