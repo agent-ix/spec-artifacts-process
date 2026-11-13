@@ -18,6 +18,8 @@ import json
 import os
 import pathlib
 import re
+import shutil
+import subprocess
 import sys
 from typing import Any
 
@@ -60,6 +62,47 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     bin_dir = SEMANTIC_DIR / "node_modules" / ".bin"
     if bin_dir.is_dir():
         os.environ["PATH"] = f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"
+
+
+#: The installed filament modules the CLI rows load beside this module: the
+#: `FR`/`NFR` archetypes (spec-artifacts-iso) and the realizing verb with the
+#: design relations (spec-objects-architecture).
+MODULES_ROOT = pathlib.Path(
+    os.environ.get("IX_FILAMENT_MODULES_PATH")
+    or pathlib.Path.home() / ".ix" / "filament" / "modules"
+)
+
+
+def ix_module(name: str) -> str:
+    """Directory of the installed sibling module `name`, or fail the row."""
+    path = MODULES_ROOT / name
+    assert (path / "manifest.yaml").is_file(), (
+        f"{name} is not installed under {MODULES_ROOT} (set "
+        "IX_FILAMENT_MODULES_PATH); the rows that load it fail rather than "
+        "skip, because a skipped row is not coverage. The sibling modules "
+        "spec-artifacts-iso and spec-objects-architecture must be installed; "
+        "spec-objects-architecture must be a release that declares "
+        "`realizes_requirement` (its FR-010)."
+    )
+    return str(path)
+
+
+def run_quire(
+    *args: str, siblings: tuple[str, ...] = ()
+) -> subprocess.CompletedProcess:
+    """Run `quire <args>` with the named sibling modules and this module loaded."""
+    assert shutil.which("quire"), (
+        "the `quire` CLI is not on PATH; run `make semantic-install` (it installs "
+        "the quire-cli the semantic package pins, which loads the manifest "
+        "keys). The row fails rather than skips."
+    )
+    modules: list[str] = []
+    for name in siblings:
+        modules += ["--module", ix_module(name)]
+    modules += ["--module", str(PACKAGE_ROOT)]
+    return subprocess.run(
+        ["quire", *args, *modules], capture_output=True, text=True, check=False
+    )
 
 
 def load_manifest() -> dict[str, Any]:
