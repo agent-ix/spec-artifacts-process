@@ -100,3 +100,12 @@ Disposition pass 1 (4526bbf).
 | FND-007 | fixed | - |
 
 Disposition pass 1 verdict: FAIL, not mergeable. All seven review-pass findings are fixed. New FND-008 and FND-009 (both medium) are open.
+
+Disposition pass 2 (e368f6a).
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-008 | fixed | - |
+| FND-009 | fixed | - |
+
+Disposition pass 2 verdict: PASS. Every finding is fixed. The regression check of e368f6a found no new defect: all six listed targets are declared in the manifest, the id-token rule rejects `-` and the empty cell, and FR-049 resolution reports any other placeholder token as dangling.
