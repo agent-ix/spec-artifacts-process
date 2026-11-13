@@ -20,6 +20,12 @@ requirements and hazards it affects, SHALL fail validation when an anomaly that 
 `assessed` or later has no assessment, and SHALL fail validation when a link names an artifact that
 does not exist or is of the wrong kind.
 
+The same type SHALL require an anomaly resolved as `fixed` to link the test or acceptance criterion
+that demonstrates the fix, in a `## Fix Verification` section. The change that made the fix is not
+recorded in the document: it is the commit that moved `status` to `resolved` in the git history of
+the file, which quoin [FR-136](ix://agent-ix/quoin/FR-136) reads. No commit hash, date or author is
+authored anywhere in the record.
+
 ### Who owns which check
 
 | Check | Owner |
@@ -27,6 +33,8 @@ does not exist or is of the wrong kind.
 | `safety_impact` vocabulary, section table shape, `Kind` and `Impact` vocabularies | This module (manifest, `assert` facet, quire-rs FR-033) |
 | Section required by `status` and `safety_impact`, and the row rules (`none` admits one `None` row; `impacting` needs a `Requirement` or `Hazard` row that is not `Unaffected`; `Impact` `None` only on a `None` row) | This module's `record_validation` schema `AnomalyFields.json` over the YAML-extracted record (FR-014; quire-rs FR-069-AC-21..28), an absence reported at the `status` line and a row defect at the row's line; the emitted record schema `Anomaly.json` (FR-009) states the same rules for the mapped record (quoin FR-073) |
 | `Target` resolution against the corpus (dangling reference) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049), the `Target` column being a declared document reference of this module's traceability model; the finding is `dangling-trace-reference`, an error under the `Strict` posture and a warning under `Okf` |
+| `## Fix Verification` required when `resolution` is `fixed`; its table shape and `Kind` vocabulary; row presence | This module (manifest, `assert` facet, `AnomalyFields.json`), as for the assessment; `Criterion` `Target` resolution and kind through quire-rs FR-049 |
+| The fixing change | quoin [FR-136](ix://agent-ix/quoin/FR-136), the git history of `status` |
 | Missing `spec-objects-safety` reported once per document | quoin [FR-136](ix://agent-ix/quoin/FR-136), as one `anomaly.missing-module` diagnostic alongside the engine's per-row reports |
 | `Target` kind (`Requirement` row names an `FR`/`NFR`/acceptance criterion; `Hazard` row names a hazard) | quire-rs [FR-049](ix://agent-ix/quire-rs/FR-049) kind-typed references (`kind_column`, finding `reference-kind-mismatch`, FR-049-AC-10..18), typing the reference by the row's `Kind` rather than a per-row check written here. [FR-040](ix://agent-ix/quire-rs/FR-040) edge findings are warnings only and are not this check |
 
@@ -76,6 +84,26 @@ does not exist or is of the wrong kind.
 - The module SHALL ship, as fixtures for the criteria below, a corpus holding an `FR`, one of its
   acceptance criteria and a hazard, the valid anomalies of AC-4 and AC-7, an anomaly with two `Hazard` rows, a hazard that no anomaly names, and the negatives of
   AC-3, AC-5, AC-6, AC-7 and AC-8. Quoin holds no copy of these documents.
+- When `resolution` is `fixed` (that is, when `status` is `resolved`, or `closed` with `resolution`
+  `fixed`), the document SHALL carry a `## Fix Verification` section; otherwise validation fails,
+  reported at the `status` line. For any other `resolution`, or while `status` is `identified` or
+  `assessed`, the section MAY be absent.
+- The section SHALL be a table with headers exactly `Kind | Target | Rationale` and at least one
+  row. `Kind` is one of `Criterion`, `Test`. `Rationale` SHALL be non-empty. A `Criterion` row's
+  `Target` SHALL be the id of an acceptance criterion of an `FR` or `NFR` artifact that exists in
+  the validated corpus; it resolves and kind-checks through the same quire-rs FR-049 reference
+  mechanism as the assessment, so a missing or non-criterion `Target` is the engine's reference
+  diagnostic, not text written here. A `Test` row's `Target` SHALL be a non-empty test identifier as
+  authored (a repository-relative path, optionally followed by `::` and a symbol); the module checks
+  its shape only and does not establish that the test exists or passes, which is the repository's
+  own test run.
+- The module SHALL map the rows to the record key `verification` as a `typed-table` mapping
+  ([FR-011](./FR-011-markdown-record-mapping.md)), one entry per row with `kind`, `target` and
+  `rationale` carried as authored.
+- The `Anomaly` type SHALL NOT carry a commit hash, author or date for the fix, or a field that
+  names the fixing change: it is read from git history.
+- The `Anomaly` type SHALL NOT carry a verdict or sign-off on the verification: a fix is shown by
+  its linked test or criterion.
 - The assessment SHALL be a statement of an engineer's judgement, not a computed risk acceptance;
   this requirement SHALL NOT add any risk-acceptance or sign-off field.
 
@@ -93,6 +121,12 @@ does not exist or is of the wrong kind.
 | FR-015-AC-8 | A row with an empty `Rationale`, or with an `Impact` outside the vocabulary, fails validation. | Test |
 | FR-015-AC-9 | The mapping yields `assessment` entries with `target` as authored, including an acceptance-criterion id, and no `target` for a `None` row. | Test |
 | FR-015-AC-10 | The skeleton validates as authored in a corpus that supplies its linked ids, and negative counterparts exist for a missing assessment and a dangling link. | Test |
+| FR-015-AC-11 | The manifest declares the `## Fix Verification` table with exactly the columns `Kind`, `Target`, `Rationale`, `min_rows: 1` and the `Kind` vocabulary `Criterion`, `Test`. | Test |
+| FR-015-AC-12 | A `resolved` anomaly and a `closed` anomaly with `resolution` `fixed` each fail validation, at the `status` line, with no `## Fix Verification` section; a `closed` anomaly with `resolution` `not-a-defect`, `duplicate` or `wont-fix` and no section validates. | Test |
+| FR-015-AC-13 | In the corpus of AC-4, a `fixed` anomaly with a `Criterion` row targeting `FR-001-AC-1` and a `Test` row targeting `tests/test_login.py::test_lockout` validates; a `Criterion` row targeting `FR-001-AC-99` fails as a dangling reference naming the id, and one targeting the hazard fails as a kind mismatch. | Test |
+| FR-015-AC-14 | A `Test` row with an empty `Target`, and any row with an empty `Rationale` or a `Kind` outside the vocabulary, fails validation. | Test |
+| FR-015-AC-15 | The mapping yields `verification` entries with `kind`, `target` and `rationale` as authored. | Test |
+| FR-015-AC-16 | No field or table column of the `Anomaly` type holds a commit hash, author or date of the fix, or a verdict or sign-off on the verification. | Inspection |
 
 ## Dependencies
 
