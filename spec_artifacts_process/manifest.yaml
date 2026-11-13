@@ -1307,10 +1307,12 @@ traceability:
     target: acceptance-criterion
     statement_column: Criteria
     method_column: Verification
+    criticality_field: criticality
   - name: nfr-acceptance-criterion
     target: nfr-acceptance-criterion
     statement_column: Criteria
     method_column: Verification
+    criticality_field: criticality
   # quire-rs#460: same 3-column `| ID | Criteria | Verification |` shape as
   # the two obligations above — the real `interface_004-checked-package.md`
   # in `agent-ix/quire-specification` carries no fourth (criticality) column,

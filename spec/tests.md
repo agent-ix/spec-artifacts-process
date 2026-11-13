@@ -205,6 +205,7 @@ type: TestMatrix
 | TC-223 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward a part reports `disallowed-edge-target` naming the `ADR`, the part and its object type. | Unit | P1 | FR-017-AC-7 | ✅ |
 | TC-224 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward an id no document has fails with `dangling-reference` naming the `ADR` file and the id. | Unit | P1 | FR-017-AC-8 | ✅ |
 | TC-225 | Over a corpus holding an `FR` and an `NFR` each realized by an `ADR`, `quire relations --json` reports each as `covered` with that `ADR` in `linked`. | Unit | P1 | FR-017-AC-9 | ✅ |
+| TC-226 | The `acceptance-criterion` and `nfr-acceptance-criterion` sources declare `criticality_field: criticality`; `quire coverage --json` over a fixture carries `high` and `low` on the criterion obligations of requirements stating them and no `criticality` on those of a requirement stating none. | Integration | P1 | FR-007-AC-17 | ✅ |
 
 ## Option Permutation Matrix
 
