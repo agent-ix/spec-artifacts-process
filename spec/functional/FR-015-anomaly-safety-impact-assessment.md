@@ -107,8 +107,9 @@ is authored anywhere in the record.
   `acceptance-criterion` and `nfr-acceptance-criterion`, and `Test` to `test-case`, so that
   resolution and kind checking are the engine's (quire-rs FR-049): validation SHALL fail a `Target`
   that resolves to nothing as a dangling reference, and one that resolves to an artifact of the
-  other kind (including a requirement document such as `FR-001`) as a kind mismatch. Both
+  other kind as a kind mismatch. Both
   diagnostics are the engine's, not text written by this module.
+- A `Criterion` row naming an `FR` or `NFR` document resolves (quire-rs FR-049) and is not reported as a kind mismatch.
 - The manifest SHALL declare, for the `Target` column of the section, a `column_patterns` rule
   requiring an id token (a value that begins with a letter or digit), because a cell matching no
   reference pattern produces no reference and no finding (quire-rs FR-049-AC-14) and `-` would
@@ -143,7 +144,7 @@ is authored anywhere in the record.
 | FR-015-AC-12 | A `resolved` anomaly and a `closed` anomaly with `resolution` `fixed` each fail validation, at the `status` line, with no `## Fix Verification` section; a `closed` anomaly with `resolution` `not-a-defect`, `duplicate` or `wont-fix` and no section validates. | Test |
 | FR-015-AC-13 | In the corpus of AC-4 plus a `TestMatrix` test case `TC-001`, a `fixed` anomaly with a `Criterion` row targeting `FR-001-AC-1` and a `Test` row targeting `TC-001` validates. | Test |
 | FR-015-AC-14 | In that corpus, a `Criterion` row targeting `FR-001-AC-99` and a `Test` row targeting `TC-999` each fail as a dangling reference naming the id and its row. | Test |
-| FR-015-AC-15 | In that corpus, a `Criterion` row targeting `FR-001` (a requirement document), a `Criterion` row targeting the hazard, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. | Test |
+| FR-015-AC-15 | In that corpus, a `Criterion` row targeting the hazard, a `Criterion` row targeting `TC-001`, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. | Test |
 | FR-015-AC-16 | A row with an empty `Rationale` or a `Kind` outside the vocabulary fails validation. | Test |
 | FR-015-AC-17 | The mapping yields `verification` entries with `kind`, `target` and `rationale` as authored. | Test |
 | FR-015-AC-18 | No field or table column of the `Anomaly` type holds a commit hash, author or date of the fix, a field naming the fixing change, or a verdict or sign-off on the verification. | Inspection |

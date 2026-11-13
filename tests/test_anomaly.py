@@ -1,6 +1,6 @@
 """The Anomaly archetype, its record schema and its fixtures.
 
-Requirements FR-014, FR-015 and NFR-001 (user story US-003).
+Requirements FR-014, FR-015, FR-016 and NFR-001 (user story US-003).
 
 Three layers are exercised, each through the real artifact it ships:
 
@@ -13,8 +13,9 @@ Three layers are exercised, each through the real artifact it ships:
   line and a present value at its own;
 * **mapped record** — the document mapped by `mappings.yaml` and validated against
   the emitted `Anomaly.json` (the same rules over the camelCase record);
-* **reference** — whether an assessment `Target` resolves, and to what kind. The
-  module owns none of that text: it is the engine's reference diagnostic.
+* **reference** — whether an assessment or fix-verification `Target` resolves, and
+  to what kind. The module owns none of that text: it is the engine's reference
+  diagnostic.
 
 The fixtures live under `tests/fixtures/anomaly/` and are read in place by
 quoin's tests; quoin holds no copy.
@@ -122,6 +123,47 @@ def table_line(path: Path) -> int:
     )
 
 
+def heading_line(path: Path, heading: str) -> int:
+    """The line of a level-2 heading."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text == f"## {heading}"
+    )
+
+
+def row_line(path: Path, prefix: str) -> int:
+    """The line of the first table row that starts with `prefix`."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text.startswith(prefix)
+    )
+
+
+def keys_named(node, name: str) -> list:
+    """Every value stored under the key `name`, anywhere in a JSON-like tree."""
+    found = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == name:
+                found.append(value)
+            found += keys_named(value, name)
+    elif isinstance(node, list):
+        for item in node:
+            found += keys_named(item, name)
+    return found
+
+
+def variant(tmp_path: Path, source: Path, old: str, new: str) -> Path:
+    """A copy of a fixture with one substring replaced, as `AN-001.md` in `tmp_path`."""
+    text = source.read_text()
+    assert old in text, f"{old!r} not in {source.name}"
+    path = tmp_path / "AN-001.md"
+    path.write_text(text.replace(old, new, 1))
+    return path
+
+
 def record_findings(path: Path) -> list[str]:
     """The `semantic.record-invalid` findings `quire validate` reports on a document."""
     return [
@@ -213,7 +255,14 @@ def test_the_placeholder_set_is_rejected_and_a_name_is_accepted(
     schema_registry, value: str
 ):
     record = json.loads((EXAMPLES_DIR / "Anomaly.record.json").read_text())
-    record |= {"status": "closed", "resolution": "fixed", "closedBy": value}
+    record |= {
+        "status": "closed",
+        "resolution": "fixed",
+        "closedBy": value,
+        "verification": [
+            {"kind": "Test", "target": "TC-001", "rationale": "Passes.", "line": 1}
+        ],
+    }
     validator = schema_registry("Anomaly")
     assert any(
         list(e.absolute_path) == ["closedBy"] for e in validator.iter_errors(record)
@@ -263,7 +312,16 @@ def test_the_mapping_names_each_key_once_and_the_golden_record_validates(
     mappings, schema_registry
 ):
     properties = mappings["models"]["Anomaly"]["properties"]
-    for key in ("status", "resolution", "closedBy", "safetyImpact", "assessment"):
+    for key in (
+        "status",
+        "resolution",
+        "closedBy",
+        "severity",
+        "safetyImpact",
+        "assessment",
+        "verification",
+        "releaseRationale",
+    ):
         assert key in properties
     assert "statusHistory" not in properties
     assert properties["closedBy"]["path"] == ["closed_by"]
@@ -543,6 +601,12 @@ def test_the_negative_counterparts_exist_for_every_named_defect():
         "dangling-hazard",
         "requirement-row-names-hazard",
         "hazard-row-names-requirement",
+        # FR-014 severity, FR-015 fix verification, FR-016 release rationale
+        "assessed-no-severity",
+        "severity-outside-high",
+        "resolved-fixed-no-verification",
+        "verification-dangling-criterion",
+        "rationale-closed-fixed",
     }
     assert required <= set(INVALID)
     assert (FIXTURES / "valid" / "two-hazards.md").is_file()
@@ -798,3 +862,579 @@ def test_a_closed_anomaly_missing_both_fields_is_reported_once_per_field():
     assert sorted(finding_lines(found)) == [line_of(path, "status")] * 2, found
     assert any("closed_by" in f for f in found)
     assert any("resolution" in f for f in found)
+
+
+# -- FR-014: severity (PLAT-1581) ----------------------------------------------
+
+
+@pytest.mark.trace("FR-014-AC-14", "TC-195")
+def test_the_severity_locator_is_optional_with_the_three_member_vocabulary(manifest):
+    assert locator(manifest, "severity") == {
+        "from": "frontmatter_field",
+        "path": ["severity"],
+        "required": False,
+        "assert": {"choices": ["minor", "major", "critical"]},
+    }
+    fields = json.loads((SCHEMAS_DIR / "AnomalyFields.json").read_text())
+    assert fields["properties"]["severity"] == {"enum": ["minor", "major", "critical"]}
+    assert keys_named(anomaly_type(manifest), "default") == []
+    assert keys_named(fields, "default") == []
+
+
+@pytest.mark.parametrize("status", ["assessed", "resolved", "closed"])
+@pytest.mark.trace("FR-014-AC-15", "TC-196")
+def test_assessed_or_later_without_severity_fails_at_the_status_line(
+    mapper, schema_registry, status: str
+):
+    path = INVALID[f"{status}-no-severity"]
+    found = record_findings(path)
+    assert finding_lines(found) == [line_of(path, "status")], found
+    assert "severity" in found[0]
+    errors = record_errors(mapper, schema_registry, path)
+    assert signature(errors) == [("required", [])]
+    assert "'severity'" in errors[0].message
+
+
+@pytest.mark.trace("FR-014-AC-15", "TC-196")
+def test_an_identified_anomaly_may_omit_severity_or_carry_one():
+    omitted = VALID_BY_NAME["identified"]
+    assert "severity" not in omitted.read_text()
+    assert quire_validate(omitted).returncode == 0
+    carried = VALID_BY_NAME["identified-severity"]
+    assert "severity: minor" in carried.read_text()
+    assert quire_validate(carried).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["severity-outside-high", "severity-outside-capitalised", "severity-outside-empty"],
+)
+@pytest.mark.trace("FR-014-AC-16", "TC-197")
+def test_a_severity_outside_the_vocabulary_is_one_finding_at_the_severity_line(
+    mapper, schema_registry, name: str
+):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert finding_lines(found) == [line_of(path, "severity")]
+    assert "severity" in found[0]
+    assert ("enum", ["severity"]) in signature(
+        record_errors(mapper, schema_registry, path)
+    )
+
+
+@pytest.mark.trace("FR-014-AC-17", "TC-198")
+def test_severity_is_not_computed_from_another_field(tmp_path: Path, mapper, mappings):
+    source = VALID_BY_NAME["assessed"]
+    table = source.read_text().index("| Requirement | FR-001 |")
+    # `safety_impact` differs (and, as the rules require, the rows with it)
+    by_impact = tmp_path / "AN-001.md"
+    by_impact.write_text(
+        source.read_text()[:table].replace("impacting", "none")
+        + "| None | - | None | Cosmetic message only; no safety function involved. |\n"
+    )
+    # the assessment rows differ, `safety_impact` does not
+    by_rows = VALID_BY_NAME["two-hazards"]
+    assert "safety_impact: impacting" in by_rows.read_text()
+    for other in (by_impact, by_rows):
+        assert quire_validate(other, scope=other.parent).returncode == 0
+    for path in (source, by_impact, by_rows):
+        assert mapper.build("Anomaly", path.read_text(), "x")["severity"] == "major"
+    # and no rule sets severity: the schemas only ever require it
+    for name in ("AnomalyFields.json", "Anomaly.json"):
+        schema = json.loads((SCHEMAS_DIR / name).read_text())
+        for rule in schema["allOf"]:
+            assert "severity" not in rule.get("then", {}).get("properties", {})
+    assert mappings["models"]["Anomaly"]["properties"]["severity"] == {
+        "kind": "frontmatter",
+        "path": ["severity"],
+    }
+
+
+# -- FR-015: fix verification (PLAT-1583) --------------------------------------
+
+
+def fix_verification_reference(manifest) -> dict:
+    return next(
+        t
+        for t in manifest["traceability"]["document_references"]
+        if t["name"] == "anomaly-fix-verification"
+    )
+
+
+@pytest.mark.trace("FR-015-AC-11", "TC-199")
+def test_the_manifest_declares_the_fix_verification_table_and_its_reference(manifest):
+    assert locator(manifest, "fix_verification") == {
+        "from": "table_row",
+        "under_section": "Fix Verification",
+        "required": False,
+        "multiple": True,
+        "assert": {
+            "columns": ["Kind", "Target", "Rationale"],
+            "min_rows": 1,
+            "column_choices": {"Kind": ["Criterion", "Test"]},
+            "column_patterns": {"Target": "^[A-Za-z0-9]", "Rationale": "\\S"},
+        },
+    }
+    reference = fix_verification_reference(manifest)
+    assert reference["archetype"] == "Anomaly"
+    assert reference["section"] == "Fix Verification"
+    assert reference["column"] == "Target"
+    assert reference["kind_column"] == "Kind"
+    assert sorted(reference["targets"]) == sorted(
+        [
+            "acceptance-criterion",
+            "nfr-acceptance-criterion",
+            "test-case",
+            "requirement-document",
+            "nfr-document",
+            "hazard-document",
+        ]
+    )
+    assert reference["kind_targets"] == {
+        "Criterion": ["acceptance-criterion", "nfr-acceptance-criterion"],
+        "Test": ["test-case"],
+    }
+
+
+@pytest.mark.parametrize("status", ["resolved", "closed"])
+@pytest.mark.trace("FR-015-AC-12", "TC-200")
+def test_a_fixed_anomaly_without_a_fix_verification_fails_at_the_status_line(
+    mapper, schema_registry, status: str
+):
+    path = INVALID[f"{status}-fixed-no-verification"]
+    found = record_findings(path)
+    assert finding_lines(found) == [line_of(path, "status")], found
+    assert "fix_verification" in found[0]
+    errors = record_errors(mapper, schema_registry, path)
+    assert signature(errors) == [("required", [])]
+    assert "'verification'" in errors[0].message
+
+
+@pytest.mark.parametrize(
+    "name", ["closed-not-a-defect", "closed-duplicate", "closed-wont-fix"]
+)
+@pytest.mark.trace("FR-015-AC-12", "TC-200")
+def test_a_closed_anomaly_that_is_not_fixed_needs_no_fix_verification(name: str):
+    path = VALID_BY_NAME[name]
+    assert "Fix Verification" not in path.read_text()
+    assert quire_validate(path).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "resolved-fixed",
+        "closed-fixed",
+        "closed-fixed-test-only",
+        "closed-fixed-criterion-only",
+    ],
+)
+@pytest.mark.trace("FR-015-AC-13", "TC-201")
+def test_a_fixed_anomaly_linking_a_criterion_and_a_test_validates(
+    tmp_path: Path, mapper, schema_registry, name: str
+):
+    path = VALID_BY_NAME[name]
+    result = bundle_validate(tmp_path, path)
+    assert result.returncode == 0, result.stderr
+    assert dangling_findings(result) == [], result.stderr
+    assert reference_findings(result, "reference-kind-mismatch") == [], result.stderr
+    assert record_errors(mapper, schema_registry, path) == []
+
+
+@pytest.mark.parametrize(
+    "name,target,kind",
+    [
+        ("verification-dangling-criterion", "FR-001-AC-99", "Criterion"),
+        ("verification-dangling-test", "TC-999", "Test"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-14", "TC-202")
+def test_a_dangling_verification_target_names_the_id_and_its_row(
+    tmp_path: Path, name: str, target: str, kind: str
+):
+    found = dangling_findings(bundle_validate(tmp_path, INVALID[name]))
+    assert len(found) == 1, found
+    assert f"'{target}'" in found[0]
+    assert f"(row '{kind}')" in found[0]
+
+
+@pytest.mark.parametrize(
+    "name,target,kind",
+    [
+        ("verification-criterion-names-hazard", "HAZ-001", "Criterion"),
+        ("verification-criterion-names-test-case", "TC-001", "Criterion"),
+        ("verification-test-names-criterion", "FR-001-AC-1", "Test"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-15", "TC-203")
+def test_a_verification_target_of_the_wrong_kind_is_a_kind_mismatch(
+    tmp_path: Path, name: str, target: str, kind: str
+):
+    result = bundle_validate(tmp_path, INVALID[name])
+    found = reference_findings(result, "reference-kind-mismatch")
+    assert len(found) == 1, found
+    assert f"'{target}'" in found[0]
+    assert f"(row '{kind}')" in found[0]
+    assert dangling_findings(result) == []
+
+
+@pytest.mark.parametrize(
+    "name,message,row",
+    [
+        ("verification-empty-rationale", "Rationale", "| Test |"),
+        ("verification-kind-outside", "Kind", "| Review |"),
+    ],
+)
+@pytest.mark.trace("FR-015-AC-16", "TC-204")
+def test_a_verification_row_with_no_rationale_or_a_foreign_kind_fails_at_the_row(
+    name: str, message: str, row: str
+):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert message in found[0]
+    assert finding_lines(found) == [row_line(path, row)]
+
+
+@pytest.mark.trace("FR-015-AC-17", "TC-205")
+def test_verification_entries_carry_kind_target_and_rationale_as_authored(mapper):
+    path = VALID_BY_NAME["closed-fixed"]
+    rows = mapper.build("Anomaly", path.read_text(), path.name)["verification"]
+    assert [(r["kind"], r["target"], r["rationale"]) for r in rows] == [
+        (
+            "Criterion",
+            "FR-001-AC-1",
+            "The criterion now rejects a mismatching checksum.",
+        ),
+        (
+            "Test",
+            "TC-001",
+            "The regression test fails without the fix and passes with it.",
+        ),
+    ]
+    assert (
+        mapper.build("Anomaly", VALID_BY_NAME["assessed"].read_text(), "x").get(
+            "verification"
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize(
+    "name", ["verification-target-dash", "verification-target-empty"]
+)
+@pytest.mark.trace("FR-015-AC-19", "TC-206")
+def test_a_verification_row_with_no_id_token_fails_at_the_row(name: str):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert "Target" in found[0]
+    assert finding_lines(found) == [row_line(path, "| Test |")]
+
+
+# -- FR-016: release rationale (PLAT-1584) -------------------------------------
+
+RATIONALE_PLACEHOLDERS = [*PLACEHOLDERS, "Tbd", "UNKNOWN", "N/a"]
+RATIONALE_PAIRS = ["identified", "assessed", "resolved"]
+
+
+@pytest.mark.parametrize("status", RATIONALE_PAIRS)
+@pytest.mark.trace("FR-016-AC-1", "TC-207")
+def test_an_impacting_anomaly_validates_with_and_without_the_release_rationale(
+    mapper, schema_registry, status: str
+):
+    for name in (f"rationale-{status}-with", f"rationale-{status}-without"):
+        path = VALID_BY_NAME[name]
+        result = quire_validate(path)
+        assert result.returncode == 0, result.stderr
+        assert diagnostics(result) == []
+        assert record_errors(mapper, schema_registry, path) == []
+    with_section = VALID_BY_NAME[f"rationale-{status}-with"].read_text()
+    assert "safety_impact: impacting" in with_section
+    assert "## Release Rationale" in with_section
+
+
+@pytest.mark.parametrize("resolution", ["fixed", "duplicate", "not-a-defect"])
+@pytest.mark.trace("FR-016-AC-2", "TC-208")
+def test_a_closed_anomaly_that_was_not_shipped_unfixed_refuses_the_section(
+    mapper, schema_registry, resolution: str
+):
+    path = INVALID[f"rationale-closed-{resolution}"]
+    found = record_findings(path)
+    assert finding_lines(found) == [heading_line(path, "Release Rationale")], found
+    assert "release_rationale_section" in found[0]
+    assert diagnostics(quire_validate(path)) == found
+    # the emitted schema states the same rule on the mapped record
+    emitted = json.loads((SCHEMAS_DIR / "Anomaly.json").read_text())
+    rule = next(
+        i for i, r in enumerate(emitted["allOf"]) if "releaseRationale" in json.dumps(r)
+    )
+    errors = record_errors(mapper, schema_registry, path)
+    assert [(e.validator, rule_index(e)) for e in errors] == [("not", rule)]
+
+
+@pytest.mark.trace("FR-016-AC-2", "TC-208")
+def test_a_closed_wont_fix_anomaly_with_a_closer_may_carry_the_section(
+    mapper, schema_registry
+):
+    path = VALID_BY_NAME["closed-wont-fix-rationale"]
+    assert quire_validate(path).returncode == 0
+    assert record_errors(mapper, schema_registry, path) == []
+    text = path.read_text()
+    closer = frontmatter(text)["closed_by"]
+    authors = [
+        row.split("|")[1].strip()
+        for row in text.split("## Release Rationale", 1)[1].splitlines()
+        if row.startswith("|") and not row.startswith(("| Author", "|--"))
+    ]
+    assert authors and closer not in authors
+
+
+@pytest.mark.parametrize(
+    "name,at",
+    [
+        ("rationale-closed-no-resolution", "status"),
+        ("rationale-closed-bad-resolution", "resolution"),
+    ],
+)
+@pytest.mark.trace("FR-016-AC-2", "TC-208")
+def test_a_closed_anomaly_with_no_usable_resolution_yields_only_the_fr014_finding(
+    name: str, at: str
+):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert finding_lines(found) == [line_of(path, at)], found
+    assert all("release_rationale" not in f for f in found)
+
+
+def rationale_row_variant(tmp_path: Path, author: str, rationale: str) -> Path:
+    """The assessed-with-section fixture with its one row's cells replaced."""
+    source = VALID_BY_NAME["rationale-assessed-with"]
+    row = next(
+        r for r in source.read_text().splitlines() if r.startswith("| Morgan Reyes |")
+    )
+    return variant(tmp_path, source, row, f"| {author} | {rationale} |")
+
+
+@pytest.mark.parametrize("value", RATIONALE_PLACEHOLDERS)
+@pytest.mark.trace("FR-016-AC-3", "TC-209")
+def test_a_placeholder_or_empty_author_fails_at_the_row_and_a_name_passes(
+    tmp_path: Path, value: str
+):
+    path = rationale_row_variant(tmp_path, value, "A written reason.")
+    found = diagnostics(quire_validate(path, scope=tmp_path))
+    assert finding_lines(found) == [row_line(path, f"| {value} |")], found
+    named = rationale_row_variant(tmp_path, f"{value}x", "A written reason.")
+    assert quire_validate(named, scope=tmp_path).returncode == 0
+
+
+@pytest.mark.parametrize("value", RATIONALE_PLACEHOLDERS)
+@pytest.mark.trace("FR-016-AC-4", "TC-210")
+def test_a_placeholder_or_empty_rationale_fails_at_the_row_and_text_passes(
+    tmp_path: Path, value: str
+):
+    path = rationale_row_variant(tmp_path, "Morgan Reyes", value)
+    found = diagnostics(quire_validate(path, scope=tmp_path))
+    assert finding_lines(found) == [row_line(path, "| Morgan Reyes")], found
+    texted = rationale_row_variant(tmp_path, "Morgan Reyes", f"{value} x")
+    assert quire_validate(texted, scope=tmp_path).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name", ["rationale-author-empty", "rationale-author-placeholder"]
+)
+@pytest.mark.trace("FR-016-AC-3", "TC-209")
+def test_the_author_fixtures_fail_at_the_row(name: str):
+    path = INVALID[name]
+    assert finding_lines(diagnostics(quire_validate(path))) == [
+        row_line(path, "| TBD |" if "placeholder" in name else "|  |")
+    ]
+
+
+@pytest.mark.parametrize(
+    "name", ["rationale-rationale-empty", "rationale-rationale-placeholder"]
+)
+@pytest.mark.trace("FR-016-AC-4", "TC-210")
+def test_the_rationale_fixtures_fail_at_the_row(name: str):
+    path = INVALID[name]
+    assert finding_lines(diagnostics(quire_validate(path))) == [
+        row_line(path, "| Morgan Reyes |")
+    ]
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "rationale-bad-headers",
+        "rationale-no-rows",
+        "rationale-no-delimiter",
+        "rationale-bare-heading",
+        "rationale-heading-prose",
+    ],
+)
+@pytest.mark.trace("FR-016-AC-5", "TC-211")
+def test_a_section_with_other_headers_or_no_row_fails_at_the_table(name: str):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert finding_lines(found) == [heading_line(path, "Release Rationale")], found
+    assert "release_rationale" in found[0]
+
+
+@pytest.mark.trace(
+    "NFR-001-AC-1", "NFR-001-AC-2", "FR-016-AC-6", "TC-186", "TC-187", "TC-212"
+)
+def test_fixture_d_reports_the_section_the_author_and_the_rationale_in_one_run():
+    path = INVALID["nfr1-d-closed-fixed-rationale-placeholder-author-empty-rationale"]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 3, found
+    by_line = {}
+    for f in found:
+        by_line.setdefault(finding_lines([f])[0], []).append(f)
+    heading, row = heading_line(path, "Release Rationale"), row_line(path, "| TBD |")
+    assert sorted(by_line) == [heading, row]
+    assert (
+        len(by_line[heading]) == 1
+        and "release_rationale_section" in by_line[heading][0]
+    )
+    assert len(by_line[row]) == 2
+    assert sum("/allOf/0/not" in f for f in by_line[row]) == 1  # the author
+    assert sum("/allOf/1/not" in f for f in by_line[row]) == 1  # the rationale
+
+
+@pytest.mark.trace("FR-016-AC-7", "TC-213")
+def test_the_mapping_and_the_emitted_schema_carry_the_release_rationale(
+    mapper, mappings, schema_registry
+):
+    entry = mappings["models"]["Anomaly"]["properties"]["releaseRationale"]
+    assert entry["kind"] == "typed-table" and entry["heading"] == "Release Rationale"
+    assert entry["fields"] == {
+        "Author": {"property": "author", "parse": "text"},
+        "Rationale": {"property": "rationale", "parse": "text"},
+    }
+    with_section = VALID_BY_NAME["rationale-assessed-with"]
+    rows = mapper.build("Anomaly", with_section.read_text(), "x")["releaseRationale"]
+    assert [(r["author"], r["rationale"].startswith("The checksum")) for r in rows] == [
+        ("Morgan Reyes", True)
+    ]
+    without = VALID_BY_NAME["rationale-assessed-without"]
+    assert "releaseRationale" not in mapper.build("Anomaly", without.read_text(), "x")
+    validator = schema_registry("Anomaly")
+    assert (
+        "releaseRationale"
+        in json.loads((SCHEMAS_DIR / "Anomaly.json").read_text())["properties"]
+    )
+    record = mapper.build("Anomaly", with_section.read_text(), "x")
+    for author, rationale in [
+        ("TBD", "Reason."),
+        ("", "Reason."),
+        ("Morgan", "n/a"),
+        ("Morgan", ""),
+    ]:
+        bad = record | {
+            "releaseRationale": [{**rows[0], "author": author, "rationale": rationale}]
+        }
+        assert any(
+            list(e.absolute_path)[:1] == ["releaseRationale"]
+            for e in validator.iter_errors(bad)
+        ), (author, rationale)
+    closed = mapper.build("Anomaly", INVALID["rationale-closed-fixed"].read_text(), "x")
+    assert any(
+        e.validator == "not" for e in validator.iter_errors(closed)
+    ), "a releaseRationale on a closed `fixed` anomaly is rejected"
+
+
+@pytest.mark.trace("FR-016-AC-8", "TC-214")
+def test_the_skeleton_has_no_release_rationale_and_nothing_defaults_or_computes_it(
+    manifest, mappings
+):
+    skeleton = (SKELETONS_DIR / "Anomaly.md").read_text()
+    assert not any(
+        line.startswith("## Release") for line in skeleton.splitlines()
+    ), "the skeleton carries no Release Rationale section"
+    fields = json.loads((SCHEMAS_DIR / "AnomalyFields.json").read_text())
+    emitted = json.loads((SCHEMAS_DIR / "Anomaly.json").read_text())
+    for tree in (
+        anomaly_type(manifest),
+        mappings["models"]["Anomaly"],
+        fields,
+        emitted,
+        json.loads((SCHEMAS_DIR / "ReleaseRationaleRow.json").read_text()),
+    ):
+        assert keys_named(tree, "default") == []
+    for rule in fields["allOf"]:
+        then = rule.get("then", {}).get("properties", {})
+        assert "release_rationale" not in then
+        section = then.get("release_rationale_section")
+        assert section in (None, False) or list(section) == ["pattern"]
+    assert "default" not in json.dumps(fields["allOf"])
+
+
+@pytest.mark.parametrize("status", RATIONALE_PAIRS)
+@pytest.mark.trace("FR-016-AC-10", "TC-215")
+def test_the_section_changes_no_other_finding(tmp_path: Path, status: str):
+    """Two documents identical but for the section report the same other findings:
+    each carries one unrelated defect (a `closed_by` on an open anomaly)."""
+
+    def report(name: str) -> list[tuple[int, str]]:
+        source = VALID_BY_NAME[name]
+        path = variant(
+            tmp_path,
+            source,
+            "type: Anomaly\n",
+            'type: Anomaly\nclosed_by: "Dana Lee"\n',
+        )
+        found = diagnostics(quire_validate(path, scope=tmp_path))
+        # the line and the schema rule; the message echoes the whole record
+        return [
+            (finding_lines([f])[0], f.split(" (/", 1)[1].split("):", 1)[0])
+            for f in found
+        ]
+
+    assert report(f"rationale-{status}-without") == report(f"rationale-{status}-with")
+    assert len(report(f"rationale-{status}-with")) == 1
+
+
+@pytest.mark.trace("FR-016-AC-11", "TC-216")
+def test_the_release_rationale_locator_is_optional_and_named_in_the_record_schema(
+    manifest,
+):
+    found = locator(manifest, "release_rationale")
+    assert found["from"] == "table_row"
+    assert found["under_section"] == "Release Rationale"
+    assert found["required"] is False
+    assert found["assert"]["columns"] == ["Author", "Rationale"]
+    assert found["assert"]["min_rows"] == 1
+    fields = json.loads((SCHEMAS_DIR / "AnomalyFields.json").read_text())
+    assert "release_rationale" in fields["properties"]
+
+
+@pytest.mark.trace("FR-014-AC-18", "FR-015-AC-18", "FR-016-AC-9")
+def test_the_type_holds_no_who_when_or_verdict_field():
+    emitted = json.loads((SCHEMAS_DIR / "Anomaly.json").read_text())
+    assert sorted(emitted["properties"]) == sorted(
+        [
+            "id",
+            "title",
+            "type",
+            "status",
+            "resolution",
+            "closedBy",
+            "severity",
+            "safetyImpact",
+            "object",
+            "relationships",
+            "provenance",
+            "description",
+            "assessment",
+            "verification",
+            "releaseRationale",
+        ]
+    )
+    for row in ("VerificationRow", "ReleaseRationaleRow"):
+        schema = json.loads((SCHEMAS_DIR / f"{row}.json").read_text())
+        assert sorted(schema["properties"]) == sorted(
+            ["kind", "target", "rationale", "line"]
+            if row == "VerificationRow"
+            else ["author", "rationale", "line"]
+        )

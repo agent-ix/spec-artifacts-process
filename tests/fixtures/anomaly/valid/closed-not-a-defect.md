@@ -6,6 +6,7 @@ status: closed
 resolution: not-a-defect
 closed_by: "Dana Lee"
 safety_impact: none
+severity: major
 ---
 # [AN-001] Fixture closed not-a-defect
 

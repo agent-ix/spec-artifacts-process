@@ -4,6 +4,7 @@ title: "Fixture g3"
 type: Anomaly
 status: assessed
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture g3
 

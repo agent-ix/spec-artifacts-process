@@ -24,6 +24,9 @@
     "closed_by": {
       "type": "string"
     },
+    "severity": {
+      "enum": ["minor", "major", "critical"]
+    },
     "safety_impact": {
       "enum": ["unassessed", "none", "impacting"]
     },

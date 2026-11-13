@@ -226,6 +226,19 @@ enum AnomalyResolution {
   `wont-fix`,
 }
 
+/** A person-assigned anomaly severity. No default and never derived from another field (FR-014). */
+enum AnomalySeverity {
+  minor,
+  major,
+  critical,
+}
+
+/** What a fix-verification row points at: an acceptance criterion or a test case. */
+enum VerificationKind {
+  Criterion,
+  Test,
+}
+
 /** Whether the anomaly's safety impact has been assessed, and with what outcome. */
 enum SafetyImpact {
   unassessed,
@@ -266,6 +279,24 @@ scalar AssessmentTarget extends string;
  */
 @pattern("^(?![ \\t]*([nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)[ \\t]*$)[ \\t]*\\S")
 scalar ClosedBy extends string;
+
+/**
+ * A fix-verification `Target` token: an acceptance-criterion id or a test-case
+ * id, beginning with a letter or digit so that `-` and an empty cell are not
+ * references (FR-015). Existence and kind are the engine's reference
+ * diagnostics, never part of the record.
+ */
+@pattern("^[A-Za-z0-9]\\S*$")
+scalar VerificationTarget extends string;
+
+/**
+ * A release-rationale cell that is written text in shape: non-empty after
+ * trimming and not one of the placeholders `n/a`, `none`, `unknown`, `tbd`,
+ * `-`, compared case-insensitively (the `closed_by` rule, FR-014). Whether the
+ * author is a real person is the commit author's attribution, not this pattern's.
+ */
+@pattern("^(?![ \\t]*([nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)[ \\t]*$)[ \\t]*\\S")
+scalar NamedText extends string;
 
 /** A relationship verb from the module's `allowed_links` registries. */
 @pattern("^[a-z][a-z0-9_]*$")
@@ -386,6 +417,31 @@ model AssessmentRow {
   impact: AssessmentImpact;
   /** free text: the engineer's judgement. */
   rationale: NonEmptyText;
+  line: LineNumber;
+}
+
+/**
+ * One `## Fix Verification` row (`Kind | Target | Rationale`). `target` is the
+ * authored reference token; whether it resolves, and to what kind, is a
+ * diagnostic, not part of the record. No field names the fixing change or holds
+ * a verdict: the change is the git history of the file (FR-015).
+ */
+model VerificationRow {
+  kind: VerificationKind;
+  target: VerificationTarget;
+  /** free text: the engineer's statement of how the fix is demonstrated. */
+  rationale: NonEmptyText;
+  line: LineNumber;
+}
+
+/**
+ * One `## Release Rationale` row (`Author | Rationale`): a named person's
+ * written reason for releasing with the anomaly not fixed (FR-016). It holds no
+ * date, commit, release identifier, signature or sign-off.
+ */
+model ReleaseRationaleRow {
+  author: NamedText;
+  rationale: NamedText;
   line: LineNumber;
 }
 
@@ -641,8 +697,9 @@ model Feedback {
 
 /**
  * Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle
- * status, how it ended, who closed it and its safety-impact assessment
- * (FR-014, FR-015). The conditional rules below are the status-conditional
+ * status, how it ended, who closed it, its severity, its safety-impact
+ * assessment, the verification of its fix and, optionally, the rationale for
+ * releasing with it not fixed (FR-014, FR-015, FR-016). The conditional rules below are the status-conditional
  * checks the module owns; the legality of a status move is judged over git
  * history by quoin and is not representable in a record. The record holds no
  * history, no author and no date.
@@ -674,7 +731,18 @@ model Feedback {
   #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "impacting" } }, `required`: #["safetyImpact", "assessment"] },
      `then`: #{ `properties`: #{ `assessment`: #{ `contains`: #{
                 `properties`: #{ `kind`: #{ `enum`: #["Requirement", "Hazard"] },
-                               `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } }
+                               `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } },
+  // severity (FR-014): required from assessed onward, optional while identified.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
+     `then`: #{ `required`: #["severity"] } },
+  // fix verification (FR-015): required when the resolution is fixed.
+  #{ `if`: #{ `properties`: #{ `resolution`: #{ `const`: "fixed" } }, `required`: #["resolution"] },
+     `then`: #{ `required`: #["verification"] } },
+  // release rationale (FR-016): refused on a closed anomaly whose resolution is
+  // present and fixed, not-a-defect or duplicate. A closed wont-fix anomaly (a
+  // defect deliberately shipped) and any non-closed anomaly may carry it.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `const`: "closed" }, `resolution`: #{ `enum`: #["fixed", "not-a-defect", "duplicate"] } }, `required`: #["status", "resolution"] },
+     `then`: #{ `not`: #{ `required`: #["releaseRationale"] } } }
 ])
 model Anomaly {
   id: UpperDocId;
@@ -683,6 +751,8 @@ model Anomaly {
   status: AnomalyStatus;
   resolution?: AnomalyResolution;
   closedBy?: ClosedBy;
+  /** Person-assigned; absent only while the anomaly is `identified`, by the conditionals above. */
+  severity?: AnomalySeverity;
   safetyImpact: SafetyImpact;
   object?: ObjectTypeName;
   /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
@@ -691,6 +761,10 @@ model Anomaly {
   description: Section;
   /** Absent while the anomaly is `identified` and unassessed; required from `assessed` onward by the conditionals above. */
   @minItems(1) assessment?: AssessmentRow[];
+  /** Absent unless the resolution is `fixed`, which requires it by the conditionals above. */
+  @minItems(1) verification?: VerificationRow[];
+  /** Absent when the section is absent; an engineer's written reason, never filled in by a tool (FR-016). */
+  @minItems(1) releaseRationale?: ReleaseRationaleRow[];
 }
 
 /**

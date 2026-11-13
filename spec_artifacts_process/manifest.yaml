@@ -123,6 +123,14 @@ artifact_types:
           from: frontmatter_field
           path: [closed_by]
           required: false
+        # FR-014: a person-assigned severity. No default and never derived from
+        # another field; presence from `assessed` onward is `record_validation`'s.
+        severity:
+          from: frontmatter_field
+          path: [severity]
+          required: false
+          assert:
+            choices: [minor, major, critical]
         description:
           from: section_body
           after_heading: Description
@@ -140,6 +148,42 @@ artifact_types:
               Impact: [Affects, Mitigates, Introduces, Unaffected, None]
             column_patterns:
               Rationale: '\S'
+        # FR-015: required when `resolution` is `fixed` (AnomalyFields.json). The
+        # `Target` pattern requires an id token, because a cell matching no
+        # reference pattern produces no reference and `-` would otherwise pass.
+        fix_verification:
+          from: table_row
+          under_section: Fix Verification
+          required: false
+          multiple: true
+          assert:
+            columns: [Kind, Target, Rationale]
+            min_rows: 1
+            column_choices:
+              Kind: [Criterion, Test]
+            column_patterns:
+              Target: '^[A-Za-z0-9]'
+              Rationale: '\S'
+        # FR-016: optional at any status. The rows are checked against the table
+        # shape here; the non-empty and placeholder rules of both cells and the
+        # closed-status rule are AnomalyFields.json's, so that they report in the
+        # same run as each other (NFR-001: the engine runs `record_validation`
+        # only when the `assert` facet found nothing). No default for any cell.
+        release_rationale:
+          from: table_row
+          under_section: Release Rationale
+          required: false
+          multiple: true
+          assert:
+            columns: [Author, Rationale]
+            min_rows: 1
+        # The same section as one body, present or absent: it carries the
+        # closed-status rule, which the engine then reports at the section
+        # heading line rather than at a row.
+        release_rationale_section:
+          from: section_body
+          after_heading: Release Rationale
+          required: false
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -1114,6 +1158,24 @@ traceability:
     kind_targets:
       Requirement: [requirement-document, nfr-document, acceptance-criterion, nfr-acceptance-criterion]
       Hazard: [hazard-document]
+    expand_ranges: false
+    strip_annotations: false
+  # FR-015: a fix-verification row's `Target` must resolve to the criterion or
+  # test case its `Kind` names. An id resolves only against `targets`, so the
+  # requirement and hazard documents are listed to make a wrong-kind id a
+  # `reference-kind-mismatch` rather than a `dangling-trace-reference`.
+  - name: anomaly-fix-verification
+    archetype: Anomaly
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Fix Verification
+    column: Target
+    row_id_column: Kind
+    pattern: '([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*)'
+    targets: [acceptance-criterion, nfr-acceptance-criterion, test-case, requirement-document, nfr-document, hazard-document]
+    kind_column: Kind
+    kind_targets:
+      Criterion: [acceptance-criterion, nfr-acceptance-criterion]
+      Test: [test-case]
     expand_ranges: false
     strip_annotations: false
 

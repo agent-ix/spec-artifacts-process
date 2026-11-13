@@ -9,6 +9,9 @@
     "resolution": {
       "enum": ["fixed", "not-a-defect", "duplicate", "wont-fix"]
     },
+    "severity": {
+      "enum": ["minor", "major", "critical"]
+    },
     "safety_impact": {
       "enum": ["unassessed", "none", "impacting"]
     },
@@ -22,10 +25,29 @@
         "type": "string",
         "not": { "pattern": "^(Requirement|Hazard)\\t[^\\t]*\\tNone\\t" }
       }
+    },
+    "fix_verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "release_rationale_section": {
+      "type": "string"
+    },
+    "release_rationale": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "allOf": [
+          { "not": { "pattern": "^[ \\t]*(?:[nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)?[ \\t]*\\t" } },
+          { "not": { "pattern": "\\t[ \\t]*(?:[nN]/[aA]|[nN][oO][nN][eE]|[uU][nN][kK][nN][oO][wW][nN]|[tT][bB][dD]|-)?[ \\t]*$" } }
+        ]
+      }
     }
   },
   "required": ["status", "safety_impact", "description"],
-  "description": "The Anomaly archetype's YAML-extracted yield record (record_validation, FR-014, FR-015): the values of `yield_pattern.match`, keyed by the match key names verbatim (`closed_by`, `safety_impact`). A table row is one tab-joined string `Kind<TAB>Target<TAB>Impact<TAB>Rationale`. It holds the status-conditional presence rules and the row rules the `assert` facet cannot express; the engine reports an absence at the `status` line (`locate_absence_at`) and a present value at its own line. The status rules are guarded on a known status, so a mistyped status yields only the status finding. It is the module's own schema for the extracted record and is not the emitted record schema: `Anomaly.json` (camelCase keys, the mapped record) is projected from TypeSpec and is untouched by it.",
+  "description": "The Anomaly archetype's YAML-extracted yield record (record_validation, FR-014, FR-015): the values of `yield_pattern.match`, keyed by the match key names verbatim (`closed_by`, `safety_impact`). A table row is one tab-joined string `Kind<TAB>Target<TAB>Impact<TAB>Rationale`. It holds the status-conditional presence rules and the row rules the `assert` facet cannot express; the engine reports an absence at the `status` line (`locate_absence_at`) and a present value at its own line. The status rules are guarded on a known status, so a mistyped status yields only the status finding. It is the module's own schema for the extracted record and is not the emitted record schema: `Anomaly.json` (camelCase keys, the mapped record) is projected from TypeSpec and is untouched by it. Severity is person-assigned: it has no default and is derived from nothing (FR-014). `fix_verification` (FR-015) and `release_rationale` (FR-016) are the section rows, and `release_rationale_section` is the same section as one body so that the closed-status rule is reported at the section heading; a release-rationale row is one tab-joined `Author<TAB>Rationale` string and an empty cell and a placeholder in either cell are refused here.",
   "allOf": [
     {
       "if": {
@@ -116,6 +138,43 @@
             "contains": {
               "pattern": "^(Requirement|Hazard)\\t[^\\t]*\\t(Affects|Mitigates|Introduces)\\t"
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "enum": ["assessed", "resolved", "closed"] } },
+        "required": ["status"]
+      },
+      "then": { "required": ["severity"] }
+    },
+    {
+      "if": {
+        "properties": { "resolution": { "const": "fixed" } },
+        "required": ["resolution"]
+      },
+      "then": { "required": ["fix_verification"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "closed" },
+          "resolution": { "enum": ["fixed", "not-a-defect", "duplicate"] }
+        },
+        "required": ["status", "resolution"]
+      },
+      "then": { "properties": { "release_rationale_section": false } }
+    },
+    {
+      "if": {
+        "required": ["release_rationale_section"],
+        "not": { "required": ["release_rationale"] }
+      },
+      "then": {
+        "properties": {
+          "release_rationale_section": {
+            "pattern": "(?m)^[ \\t]*\\|[ \\t:|-]*-[ \\t:|-]*$"
           }
         }
       }

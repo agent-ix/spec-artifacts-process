@@ -3,36 +3,37 @@
     {
       "impact": "Affects",
       "kind": "Requirement",
-      "line": 40,
+      "line": 55,
       "rationale": "<why the anomaly bears on this requirement>",
       "target": "FR-001"
     },
     {
       "impact": "Affects",
       "kind": "Requirement",
-      "line": 41,
+      "line": 56,
       "rationale": "<why the anomaly bears on this acceptance criterion>",
       "target": "FR-001-AC-1"
     },
     {
       "impact": "Introduces",
       "kind": "Hazard",
-      "line": 42,
+      "line": 57,
       "rationale": "<why the anomaly introduces or worsens this hazard>",
       "target": "HAZ-001"
     }
   ],
   "description": {
-    "endLine": 35,
-    "startLine": 33,
+    "endLine": 50,
+    "startLine": 48,
     "text": "<What was observed, where, and how it differs from what was expected.>"
   },
   "id": "AN-001",
   "provenance": {
-    "digest": "sha256:b9ca6f0020cc70e38e271b589cd4b0df469702b8ae87416a4ef740e8dbd92d9a",
+    "digest": "sha256:ae3715dd05fc69086bbfd3aa851b5f82ac9aa6b83277e1479eba7dff2351ec96",
     "path": "skeletons/Anomaly.md"
   },
   "safetyImpact": "impacting",
+  "severity": "major",
   "status": "assessed",
   "title": "<short summary of the anomaly>",
   "type": "Anomaly"
