@@ -196,6 +196,7 @@ type: TestMatrix
 | TC-214 | The shipped skeleton contains no `## Release Rationale` section, the manifest, mapping and `AnomalyFields.json` define no default for any of its cells, and no schema, locator or mapping computes a cell from another field. | Unit | P1 | FR-016-AC-8 | ✅ |
 | TC-215 | Two fixtures identical except for the presence of the section validate the same on every other finding. | Unit | P1 | FR-016-AC-10 | ✅ |
 | TC-216 | The `Anomaly` `yield_pattern.match` carries a `release_rationale` locator with `required: false`, and `AnomalyFields.json` names the property `release_rationale`. | Unit | P1 | FR-016-AC-11 | ✅ |
+| TC-217 | An `ADR` whose `relationships` carry `realizes_requirement` toward a requirement validates with no disallowed-edge-type finding; an `ADR` carrying a verb outside its `allowed_links` still draws the finding. | Unit | P1 | FR-017-AC-1 | ✅ |
 
 ## Option Permutation Matrix
 
