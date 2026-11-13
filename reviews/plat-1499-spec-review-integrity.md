@@ -86,3 +86,19 @@ bindings:
 - {test_id: TC-076, ac_id: FR-003-AC-12, trace: correct}
 - {test_id: TC-016, ac_id: FR-003-AC-1, trace: wrong}
 ```
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | medium | The FR-003 Description still says the module SHALL declare `body_extraction` "so that Quire machine-validates every `type: TestMatrix` document (`tests.md`) against the coverage tables and Test Case Summary". The Behavior section now says no coverage table is declared, so the Description's SHALL contradicts it. Change it to "against the Test Case Summary". | spec/functional/FR-003-testmatrix-body-extraction.md:16-19 |
+| FND-006 | low | TC-017 now also traces FR-003-AC-15 ("The `TestMatrix` manifest entry declares extractions for the `Test Case Summary` only"). Its title still describes only AC-9 ("Contract lands without altering TestMatrix frontmatter schema or other archetypes"), so nothing in the test row tells the implementer to assert the AC-15 claim. Extend TC-017's title to state that the TestMatrix match declares only `test_cases`, or give AC-15 its own TC. | spec/tests.md:192 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | a4184b0: FR-004-AC-2 reads "exactly one entry per kind of table (`test-case`, `traces-to`)", TC-039 names the same two kinds, and the manifest entry removal is in the implementation list. |
+| FND-002 | fixed | a4184b0: FR-003-AC-2 owns the min-rows rule ("a `Test Case Summary` with a header and zero data rows fails with reason `assert`, and one with exactly one data row passes"). TC-016 traces FR-003-AC-2 only, and the boundary rows read `min_rows (Test Case Summary)`. |
+| FND-003 | fixed | a4184b0: FR-003-AC-13 reads "A `TestMatrix` doc validates whether or not it carries a `Functional Requirement Coverage` section, and no column set of such a section is asserted", which is distinct from AC-1. The manifest claim is its own Inspection criterion, FR-003-AC-15. |
+| FND-004 | fixed | a4184b0: "violate it. Each binds to its TC row by the TC row's own `Traces To` cell". |

@@ -189,7 +189,7 @@ type: TestMatrix
 | TC-014 | A doc with no StR/US/NFR coverage section validates | Unit | P1 | FR-003-AC-7 | 🚧 |
 | TC-015 | A doc carrying a StR, US or NFR coverage section with any column set validates: no such section is asserted (PLAT-1499) | Unit | P1 | FR-003-AC-7 | 🚧 |
 | TC-016 | `min_rows` boundary: a `Test Case Summary` with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-2 | ✅ |
-| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion) | Unit | P2 | FR-003-AC-9, FR-003-AC-15 | ✅ |
+| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion), and the TestMatrix entry declares `test_cases` as its only extraction: no functional, stakeholder, user-story or non-functional coverage match | Unit | P2 | FR-003-AC-9, FR-003-AC-15 | ✅ |
 | TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | ✅ |
 | TC-019 | Conforming SpecReview doc validates; doc missing the Findings table fails with reason `missing` | Unit | P1 | FR-002-AC-1 | 🚧 |
 | TC-020 | Severity vocabulary permutation: low/medium/high accepted; cell outside fails via `column_choices` (reason `assert`) | Unit | P1 | FR-002-AC-2 | 🚧 |

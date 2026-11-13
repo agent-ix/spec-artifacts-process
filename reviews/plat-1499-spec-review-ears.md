@@ -43,3 +43,9 @@ scope:
   role: context_only
   excerpt: "each binds to its TC row by the TC row's own `Traces To` cell, which is a different column and is not affected."
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | a4184b0: the bullet reads "`body_extraction` SHALL NOT declare a `Functional Requirement Coverage` extraction, required or optional (PLAT-1499)", and the rationale moved to the PLAT-1499 note. |

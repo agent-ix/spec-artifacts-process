@@ -90,3 +90,11 @@ scope:
   role: examined
   excerpt: "TC-003, TC-194, TC-076 rows; edge-case row; retained Functional Requirement Coverage section (lines 23-183)"
 ```
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | a4184b0: FR-003 Behavior now reads "`body_extraction` SHALL NOT declare an extraction for the `Stakeholder Requirement Coverage`, `User Story Coverage` or `Non-Functional Requirement Coverage` tables, required or optional (PLAT-1499)". AC-7, TC-014 and TC-015 are rewritten, the StR and US tables are deleted from spec/tests.md, and the manifest, skeleton, semantic, schema and fixture removals are in the PR's implementation list. |
+| FND-002 | fixed | a4184b0: FR-003-AC-12 requires a `Requirements Traceability` table of `Subsystem \| Local Matrix` (navigation only). TC-076 asserts the two columns, and the implementation list reduces `subsystem_index` and drops the `Status` pattern. |
+| FND-003 | fixed | The PR body at a4184b0 lists the `functional-coverage` document_reference and its CR-062 comment, `examples/TestMatrix.record.json`, the expected kind list at `test_traceability_declaration.py` ~232, `missing-fr-coverage.md`, and quoin's spec-matrix template, example and semantic-module cookiecutter. |

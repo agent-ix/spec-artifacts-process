@@ -15,7 +15,7 @@ relationships:
 
 The module **SHALL** declare a `body_extraction` contract on the `TestMatrix`
 artifact type so that Quire machine-validates every `type: TestMatrix` document
-(`tests.md`) against the coverage tables and Test Case Summary that the quoin
+(`tests.md`) against the Test Case Summary that the quoin
 `spec-matrix` template emits. This requirement specifies the **structural and
 vocabulary layer only**: column sets, id shapes, and cell vocabularies.
 Resolving whether a referenced requirement/AC id actually exists is the
