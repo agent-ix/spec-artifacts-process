@@ -63,14 +63,15 @@ the file, which already records it and which a typed table could only duplicate 
   `closed` carries the author and, where commits are signed, the signature, and that is the
   attribution of record.
 - When `status` is not `closed`, `closed_by` SHALL be absent.
-- The `severity` field SHALL be one of exactly `minor`, `major`, `critical`, declared in the
-  manifest `vocabularies`.
-- The module SHALL declare no default for `severity`; it is assigned by a person.
+- The `severity` field SHALL be one of exactly `minor`, `major`, `critical`, declared as an
+  `assert: choices` constraint on a `severity` `frontmatter_field` locator in the `Anomaly`
+  `yield_pattern.match`.
+- The module SHALL declare no default for `severity`.
 - The module SHALL NOT derive `severity` from any other field.
 - While `status` is `identified`, `severity` MAY be absent.
 - When `status` is `assessed`, `resolved` or `closed`, `severity` SHALL be present.
-- Who set or changed `severity`, and when, is the git history of the file, as for `status`; the
-  module adds no severity history field.
+- The module SHALL add no field that records who set or changed `severity`, or when; that is the git
+  history of the file, as for `status`.
 - The module SHALL ship the emitted schema for `Anomaly` and a skeleton that validates as authored,
   with negative counterparts for a closed anomaly with no `closed_by`, a placeholder `closed_by`,
   an `assessed` anomaly with no `severity`, a `severity` outside the vocabulary, a `resolved` anomaly with no `resolution`, and an `identified` anomaly carrying `closed_by`.
@@ -120,10 +121,11 @@ the file, which already records it and which a typed table could only duplicate 
 | FR-014-AC-11 | `AnomalyFields.json` ships in the package data beside the emitted schemas and is not counted as a projection by the schema generator. | Test |
 | FR-014-AC-12 | A `closed` anomaly with no `closed_by` and no `resolution` is reported once per missing field, both at the `status` line. | Test |
 | FR-014-AC-13 | An anomaly whose `status` is outside the vocabulary yields exactly one finding, at the `status` line. | Test |
-| FR-014-AC-14 | The manifest declares `severity` with exactly the vocabulary `minor`, `major`, `critical` and no default. | Test |
+| FR-014-AC-14 | The `Anomaly` `yield_pattern.match` carries a `severity` `frontmatter_field` locator (`required: false`) whose `assert` is `choices` of exactly `minor`, `major`, `critical`, and the manifest and `AnomalyFields.json` define no default for `severity`. | Test |
 | FR-014-AC-15 | For each of `assessed`, `resolved` and `closed`, a fixture with no `severity` fails, reported at the `status` line; an `identified` fixture with no `severity` validates. | Test |
 | FR-014-AC-16 | A fixture whose `severity` is outside the vocabulary (including `high`, `Major` and the empty string) fails with exactly one finding, at the `severity` line. | Test |
-| FR-014-AC-17 | The manifest and `AnomalyFields.json` define no default for `severity`, and no field of the `Anomaly` type records who set it. | Inspection |
+| FR-014-AC-17 | Two fixtures identical except for one differing field (`safety_impact`, or the assessment rows) validate with the same `severity`, and no schema, locator or mapping of the `Anomaly` type computes `severity` from another field. | Test |
+| FR-014-AC-18 | No field of the `Anomaly` type records who set `severity` or when. | Inspection |
 
 ## Dependencies
 
