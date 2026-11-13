@@ -1,6 +1,6 @@
 """The Anomaly archetype, its record schema and its fixtures.
 
-Requirements FR-014, FR-015 and NFR-001 (user story US-003).
+Requirements FR-014, FR-015, FR-016 and NFR-001 (user story US-003).
 
 Three layers are exercised, each through the real artifact it ships:
 
@@ -13,8 +13,9 @@ Three layers are exercised, each through the real artifact it ships:
   line and a present value at its own;
 * **mapped record** — the document mapped by `mappings.yaml` and validated against
   the emitted `Anomaly.json` (the same rules over the camelCase record);
-* **reference** — whether an assessment `Target` resolves, and to what kind. The
-  module owns none of that text: it is the engine's reference diagnostic.
+* **reference** — whether an assessment or fix-verification `Target` resolves, and
+  to what kind. The module owns none of that text: it is the engine's reference
+  diagnostic.
 
 The fixtures live under `tests/fixtures/anomaly/` and are read in place by
 quoin's tests; quoin holds no copy.
@@ -122,6 +123,47 @@ def table_line(path: Path) -> int:
     )
 
 
+def heading_line(path: Path, heading: str) -> int:
+    """The line of a level-2 heading."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text == f"## {heading}"
+    )
+
+
+def row_line(path: Path, prefix: str) -> int:
+    """The line of the first table row that starts with `prefix`."""
+    return next(
+        i
+        for i, text in enumerate(path.read_text().splitlines(), 1)
+        if text.startswith(prefix)
+    )
+
+
+def keys_named(node, name: str) -> list:
+    """Every value stored under the key `name`, anywhere in a JSON-like tree."""
+    found = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == name:
+                found.append(value)
+            found += keys_named(value, name)
+    elif isinstance(node, list):
+        for item in node:
+            found += keys_named(item, name)
+    return found
+
+
+def variant(tmp_path: Path, source: Path, old: str, new: str) -> Path:
+    """A copy of a fixture with one substring replaced, as `AN-001.md` in `tmp_path`."""
+    text = source.read_text()
+    assert old in text, f"{old!r} not in {source.name}"
+    path = tmp_path / "AN-001.md"
+    path.write_text(text.replace(old, new, 1))
+    return path
+
+
 def record_findings(path: Path) -> list[str]:
     """The `semantic.record-invalid` findings `quire validate` reports on a document."""
     return [
@@ -213,7 +255,11 @@ def test_the_placeholder_set_is_rejected_and_a_name_is_accepted(
     schema_registry, value: str
 ):
     record = json.loads((EXAMPLES_DIR / "Anomaly.record.json").read_text())
-    record |= {"status": "closed", "resolution": "fixed", "closedBy": value}
+    record |= {
+        "status": "closed",
+        "resolution": "fixed",
+        "closedBy": value,
+    }
     validator = schema_registry("Anomaly")
     assert any(
         list(e.absolute_path) == ["closedBy"] for e in validator.iter_errors(record)
@@ -263,7 +309,14 @@ def test_the_mapping_names_each_key_once_and_the_golden_record_validates(
     mappings, schema_registry
 ):
     properties = mappings["models"]["Anomaly"]["properties"]
-    for key in ("status", "resolution", "closedBy", "safetyImpact", "assessment"):
+    for key in (
+        "status",
+        "resolution",
+        "closedBy",
+        "severity",
+        "safetyImpact",
+        "assessment",
+    ):
         assert key in properties
     assert "statusHistory" not in properties
     assert properties["closedBy"]["path"] == ["closed_by"]
@@ -543,6 +596,9 @@ def test_the_negative_counterparts_exist_for_every_named_defect():
         "dangling-hazard",
         "requirement-row-names-hazard",
         "hazard-row-names-requirement",
+        # FR-014 severity, FR-015 fix verification, FR-016 release rationale
+        "assessed-no-severity",
+        "severity-outside-high",
     }
     assert required <= set(INVALID)
     assert (FIXTURES / "valid" / "two-hazards.md").is_file()
@@ -798,3 +854,90 @@ def test_a_closed_anomaly_missing_both_fields_is_reported_once_per_field():
     assert sorted(finding_lines(found)) == [line_of(path, "status")] * 2, found
     assert any("closed_by" in f for f in found)
     assert any("resolution" in f for f in found)
+
+
+# -- FR-014: severity (PLAT-1581) ----------------------------------------------
+
+
+@pytest.mark.trace("FR-014-AC-14", "TC-195")
+def test_the_severity_locator_is_optional_with_the_three_member_vocabulary(manifest):
+    assert locator(manifest, "severity") == {
+        "from": "frontmatter_field",
+        "path": ["severity"],
+        "required": False,
+        "assert": {"choices": ["minor", "major", "critical"]},
+    }
+    fields = json.loads((SCHEMAS_DIR / "AnomalyFields.json").read_text())
+    assert fields["properties"]["severity"] == {"enum": ["minor", "major", "critical"]}
+    assert keys_named(anomaly_type(manifest), "default") == []
+    assert keys_named(fields, "default") == []
+
+
+@pytest.mark.parametrize("status", ["assessed", "resolved", "closed"])
+@pytest.mark.trace("FR-014-AC-15", "TC-196")
+def test_assessed_or_later_without_severity_fails_at_the_status_line(
+    mapper, schema_registry, status: str
+):
+    path = INVALID[f"{status}-no-severity"]
+    found = record_findings(path)
+    assert finding_lines(found) == [line_of(path, "status")], found
+    assert "severity" in found[0]
+    errors = record_errors(mapper, schema_registry, path)
+    assert signature(errors) == [("required", [])]
+    assert "'severity'" in errors[0].message
+
+
+@pytest.mark.trace("FR-014-AC-15", "TC-196")
+def test_an_identified_anomaly_may_omit_severity_or_carry_one():
+    omitted = VALID_BY_NAME["identified"]
+    assert "severity" not in omitted.read_text()
+    assert quire_validate(omitted).returncode == 0
+    carried = VALID_BY_NAME["identified-severity"]
+    assert "severity: minor" in carried.read_text()
+    assert quire_validate(carried).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["severity-outside-high", "severity-outside-capitalised", "severity-outside-empty"],
+)
+@pytest.mark.trace("FR-014-AC-16", "TC-197")
+def test_a_severity_outside_the_vocabulary_is_one_finding_at_the_severity_line(
+    mapper, schema_registry, name: str
+):
+    path = INVALID[name]
+    found = diagnostics(quire_validate(path))
+    assert len(found) == 1, found
+    assert finding_lines(found) == [line_of(path, "severity")]
+    assert "severity" in found[0]
+    assert ("enum", ["severity"]) in signature(
+        record_errors(mapper, schema_registry, path)
+    )
+
+
+@pytest.mark.trace("FR-014-AC-17", "TC-198")
+def test_severity_is_not_computed_from_another_field(tmp_path: Path, mapper, mappings):
+    source = VALID_BY_NAME["assessed"]
+    table = source.read_text().index("| Requirement | FR-001 |")
+    # `safety_impact` differs (and, as the rules require, the rows with it)
+    by_impact = tmp_path / "AN-001.md"
+    by_impact.write_text(
+        source.read_text()[:table].replace("impacting", "none")
+        + "| None | - | None | Cosmetic message only; no safety function involved. |\n"
+    )
+    # the assessment rows differ, `safety_impact` does not
+    by_rows = VALID_BY_NAME["two-hazards"]
+    assert "safety_impact: impacting" in by_rows.read_text()
+    for other in (by_impact, by_rows):
+        assert quire_validate(other, scope=other.parent).returncode == 0
+    for path in (source, by_impact, by_rows):
+        assert mapper.build("Anomaly", path.read_text(), "x")["severity"] == "major"
+    # and no rule sets severity: the schemas only ever require it
+    for name in ("AnomalyFields.json", "Anomaly.json"):
+        schema = json.loads((SCHEMAS_DIR / name).read_text())
+        for rule in schema["allOf"]:
+            assert "severity" not in rule.get("then", {}).get("properties", {})
+    assert mappings["models"]["Anomaly"]["properties"]["severity"] == {
+        "kind": "frontmatter",
+        "path": ["severity"],
+    }

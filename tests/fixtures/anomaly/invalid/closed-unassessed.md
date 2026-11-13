@@ -6,6 +6,7 @@ status: closed
 resolution: fixed
 closed_by: "Dana Lee"
 safety_impact: unassessed
+severity: major
 ---
 # [AN-001] Fixture f3
 

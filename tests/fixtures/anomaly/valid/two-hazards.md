@@ -4,6 +4,7 @@ title: "Fixture two hazards"
 type: Anomaly
 status: assessed
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture two hazards
 

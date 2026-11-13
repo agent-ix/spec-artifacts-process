@@ -6,6 +6,7 @@ status: closed
 resolution: fixed
 closed_by: n/a
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture b3
 

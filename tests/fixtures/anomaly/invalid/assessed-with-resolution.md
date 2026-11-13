@@ -5,6 +5,7 @@ type: Anomaly
 status: assessed
 resolution: fixed
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture assessed with resolution
 

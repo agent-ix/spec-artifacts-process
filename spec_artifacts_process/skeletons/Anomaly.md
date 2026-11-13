@@ -4,6 +4,7 @@ title: "<short summary of the anomaly>"
 type: Anomaly
 status: assessed
 safety_impact: impacting
+severity: major
 ---
 <!-- Anomaly authoring skeleton (spec-artifacts-process). One document per
      reported anomaly. Contract (validated by `quire validate`):
@@ -12,7 +13,10 @@ safety_impact: impacting
        resolution ∈ fixed|not-a-defect|duplicate|wont-fix, present exactly when
        status is resolved or closed (resolved requires fixed);
        closed_by is a named person, present exactly when status is closed;
-       safety_impact ∈ unassessed|none|impacting.
+       safety_impact ∈ unassessed|none|impacting;
+       severity ∈ minor|major|critical, assigned by a person: it has no default
+       and is derived from nothing. It may be omitted while status is
+       identified and is required from assessed onward.
      - There is no typed history. Who moved the status, and when, is the git
        history of this file; the legality of each move is judged by
        `quoin anomaly check`.

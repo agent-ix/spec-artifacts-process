@@ -4,6 +4,7 @@ title: "Fixture c"
 type: Anomaly
 status: resolved
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture c
 

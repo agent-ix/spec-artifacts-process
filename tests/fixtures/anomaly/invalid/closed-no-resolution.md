@@ -5,6 +5,7 @@ type: Anomaly
 status: closed
 closed_by: "Dana Lee"
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture c2
 

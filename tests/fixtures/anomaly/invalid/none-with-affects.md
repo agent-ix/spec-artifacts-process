@@ -4,6 +4,7 @@ title: "Fixture j"
 type: Anomaly
 status: assessed
 safety_impact: none
+severity: major
 ---
 # [AN-001] Fixture j
 

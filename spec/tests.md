@@ -154,7 +154,7 @@ type: TestMatrix
 | TC-171 | A `closed` fixture with no `closed_by` fails; a `closed` fixture with `closed_by` of `TBD`, `unknown`, `n/a`, `none`, `-` or empty fails in any letter case; the same fixture with a non-placeholder value passes. | Unit | P1 | FR-014-AC-4 | ✅ |
 | TC-172 | A fixture with `status` of `resolved` or `closed` and no `resolution` fails; a `resolved` fixture with `resolution` other than `fixed` fails; a fixture with `status` of `identified` or `assessed` and a `resolution` fails. | Unit | P1 | FR-014-AC-5 | ✅ |
 | TC-173 | A fixture with `status` other than `closed` that carries `closed_by` fails. | Unit | P1 | FR-014-AC-6 | ✅ |
-| TC-174 | The mapping lists `status`, `resolution`, `closedBy`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Unit | P1 | FR-014-AC-7 | ✅ |
+| TC-174 | The mapping lists `status`, `resolution`, `closedBy`, `severity`, `safetyImpact` and `assessment` for `Anomaly`, each named by exactly one entry, and the golden record built from the skeleton validates against the emitted `Anomaly` schema. | Unit | P1 | FR-014-AC-7 | ✅ |
 | TC-175 | A repository declaring no `Anomaly` document loads and validates exactly as it did before the type existed. | Unit | P1 | FR-014-AC-8 | ✅ |
 | TC-176 | The manifest declares `safety_impact` with exactly the three-member vocabulary, and the section table with exactly the four columns, `min_rows: 1`, and the `Kind` and `Impact` vocabularies above. | Unit | P1 | FR-015-AC-1 | ✅ |
 | TC-177 | An `identified` anomaly with `safety_impact: unassessed` and no section validates. | Unit | P1 | FR-015-AC-2 | ✅ |
@@ -174,6 +174,10 @@ type: TestMatrix
 | TC-191 | A `closed` anomaly with no `closed_by` and no `resolution` yields one `semantic.record-invalid` finding per missing field, both at the `status` line. | Unit | P1 | FR-014-AC-12 | ✅ |
 | TC-192 | A `closed` fixture with `status: open` yields exactly one finding, the `status` vocabulary finding at the `status` line. | Unit | P1 | FR-014-AC-13 | ✅ |
 | TC-193 | The generator's projection test counts `Anomaly.json` and `Stale.json` as projections and `AnomalyFields.json` and `*-frontmatter.schema.json` files as hand-authored. | Unit | P1 | FR-009-AC-14 | ✅ |
+| TC-195 | The `Anomaly` `yield_pattern.match` carries a `severity` `frontmatter_field` locator (`required: false`) whose `assert` is `choices` of exactly `minor`, `major`, `critical`, and the manifest and `AnomalyFields.json` define no default for `severity`. | Unit | P1 | FR-014-AC-14 | ✅ |
+| TC-196 | For each of `assessed`, `resolved` and `closed`, a fixture with no `severity` fails, reported at the `status` line; an `identified` fixture with no `severity` validates. | Unit | P1 | FR-014-AC-15 | ✅ |
+| TC-197 | A fixture whose `severity` is outside the vocabulary (including `high`, `Major` and the empty string) fails with exactly one finding, at the `severity` line. | Unit | P1 | FR-014-AC-16 | ✅ |
+| TC-198 | Two fixtures identical except for one differing field (`safety_impact`, or the assessment rows) validate with the same `severity`, and no schema, locator or mapping of the `Anomaly` type computes `severity` from another field. | Unit | P1 | FR-014-AC-17 | ✅ |
 
 ## Option Permutation Matrix
 

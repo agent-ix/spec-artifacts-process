@@ -195,6 +195,7 @@ models:
     notes:
       - "`statusHistory` is not authored anywhere and is not a property of this record: who moved the status, and when, is the git history of the file, which quoin derives (quoin FR-136). Nothing here carries an author or a date."
       - "`resolution` and `closedBy` are carried verbatim and are absent when the document omits them; the status-conditional checks are the emitted Anomaly schema's."
+      - "`severity` is carried verbatim and is absent when the document omits it; it is person-assigned and nothing here computes it from another field."
       - "`assessment` is absent while the section is absent. A `target` is the authored reference token and is absent for a row whose Target is `-`; whether it resolves is a diagnostic, not part of the record."
     dropped_frontmatter_keys: []
     properties:
@@ -207,6 +208,7 @@ models:
       status: {kind: frontmatter, path: [status], required: true}
       resolution: {kind: frontmatter, path: [resolution]}
       closedBy: {kind: frontmatter, path: [closed_by]}
+      severity: {kind: frontmatter, path: [severity]}
       safetyImpact: {kind: frontmatter, path: [safety_impact], required: true}
       description: {kind: section, heading: Description, required: true}
       assessment:

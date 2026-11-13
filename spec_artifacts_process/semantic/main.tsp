@@ -226,6 +226,13 @@ enum AnomalyResolution {
   `wont-fix`,
 }
 
+/** A person-assigned anomaly severity. No default and never derived from another field (FR-014). */
+enum AnomalySeverity {
+  minor,
+  major,
+  critical,
+}
+
 /** Whether the anomaly's safety impact has been assessed, and with what outcome. */
 enum SafetyImpact {
   unassessed,
@@ -641,8 +648,8 @@ model Feedback {
 
 /**
  * Anomaly record (archetype `Anomaly`): one reported anomaly, its lifecycle
- * status, how it ended, who closed it and its safety-impact assessment
- * (FR-014, FR-015). The conditional rules below are the status-conditional
+ * status, how it ended, who closed it, its severity and its safety-impact
+ * assessment (FR-014, FR-015). The conditional rules below are the status-conditional
  * checks the module owns; the legality of a status move is judged over git
  * history by quoin and is not representable in a record. The record holds no
  * history, no author and no date.
@@ -674,7 +681,10 @@ model Feedback {
   #{ `if`: #{ `properties`: #{ `safetyImpact`: #{ `const`: "impacting" } }, `required`: #["safetyImpact", "assessment"] },
      `then`: #{ `properties`: #{ `assessment`: #{ `contains`: #{
                 `properties`: #{ `kind`: #{ `enum`: #["Requirement", "Hazard"] },
-                               `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } }
+                               `impact`: #{ `not`: #{ `enum`: #["Unaffected", "None"] } } } } } } } },
+  // severity (FR-014): required from assessed onward, optional while identified.
+  #{ `if`: #{ `properties`: #{ `status`: #{ `enum`: #["assessed", "resolved", "closed"] } }, `required`: #["status"] },
+     `then`: #{ `required`: #["severity"] } },
 ])
 model Anomaly {
   id: UpperDocId;
@@ -683,6 +693,8 @@ model Anomaly {
   status: AnomalyStatus;
   resolution?: AnomalyResolution;
   closedBy?: ClosedBy;
+  /** Person-assigned; absent only while the anomaly is `identified`, by the conditionals above. */
+  severity?: AnomalySeverity;
   safetyImpact: SafetyImpact;
   object?: ObjectTypeName;
   /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */

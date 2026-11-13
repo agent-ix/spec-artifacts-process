@@ -6,6 +6,7 @@ status: closed
 resolution: wont-fix
 closed_by: "Dana Lee"
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture closed wont-fix
 

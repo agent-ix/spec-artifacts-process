@@ -123,6 +123,14 @@ artifact_types:
           from: frontmatter_field
           path: [closed_by]
           required: false
+        # FR-014: a person-assigned severity. No default and never derived from
+        # another field; presence from `assessed` onward is `record_validation`'s.
+        severity:
+          from: frontmatter_field
+          path: [severity]
+          required: false
+          assert:
+            choices: [minor, major, critical]
         description:
           from: section_body
           after_heading: Description

@@ -4,6 +4,7 @@ title: "Fixture n1"
 type: Anomaly
 status: closed
 safety_impact: impacting
+severity: major
 ---
 # [AN-001] Fixture n1
 

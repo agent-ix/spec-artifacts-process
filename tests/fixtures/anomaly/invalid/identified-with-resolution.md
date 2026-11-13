@@ -11,4 +11,3 @@ safety_impact: unassessed
 ## Description
 
 The importer accepted a file whose checksum did not match.
-
