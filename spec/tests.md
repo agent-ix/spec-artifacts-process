@@ -188,7 +188,7 @@ type: TestMatrix
 |---------|-------|------|----------|-----------|--------|
 | TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
 | TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
-| TC-003 | Doc missing the Functional Requirement Coverage table fails with reason `missing` | Unit | P1 | FR-003, FR-003-AC-1 | ✅ |
+| TC-003 | A `TestMatrix` doc with a `Test Case Summary` and no `Functional Requirement Coverage` section validates: the contract declares no functional-coverage extraction, so none is required and none is asserted (PLAT-1499) | Unit | P1 | FR-003-AC-13 | 🚧 |
 | TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |
 | TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
 | TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
@@ -255,7 +255,8 @@ type: TestMatrix
 | TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
 | TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — every corpus row carrying `-` is retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
-| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
+| TC-194 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section and its authoring comment names `quire matrix` as the source of requirement-to-criterion coverage (PLAT-1499) | Unit | P1 | FR-003-AC-14 | 🚧 |
+| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires `test_cases`; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core model; no other host appears | Unit | P0 | FR-009-AC-3 | ✅ |
 | TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | ✅ |
@@ -375,7 +376,7 @@ mixed combination in one conforming document.
 | min_rows (required tables) | Min | 1 data row | TC-016 | pass |
 | min_rows (required tables) | Below Min | 0 data rows (header only) | TC-016 | Error (`assert`) |
 | Required table presence | Absent | Test Case Summary omitted | TC-002 | Error (`missing`) |
-| Required table presence | Absent | Functional Requirement Coverage omitted | TC-003 | Error (`missing`) |
+| Functional coverage table | Absent | Functional Requirement Coverage omitted | TC-003 | Valid (computed by `quire matrix`) |
 | Optional table presence | Absent | StR/US/NFR tables omitted | TC-014 | pass |
 | Optional table presence | Present, wrong columns | renamed column | TC-015 | Error (`assert`) |
 | min_rows (SpecReview Findings) | Below Min | 0 data rows (header only) | TC-019 | Error (`assert`) |

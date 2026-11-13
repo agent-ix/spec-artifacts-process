@@ -33,10 +33,12 @@ validation engine's cross-reference job and is out of scope here.
 
 ## Behavior
 
-- `body_extraction` **SHALL** require a `Functional Requirement Coverage`
-  `table_row` extraction with columns exactly
-  `Functional Req | Acceptance Criteria | Test Cases | Status` and at
-  least one row.
+- `body_extraction` **SHALL NOT** declare a `Functional Requirement Coverage`
+  extraction, required or optional. The requirement-to-criterion-to-test
+  coverage a hand-kept `Functional Req | Acceptance Criteria | Test Cases |
+  Status` table restates is computed by `quire matrix` from the criteria and the
+  tests' trace tags, so the computed matrix is the single source and a second,
+  authored copy can only drift from it (PLAT-1499).
 - `body_extraction` **SHALL** require a `Test Case Summary` `table_row`
   extraction with columns exactly
   `Test ID | Title | Type | Priority | Traces To | Status` and at least one row.
@@ -178,7 +180,7 @@ validation engine's cross-reference job and is out of scope here.
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-003-AC-1 | A `TestMatrix` doc with a conforming `Functional Requirement Coverage` table and `Test Case Summary` validates | Test (TC-001) |
+| FR-003-AC-1 | A `TestMatrix` doc with a conforming `Test Case Summary` validates | Test (TC-001) |
 | FR-003-AC-2 | A doc missing the `Test Case Summary` table fails with reason `missing` | Test (TC-001) |
 | FR-003-AC-3 | A `Type` cell outside the core evidence vocabulary and the module's declared extensions fails via `column_choices` (reason `assert`); every core value and every declared extension passes | Test (TC-001) |
 | FR-003-AC-4 | A `Test ID` cell not matching `^(TC\|IT)(-[A-Za-z0-9]+)+$` with a numeric segment fails validation; the segmented ecosystem forms (`TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`) pass, as does an `IT-NNN` id (CR-019); a prefix naming no declared archetype (`BENCH-001`, `AUDIT-001`, `SB-001`, `TCX-001`) fails | Test (TC-001) |
@@ -189,7 +191,34 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-9 | The contract is added without altering the TestMatrix frontmatter schema or the other archetypes | Inspection |
 | FR-003-AC-10 | A `Priority` cell outside `P0\|P1\|P2\|P3\|P4` fails via `column_choices` **when the column is authored**; a `Test Case Summary` that omits the `Priority` column entirely validates, and neither the missing column nor its absent cells are reported (CR-018) | Test (TC-001) |
 | FR-003-AC-11 | A `Test Case Summary` containing two rows with the same `Test ID` fails validation | Test (TC-024) — blocked on a quire-rs uniqueness assert (none exists today) |
-| FR-003-AC-12 | A `TestMatrixIndex` archetype models the **root index** of a matrix tree: it requires a `Requirements Traceability` table of `Subsystem \| Requirements \| Local Matrix \| Status` and optionally an `Integration Test Matrix` (`INT-NNN`) and a `Coverage Gaps` register (`GAP-NNN`). It requires neither `test_cases` nor `functional_coverage`, and it mints no test-case ids — `trace_targets.test-case` binds `TestMatrix` only, so an index is not a minting document. | Test (TC-076) |
+| FR-003-AC-12 | A `TestMatrixIndex` archetype models the **root index** of a matrix tree: it requires a `Requirements Traceability` table of `Subsystem \| Requirements \| Local Matrix \| Status` and optionally an `Integration Test Matrix` (`INT-NNN`) and a `Coverage Gaps` register (`GAP-NNN`). It requires no `test_cases` table, and it mints no test-case ids — `trace_targets.test-case` binds `TestMatrix` only, so an index is not a minting document. | Test (TC-076) |
+| FR-003-AC-13 | A `TestMatrix` doc with a `Test Case Summary` and no `Functional Requirement Coverage` section validates; the contract names no functional-coverage extraction, so no table restating the computed matrix is required or column-asserted | Test (TC-003) |
+| FR-003-AC-14 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section, and its authoring comment states that requirement-to-criterion coverage is read from `quire matrix`, never authored | Test (TC-194) |
+
+> **PLAT-1499 note (2026-11-12):** the computed matrix is the single source of
+> functional coverage.
+>
+> The required `Functional Requirement Coverage` table was a hand-kept copy of
+> what `quire matrix` computes from criterion ids and trace tags. In
+> `spec-artifacts-iso` it drifted: it marked untagged criteria Complete and
+> listed criteria and a test case that do not exist (SR-028 FND-006). A hand
+> table cannot be made to agree with the thing it duplicates; it can only be
+> checked against it, and that check is a tracking ledger.
+>
+> **Dropped, not generated.** A generated table would be a second rendering of
+> the matrix committed into every module, stale the moment a tag changes, and
+> would need a generator, a freshness check and a regeneration step to stay
+> honest. `quire matrix` already renders the same view on demand from the
+> current tree, so the simplest change that removes the hand table is to stop
+> declaring it. There is no tolerance layer for the old table: a module that
+> still carries the section has prose the contract no longer reads, and deletes
+> it in its own change.
+>
+> **Scope.** Only the functional table. The `Test Case Summary` stays: it
+> declares test-case records and their `Traces To` edges, which are authored
+> facts, not derived ones. The optional stakeholder, user-story and
+> non-functional tables are untouched here; whether the non-functional table is
+> the same duplication is a separate decision for the owner.
 
 > **CR-031 note (2026-08-20):** `⚠️` is **retired** from the `Status`
 > vocabulary. agent-ix/spec-artifacts-process#52, agent-ix/quire-rs#192.

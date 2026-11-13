@@ -105,9 +105,8 @@ modules can version apart.
     [FR-007-AC-15](./FR-007-verification-method-catalog.md) — **SHALL** name a
     bare method in their own `Verification` cell (no `TC-148`/`TC-149`/`TC-150`
     in the cell), so the criteria that mint this rule do not themselves
-    violate it. `spec/tests.md` still traces each to its TC row through the
-    Functional Requirement Coverage table, which is a different column and
-    is not affected.
+    violate it. each binds to its TC row by the TC row's own
+    `Traces To` cell, which is a different column and is not affected.
   - **This module owns the `FR`/`NFR`/`interface` `Verification`-column
     contract**, because it already owns the `verification_catalog` (FR-007)
     and the obligation sources that read the cell (FR-007-AC-8/AC-15) — the
