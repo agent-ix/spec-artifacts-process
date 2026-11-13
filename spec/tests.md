@@ -7,19 +7,6 @@ type: TestMatrix
 
 ## Requirements Traceability
 
-### Stakeholder Requirement Coverage
-
-| Stakeholder Req | Trace to US/FR | Test/Validation | Status |
-|-----------------|----------------|-----------------|-----------------|
-| StR-001 | US-001, FR-001, FR-002, FR-003, FR-004 | Review | ✅ Complete |
-
-### User Story Coverage
-
-| User Story | Acceptance Criteria | Test Cases | Status |
-|------------|---------------------|------------|-----------------|
-| US-001 | US-001-EX-1, US-001-EX-2 (illustrative) | TC-001, TC-002, TC-005 | 🚧 Planned |
-| US-002 | US-002-EX-1, US-002-EX-2, US-002-EX-3 (illustrative) | TC-100 | ✅ Complete |
-
 ### Functional Requirement Coverage
 
 | Functional Req | Acceptance Criteria | Test Cases | Status |
@@ -188,7 +175,7 @@ type: TestMatrix
 |---------|-------|------|----------|-----------|--------|
 | TC-001 | Conforming TestMatrix (all tables) validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
 | TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
-| TC-003 | Doc missing the Functional Requirement Coverage table fails with reason `missing` | Unit | P1 | FR-003, FR-003-AC-1 | ✅ |
+| TC-003 | A `TestMatrix` doc validates with no `Functional Requirement Coverage` section, and with one carrying any column set, since the contract declares no functional-coverage extraction (PLAT-1499) | Unit | P1 | FR-003-AC-13 | 🚧 |
 | TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |
 | TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
 | TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
@@ -199,10 +186,10 @@ type: TestMatrix
 | TC-011 | Priority cell outside the vocabulary (`P5`, `High`) fails via `column_choices` | Unit | P0 | FR-003-AC-10 | ✅ |
 | TC-012 | Traces To valid-token permutation: each token kind (StR/US/FR/NFR bare, -AC-, -CON-, IT, IT-SC) alone and comma-separated | Unit | P1 | FR-003-AC-6 | ✅ |
 | TC-013 | Malformed Traces To rejected: semicolon separator, space-before-comma, TC token, truncated `FR--AC-1`, trailing comma | Unit | P0 | FR-003-AC-6 | ✅ |
-| TC-014 | Doc omitting the StR/US/NFR coverage tables still validates (optional extractions) | Unit | P1 | FR-003-AC-7 | ✅ |
-| TC-015 | Optional coverage table present with a wrong column set fails via column assert | Unit | P1 | FR-003-AC-7 | ✅ |
-| TC-016 | `min_rows` boundary: required table with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-1, FR-003-AC-2 | ✅ |
-| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion) | Unit | P2 | FR-003-AC-9 | ✅ |
+| TC-014 | A doc with no StR/US/NFR coverage section validates | Unit | P1 | FR-003-AC-7 | 🚧 |
+| TC-015 | A doc carrying a StR, US or NFR coverage section with any column set validates: no such section is asserted (PLAT-1499) | Unit | P1 | FR-003-AC-7 | 🚧 |
+| TC-016 | `min_rows` boundary: a `Test Case Summary` with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-2 | ✅ |
+| TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion), and the TestMatrix entry declares `test_cases` as its only extraction: no functional, stakeholder, user-story or non-functional coverage match | Unit | P2 | FR-003-AC-9, FR-003-AC-15 | ✅ |
 | TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | ✅ |
 | TC-019 | Conforming SpecReview doc validates; doc missing the Findings table fails with reason `missing` | Unit | P1 | FR-002-AC-1 | 🚧 |
 | TC-020 | Severity vocabulary permutation: low/medium/high accepted; cell outside fails via `column_choices` (reason `assert`) | Unit | P1 | FR-002-AC-2 | 🚧 |
@@ -222,7 +209,7 @@ type: TestMatrix
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
 | TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
-| TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to`, `functional-coverage` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
+| TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
 | TC-041 | The manifest declares `Inspections` with its six columns, `Note` optional, `^INSP-\d+$`, and the closed `Pass\|Fail\|Waived` verdict vocabulary (FR-006) | Unit | P0 | FR-006-AC-2 | ✅ |
 | TC-042 | `Evidence Kind` is byte-equal to the declared `test_type` vocabulary AND to the Test Matrix `Type` choices — one vocabulary, three uses. This test is what keeps the copies honest until `from_vocabulary` lands (quire-rs#146) (FR-006) | Unit | P0 | FR-006-AC-3 | ✅ |
@@ -255,7 +242,8 @@ type: TestMatrix
 | TC-072 | `test_type` carries `Inspection`/`Analysis`/`Demonstration`; `no_source_symbol` carries the first two and NOT `Demonstration` — corpus rows named a means the vocabulary had no word for, and `Inspection` rows were reported as status lies because no declared type said what they are (CR-035) | Unit | P0 | FR-004-AC-12 | ✅ |
 | TC-073 | The `Traces To` pattern admits a lone `-` and still rejects prose, `—` (pinned rejected since CR-017), `n/a` and a malformed id — every corpus row carrying `-` is retired, and there was no valid way to author one (CR-036) | Unit | P0 | FR-004-AC-13 | ✅ |
 | TC-074 | A `stakeholder-validation-criterion` target mints StR VC ids from a table; no IT or US target is declared, because their criteria are list items and headings a `section`+`id_column` target cannot mint (CR-037) | Unit | P0 | FR-004-AC-14 | ✅ |
-| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires both; the integration matrix and gap register are optional; and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
+| TC-194 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section and its authoring comment names `quire matrix` as the source of requirement-to-criterion coverage (PLAT-1499) | Unit | P1 | FR-003-AC-14 | 🚧 |
+| TC-076 | A `TestMatrixIndex` archetype requires the subsystem index and requires NEITHER leaf table, while `TestMatrix` still requires `test_cases`; the integration matrix and gap register are optional; the index table asserts `Subsystem` and `Local Matrix` only, and an index mints no test-case ids because `test-case` binds the leaf archetype only (CR-039) | Unit | P0 | FR-003-AC-12 | ✅ |
 | TC-081 | Every shipped projection declares the 2020-12 `$schema` and an `$id` matching its file name | Unit | P0 | FR-009-AC-2 | ✅ |
 | TC-082 | Every `$ref` resolves to a shipped sibling or a semantic-core model; no other host appears | Unit | P0 | FR-009-AC-3 | ✅ |
 | TC-083 | `make schemas-check` exits zero on the committed tree, and exits non-zero naming the file after one byte of a projection is changed, writing nothing | Unit | P0 | FR-009-AC-4 | ✅ |
@@ -372,12 +360,12 @@ mixed combination in one conforming document.
 
 | Constraint | Boundary Type | Test Value | Test Case | Expected |
 |------------|---------------|------------|-----------|----------|
-| min_rows (required tables) | Min | 1 data row | TC-016 | pass |
-| min_rows (required tables) | Below Min | 0 data rows (header only) | TC-016 | Error (`assert`) |
+| min_rows (Test Case Summary) | Min | 1 data row | TC-016 | pass |
+| min_rows (Test Case Summary) | Below Min | 0 data rows (header only) | TC-016 | Error (`assert`) |
 | Required table presence | Absent | Test Case Summary omitted | TC-002 | Error (`missing`) |
-| Required table presence | Absent | Functional Requirement Coverage omitted | TC-003 | Error (`missing`) |
-| Optional table presence | Absent | StR/US/NFR tables omitted | TC-014 | pass |
-| Optional table presence | Present, wrong columns | renamed column | TC-015 | Error (`assert`) |
+| Functional coverage table | Absent | Functional Requirement Coverage omitted | TC-003 | Valid (computed by `quire matrix`) |
+| Coverage tables | Absent | StR/US/NFR tables omitted | TC-014 | pass |
+| Coverage tables | Present, any columns | renamed column | TC-015 | pass (not asserted) |
 | min_rows (SpecReview Findings) | Below Min | 0 data rows (header only) | TC-019 | Error (`assert`) |
 | FR-003-CON-1 | Process gate | enforcing module version published before ecosystem `tests.md` sweep + user sign-off | Inspection (plan gate, no TC) | violation |
 | FR-009-CON-3 | Determinism | two generator runs on one tree | TC-087 | byte-identical output |

@@ -105,9 +105,8 @@ modules can version apart.
     [FR-007-AC-15](./FR-007-verification-method-catalog.md) — **SHALL** name a
     bare method in their own `Verification` cell (no `TC-148`/`TC-149`/`TC-150`
     in the cell), so the criteria that mint this rule do not themselves
-    violate it. `spec/tests.md` still traces each to its TC row through the
-    Functional Requirement Coverage table, which is a different column and
-    is not affected.
+    violate it. Each binds to its TC row by the TC row's own
+    `Traces To` cell, which is a different column and is not affected.
   - **This module owns the `FR`/`NFR`/`interface` `Verification`-column
     contract**, because it already owns the `verification_catalog` (FR-007)
     and the obligation sources that read the cell (FR-007-AC-8/AC-15) — the
@@ -218,7 +217,7 @@ modules can version apart.
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-004-AC-1 | The model declares trace targets minting test-case ids from the Test Matrix and acceptance-criterion ids from `FR`, `NFR` and `interface`, and loads without a validation error | Test (TC-028) |
-| FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`, `functional-coverage`), never one per matrix filename | Test (TC-029, TC-039) |
+| FR-004-AC-2 | Every trace target and document reference is bound by `archetype` and declares no `document` path, the Test Matrix included; matrix entries additionally declare an `exclude` covering test data; and there is exactly one entry per kind of table (`test-case`, `traces-to`), never one per matrix filename | Test (TC-029, TC-039) |
 | FR-004-AC-3 | `trace_tags.markers` declares exactly one marker for each of rust, python, typescript and shell, each declares a `template`, and the shell marker declares `syntax: comment` and `entry_paths` | Test (TC-030) |
 | FR-004-AC-5 | Every `document_references.targets` name is a declared trace target, and every `pattern` compiles with at least one capture group | Test (TC-032) |
 | FR-004-AC-6 | `quire coverage` over this repo reports a non-zero backed count and mints no rows from `tests/fixtures/` | Test (TC-033) |
