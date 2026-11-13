@@ -1263,14 +1263,22 @@ def test_the_rationale_fixtures_fail_at_the_row(name: str):
     ]
 
 
-@pytest.mark.parametrize("name", ["rationale-bad-headers", "rationale-no-rows"])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "rationale-bad-headers",
+        "rationale-no-rows",
+        "rationale-no-delimiter",
+        "rationale-bare-heading",
+        "rationale-heading-prose",
+    ],
+)
 @pytest.mark.trace("FR-016-AC-5", "TC-211")
 def test_a_section_with_other_headers_or_no_row_fails_at_the_table(name: str):
     path = INVALID[name]
     found = diagnostics(quire_validate(path))
-    assert found, "the section must fail validation"
-    assert set(finding_lines(found)) == {heading_line(path, "Release Rationale")}, found
-    assert all("release_rationale" in f for f in found)
+    assert finding_lines(found) == [heading_line(path, "Release Rationale")], found
+    assert "release_rationale" in found[0]
 
 
 @pytest.mark.trace(
@@ -1357,7 +1365,8 @@ def test_the_skeleton_has_no_release_rationale_and_nothing_defaults_or_computes_
     for rule in fields["allOf"]:
         then = rule.get("then", {}).get("properties", {})
         assert "release_rationale" not in then
-        assert then.get("release_rationale_section") in (None, False)
+        section = then.get("release_rationale_section")
+        assert section in (None, False) or list(section) == ["pattern"]
     assert "default" not in json.dumps(fields["allOf"])
 
 

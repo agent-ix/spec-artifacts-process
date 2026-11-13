@@ -81,6 +81,12 @@ scope:
   excerpt: Every diagnostic from those runs carries a line; for an absence the line is that of the `status` field.
 ```
 
+## New findings (disposition pass 2)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-004 | low | A section with headers but no data row (`rationale-no-rows`) now yields two diagnostics at the heading for one defect: the `assert` finding "table has 0 data row(s) but assert requires at least 1", and the new no-row rule. At a4141f7 it yielded one. Tests still pass, because TC-211 asserts only the heading line. Exclude that case from the new rule, or accept the duplicate with a stated reason. | spec_artifacts_process/schemas/AnomalyFields.json:169-175 |
+
 ## Dispositions
 
 | FND | Outcome | Reason |
@@ -88,3 +94,4 @@ scope:
 | FND-001 | still-open | Round 1 (head a4141f7): Partly fixed at a4141f7. A bare heading and a heading followed by prose now fail at the heading (probed). Two things remain. (1) A pipe table with no delimiter row (`\| Author \| Rationale \|` then `\| TBD \| n/a \|`) is not a table, so it has no row, and it still validates with no diagnostic, hiding two placeholder cells. `(?m)^[ \t]*\\|` only checks for a line that starts with a pipe. The exact rule is `if: {required: [release_rationale_section], not: {required: [release_rationale]}}, then: {properties: {release_rationale_section: false}}`. It is still reported at the heading line. (2) No test references `rationale-bare-heading` or `rationale-heading-prose`, so nothing asserts the fix. Add both, plus a no-delimiter fixture, to the FR-016-AC-5 / TC-211 parametrize. |
 | FND-002 | fixed | Round 1 (head a4141f7): for rule in fields["allOf"]:     then = rule.get("then", {}).get("properties", {})     assert "release_rationale" not in then     assert then.get("release_rationale_section") in (None, False) assert "default" not in json.dumps(fields["allOf"]) |
 | FND-003 | fixed | Round 1 (head a4141f7): @pytest.mark.trace("FR-016-AC-8", "TC-214") |
+| FND-001 | still-open | Round 2 (head 99cf488): The rule is fixed. The test half is not. At 99cf488 `AnomalyFields.json` carries `if: {required: [release_rationale_section], not: {required: [release_rationale]}}, then: {properties: {release_rationale_section: false}}`. Probed through `quire validate`: `rationale-no-delimiter`, `rationale-bare-heading`, `rationale-heading-prose` and a header-only, no-delimiter section each fail at the heading line (23). Prose followed by a well-formed table passes, and so do the six with/without fixtures and `closed-wont-fix-rationale`. Fixture (d) still gives 3 findings. The commit does not touch tests/test_anomaly.py. The TC-211 parametrize (line 1266) is still `["rationale-bad-headers", "rationale-no-rows"]` and no test references the three new fixtures, so nothing asserts the fix. Fix: add `rationale-no-delimiter`, `rationale-bare-heading` and `rationale-heading-prose` to that parametrize. The test body already asserts the heading line. |

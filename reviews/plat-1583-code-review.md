@@ -74,3 +74,4 @@ scope:
 | FND | Outcome | Reason |
 | --- | --- | --- |
 | FND-001 | fixed | Round 1 (head a4141f7): The xfail parameter and its reason string are removed. The case list is now ("verification-criterion-names-hazard", "HAZ-001", "Criterion"), ("verification-criterion-names-test-case", "TC-001", "Criterion"), ("verification-test-names-criterion", "FR-001-AC-1", "Test"), |
+| FND-002 | fixed | Round 2 (head 99cf488): tests/fixtures/anomaly/invalid/verification-criterion-names-requirement.md is gone; no file under tests/ names it (renamed in 99cf488 to the unrelated negative rationale-no-delimiter.md). |

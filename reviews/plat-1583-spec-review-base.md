@@ -134,3 +134,4 @@ scope:
 | FND | Outcome | Reason |
 | --- | --- | --- |
 | FND-001 | fixed | Round 1 (head a4141f7): \| TC-203 \| In that corpus, a `Criterion` row targeting the hazard, a `Criterion` row targeting `TC-001`, and a `Test` row targeting `FR-001-AC-1` each fail as a kind mismatch. \| Unit \| P1 \| FR-015-AC-15 \| ✅ \| |
+| FND-002 | fixed | Round 2 (head 99cf488): - A `Criterion` row naming an `FR` or `NFR` document resolves (quire-rs FR-049) and is not reported as a kind mismatch. |

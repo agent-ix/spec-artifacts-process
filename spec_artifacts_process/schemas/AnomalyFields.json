@@ -171,7 +171,13 @@
         "required": ["release_rationale_section"],
         "not": { "required": ["release_rationale"] }
       },
-      "then": { "properties": { "release_rationale_section": false } }
+      "then": {
+        "properties": {
+          "release_rationale_section": {
+            "pattern": "(?m)^[ \\t]*\\|[ \\t:|-]*-[ \\t:|-]*$"
+          }
+        }
+      }
     }
   ]
 }
