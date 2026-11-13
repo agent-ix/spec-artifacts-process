@@ -23,3 +23,4 @@ description: "Index of artifacts in this directory."
 * [FR-014: Anomaly archetype with a state lifecycle](./FR-014-anomaly-archetype-and-state-lifecycle.md)
 * [FR-015: Anomaly safety-impact assessment with resolving links](./FR-015-anomaly-safety-impact-assessment.md)
 * [FR-016: Anomaly release rationale: a human-authored, named reason for releasing with an anomaly open](./FR-016-anomaly-release-rationale.md)
+* [FR-017: ADR may author the design-realization verb](./FR-017-adr-design-realization-verb.md)

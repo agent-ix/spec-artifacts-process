@@ -28,6 +28,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 - The Module manifest and the contributions it declares: 6 process archetypes (adr, plan, review, spec-review, test-matrix, standard), 1 grammar (process-artifacts), and the 13 artifact types the manifest declares (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrixIndex, TestMatrix, Standard, SuiteRegistry, Inspections, Anomaly).
 - The `Anomaly` artifact type: its state, resolution, named closer and safety-impact assessment, fix verification and release rationale (US-003, FR-014, FR-015, FR-016, NFR-001).
+- The `ADR` archetype's `allowed_links`, including the design-realization verb (FR-017).
 - The templates and schemas this module ships for agent CLI generators (minijinja-cli).
 - The semantic-module contract (issue #78): a TypeSpec source importing `@agent-ix/semantic-core`, one emitted JSON Schema per declared artifact type under `spec_artifacts_process/schemas/`, the manifest `semantic` block with reference-form `data_schema`, the published Markdown mapping, and the skeletons rewritten as executable fixtures with negative counterparts.
 

@@ -72,6 +72,7 @@ artifact_types:
   - superseded_by
   - relates_to
   - depends_on
+  - realizes_requirement
   examples: []
   lint_rules_ref: []
 - name: Anomaly
