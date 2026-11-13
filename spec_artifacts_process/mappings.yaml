@@ -28,7 +28,7 @@ notes:
   - "Every section and column named below is declared by that type's `body_extraction` in manifest.yaml (FR-011-CON-1). This file names nothing the manifest does not assert."
   - "`expect:` and `because:` on the negative fixtures survive only because every frontmatter schema in this module sets `additionalProperties: true`. Tightening any of those schemas invalidates the whole negative corpus at once (SR-012 FND-006)."
   - "`provenance.digest` is computed over the LINE-ENDING-NORMALISED bytes, so one document has one digest whatever the checkout did to its line endings."
-  - "Row-id uniqueness is scoped per table, not per document: a TestMatrixIndex carries INT- and GAP- ids in different tables, and a TestMatrix carries rows in five."
+  - "Row-id uniqueness is scoped per table, not per document: a TestMatrixIndex carries INT- and GAP- ids in different tables, and a TestMatrix carries rows in one."
 
 kinds:
   - frontmatter
@@ -237,12 +237,10 @@ models:
         kind: typed-table
         heading: Requirements Traceability
         required: true
-        columns: [Subsystem, Requirements, Local Matrix, Status]
+        columns: [Subsystem, Local Matrix]
         fields:
           Subsystem: {property: subsystem, parse: text}
-          Requirements: {property: requirements, parse: text}
           Local Matrix: {property: localMatrix, parse: text}
-          Status: {property: status, parse: status-marker}
       integrationMatrix:
         kind: typed-table
         heading: Integration Test Matrix
@@ -281,16 +279,6 @@ models:
       object: {kind: frontmatter, path: [object]}
       relationships: {kind: frontmatter, path: [relationships]}
       provenance: {kind: provenance, required: true}
-      functionalCoverage:
-        kind: typed-table
-        heading: Functional Requirement Coverage
-        required: true
-        columns: [Functional Req, Acceptance Criteria, Test Cases, Status]
-        fields:
-          Functional Req: {property: functionalReq, parse: text}
-          Acceptance Criteria: {property: acceptanceCriteria, parse: text}
-          Test Cases: {property: testCases, parse: text}
-          Status: {property: status, parse: status-marker}
       testCases:
         kind: typed-table
         heading: Test Case Summary
@@ -304,33 +292,6 @@ models:
           Type: {property: type, parse: enum}
           Priority: {property: priority, parse: enum}
           Traces To: {property: tracesTo, parse: trace-tokens}
-          Status: {property: status, parse: status-marker}
-      stakeholderCoverage:
-        kind: typed-table
-        heading: Stakeholder Requirement Coverage
-        columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Status]
-        fields:
-          Stakeholder Req: {property: stakeholderReq, parse: text}
-          Trace to US/FR: {property: traceToUsFr, parse: text}
-          Test/Validation: {property: testValidation, parse: text}
-          Status: {property: status, parse: status-marker}
-      userStoryCoverage:
-        kind: typed-table
-        heading: User Story Coverage
-        columns: [User Story, Acceptance Criteria, Test Cases, Status]
-        fields:
-          User Story: {property: userStory, parse: text}
-          Acceptance Criteria: {property: acceptanceCriteria, parse: text}
-          Test Cases: {property: testCases, parse: text}
-          Status: {property: status, parse: status-marker}
-      nonFunctionalCoverage:
-        kind: typed-table
-        heading: Non-Functional Requirement Coverage
-        columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
-        fields:
-          Non-Functional Req: {property: nonFunctionalReq, parse: text}
-          Verification Method: {property: verificationMethod, parse: text}
-          Evidence/Test Cases: {property: evidence, parse: text}
           Status: {property: status, parse: status-marker}
 
   Standard:

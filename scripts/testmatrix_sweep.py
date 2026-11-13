@@ -59,9 +59,6 @@ SKIP_DIRS = {
 }
 
 SUMMARY_HEADING = re.compile(r"^##\s+Test Case Summary\s*$", re.MULTILINE)
-FR_COVERAGE_HEADING = re.compile(
-    r"^##\s+Functional Requirement Coverage\s*$", re.MULTILINE
-)
 ID_COLUMN_TABLE = re.compile(r"^\|\s*(Test ID|TC ID|ID)\s*\|", re.MULTILINE)
 
 

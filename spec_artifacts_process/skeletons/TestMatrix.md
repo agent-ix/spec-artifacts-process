@@ -9,13 +9,12 @@ type: TestMatrix
      see that skeleton.
 
      Contract (manifest body_extraction asserts, validated by `quire validate`):
-     - REQUIRED: `Functional Requirement Coverage` (columns exactly
-       Functional Req | Acceptance Criteria | Test Cases | Status)
-       and `Test Case Summary` (columns exactly
-       Test ID | Title | Type | Priority | Traces To | Status), each with
+     - REQUIRED: `Test Case Summary` (columns exactly
+       Test ID | Title | Type | Priority | Traces To | Status), with
        >= 1 data row.
-     - OPTIONAL: Stakeholder Requirement Coverage, User Story Coverage,
-       Non-Functional Requirement Coverage. Absent is fine; present is asserted.
+     - Requirement-to-criterion-to-test coverage is NOT authored here. Read it
+       from `quire matrix`, which computes it from the criteria and the tests'
+       trace tags; a hand-kept coverage table can only drift from it.
      - `Priority` is an OPTIONAL COLUMN (CR-018): a matrix that authors no
        priority anywhere omits the whole column rather than inventing values.
        When present, values are P0..P4.
@@ -39,15 +38,6 @@ type: TestMatrix
        to nothing is what a traceability matrix exists to catch. Never trace to
        another TC. -->
 # TM-001: Example module test matrix
-
-## Requirements Traceability
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 | TC-001 | ✅ Complete |
-| FR-001 | FR-001-AC-2 | TC-002 | ✅ Complete |
 
 ## Test Case Summary
 

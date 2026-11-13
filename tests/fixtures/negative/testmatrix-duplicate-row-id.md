@@ -7,14 +7,6 @@ because: "a duplicated Test ID makes record extraction by id ambiguous and a tra
 ---
 # TM-902: negative — two Test Case Summary rows sharing one id
 
-## Requirements Traceability
-
-### Functional Requirement Coverage
-
-| Functional Req | Acceptance Criteria | Test Cases | Status |
-|----------------|---------------------|------------|-----------------|
-| FR-001 | FR-001-AC-1 | TC-001 | ✅ |
-
 ## Test Case Summary
 
 | Test ID | Title | Type | Priority | Traces To | Status |

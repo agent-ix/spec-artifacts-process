@@ -415,63 +415,12 @@ model TestCaseRow {
   line: LineNumber;
 }
 
-/** One `### Functional Requirement Coverage` row (`Functional Req | Acceptance Criteria | Test Cases | Status`). */
-model FunctionalCoverageRow {
-  /** free text: the requirement cell as authored. */
-  functionalReq: NonEmptyText;
-  /** free text: the criteria cell; ranges and elisions are authored here and are not expanded. */
-  acceptanceCriteria: NonEmptyText;
-  /** free text: the test-case cell. */
-  testCases: NonEmptyText;
-  status: CoverageStatus;
-  line: LineNumber;
-}
-
-/** One `### Stakeholder Requirement Coverage` row. */
-model StakeholderCoverageRow {
-  /** free text: the stakeholder requirement cell. */
-  stakeholderReq: NonEmptyText;
-  /** free text: the US/FR trace cell. */
-  traceToUsFr: NonEmptyText;
-  /** free text: the test or validation cell. */
-  testValidation: NonEmptyText;
-  status: CoverageStatus;
-  line: LineNumber;
-}
-
-/** One `### User Story Coverage` row. */
-model UserStoryCoverageRow {
-  /** free text: the user story cell. */
-  userStory: NonEmptyText;
-  /** free text: the criteria cell. */
-  acceptanceCriteria: NonEmptyText;
-  /** free text: the test-case cell. */
-  testCases: NonEmptyText;
-  status: CoverageStatus;
-  line: LineNumber;
-}
-
-/** One `### Non-Functional Requirement Coverage` row. */
-model NonFunctionalCoverageRow {
-  /** free text: the non-functional requirement cell. */
-  nonFunctionalReq: NonEmptyText;
-  /** free text: the verification method in the author's words; the closed catalog lives in `verification_catalog`, and this column is prose. */
-  verificationMethod: NonEmptyText;
-  /** free text: the evidence or test-case cell. */
-  evidence: NonEmptyText;
-  status: CoverageStatus;
-  line: LineNumber;
-}
-
 /** One `## Requirements Traceability` row of a TestMatrixIndex: a subsystem and where its detail lives. */
 model SubsystemIndexRow {
   /** free text: the subsystem name. */
   subsystem: NonEmptyText;
-  /** free text: the requirement range this subsystem owns. */
-  requirements: NonEmptyText;
   /** The relative link that makes the matrix tree navigable; asserting it is what makes a dropped cell visible. */
   localMatrix: RelativeHref;
-  status: CoverageStatus;
   line: LineNumber;
 }
 
@@ -779,14 +728,7 @@ model TestMatrix {
   /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
   relationships?: Relationship[];
   provenance: Provenance;
-  @minItems(1) functionalCoverage: FunctionalCoverageRow[];
   @minItems(1) testCases: TestCaseRow[];
-  /** Optional: a bundle with no StR artifacts cannot truthfully populate it. */
-  stakeholderCoverage?: StakeholderCoverageRow[];
-  /** Optional, for the same reason. */
-  userStoryCoverage?: UserStoryCoverageRow[];
-  /** Optional, for the same reason. */
-  nonFunctionalCoverage?: NonFunctionalCoverageRow[];
 }
 
 /**

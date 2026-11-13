@@ -280,10 +280,9 @@ artifact_types:
 # A repository past a certain size does not have one matrix; it has a tree. The
 # root document indexes the module matrices and the detailed coverage lives one
 # level down. `TestMatrix` modelled only the leaf, so the root was permanently
-# `[missing]` on both required tables:
+# `[missing]` on its required table:
 #
 #   spec/tests.md: [TestMatrix] required 'test_cases' … is missing [missing]
-#   spec/tests.md: [TestMatrix] required 'functional_coverage' … is missing [missing]
 #
 # and there was no way to clear that without inventing content. Copying the
 # module test cases up into the root would give every TC two declaring
@@ -330,12 +329,8 @@ artifact_types:
           required: true
           multiple: true
           assert:
-            columns: [Subsystem, Requirements, Local Matrix, Status]
+            columns: [Subsystem, Local Matrix]
             min_rows: 1
-            column_patterns:
-              # Same status vocabulary as every other matrix surface, marker
-              # first and the note that says why after it (CR-016/CR-031).
-              Status: '^(✅|❌|🚧|⛔)(\s+.*)?$'
         # Cross-module integration scenarios. Optional: a repository whose
         # subsystems do not integrate has none, and requiring the table would
         # force an empty one.
@@ -379,14 +374,6 @@ artifact_types:
   body_extraction:
     yield_pattern:
       match:
-        functional_coverage:
-          from: table_row
-          under_section: Functional Requirement Coverage
-          required: true
-          multiple: true
-          assert:
-            columns: [Functional Req, Acceptance Criteria, Test Cases, Status]
-            min_rows: 1
         test_cases:
           from: table_row
           under_section: Test Case Summary
@@ -483,30 +470,6 @@ artifact_types:
               # `inspection-obligation` above; a generic word_number class
               # read `sha_256`/`retry_3` in ordinary prose as trace ids.
               Traces To: '^(-|(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+)?)?( \([^)]*\))?(, (-[A-Za-z]+-\d+(/\d+)*|(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+(/\d+)*)?(\.\.(?:[A-Za-z]+-\d+|interface_\d+)(-[A-Za-z]+-\d+)?)?)( \([^)]*\))?)*)$'
-        # Optional: the spec-matrix template emits these unconditionally, but a
-        # bundle with no StR/US/NFR artifacts cannot truthfully populate them.
-        # Absent is fine; present is asserted.
-        stakeholder_coverage:
-          from: table_row
-          under_section: Stakeholder Requirement Coverage
-          required: false
-          multiple: true
-          assert:
-            columns: [Stakeholder Req, Trace to US/FR, Test/Validation, Status]
-        user_story_coverage:
-          from: table_row
-          under_section: User Story Coverage
-          required: false
-          multiple: true
-          assert:
-            columns: [User Story, Acceptance Criteria, Test Cases, Status]
-        non_functional_coverage:
-          from: table_row
-          under_section: Non-Functional Requirement Coverage
-          required: false
-          multiple: true
-          assert:
-            columns: [Non-Functional Req, Verification Method, Evidence/Test Cases, Status]
 - name: Standard
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/standard-frontmatter.schema.json
@@ -852,8 +815,8 @@ traceability:
   # authored. The collapse removes those dead trace tags.
   #
   # Collapsing the *references* matters as much as the target: rebinding
-  # `test-case` alone leaves dead tags behind, because `traces-to` and
-  # `functional-coverage` were path-bound too and could not read the nested
+  # `test-case` alone leaves dead tags behind, because `traces-to` was
+  # path-bound too and could not read the nested
   # matrices they describe.
   #
   # Nine declarations collapse to three. `spec/matrix.md` and `spec/evals.md`
@@ -1153,16 +1116,6 @@ traceability:
       Hazard: [hazard-document]
     expand_ranges: false
     strip_annotations: false
-  - name: functional-coverage
-    archetype: TestMatrix
-    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
-    section: Functional Requirement Coverage
-    column: Test Cases
-    row_id_column: Functional Req
-    pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case]
-    expand_ranges: true
-    strip_annotations: true
 
   # ── How a test carries a trace id (FR-051) ──
   #

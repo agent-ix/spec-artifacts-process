@@ -1,4 +1,4 @@
-"""FR-003 — TestMatrix `body_extraction` contract (TC-001..TC-016, TC-018).
+"""FR-003 — TestMatrix `body_extraction` contract (TC-001..TC-018, TC-194).
 
 The harness drives the real `quire validate` against this module's manifest, so
 the tests assert the contract as an author experiences it rather than as a YAML
@@ -71,22 +71,25 @@ def assert_invalid(fixture: str, *, reason: str, mentions: str = "") -> None:
 
 @pytest.mark.trace("TC-001", "FR-003-AC-1", "FR-003-AC-8")
 def test_conforming_matrix_validates() -> None:
-    """TC-001 (FR-003-AC-1, FR-003-AC-8): a full matrix with every coverage
-    table, a mixed vocabulary, and several test-case rows validates."""
+    """TC-001 (FR-003-AC-1, FR-003-AC-8): a matrix with a mixed vocabulary and
+    several test-case rows validates."""
     assert_valid("conforming.md")
 
 
 @pytest.mark.trace("TC-014", "FR-003-AC-7")
-def test_optional_tables_omitted_still_validates() -> None:
-    """TC-014 (FR-003-AC-7): the StR/US/NFR coverage tables are optional."""
-    assert_valid("optional-tables-omitted.md")
+def test_no_coverage_section_of_any_kind_is_required() -> None:
+    """TC-014 (FR-003-AC-7): the stakeholder, user-story and non-functional
+    coverage tables are not required; a matrix with only the Test Case Summary
+    validates."""
+    assert_valid("no-coverage-section.md")
 
 
 @pytest.mark.trace("TC-015", "FR-003-AC-7")
-def test_optional_table_with_renamed_column_fails() -> None:
-    """TC-015 (FR-003-AC-7): optional means "absent is fine", not "anything
-    goes" — a present optional table still has its columns asserted."""
-    assert_invalid("optional-table-renamed-column.md", reason="assert")
+def test_a_present_coverage_section_is_not_asserted() -> None:
+    """TC-015 (FR-003-AC-7): functional, stakeholder, user-story and
+    non-functional coverage sections a matrix still carries are neither
+    required nor column-asserted, whatever their columns."""
+    assert_valid("unasserted-coverage-section.md")
 
 
 # ── TC-002 / TC-003 / TC-016: structural drift ──
@@ -98,20 +101,29 @@ def test_missing_test_case_summary_fails() -> None:
     assert_invalid("missing-test-case-summary.md", reason="missing")
 
 
-@pytest.mark.trace("TC-003", "FR-003-AC-1")
-def test_missing_functional_coverage_fails() -> None:
-    """TC-003 (FR-003-AC-1)."""
-    assert_invalid("missing-fr-coverage.md", reason="missing")
+@pytest.mark.trace("TC-003", "FR-003-AC-13")
+def test_matrix_validates_with_or_without_functional_coverage_section() -> None:
+    """TC-003 (FR-003-AC-13): no Functional Requirement Coverage section is
+    required, and one that is present has no column set asserted."""
+    assert_valid("no-coverage-section.md")
+    assert_valid("unasserted-coverage-section.md")
 
 
-@pytest.mark.parametrize(
-    "fixture", ["header-only-summary.md", "header-only-fr-coverage.md"]
-)
-@pytest.mark.trace("TC-016", "FR-003-AC-1", "FR-003-AC-2")
-def test_header_only_table_fails_min_rows(fixture: str) -> None:
-    """TC-016 (FR-003-AC-1, FR-003-AC-2): a header-only table is not a table —
-    both required extractions demand at least one row."""
-    assert_invalid(fixture, reason="assert")
+@pytest.mark.trace("TC-016", "FR-003-AC-2")
+def test_header_only_summary_fails_min_rows() -> None:
+    """TC-016 (FR-003-AC-2): a Test Case Summary with a header and zero data
+    rows fails; one with a data row passes (every conforming fixture)."""
+    assert_invalid("header-only-summary.md", reason="assert")
+
+
+@pytest.mark.trace("TC-194", "FR-003-AC-14")
+def test_skeleton_emits_no_functional_coverage_section() -> None:
+    """TC-194 (FR-003-AC-14): the shipped TestMatrix skeleton has no coverage
+    section, and its authoring comment points at `quire matrix`."""
+    text = (pack.PACK_ROOT / "skeletons" / "TestMatrix.md").read_text()
+    comment, body = text.split("-->", 1)
+    assert "Coverage" not in body, "the skeleton body emits no coverage section"
+    assert "quire matrix" in comment
 
 
 # ── TC-004 / TC-005: Type vocabulary ──
