@@ -31,13 +31,17 @@ advisory disallowed-edge-type finding although the relation still counts the edg
 
 - The `ADR` `allowed_links` SHALL include `realizes_requirement`, authored by the ADR toward the requirement it realizes.
 - The `ADR` `allowed_links` SHALL NOT include `requirement_realized_by`, which a requirement authors toward the element.
-- The existing `ADR` verbs SHALL stay listed, and a verb outside the list SHALL still draw the disallowed-edge-type finding.
+- The `ADR` `allowed_links` SHALL keep every verb it listed before this requirement.
+- A verb outside the `ADR` `allowed_links` SHALL still draw the disallowed-edge-type finding.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-017-AC-1 | `quire validate` accepts an `ADR` that authors `realizes_requirement` toward a requirement with no disallowed-edge-type finding, does not accept `requirement_realized_by` on it, and still reports a verb outside the `ADR` `allowed_links`. | Test |
+| FR-017-AC-1 | `quire validate` of an `ADR` that authors `realizes_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Test |
+| FR-017-AC-2 | `quire validate` of an `ADR` that authors `requirement_realized_by` reports a `disallowed-edge-type` finding. | Test |
+| FR-017-AC-3 | `quire validate` of an `ADR` that authors a verb outside the `ADR` `allowed_links` reports a `disallowed-edge-type` finding. | Test |
+| FR-017-AC-4 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`. | Test |
 
 ## Dependencies
 

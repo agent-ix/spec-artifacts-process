@@ -29,16 +29,32 @@ def validate(name: str) -> str:
     return result.stdout + result.stderr
 
 
-@pytest.mark.trace("FR-017-AC-1", "TC-217")
-def test_adr_may_author_realizes_requirement_but_not_unlisted_verbs() -> None:
-    adr = next(
-        a
-        for a in load_yaml_strict(MANIFEST_PATH.read_text())["artifact_types"]
-        if a["name"] == "ADR"
-    )
-    assert "realizes_requirement" in adr["allowed_links"]
-    assert "requirement_realized_by" not in adr["allowed_links"]
+def adr_links() -> list[str]:
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
+    return next(a for a in manifest["artifact_types"] if a["name"] == "ADR")[
+        "allowed_links"
+    ]
 
+
+@pytest.mark.trace("FR-017-AC-1", "TC-217")
+def test_adr_may_author_realizes_requirement() -> None:
+    assert "realizes_requirement" in adr_links()
     assert "disallowed-edge-type" not in validate("realizes_requirement")
+
+
+@pytest.mark.trace("FR-017-AC-2", "TC-218")
+def test_adr_may_not_author_the_inverse_verb() -> None:
+    assert "requirement_realized_by" not in adr_links()
     assert "disallowed-edge-type" in validate("requirement_realized_by")
+
+
+@pytest.mark.trace("FR-017-AC-3", "TC-219")
+def test_adr_unlisted_verb_still_draws_the_finding() -> None:
     assert "disallowed-edge-type" in validate("bogus_verb")
+
+
+@pytest.mark.trace("FR-017-AC-4", "TC-220")
+def test_adr_keeps_its_previous_verbs() -> None:
+    assert {"supersedes", "superseded_by", "relates_to", "depends_on"} <= set(
+        adr_links()
+    )
