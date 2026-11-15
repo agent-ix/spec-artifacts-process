@@ -57,8 +57,6 @@ def test_the_module_loads_with_every_declared_archetype(quire_engine):
 @pytest.mark.trace("TC-152", "FR-010-AC-10")
 def test_every_allowed_link_verb_is_registered(manifest):
     """Each allowed relationship verb has a local edge-type registration.
-
-    Trace: TC-152, FR-010-AC-10
     """
     allowed_verbs = {
         verb
@@ -72,6 +70,7 @@ def test_every_allowed_link_verb_is_registered(manifest):
         "validate",
         str(REPO_ROOT / "tests" / "fixtures" / "adr" / "adr-realizes_requirement.md"),
     )
+    assert result.returncode == 0, result.stderr
     unknown_edge_types = [
         line for line in result.stderr.splitlines() if "UnknownEdgeType:" in line
     ]
