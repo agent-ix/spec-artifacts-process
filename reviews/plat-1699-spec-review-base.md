@@ -1,14 +1,14 @@
 ---
-id: SR-20261113192028
-title: "Base review of PLAT-1699 FR-010 registry contract"
+id: SR-20261115084900
+title: "Base review of PLAT-1699 TC-152 registry completeness coverage"
 type: SpecReview
 analysis: base
-scope: "agent-ix/spec-artifacts-process; spec/functional/FR-010-semantic-manifest-contract.md"
+scope: "agent-ix/spec-artifacts-process; spec/tests.md"
 review_set: subset
 ---
 ## Summary
 
-Reviewed the changed FR-010 output, behavior, and AC-10 in the context of its existing contract. The new obligation has a concrete, testable result: each allowed link verb is declared in this module's registry. No spec defect was found in the changed scope.
+Reviewed the added TC-152 TestMatrix row against FR-010-AC-10, the TestMatrix row contract, trace conventions, and Quire FR-040's advisory edge diagnostics. The row has one unique TestMatrix identifier, a valid type, priority, trace target, and in-progress marker. Its oracle checks registry completeness and absence of `UnknownEdgeType` warnings, matching FR-040's advisory behavior. No finding in the changed row.
 
 ## Findings
 
@@ -18,4 +18,4 @@ Reviewed the changed FR-010 output, behavior, and AC-10 in the context of its ex
 
 ## Verdict
 
-PASS. The amendment is scoped to the module manifest contract and preserves its existing behavior.
+PASS. TC-152 is atomic and measurable for FR-010-AC-10; the 🚧 marker correctly leaves implementation coverage pending.
