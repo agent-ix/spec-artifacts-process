@@ -50,7 +50,7 @@ document with no source binding and no `as_of`.
 
 - The `DossierDocument` frontmatter schema SHALL require `id`, `title`, `version`, `document_kind` and `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept only non-empty text for `id`, `title` and `version`.
-- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` or `release-record` for `document_kind`.
+- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan`, `release-record` or `threat-model` for `document_kind`.
 - The `DossierDocument` frontmatter schema SHALL accept only `quoin dossier` for `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept `as_of` only as an RFC 3339 `date-time` instant in its upper-case `T` and `Z` form.
 - Where `document_kind` is `rmm`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
@@ -85,6 +85,7 @@ document with no source binding and no `as_of`.
 | FR-018-AC-14 | Fixtures using `document_kind` values `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` each validate with `quire validate` when their required fields are present. | Test |
 | FR-018-AC-15 | A `soup` fixture with no `as_of` validates as a gap document; the same fixture with a valid RFC 3339 `as_of` validates, while a malformed `as_of` fails `quire validate` naming `as_of`. | Test |
 | FR-018-AC-16 | The emitted record schema accepts a `soup` record both without `asOf` and with a valid RFC 3339 `asOf`, and rejects a malformed `asOf`. | Test |
+| FR-018-AC-17 | A fixture with `document_kind: threat-model` and `id: DOS-TM` validates with `quire validate` without `as_of`; the emitted record schema accepts `documentKind: threat-model` with no `asOf`; the frontmatter and record enums contain the same eleven members. | Test |
 
 ## Dependencies
 
