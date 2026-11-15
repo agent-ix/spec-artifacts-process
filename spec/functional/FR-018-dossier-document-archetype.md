@@ -31,9 +31,10 @@ free Markdown. The git commit that holds the file is the document's identity, so
 no digest and no source hash, and its record carries no `provenance`. [FR-011](./FR-011-markdown-record-mapping.md)
 gives every other model a `provenance` entry; `DossierDocument` is the one exception, and FR-011 states it.
 
-The producer names each document's `id` (for example `DOS-SRS`); this module constrains it to non-empty
-text and mints no default. The producer also decides when a document needs `as_of`; this module only
-validates what is written.
+The producer names each document's `id` (for example `DOS-SRS`); this module
+constrains it to non-empty text and mints no default. This module requires
+`as_of` for `rmm` and `soup`; the producer decides whether to include it for
+other document kinds.
 
 ## Inputs
 
@@ -82,11 +83,12 @@ validates what is written.
 | FR-018-AC-11 | The `document_kind` and `generated_by` members of the frontmatter schema equal those of the projected record schema, and the manifest `body_extraction` of `DossierDocument` declares no `choices` for either. | Test |
 | FR-018-AC-12 | `DossierDocument.json` matches a fresh projection of the TypeSpec model, so the schema generator's `--check` reports no drift. | Test |
 | FR-018-AC-13 | The emitted record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts the same record with an RFC 3339 `asOf`. | Test |
-| FR-018-AC-14 | Fixtures using each of the six M2 `document_kind` values validate with `quire validate` when their required fields are present. | Test |
-| FR-018-AC-15 | A fixture with `document_kind: soup` and no `as_of` fails `quire validate` naming `as_of`; the record schema rejects `documentKind: soup` without `asOf` and accepts it with an RFC 3339 `asOf`. | Test |
+| FR-018-AC-14 | Fixtures using `document_kind` values `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` each validate with `quire validate` when their required fields are present. | Test |
+| FR-018-AC-15 | A fixture with `document_kind: soup` and no `as_of` fails `quire validate` with a diagnostic naming `as_of`; the same fixture with a valid RFC 3339 `as_of` validates. | Test |
+| FR-018-AC-16 | The emitted record schema rejects a record with `documentKind: soup` and no `asOf`, and accepts the same record with an RFC 3339 `asOf`. | Test |
 
 ## Dependencies
 
 - **Upstream**: [FR-001](./FR-001-module-manifest-activates.md), [FR-009](./FR-009-emitted-json-schemas.md), [FR-011](./FR-011-markdown-record-mapping.md), [FR-012](./FR-012-executable-skeletons.md), quire-cli [FR-034](ix://agent-ix/quire-cli/FR-034)
-- **Downstream**: quoin [FR-191](ix://agent-ix/quoin/FR-191)
+- **Downstream**: quoin [FR-191](ix://agent-ix/quoin/FR-191) and its M2 content requirements [FR-196](ix://agent-ix/quoin/FR-196), [FR-197](ix://agent-ix/quoin/FR-197), [FR-198](ix://agent-ix/quoin/FR-198), [FR-199](ix://agent-ix/quoin/FR-199), [FR-200](ix://agent-ix/quoin/FR-200), [FR-201](ix://agent-ix/quoin/FR-201).
 - **Merge order**: quoin FR-191 defines the producer and precedes this archetype.

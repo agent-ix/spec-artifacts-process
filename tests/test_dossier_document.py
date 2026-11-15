@@ -44,8 +44,8 @@ def messages(result: subprocess.CompletedProcess, path: Path) -> list[str]:
     ]
 
 
-def fails_naming(path: Path, field: str) -> None:
-    result = validate(path)
+def fails_naming(path: Path, field: str, *, scope: Path = FIXTURES) -> None:
+    result = quire_validate(path, scope=scope)
     assert result.returncode != 0, result.stderr
     found = messages(result, path)
     assert found, result.stderr
@@ -199,7 +199,7 @@ def m2_document(kind: str, *, as_of: bool = False) -> str:
     )
 
 
-@pytest.mark.trace("FR-018-AC-14")
+@pytest.mark.trace("FR-018-AC-14", "TC-243")
 @pytest.mark.parametrize("kind", M2_KINDS)
 def test_each_m2_kind_validates(kind: str, tmp_path: Path):
     document = tmp_path / "dossier.md"
@@ -208,17 +208,18 @@ def test_each_m2_kind_validates(kind: str, tmp_path: Path):
     assert result.returncode == 0, result.stderr
 
 
-@pytest.mark.trace("FR-018-AC-15")
-def test_soup_requires_as_of_in_both_schemas(tmp_path: Path, schema_registry):
+@pytest.mark.trace("FR-018-AC-15", "TC-244")
+def test_soup_frontmatter_requires_as_of(tmp_path: Path):
     document = tmp_path / "dossier.md"
     document.write_text(m2_document("soup"))
-    result = quire_validate(document, scope=tmp_path)
-    assert result.returncode != 0, result.stderr
-    assert any("as_of" in message for message in messages(result, document))
+    fails_naming(document, "as_of", scope=tmp_path)
     document.write_text(m2_document("soup", as_of=True))
     result = quire_validate(document, scope=tmp_path)
     assert result.returncode == 0, result.stderr
 
+
+@pytest.mark.trace("FR-018-AC-16", "TC-245")
+def test_soup_record_requires_as_of(schema_registry):
     golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
     soup = {**golden, "documentKind": "soup"}
     validator = schema_registry("DossierDocument")
