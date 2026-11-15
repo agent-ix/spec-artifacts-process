@@ -13,14 +13,14 @@ relationships:
     type: "depends_on"
   - target: "ix://agent-ix/quire-cli/FR-034"
     type: "references"
-  - target: "ix://agent-ix/quoin/FR-188"
+  - target: "ix://agent-ix/quoin/FR-191"
     type: "references"
 ---
 # FR-018: DossierDocument archetype for generated submission-dossier documents
 
 ## Description
 
-`quoin dossier` ([quoin FR-188](ix://agent-ix/quoin/FR-188)) writes Markdown documents (a software
+`quoin dossier` ([quoin FR-191](ix://agent-ix/quoin/FR-191)) writes Markdown documents (a software
 requirements specification, an architecture document, a trace matrix and a requirements mapping matrix)
 into a repository, and `quire export` renders them. Both need a document type that validates, so this
 module declares the artifact type `DossierDocument`.
@@ -84,5 +84,5 @@ validates what is written.
 ## Dependencies
 
 - **Upstream**: [FR-001](./FR-001-module-manifest-activates.md), [FR-009](./FR-009-emitted-json-schemas.md), [FR-011](./FR-011-markdown-record-mapping.md), [FR-012](./FR-012-executable-skeletons.md), quire-cli [FR-034](ix://agent-ix/quire-cli/FR-034)
-- **Downstream**: quoin [FR-188](ix://agent-ix/quoin/FR-188)
-- **Merge order**: quoin FR-188 is specified in quoin#924. Land that change first, or together with this one, so the cross-repository reference resolves. This change validates without it.
+- **Downstream**: quoin [FR-191](ix://agent-ix/quoin/FR-191)
+- **Merge order**: quoin FR-191 defines the producer and precedes this archetype.
