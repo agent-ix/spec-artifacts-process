@@ -795,11 +795,11 @@ model Anomaly {
  * Dossier document record (archetype `DossierDocument`, FR-018): one generated
  * document of a submission dossier. The git commit that holds the file is its
  * identity, so the record has no `provenance` and no digest. `asOf` is required
- * for a requirements mapping matrix (`rmm`) or SOUP list (`soup`), whose
- * sources are computed at an instant.
+ * for a requirements mapping matrix (`rmm`); a source-backed SOUP list
+ * supplies it, while a SOUP gap document may omit it.
  */
 @extension("allOf", #[
-  #{ `if`: #{ `properties`: #{ `documentKind`: #{ `enum`: #["rmm", "soup"] } }, `required`: #["documentKind"] },
+  #{ `if`: #{ `properties`: #{ `documentKind`: #{ `const`: "rmm" } }, `required`: #["documentKind"] },
      `then`: #{ `required`: #["asOf"] } }
 ])
 model DossierDocument {

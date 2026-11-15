@@ -209,19 +209,26 @@ def test_each_m2_kind_validates(kind: str, tmp_path: Path):
 
 
 @pytest.mark.trace("FR-018-AC-15", "TC-244")
-def test_soup_frontmatter_requires_as_of(tmp_path: Path):
+def test_soup_frontmatter_accepts_gap_document_without_as_of(tmp_path: Path):
     document = tmp_path / "dossier.md"
     document.write_text(m2_document("soup"))
-    fails_naming(document, "as_of", scope=tmp_path)
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
     document.write_text(m2_document("soup", as_of=True))
     result = quire_validate(document, scope=tmp_path)
     assert result.returncode == 0, result.stderr
+    malformed = m2_document("soup", as_of=True).replace(
+        "2026-11-01T00:00:00Z", "2026-11-01"
+    )
+    document.write_text(malformed)
+    fails_naming(document, "as_of", scope=tmp_path)
 
 
 @pytest.mark.trace("FR-018-AC-16", "TC-245")
-def test_soup_record_requires_as_of(schema_registry):
+def test_soup_record_accepts_optional_as_of(schema_registry):
     golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
     soup = {**golden, "documentKind": "soup"}
     validator = schema_registry("DossierDocument")
-    assert list(validator.iter_errors(soup)) != []
+    assert list(validator.iter_errors(soup)) == []
     assert list(validator.iter_errors({**soup, "asOf": "2026-11-01T00:00:00Z"})) == []
+    assert list(validator.iter_errors({**soup, "asOf": "2026-11-01"})) != []

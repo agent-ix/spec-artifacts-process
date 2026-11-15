@@ -224,8 +224,8 @@ type: TestMatrix
 | TC-241 | The schema generator's `--check` reports no drift, so `DossierDocument.json` equals a fresh projection of the TypeSpec model. | Unit | P1 | FR-018-AC-12 | ✅ |
 | TC-242 | The emitted `DossierDocument` record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts it with an RFC 3339 `asOf`. | Unit | P1 | FR-018-AC-13 | ✅ |
 | TC-243 | Fixtures with each of `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` validate with `quire validate` when their required fields are present. | Unit | P1 | FR-018-AC-14 | ✅ |
-| TC-244 | A `DossierDocument` with `document_kind: soup` and no `as_of` fails `quire validate` naming `as_of`; the same document with a valid instant validates. | Unit | P1 | FR-018-AC-15 | ✅ |
-| TC-245 | The emitted `DossierDocument` record schema rejects `documentKind: soup` without `asOf` and accepts it with a valid RFC 3339 `asOf`. | Unit | P1 | FR-018-AC-16 | ✅ |
+| TC-244 | A `soup` gap document without `as_of` validates, one with a valid instant validates, and one with a malformed instant fails naming `as_of`. | Unit | P1 | FR-018-AC-15 | ✅ |
+| TC-245 | The emitted `DossierDocument` record schema accepts `documentKind: soup` with no `asOf` or a valid instant, and rejects a malformed instant. | Unit | P1 | FR-018-AC-16 | ✅ |
 
 ## Option Permutation Matrix
 

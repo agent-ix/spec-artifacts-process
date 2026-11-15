@@ -49,7 +49,7 @@
   "allOf": [
     {
       "if": {
-        "properties": { "document_kind": { "enum": ["rmm", "soup"] } },
+        "properties": { "document_kind": { "const": "rmm" } },
         "required": ["document_kind"]
       },
       "then": { "required": ["as_of"] }

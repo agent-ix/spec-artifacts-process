@@ -33,8 +33,9 @@ gives every other model a `provenance` entry; `DossierDocument` is the one excep
 
 The producer names each document's `id` (for example `DOS-SRS`); this module
 constrains it to non-empty text and mints no default. This module requires
-`as_of` for `rmm` and `soup`; the producer decides whether to include it for
-other document kinds.
+`as_of` for `rmm`. A source-backed SOUP list needs the producer's `as_of`
+under quoin FR-197, but this generic archetype also accepts a SOUP gap
+document with no source binding and no `as_of`.
 
 ## Inputs
 
@@ -53,10 +54,8 @@ other document kinds.
 - The `DossierDocument` frontmatter schema SHALL accept only `quoin dossier` for `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept `as_of` only as an RFC 3339 `date-time` instant in its upper-case `T` and `Z` form.
 - Where `document_kind` is `rmm`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
-- Where `document_kind` is `soup`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
 - The schema generator SHALL project the `DossierDocument` record schema from the `DossierDocument` TypeSpec model.
 - Where `documentKind` is `rmm`, the `DossierDocument` record schema SHALL require `asOf`.
-- Where `documentKind` is `soup`, the `DossierDocument` record schema SHALL require `asOf`.
 - The `DossierDocument` frontmatter schema SHALL be the only validation authority for the `document_kind` and `generated_by` vocabularies.
 - The `DossierDocument` TypeSpec model SHALL list the same `document_kind` and `generated_by` members as the frontmatter schema.
 - The manifest SHALL declare no `choices` for `document_kind` or `generated_by`.
@@ -84,8 +83,8 @@ other document kinds.
 | FR-018-AC-12 | `DossierDocument.json` matches a fresh projection of the TypeSpec model, so the schema generator's `--check` reports no drift. | Test |
 | FR-018-AC-13 | The emitted record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts the same record with an RFC 3339 `asOf`. | Test |
 | FR-018-AC-14 | Fixtures using `document_kind` values `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` each validate with `quire validate` when their required fields are present. | Test |
-| FR-018-AC-15 | A fixture with `document_kind: soup` and no `as_of` fails `quire validate` with a diagnostic naming `as_of`; the same fixture with a valid RFC 3339 `as_of` validates. | Test |
-| FR-018-AC-16 | The emitted record schema rejects a record with `documentKind: soup` and no `asOf`, and accepts the same record with an RFC 3339 `asOf`. | Test |
+| FR-018-AC-15 | A `soup` fixture with no `as_of` validates as a gap document; the same fixture with a valid RFC 3339 `as_of` validates, while a malformed `as_of` fails `quire validate` naming `as_of`. | Test |
+| FR-018-AC-16 | The emitted record schema accepts a `soup` record both without `asOf` and with a valid RFC 3339 `asOf`, and rejects a malformed `asOf`. | Test |
 
 ## Dependencies
 
