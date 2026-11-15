@@ -34,6 +34,7 @@ from conftest import (
 EXPECTED_ROLES = {
     "ADR": "definition",
     "Plan": "definition",
+    "DossierDocument": "definition",
     "Task": "definition",
     "Review": "definition",
     "SpecReview": "definition",
@@ -189,7 +190,7 @@ def test_no_fixture_mints_an_id():
     assert "tests/fixtures" not in coverage.stdout
 
 
-@pytest.mark.trace("TC-120")
+@pytest.mark.trace("TC-120", "FR-018-AC-7", "TC-236")
 def test_every_model_carries_exactly_one_role(mappings):
     roles = {model: spec["role"] for model, spec in mappings["models"].items()}
     assert roles == EXPECTED_ROLES

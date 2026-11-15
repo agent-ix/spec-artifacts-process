@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/DossierDocument.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "DossierDocument"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/ObjectTypeName.json"
+    },
+    "version": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "documentKind": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/DossierKind.json"
+    },
+    "generatedBy": {
+      "type": "string",
+      "const": "quoin dossier"
+    },
+    "asOf": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Rfc3339Instant.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Relationship.json"
+      },
+      "description": "Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15)."
+    },
+    "body": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Section.json",
+      "description": "free text: the whole generated body."
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "version",
+    "documentKind",
+    "generatedBy",
+    "body"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Dossier document record (archetype `DossierDocument`, FR-018): one generated\ndocument of a submission dossier. The git commit that holds the file is its\nidentity, so the record has no `provenance` and no digest. `asOf` is required\nfor a requirements mapping matrix (`rmm`), whose source is computed at an\ninstant.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "documentKind": {
+            "const": "rmm"
+          }
+        },
+        "required": [
+          "documentKind"
+        ]
+      },
+      "then": {
+        "required": [
+          "asOf"
+        ]
+      }
+    }
+  ]
+}

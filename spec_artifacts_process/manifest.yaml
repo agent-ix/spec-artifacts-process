@@ -42,6 +42,10 @@ archetypes:
   name: Test Matrix
   doc_backed: true
   supports_membership: false
+- kind: dossier-document
+  name: DossierDocument
+  doc_backed: true
+  supports_membership: false
 - kind: standard
   name: Standard
   doc_backed: true
@@ -185,6 +189,33 @@ artifact_types:
           from: section_body
           after_heading: Release Rationale
           required: false
+- name: DossierDocument
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/dossier-document-frontmatter.schema.json
+  data_schema:
+    schema: schemas/DossierDocument.json
+  allowed_links: []
+  examples: []
+  lint_rules_ref: []
+  # FR-018. One generated document of a submission dossier. Frontmatter carries
+  # the identity `quire export` needs (title, id, version); the body is free
+  # Markdown. The `document_kind` and `generated_by` vocabularies live only in
+  # the frontmatter schema; the locators here assert presence, not membership.
+  body_extraction:
+    yield_pattern:
+      match:
+        version:
+          from: frontmatter_field
+          path: [version]
+          required: true
+        document_kind:
+          from: frontmatter_field
+          path: [document_kind]
+          required: true
+        generated_by:
+          from: frontmatter_field
+          path: [generated_by]
+          required: true
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -662,6 +693,7 @@ artifact_types:
   lint_rules_ref: []
 doc_kinds:
 - adr
+- dossier-document
 - plan
 - review
 - spec-review
@@ -1933,6 +1965,7 @@ semantic:
   exports:
   - ADR
   - Anomaly
+  - DossierDocument
   - Plan
   - Task
   - Review

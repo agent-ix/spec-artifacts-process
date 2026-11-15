@@ -11,7 +11,9 @@ using AgentIx.Semantic.Core;
  * One model per declared process artifact type. Each model is the typed form of
  * the record the archetype's `body_extraction` locators already extract, plus
  * the frontmatter identity, relationships and provenance. The Markdown is the
- * authority and the record is a derived projection (FR-011).
+ * authority and the record is a derived projection (FR-011). `DossierDocument`
+ * is the one model with no `provenance`: a generated dossier document is
+ * identified by the git commit that holds it (FR-018), so no digest is recorded.
  *
  * Every model describes an **authored definition** or an **authored evidence
  * act** (FR-013). None carries a run identifier, a run timestamp, a duration, a
@@ -52,6 +54,14 @@ scalar MixedDocId extends string;
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
 scalar StandardDocId extends string;
+
+/**
+ * An RFC 3339 `date-time` instant in its upper-case `T` and `Z` form, for
+ * example `2026-11-01T00:00:00Z`. Written as a pattern because the frontmatter
+ * schema cannot rely on a `format` assertion being enforced.
+ */
+@pattern("^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$")
+scalar Rfc3339Instant extends string;
 
 /** A findings ROW id inside a SpecReview (`FND-1`). Deliberately not the `Finding` document namespace, which is `FIND-` (FR-008, FR-013). */
 @pattern("^FND-[0-9]+$")
@@ -231,6 +241,14 @@ enum AnomalySeverity {
   minor,
   major,
   critical,
+}
+
+/** The document a dossier carries. Closed in M1; the record schema and the frontmatter schema both enumerate it (FR-018). */
+enum DossierKind {
+  srs,
+  architecture,
+  `trace-matrix`,
+  rmm,
 }
 
 /** What a fix-verification row points at: an acceptance criterion or a test case. */
@@ -765,6 +783,32 @@ model Anomaly {
   @minItems(1) verification?: VerificationRow[];
   /** Absent when the section is absent; an engineer's written reason, never filled in by a tool (FR-016). */
   @minItems(1) releaseRationale?: ReleaseRationaleRow[];
+}
+
+/**
+ * Dossier document record (archetype `DossierDocument`, FR-018): one generated
+ * document of a submission dossier. The git commit that holds the file is its
+ * identity, so the record has no `provenance` and no digest. `asOf` is required
+ * for a requirements mapping matrix (`rmm`), whose source is computed at an
+ * instant.
+ */
+@extension("allOf", #[
+  #{ `if`: #{ `properties`: #{ `documentKind`: #{ `const`: "rmm" } }, `required`: #["documentKind"] },
+     `then`: #{ `required`: #["asOf"] } }
+])
+model DossierDocument {
+  id: NonEmptyText;
+  title: NonEmptyText;
+  type: "DossierDocument";
+  object?: ObjectTypeName;
+  version: NonEmptyText;
+  documentKind: DossierKind;
+  generatedBy: "quoin dossier";
+  asOf?: Rfc3339Instant;
+  /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
+  relationships?: Relationship[];
+  /** free text: the whole generated body. */
+  body: Section;
 }
 
 /**

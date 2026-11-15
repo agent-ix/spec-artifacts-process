@@ -105,6 +105,38 @@ def run_quire(
     )
 
 
+def quire_validate(
+    *paths: pathlib.Path, scope: pathlib.Path
+) -> subprocess.CompletedProcess:
+    """`quire validate` against this module only: it replaces ambient discovery."""
+    assert shutil.which("quire"), (
+        "the `quire` CLI is not on PATH; run `make semantic-install` (it installs "
+        "the quire-cli the semantic package pins, which loads the manifest "
+        "keys). The row fails rather than skips."
+    )
+    return subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--module",
+            str(PACKAGE_ROOT),
+            "--scope",
+            str(scope),
+            *map(str, paths),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def diagnostics(result: subprocess.CompletedProcess) -> list[str]:
+    """The located diagnostics of a run; engine registry warnings are not documents'."""
+    return [
+        line for line in result.stderr.splitlines() if ": line " in line and "[" in line
+    ]
+
+
 def load_manifest() -> dict[str, Any]:
     return load_yaml_strict(MANIFEST_PATH.read_text())
 

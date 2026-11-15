@@ -112,6 +112,9 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
   the named section, in document order.
 - A `provenance` mapping SHALL fill `provenance` with the document path as supplied, the SHA-256 of
   the document bytes as read, and the caller's `sourceIdentity` when one is supplied.
+- The `DossierDocument` mapping SHALL declare no `provenance` entry, because the git commit that
+  holds a generated dossier document is its identity ([FR-018](./FR-018-dossier-document-archetype.md)).
+  Every other model keeps its `provenance` entry.
 - The record SHALL carry no property that is not derivable from the document and the caller's
   provenance inputs; the Markdown is the sole authority and no default is invented.
 - If a required section, a required table, or a required cell is absent, then the mapping SHALL
