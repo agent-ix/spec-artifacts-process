@@ -109,6 +109,11 @@ def quire_validate(
     *paths: pathlib.Path, scope: pathlib.Path
 ) -> subprocess.CompletedProcess:
     """`quire validate` against this module only: it replaces ambient discovery."""
+    assert shutil.which("quire"), (
+        "the `quire` CLI is not on PATH; run `make semantic-install` (it installs "
+        "the quire-cli the semantic package pins, which loads the manifest "
+        "keys). The row fails rather than skips."
+    )
     return subprocess.run(
         [
             "quire",
