@@ -44,8 +44,8 @@ def messages(result: subprocess.CompletedProcess, path: Path) -> list[str]:
     ]
 
 
-def fails_naming(path: Path, field: str) -> None:
-    result = validate(path)
+def fails_naming(path: Path, field: str, *, scope: Path = FIXTURES) -> None:
+    result = quire_validate(path, scope=scope)
     assert result.returncode != 0, result.stderr
     found = messages(result, path)
     assert found, result.stderr
@@ -171,3 +171,64 @@ def test_record_schema_requires_as_of_for_an_rmm(schema_registry):
     assert list(validator.iter_errors(rmm)) != []
     assert list(validator.iter_errors({**rmm, "asOf": "2026-11-01T00:00:00Z"})) == []
     assert list(validator.iter_errors({**rmm, "asOf": "2026-11-01"})) != []
+
+
+M2_KINDS = (
+    "verification-report",
+    "soup",
+    "anomalies",
+    "risk-management",
+    "risk-management-plan",
+    "release-record",
+)
+
+
+def m2_document(kind: str, *, as_of: bool = False) -> str:
+    instant = "as_of: 2026-11-01T00:00:00Z\n" if as_of else ""
+    return (
+        "---\n"
+        "id: DOS-M2\n"
+        "title: M2 document\n"
+        "type: DossierDocument\n"
+        'version: "1.0"\n'
+        f"document_kind: {kind}\n"
+        "generated_by: quoin dossier\n"
+        f"{instant}"
+        "---\n"
+        "# M2 document\n"
+    )
+
+
+@pytest.mark.trace("FR-018-AC-14", "TC-243")
+@pytest.mark.parametrize("kind", M2_KINDS)
+def test_each_m2_kind_validates(kind: str, tmp_path: Path):
+    document = tmp_path / "dossier.md"
+    document.write_text(m2_document(kind, as_of=kind == "soup"))
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.trace("FR-018-AC-15", "TC-244")
+def test_soup_frontmatter_accepts_gap_document_without_as_of(tmp_path: Path):
+    document = tmp_path / "dossier.md"
+    document.write_text(m2_document("soup"))
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
+    document.write_text(m2_document("soup", as_of=True))
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
+    malformed = m2_document("soup", as_of=True).replace(
+        "2026-11-01T00:00:00Z", "2026-11-01"
+    )
+    document.write_text(malformed)
+    fails_naming(document, "as_of", scope=tmp_path)
+
+
+@pytest.mark.trace("FR-018-AC-16", "TC-245")
+def test_soup_record_accepts_optional_as_of(schema_registry):
+    golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
+    soup = {**golden, "documentKind": "soup"}
+    validator = schema_registry("DossierDocument")
+    assert list(validator.iter_errors(soup)) == []
+    assert list(validator.iter_errors({**soup, "asOf": "2026-11-01T00:00:00Z"})) == []
+    assert list(validator.iter_errors({**soup, "asOf": "2026-11-01"})) != []

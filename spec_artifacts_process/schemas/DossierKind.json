@@ -6,7 +6,13 @@
     "srs",
     "architecture",
     "trace-matrix",
-    "rmm"
+    "rmm",
+    "verification-report",
+    "soup",
+    "anomalies",
+    "risk-management",
+    "risk-management-plan",
+    "release-record"
   ],
-  "description": "The document a dossier carries. Closed in M1; the record schema and the frontmatter schema both enumerate it (FR-018)."
+  "description": "The document a dossier carries; the record and frontmatter schemas both enumerate it (FR-018)."
 }

@@ -212,7 +212,7 @@ type: TestMatrix
 | TC-229 | No `language: qsl` form is declared under `markers` or `implements`, no non-`qsl` form under `formalizes`, and no form name occurs in two of the three lists | Unit | P1 | FR-004-AC-40 | 🚧 |
 | TC-230 | A dossier fixture carrying every member validates, and the same fixture without `as_of` validates. | Unit | P1 | FR-018-AC-1 | ✅ |
 | TC-231 | A `DossierDocument` with no `version`, and one with an empty `version`, each fail `quire validate` with a diagnostic naming `version`. | Unit | P1 | FR-018-AC-2 | ✅ |
-| TC-232 | A `DossierDocument` with `document_kind: verification-report` fails `quire validate` with a diagnostic naming `document_kind`. | Unit | P1 | FR-018-AC-3 | ✅ |
+| TC-232 | A `DossierDocument` with `document_kind: not-a-dossier-kind` fails `quire validate` with a diagnostic naming `document_kind`. | Unit | P1 | FR-018-AC-3 | ✅ |
 | TC-233 | A `DossierDocument` with `generated_by: hand`, and one with no `generated_by`, each fail `quire validate` with a diagnostic naming `generated_by`. | Unit | P1 | FR-018-AC-4 | ✅ |
 | TC-234 | No property name in the `DossierDocument` frontmatter schema, record schema or mapping, and no golden-record key, contains `digest`, `hash`, `sha`, `revision` or `provenance`, and the record schema does not `$ref` `Provenance.json`. | Unit | P1 | FR-018-AC-5 | ✅ |
 | TC-235 | The shipped `DossierDocument.md` skeleton validates with `quire validate`. | Unit | P1 | FR-018-AC-6 | ✅ |
@@ -223,6 +223,9 @@ type: TestMatrix
 | TC-240 | The `document_kind` and `generated_by` members of the frontmatter schema equal those of the projected record schema, and the manifest `body_extraction` of `DossierDocument` declares no `choices` for either. | Unit | P1 | FR-018-AC-11 | ✅ |
 | TC-241 | The schema generator's `--check` reports no drift, so `DossierDocument.json` equals a fresh projection of the TypeSpec model. | Unit | P1 | FR-018-AC-12 | ✅ |
 | TC-242 | The emitted `DossierDocument` record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts it with an RFC 3339 `asOf`. | Unit | P1 | FR-018-AC-13 | ✅ |
+| TC-243 | Fixtures with each of `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` validate with `quire validate` when their required fields are present. | Unit | P1 | FR-018-AC-14 | ✅ |
+| TC-244 | A `soup` gap document without `as_of` validates, one with a valid instant validates, and one with a malformed instant fails naming `as_of`. | Unit | P1 | FR-018-AC-15 | ✅ |
+| TC-245 | The emitted `DossierDocument` record schema accepts `documentKind: soup` with no `asOf` or a valid instant, and rejects a malformed instant. | Unit | P1 | FR-018-AC-16 | ✅ |
 
 ## Option Permutation Matrix
 

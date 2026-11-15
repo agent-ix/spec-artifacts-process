@@ -53,7 +53,7 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "Dossier document record (archetype `DossierDocument`, FR-018): one generated\ndocument of a submission dossier. The git commit that holds the file is its\nidentity, so the record has no `provenance` and no digest. `asOf` is required\nfor a requirements mapping matrix (`rmm`), whose source is computed at an\ninstant.",
+  "description": "Dossier document record (archetype `DossierDocument`, FR-018): one generated\ndocument of a submission dossier. The git commit that holds the file is its\nidentity, so the record has no `provenance` and no digest. `asOf` is required\nfor a requirements mapping matrix (`rmm`); a source-backed SOUP list\nsupplies it, while a SOUP gap document may omit it.",
   "allOf": [
     {
       "if": {
