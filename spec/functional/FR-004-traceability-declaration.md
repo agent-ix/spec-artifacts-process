@@ -9,6 +9,9 @@ relationships:
   - target: "ix://agent-ix/quire-rs/spec/functional/FR-051"
     type: "requires"
     cardinality: "1:1"
+  - target: "ix://agent-ix/quire-rs/spec/functional/FR-094"
+    type: "requires"
+    cardinality: "1:1"
 ---
 # FR-004: Traceability declaration: what mints trace ids, what references them, how a test carries one
 
@@ -197,6 +200,20 @@ modules can version apart.
   never as a flag on one. `markers` mint `verifies` — evidence, which may back an
   acceptance criterion — and `implements` mints scope, which may not. A shared
   list with a discriminator field would put one typo between the two.
+- `trace_tags.formalizes` **SHALL** declare exactly one form,
+  `qsl-formalizes-comment`, as a third list beside `markers` and `implements`:
+  `language: qsl`, `syntax: comment`, pattern `^//\s*formalizes:\s*(.*)$`,
+  template `// formalizes: {ids}`, where `{ids}` renders the ids unquoted and
+  joined by `, `. The requirement record being formalized does not declare the
+  link; only the QSL source does, as a `//` marker comment above a declaration.
+  The module declares only the marker form; quire-rs FR-094
+  owns binding the marker to a declaration, minting the `formalizes` relation and
+  reporting a marker that binds nothing. A marker may be separated from its
+  declaration by blank lines and further `//` comment lines.
+  The module **SHALL NOT** declare a `language: qsl` form under `markers` or
+  `implements`, nor a form of any other language under `formalizes`: `formalizes`
+  states a requirement formally, is never evidence, and never backs an acceptance
+  criterion.
 - Every `document_references` entry **SHALL** name only declared `targets`, and
   **SHALL** opt into `expand_ranges` and `strip_annotations` where the corpus
   authors ranges (`FR-001-AC-1 .. FR-001-AC-4`) or qualifiers
@@ -245,6 +262,9 @@ modules can version apart.
 | FR-004-AC-35 | A fixture tree carrying a structural `implements` marker on a test symbol, and a `trace` marker on a production symbol, binds nothing from either, for Python and TypeScript. | Test (TC-164) |
 | FR-004-AC-36 | The Rust `Implements:` line-comment form requires `Implements:` before a comma-separated id list and binds no id from a sentence that merely names a requirement. | Test (TC-165) |
 | FR-004-AC-37 | `trace_tags.implements` declares for Python only `python-implements-decorator` and for TypeScript only `typescript-implements-decorator` then `typescript-implements-wrapper`, each templated as the Behavior section pins, and no Python or TypeScript line-comment form. | Test (TC-166) |
+| FR-004-AC-38 | `trace_tags.formalizes` declares exactly one form, `qsl-formalizes-comment`, with `language: qsl`, `syntax: comment`, pattern `^//\s*formalizes:\s*(.*)$` and template `// formalizes: {ids}`. | Test (TC-227) |
+| FR-004-AC-39 | The pattern captures the id list of `// formalizes: FR-012, FR-012-AC-3` as `FR-012, FR-012-AC-3` and of `// formalizes: ix://agent-ix/quire-rs/FR-001` as that qualified id, matches none of `formalizes: FR-001` (no `//`), `//formalizes FR-001` (no colon), `// verifies: FR-001` and `/// formalizes: FR-001`, and matches `// formalizes:`, `// formalizes:   ` and `// formalizes: ,` with an empty or comma-only capture. | Test (TC-228) |
+| FR-004-AC-40 | No form with `language: qsl` appears under `trace_tags.markers` or `trace_tags.implements`, no form of another language appears under `trace_tags.formalizes`, and no form name occurs in two of the three lists. | Test (TC-229) |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
@@ -536,7 +556,10 @@ modules can version apart.
   [FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) (coverage rollup),
   [FR-051](ix://agent-ix/quire-rs/spec/functional/FR-051) (source symbol
   extraction + trace tags) and quire-rs FR-036 (declarative `lint_rules`,
-  `table_column_values`) for AC-21
+  `table_column_values`) for AC-21, and quire-rs
+  [FR-094](ix://agent-ix/quire-rs/spec/functional/FR-094) (the `formalizes`
+  relation; AC-39's empty-capture cases are reported by the adapter under
+  FR-094-AC-15) for AC-38..AC-40
 - **Ships with (PLAT-1085, spec-artifacts-iso)**: removal of `iso`'s
   conflicting `ac-verification-method` lint rule and the `TC-…` annotation on
   its StR sibling rule. Neither module releases this contract alone.
