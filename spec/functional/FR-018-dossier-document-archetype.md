@@ -20,10 +20,10 @@ relationships:
 
 ## Description
 
-`quoin dossier` ([quoin FR-191](ix://agent-ix/quoin/FR-191)) writes Markdown documents (a software
-requirements specification, an architecture document, a trace matrix and a requirements mapping matrix)
-into a repository, and `quire export` renders them. Both need a document type that validates, so this
-module declares the artifact type `DossierDocument`.
+`quoin dossier` ([quoin FR-191](ix://agent-ix/quoin/FR-191)) writes its source-derived
+documents into a repository, and `quire export` renders them. Both need a
+document type that validates, so this module declares the artifact type
+`DossierDocument`.
 
 `quire export` reads a document's identity from the committed blob: `title`, `id` and `version`
 ([quire-cli FR-034](ix://agent-ix/quire-cli/FR-034)), and needs a version or a release. The body is
@@ -48,12 +48,14 @@ validates what is written.
 
 - The `DossierDocument` frontmatter schema SHALL require `id`, `title`, `version`, `document_kind` and `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept only non-empty text for `id`, `title` and `version`.
-- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix` or `rmm` for `document_kind`.
+- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` or `release-record` for `document_kind`.
 - The `DossierDocument` frontmatter schema SHALL accept only `quoin dossier` for `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept `as_of` only as an RFC 3339 `date-time` instant in its upper-case `T` and `Z` form.
 - Where `document_kind` is `rmm`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
+- Where `document_kind` is `soup`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
 - The schema generator SHALL project the `DossierDocument` record schema from the `DossierDocument` TypeSpec model.
 - Where `documentKind` is `rmm`, the `DossierDocument` record schema SHALL require `asOf`.
+- Where `documentKind` is `soup`, the `DossierDocument` record schema SHALL require `asOf`.
 - The `DossierDocument` frontmatter schema SHALL be the only validation authority for the `document_kind` and `generated_by` vocabularies.
 - The `DossierDocument` TypeSpec model SHALL list the same `document_kind` and `generated_by` members as the frontmatter schema.
 - The manifest SHALL declare no `choices` for `document_kind` or `generated_by`.
@@ -69,7 +71,7 @@ validates what is written.
 |----|----------|--------------|
 | FR-018-AC-1 | A fixture carrying `id`, `title`, `version`, `type`, `document_kind`, `generated_by` and `as_of` validates with `quire validate`, and the same fixture without `as_of` validates. | Test |
 | FR-018-AC-2 | A fixture with no `version`, and a fixture with an empty `version`, each fail `quire validate` with a diagnostic naming `version`. | Test |
-| FR-018-AC-3 | A fixture with `document_kind: verification-report` fails `quire validate`, with a diagnostic naming `document_kind`. | Test |
+| FR-018-AC-3 | A fixture with `document_kind: not-a-dossier-kind` fails `quire validate`, with a diagnostic naming `document_kind`. | Test |
 | FR-018-AC-4 | A fixture with `generated_by: hand` fails `quire validate`, and a fixture with no `generated_by` fails, each with a diagnostic naming `generated_by`. | Test |
 | FR-018-AC-5 | No property name in the `DossierDocument` frontmatter schema, record schema or mapping, and no key of the golden record, contains `digest`, `hash`, `sha`, `revision` or `provenance` (case-insensitive), and the record schema has no `$ref` to `Provenance.json`. | Test |
 | FR-018-AC-6 | The skeleton `DossierDocument.md` validates with `quire validate`. | Test |
@@ -80,6 +82,8 @@ validates what is written.
 | FR-018-AC-11 | The `document_kind` and `generated_by` members of the frontmatter schema equal those of the projected record schema, and the manifest `body_extraction` of `DossierDocument` declares no `choices` for either. | Test |
 | FR-018-AC-12 | `DossierDocument.json` matches a fresh projection of the TypeSpec model, so the schema generator's `--check` reports no drift. | Test |
 | FR-018-AC-13 | The emitted record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts the same record with an RFC 3339 `asOf`. | Test |
+| FR-018-AC-14 | Fixtures using each of the six M2 `document_kind` values validate with `quire validate` when their required fields are present. | Test |
+| FR-018-AC-15 | A fixture with `document_kind: soup` and no `as_of` fails `quire validate` naming `as_of`; the record schema rejects `documentKind: soup` without `asOf` and accepts it with an RFC 3339 `asOf`. | Test |
 
 ## Dependencies
 

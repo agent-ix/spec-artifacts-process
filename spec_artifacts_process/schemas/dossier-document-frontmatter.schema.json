@@ -20,7 +20,7 @@
       "minLength": 1
     },
     "document_kind": {
-      "enum": ["srs", "architecture", "trace-matrix", "rmm"]
+      "enum": ["srs", "architecture", "trace-matrix", "rmm", "verification-report", "soup", "anomalies", "risk-management", "risk-management-plan", "release-record"]
     },
     "generated_by": {
       "const": "quoin dossier"
@@ -50,6 +50,13 @@
     {
       "if": {
         "properties": { "document_kind": { "const": "rmm" } },
+        "required": ["document_kind"]
+      },
+      "then": { "required": ["as_of"] }
+    },
+    {
+      "if": {
+        "properties": { "document_kind": { "const": "soup" } },
         "required": ["document_kind"]
       },
       "then": { "required": ["as_of"] }
