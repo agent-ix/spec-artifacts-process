@@ -1322,6 +1322,19 @@ traceability:
       syntax: typescript_wrapper
       pattern: '\A(?:ixTrace\.)?implementing\(\s*("(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)"(?:\s*,\s*"(?:[A-Za-z][A-Za-z0-9_]*(?:-[A-Za-z0-9]+)*-[A-Za-z0-9]*[0-9][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)")*\s*,?)\s*\)'
       template: 'implementing({ids})'
+    # ── formalizes: which requirement a QSL declaration states formally (quire-rs FR-094) ──
+    #
+    # A third list beside `markers` and `implements`, never a flag on either: a
+    # formalization is neither verification evidence nor production scope, so it
+    # never backs an acceptance criterion. Only QSL source carries the marker, as
+    # a `//` comment above a declaration; the engine binds it. The capture may be
+    # empty so the engine, not this pattern, reports a marker that names no id.
+    formalizes:
+    - name: qsl-formalizes-comment
+      language: qsl
+      syntax: comment
+      pattern: '^//\s*formalizes:\s*(.*)$'
+      template: '// formalizes: {ids}'
   status:
     column: Status
     complete: ["✅"]

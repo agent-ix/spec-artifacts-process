@@ -1090,3 +1090,75 @@ def _testmatrix_extraction() -> dict:
                 "assert"
             ]
     raise AssertionError("TestMatrix archetype not declared")
+
+
+def _formalizes_form(traceability: dict) -> dict:
+    return traceability["trace_tags"]["formalizes"][0]
+
+
+@pytest.mark.trace("TC-227", "FR-004-AC-38")
+def test_formalizes_declares_one_qsl_comment_form(traceability: dict) -> None:
+    """TC-227 (FR-004-AC-38): `trace_tags.formalizes` holds exactly the QSL
+    comment form."""
+    forms = traceability["trace_tags"]["formalizes"]
+    assert len(forms) == 1
+    assert forms[0] == {
+        "name": "qsl-formalizes-comment",
+        "language": "qsl",
+        "syntax": "comment",
+        "pattern": r"^//\s*formalizes:\s*(.*)$",
+        "template": "// formalizes: {ids}",
+    }
+
+
+@pytest.mark.trace("TC-228", "FR-004-AC-39")
+def test_formalizes_pattern_captures_ids_and_rejects_other_lines(
+    traceability: dict,
+) -> None:
+    """TC-228 (FR-004-AC-39): the pattern captures the id list and matches only
+    a `//` formalizes marker."""
+    pattern = re.compile(_formalizes_form(traceability)["pattern"])
+
+    for line, ids in [
+        ("// formalizes: FR-001", "FR-001"),
+        ("// formalizes: FR-012, FR-012-AC-3", "FR-012, FR-012-AC-3"),
+        (
+            "// formalizes: ix://agent-ix/quire-rs/FR-001",
+            "ix://agent-ix/quire-rs/FR-001",
+        ),
+    ]:
+        match = pattern.match(line)
+        assert match, line
+        assert match.group(1) == ids
+
+    for line in [
+        "formalizes: FR-001",
+        "//formalizes FR-001",
+        "// verifies: FR-001",
+        "/// formalizes: FR-001",
+    ]:
+        assert not pattern.match(line), line
+
+    for line, capture in [
+        ("// formalizes:", ""),
+        ("// formalizes:   ", ""),
+        ("// formalizes: ,", ","),
+    ]:
+        match = pattern.match(line)
+        assert match, line
+        assert match.group(1) == capture
+
+
+@pytest.mark.trace("TC-229", "FR-004-AC-40")
+def test_formalizes_is_the_only_list_holding_qsl_forms(traceability: dict) -> None:
+    """TC-229 (FR-004-AC-40): QSL forms stay out of `markers` and `implements`,
+    other languages stay out of `formalizes`, and no form name repeats."""
+    tags = traceability["trace_tags"]
+    for key in ("markers", "implements"):
+        assert not [f for f in tags[key] if f["language"] == "qsl"], key
+    assert all(f["language"] == "qsl" for f in tags["formalizes"])
+
+    names = [
+        f["name"] for key in ("markers", "implements", "formalizes") for f in tags[key]
+    ]
+    assert len(names) == len(set(names))
