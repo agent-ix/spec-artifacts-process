@@ -54,11 +54,11 @@ def test_the_module_loads_with_every_declared_archetype(quire_engine):
     assert set(artifact_type_names()) <= set(current)
 
 
-@pytest.mark.trace("FR-010-AC-10")
+@pytest.mark.trace("TC-152", "FR-010-AC-10")
 def test_every_allowed_link_verb_is_registered(manifest):
     """Each allowed relationship verb has a local edge-type registration.
 
-    Trace: FR-010-AC-10
+    Trace: TC-152, FR-010-AC-10
     """
     allowed_verbs = {
         verb
