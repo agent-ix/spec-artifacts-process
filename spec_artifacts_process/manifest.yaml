@@ -1896,6 +1896,28 @@ verification_catalog:
       characteristics: [agent-behaviour, non-deterministic-subject]
     tooling: [eval harness]
 
+# ── Edge-type registry (quire-rs FR-040) ─────────────────────────────────
+# Every artifact type's allowed_links verbs are registered here so Quire can
+# validate the module's relationship vocabulary without relying on another
+# loaded module.
+edge_types:
+  # structural
+  contains: { description: "Composition; the source owns the target's lifecycle.", category: structural, inverse: contained_in, composite: true }
+  # dependency
+  blocks: { description: "Source blocks progress on or resolution of the target.", category: dependency, inverse: blocked_by }
+  depends_on: { description: "Requires the target to exist/function.", category: dependency }
+  # realization
+  realizes_requirement: { description: "An ADR records the design decision that realizes the target requirement.", category: realization }
+  # traceability
+  covers: { description: "A test/matrix covers the target requirement.", category: traceability, inverse: covered_by }
+  found_in: { description: "A finding was identified in the target.", category: traceability }
+  references: { description: "Loose, untyped linkage.", category: traceability }
+  relates_to: { description: "Loose associative link between decisions/records.", category: traceability }
+  reviews: { description: "A review assesses the target artifact.", category: traceability, inverse: reviewed_by }
+  superseded_by: { description: "The source artifact was replaced by the target.", category: traceability }
+  supersedes: { description: "Replaces a prior artifact.", category: traceability, inverse: superseded_by }
+  verifies: { description: "Test/integration artifact verifies a requirement.", category: traceability }
+
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
 # `exports` names every artifact type carrying a `data_schema` reference.
 #
