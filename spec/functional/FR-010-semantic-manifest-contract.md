@@ -32,6 +32,8 @@ validated by its locator and the `Standard` frontmatter schema (see Behavior).
 
 - `manifest.yaml` carrying a `semantic` block and a reference-form
   `data_schema` on each of the twelve declared artifact types.
+- `manifest.yaml` carrying an `edge_types` registry that declares every verb
+  used by an artifact type's `allowed_links`.
 
 ## Behavior
 
@@ -45,6 +47,9 @@ validated by its locator and the `Standard` frontmatter schema (see Behavior).
   `SuiteRegistry`, `Inspections`.
 - Every declared artifact type SHALL carry `data_schema: { schema: schemas/<Model>.json }`.
 - No artifact type SHALL carry an inline `data_schema`.
+- Every verb listed in any artifact type's `allowed_links` SHALL be a key in
+  this module's top-level `edge_types` registry. This module SHALL NOT rely on
+  another loaded module to declare one of its allowed link verbs.
 - `manifest_version` SHALL stay `1.0.0`, because it names the manifest format
   rather than this module.
 - The `Status` column pattern `^(✅|❌|🚧|⛔)(\s+.*)?$` SHALL admit exactly the four markers it names.
@@ -82,6 +87,7 @@ validated by its locator and the `Standard` frontmatter schema (see Behavior).
 | FR-010-AC-6 | A manifest copy whose `semantic` block gains a key `foo` is refused by the loader. | Test (TC-094) |
 | FR-010-AC-8 | The `object_types` entry `standard` carries no `data_schema` and its locator requires `code` from frontmatter, while the artifact type `Standard` carries the reference form; a document is dispatched on frontmatter `type:` to the artifact type and on `object:` to the object type. | Test (TC-096) |
 | FR-010-AC-9 | The refusal of an unknown `semantic` key names the key. Both refusals are silent, so this criterion is a **strict expected failure** naming `agent-ix/quire-rs#221`: the test asserts the current silence and turns red the day the engine starts naming them. It is never skipped — a skipped row is not coverage. | Test (TC-135) |
+| FR-010-AC-10 | Every verb key in every artifact type's `allowed_links` is present in this module's top-level `edge_types` registry. | Test |
 
 ## Dependencies
 
