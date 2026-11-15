@@ -13,6 +13,7 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     artifact_type_names,
+    run_quire,
 )
 
 ADMITTED_SEMANTIC_KEYS = {
@@ -51,6 +52,28 @@ def test_the_module_loads_with_every_declared_archetype(quire_engine):
     (agent-ix/quire-rs#221), so the archetype set is compared, not merely counted."""
     current = quire_engine.Registry.load_from([str(REPO_ROOT)]).archetype_names()
     assert set(artifact_type_names()) <= set(current)
+
+
+@pytest.mark.trace("TC-152", "FR-010-AC-10")
+def test_every_allowed_link_verb_is_registered(manifest):
+    """Each allowed relationship verb has a local edge-type registration."""
+    allowed_verbs = {
+        verb
+        for artifact_type in manifest["artifact_types"]
+        for verb in artifact_type.get("allowed_links", {})
+    }
+    registered_verbs = set(manifest.get("edge_types", {}))
+    assert allowed_verbs <= registered_verbs
+
+    result = run_quire(
+        "validate",
+        str(REPO_ROOT / "tests" / "fixtures" / "adr" / "adr-realizes_requirement.md"),
+    )
+    assert result.returncode == 0, result.stderr
+    unknown_edge_types = [
+        line for line in result.stderr.splitlines() if "UnknownEdgeType:" in line
+    ]
+    assert not unknown_edge_types
 
 
 @pytest.mark.trace("TC-094", "FR-010-AC-6")
