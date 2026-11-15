@@ -210,6 +210,19 @@ type: TestMatrix
 | TC-227 | The loaded manifest declares `trace_tags.formalizes` with exactly one form, `qsl-formalizes-comment`, with language `qsl`, syntax `comment`, the pinned pattern and the pinned template | Unit | P1 | FR-004-AC-38 | 🚧 |
 | TC-228 | The `qsl-formalizes-comment` pattern captures the id list of a single-id, multi-id and `ix://`-qualified marker, matches none of an unprefixed line, a missing colon, another verb and a `///` line, and matches an empty or comma-only list with an empty or comma-only capture | Unit | P1 | FR-004-AC-39 | 🚧 |
 | TC-229 | No `language: qsl` form is declared under `markers` or `implements`, no non-`qsl` form under `formalizes`, and no form name occurs in two of the three lists | Unit | P1 | FR-004-AC-40 | 🚧 |
+| TC-230 | A dossier fixture carrying every member validates, and the same fixture without `as_of` validates. | Unit | P1 | FR-018-AC-1 | ✅ |
+| TC-231 | A `DossierDocument` with no `version`, and one with an empty `version`, each fail `quire validate` with a diagnostic naming `version`. | Unit | P1 | FR-018-AC-2 | ✅ |
+| TC-232 | A `DossierDocument` with `document_kind: verification-report` fails `quire validate` with a diagnostic naming `document_kind`. | Unit | P1 | FR-018-AC-3 | ✅ |
+| TC-233 | A `DossierDocument` with `generated_by: hand`, and one with no `generated_by`, each fail `quire validate` with a diagnostic naming `generated_by`. | Unit | P1 | FR-018-AC-4 | ✅ |
+| TC-234 | No property name in the `DossierDocument` frontmatter schema, record schema or mapping, and no golden-record key, contains `digest`, `hash`, `sha`, `revision` or `provenance`, and the record schema does not `$ref` `Provenance.json`. | Unit | P1 | FR-018-AC-5 | ✅ |
+| TC-235 | The shipped `DossierDocument.md` skeleton validates with `quire validate`. | Unit | P1 | FR-018-AC-6 | ✅ |
+| TC-236 | `DossierDocument` carries the role `definition` in `mappings.yaml`. | Unit | P1 | FR-018-AC-7 | ✅ |
+| TC-237 | A `DossierDocument` with `document_kind: rmm` and no `as_of` fails `quire validate` naming `as_of`; the same with an `as_of` validates. | Unit | P1 | FR-018-AC-8 | ✅ |
+| TC-238 | A `DossierDocument` whose `as_of` is the date `2026-11-01` fails `quire validate` naming `as_of`. | Unit | P1 | FR-018-AC-9 | ✅ |
+| TC-239 | A `DossierDocument` with `id: SRS-2026` validates, one with an empty `id` fails naming `id`, and the manifest declares no `id_pattern` default for it. | Unit | P1 | FR-018-AC-10 | ✅ |
+| TC-240 | The `document_kind` and `generated_by` members of the frontmatter schema equal those of the projected record schema, and the manifest `body_extraction` of `DossierDocument` declares no `choices` for either. | Unit | P1 | FR-018-AC-11 | ✅ |
+| TC-241 | The schema generator's `--check` reports no drift, so `DossierDocument.json` equals a fresh projection of the TypeSpec model. | Unit | P1 | FR-018-AC-12 | ✅ |
+| TC-242 | The emitted `DossierDocument` record schema rejects a record with `documentKind: rmm` and no `asOf`, and accepts it with an RFC 3339 `asOf`. | Unit | P1 | FR-018-AC-13 | ✅ |
 
 ## Option Permutation Matrix
 

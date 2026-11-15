@@ -10,8 +10,8 @@ generated_by: quoin dossier
      - Frontmatter: `type: DossierDocument`; `id` such as DOS-SRS; `title`;
        `version` (required: quire export needs a Version or a Release);
        `document_kind` is srs|architecture|trace-matrix|rmm; `generated_by` is
-       `quoin dossier`; `as_of` is an ISO-8601 instant, present only where the
-       source needs one (for example an rmm).
+       `quoin dossier`; `as_of` is an RFC 3339 instant (for example
+       2026-11-01T00:00:00Z), required when `document_kind` is rmm.
      - The body is free Markdown. By convention it ends with a level-2 `Gaps`
        heading listing one bullet per missing input, or `Gaps: none`.
      - No digest and no recorded source hash: the commit holding the file is its

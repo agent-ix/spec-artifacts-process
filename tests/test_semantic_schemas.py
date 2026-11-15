@@ -95,7 +95,7 @@ def test_every_ref_resolves_to_a_sibling_or_to_semantic_core():
             ), f"{path.name} refs a missing sibling: {ref}"
 
 
-@pytest.mark.trace("TC-083")
+@pytest.mark.trace("TC-083", "FR-018-AC-12", "TC-241")
 def test_check_is_clean_and_fails_on_one_changed_byte(sandbox: Path):
     assert run_generator(["--check"], cwd=sandbox).returncode == 0
     victim = sandbox.parent / "schemas" / "SpecReview.json"

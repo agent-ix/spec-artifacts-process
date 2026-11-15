@@ -27,6 +27,7 @@ import importlib.util
 import json
 import shutil
 import subprocess
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -36,8 +37,10 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     SKELETONS_DIR,
+    diagnostics,
     frontmatter,
 )
+from conftest import quire_validate as shared_quire_validate
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "anomaly"
 CORPUS = FIXTURES / "corpus"
@@ -59,29 +62,7 @@ PLACEHOLDERS = [
 ]
 
 
-def quire_validate(*paths: Path, scope: Path = FIXTURES) -> subprocess.CompletedProcess:
-    """`quire validate` against this module only: it replaces ambient discovery."""
-    return subprocess.run(
-        [
-            "quire",
-            "validate",
-            "--module",
-            str(PACKAGE_ROOT),
-            "--scope",
-            str(scope),
-            *map(str, paths),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-
-def diagnostics(result: subprocess.CompletedProcess) -> list[str]:
-    """The located diagnostics of a run; engine registry warnings are not documents'."""
-    return [
-        line for line in result.stderr.splitlines() if ": line " in line and "[" in line
-    ]
+quire_validate = partial(shared_quire_validate, scope=FIXTURES)
 
 
 def record_errors(mapper, schema_registry, path: Path) -> list:

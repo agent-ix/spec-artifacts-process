@@ -194,14 +194,13 @@ artifact_types:
   frontmatter_schema_ref: schemas/dossier-document-frontmatter.schema.json
   data_schema:
     schema: schemas/DossierDocument.json
-  defaults:
-    id_pattern: DOS-{next:03d}
   allowed_links: []
   examples: []
   lint_rules_ref: []
   # FR-018. One generated document of a submission dossier. Frontmatter carries
   # the identity `quire export` needs (title, id, version); the body is free
-  # Markdown. Vocabularies are asserted here, as for Anomaly.
+  # Markdown. The `document_kind` and `generated_by` vocabularies live only in
+  # the frontmatter schema; the locators here assert presence, not membership.
   body_extraction:
     yield_pattern:
       match:
@@ -213,14 +212,10 @@ artifact_types:
           from: frontmatter_field
           path: [document_kind]
           required: true
-          assert:
-            choices: [srs, architecture, trace-matrix, rmm]
         generated_by:
           from: frontmatter_field
           path: [generated_by]
           required: true
-          assert:
-            choices: [quoin dossier]
 - name: Plan
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/plan-frontmatter.schema.json
@@ -1970,6 +1965,7 @@ semantic:
   exports:
   - ADR
   - Anomaly
+  - DossierDocument
   - Plan
   - Task
   - Review
