@@ -77,6 +77,25 @@ models:
       state: {kind: frontmatter, path: [state]}
       body: {kind: section, whole_body: true, required: true}
 
+  DossierDocument:
+    archetype: DossierDocument
+    role: definition
+    notes:
+      - "A generated document of a submission dossier. The commit holding the file is its identity; no digest is recorded."
+    dropped_frontmatter_keys: [priority, owner, tags]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      object: {kind: frontmatter, path: [object]}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      version: {kind: frontmatter, path: [version], required: true}
+      documentKind: {kind: frontmatter, path: [document_kind], required: true}
+      generatedBy: {kind: frontmatter, path: [generated_by], required: true}
+      asOf: {kind: frontmatter, path: [as_of]}
+      body: {kind: section, whole_body: true, required: true}
+
   Plan:
     archetype: Plan
     role: definition

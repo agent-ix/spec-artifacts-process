@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/DossierDocument.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "DossierDocument"
+    },
+    "object": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/ObjectTypeName.json"
+    },
+    "version": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "documentKind": {
+      "type": "string",
+      "enum": ["srs", "architecture", "trace-matrix", "rmm"]
+    },
+    "generatedBy": {
+      "type": "string",
+      "const": "quoin dossier"
+    },
+    "asOf": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json",
+      "description": "ISO-8601 instant; present only where the source needs one."
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Relationship.json"
+      }
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Provenance.json"
+    },
+    "body": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Section.json",
+      "description": "free text: the whole generated body."
+    }
+  },
+  "required": ["id", "title", "type", "version", "documentKind", "generatedBy", "provenance", "body"],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "Dossier document record (archetype `DossierDocument`). One generated document of a submission dossier. The commit that holds the file is its identity; it carries no digest."
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["id", "title", "type", "version", "document_kind", "generated_by"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DOS-[A-Z0-9]+(-[A-Z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "const": "DossierDocument"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_kind": {
+      "enum": ["srs", "architecture", "trace-matrix", "rmm"]
+    },
+    "generated_by": {
+      "const": "quoin dossier"
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 1
+    },
+    "object": {
+      "type": "string"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "target": { "type": "string", "pattern": "^ix://" },
+          "type": { "type": "string" },
+          "cardinality": { "type": "string" }
+        }
+      }
+    }
+  }
+}

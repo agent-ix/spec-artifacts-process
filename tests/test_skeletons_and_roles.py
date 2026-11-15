@@ -34,6 +34,7 @@ from conftest import (
 EXPECTED_ROLES = {
     "ADR": "definition",
     "Plan": "definition",
+    "DossierDocument": "definition",
     "Task": "definition",
     "Review": "definition",
     "SpecReview": "definition",
