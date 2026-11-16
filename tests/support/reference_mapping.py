@@ -634,14 +634,16 @@ class ReferenceMapper:
             keyword, _, value = item.partition(":")
             keyword, value = keyword.strip(), value.strip()
             if keyword == "pattern":
-                constraints.append({
-                    "kind": "PatternConstraint",
-                    "value": {
-                        "keyword": "pattern",
-                        "regex": value,
-                        "dialect": "ecma-262",
-                    },
-                })
+                constraints.append(
+                    {
+                        "kind": "PatternConstraint",
+                        "value": {
+                            "keyword": "pattern",
+                            "regex": value,
+                            "dialect": "ecma-262",
+                        },
+                    }
+                )
             elif keyword in ("minLength", "maxLength", "min", "max"):
                 kind = {
                     "minLength": "MinLengthConstraint",
@@ -649,20 +651,26 @@ class ReferenceMapper:
                     "min": "MinConstraint",
                     "max": "MaxConstraint",
                 }[keyword]
-                constraints.append({
-                    "kind": kind,
-                    "value": {"keyword": keyword, "value": int(value)},
-                })
+                constraints.append(
+                    {
+                        "kind": kind,
+                        "value": {"keyword": keyword, "value": int(value)},
+                    }
+                )
             elif keyword == "format":
-                constraints.append({
-                    "kind": "FormatConstraint",
-                    "value": {"keyword": "format", "name": f"ix:{value}"},
-                })
+                constraints.append(
+                    {
+                        "kind": "FormatConstraint",
+                        "value": {"keyword": "format", "name": f"ix:{value}"},
+                    }
+                )
             elif keyword == "nonEmpty":
-                constraints.append({
-                    "kind": "NonEmptyConstraint",
-                    "value": {"keyword": "nonEmpty"},
-                })
+                constraints.append(
+                    {
+                        "kind": "NonEmptyConstraint",
+                        "value": {"keyword": "nonEmpty"},
+                    }
+                )
             else:
                 raise MappingFailure(
                     [
