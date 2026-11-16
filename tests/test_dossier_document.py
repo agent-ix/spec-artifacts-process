@@ -184,7 +184,10 @@ def test_record_schema_only_omits_version_for_records_of_processing(schema_regis
     assert list(validator.iter_errors({**processing, "documentKind": "srs"})) != []
     assert "records-of-processing" in schema("DossierKind.json")["enum"]
     frontmatter_schema = schema("dossier-document-frontmatter.schema.json")
-    assert "records-of-processing" in frontmatter_schema["properties"]["document_kind"]["enum"]
+    assert (
+        "records-of-processing"
+        in frontmatter_schema["properties"]["document_kind"]["enum"]
+    )
     assert list(schema_registry("DossierDocument").iter_errors(processing)) == []
 
 
@@ -247,7 +250,14 @@ def test_threat_model_validates_without_as_of(tmp_path: Path, schema_registry):
     result = quire_validate(document, scope=tmp_path)
     assert result.returncode == 0, result.stderr
     golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
-    assert list(schema_registry("DossierDocument").iter_errors({**golden, "documentKind": "threat-model"})) == []
+    assert (
+        list(
+            schema_registry("DossierDocument").iter_errors(
+                {**golden, "documentKind": "threat-model"}
+            )
+        )
+        == []
+    )
 
 
 @pytest.mark.trace("FR-018-AC-15", "TC-244")
