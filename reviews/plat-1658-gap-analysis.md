@@ -28,3 +28,10 @@ Reconciliation: quire matrix (quire 0.46.0, engine 0.61.0) — no run evidence r
 | --- | --- | --- | --- |
 | FND-001 | high | The computed matrix reports FR-018-AC-17 untagged: its test cites undeclared TC-247, so the test marker does not back the criterion. | tests/test_dossier_document.py:246-247 |
 | FND-002 | high | The computed matrix reports FR-018-AC-18 untagged: its tests cite undeclared TC-246, so neither marker backs the criterion. | tests/test_dossier_document.py:176-177,229-230 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | Commit 8f92751 adds TC-247 to spec/tests.md with FR-018-AC-17; Quire 0.46.0 now reports the criterion tagged with the threat-model test as a binder. |
+| FND-002 | fixed | Commit 8f92751 adds TC-246 to spec/tests.md with FR-018-AC-18; Quire 0.46.0 now reports the criterion tagged with both records-of-processing tests as binders. |
