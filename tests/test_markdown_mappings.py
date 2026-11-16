@@ -19,6 +19,7 @@ from conftest import (
     MAPPINGS_SCHEMA_PATH,
     PACKAGE_ROOT,
     SCHEMAS_DIR,
+    SEMANTIC_CORE_DIR,
     SKELETONS_DIR,
     artifact_type_names,
     frontmatter,
@@ -195,6 +196,21 @@ def test_the_golden_record_is_reproduced_exactly(mapper, model: str):
 
 
 @pytest.mark.trace("TC-115")
+def test_kernel_scalar_targets_follow_the_installed_semantic_core_schema(mapper):
+    scalar_schema = json.loads((SEMANTIC_CORE_DIR / "KernelScalar.json").read_text())
+    for scalar in scalar_schema["enum"]:
+        field = mapper._to_field(
+            "Standard",
+            {"name": "value", "type": scalar, "multiplicity": "1..1"},
+            1,
+        )
+        assert field["type"]["target"] == {
+            "kind": "KernelScalar",
+            "value": scalar,
+        }
+
+
+@pytest.mark.trace("TC-115")
 def test_the_two_standard_forms_declare_the_same_fields(mapper):
     table = build(mapper, "Standard", skeleton("Standard.md"), "skeletons/Standard.md")
     fence = build(
@@ -202,6 +218,33 @@ def test_the_two_standard_forms_declare_the_same_fields(mapper):
     )
     assert table["properties"] == fence["properties"]
     assert table["invariants"] == fence["invariants"]
+    properties = {field["name"]: field for field in table["properties"]}
+    assert properties["code"]["type"]["target"] == {
+        "kind": "KernelScalar",
+        "value": "String",
+    }
+    assert properties["code"]["constraints"] == [
+        {
+            "kind": "PatternConstraint",
+            "value": {
+                "keyword": "pattern",
+                "regex": "^[a-z0-9][a-z0-9.-]*$",
+                "dialect": "ecma-262",
+            },
+        }
+    ]
+    assert properties["title"]["constraints"] == [
+        {
+            "kind": "MinLengthConstraint",
+            "value": {"keyword": "minLength", "value": 1},
+        }
+    ]
+    assert properties["link"]["constraints"] == [
+        {
+            "kind": "FormatConstraint",
+            "value": {"keyword": "format", "name": "ix:iri"},
+        }
+    ]
     # Provenance differs by construction: the two files are different bytes.
     for record in (table, fence):
         record.pop("provenance")

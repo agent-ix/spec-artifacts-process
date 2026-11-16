@@ -45,7 +45,6 @@
     "id",
     "title",
     "type",
-    "version",
     "documentKind",
     "generatedBy",
     "body"
@@ -53,7 +52,7 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "Dossier document record (archetype `DossierDocument`, FR-018): one generated\ndocument of a submission dossier. The git commit that holds the file is its\nidentity, so the record has no `provenance` and no digest. `asOf` is required\nfor a requirements mapping matrix (`rmm`); a source-backed SOUP list\nsupplies it, while a SOUP gap document may omit it.",
+  "description": "Dossier document record (archetype `DossierDocument`, FR-018): one generated\ndocument of a submission dossier. `version` is required for every kind\nexcept `records-of-processing`; `asOf` is required for a requirements mapping\nmatrix (`rmm`). A source-backed SOUP list supplies `asOf`, while a SOUP gap\ndocument may omit it.",
   "allOf": [
     {
       "if": {
@@ -69,6 +68,25 @@
       "then": {
         "required": [
           "asOf"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "documentKind": {
+            "not": {
+              "const": "records-of-processing"
+            }
+          }
+        },
+        "required": [
+          "documentKind"
+        ]
+      },
+      "then": {
+        "required": [
+          "version"
         ]
       }
     }

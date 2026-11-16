@@ -173,6 +173,24 @@ def test_record_schema_requires_as_of_for_an_rmm(schema_registry):
     assert list(validator.iter_errors({**rmm, "asOf": "2026-11-01"})) != []
 
 
+@pytest.mark.trace("FR-018-AC-18", "TC-246")
+def test_record_schema_only_omits_version_for_records_of_processing(schema_registry):
+    golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
+    validator = schema_registry("DossierDocument")
+    processing = {key: value for key, value in golden.items() if key != "version"}
+    processing["documentKind"] = "records-of-processing"
+    assert list(validator.iter_errors(processing)) == []
+    assert list(validator.iter_errors({**processing, "version": ""})) != []
+    assert list(validator.iter_errors({**processing, "documentKind": "srs"})) != []
+    assert "records-of-processing" in schema("DossierKind.json")["enum"]
+    frontmatter_schema = schema("dossier-document-frontmatter.schema.json")
+    assert (
+        "records-of-processing"
+        in frontmatter_schema["properties"]["document_kind"]["enum"]
+    )
+    assert list(schema_registry("DossierDocument").iter_errors(processing)) == []
+
+
 M2_KINDS = (
     "verification-report",
     "soup",
@@ -206,6 +224,40 @@ def test_each_m2_kind_validates(kind: str, tmp_path: Path):
     document.write_text(m2_document(kind, as_of=kind == "soup"))
     result = quire_validate(document, scope=tmp_path)
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.trace("FR-018-AC-18", "TC-246")
+def test_records_of_processing_validates_without_a_version(tmp_path: Path):
+    document = tmp_path / "records-of-processing.md"
+    document.write_text(
+        "---\n"
+        "id: DOS-ROP\n"
+        "title: Records of Processing\n"
+        "type: DossierDocument\n"
+        "document_kind: records-of-processing\n"
+        "generated_by: quoin dossier\n"
+        "---\n"
+        "# Records of Processing\n"
+    )
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.trace("FR-018-AC-17", "TC-247")
+def test_threat_model_validates_without_as_of(tmp_path: Path, schema_registry):
+    document = tmp_path / "threat-model.md"
+    document.write_text(m2_document("threat-model"))
+    result = quire_validate(document, scope=tmp_path)
+    assert result.returncode == 0, result.stderr
+    golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
+    assert (
+        list(
+            schema_registry("DossierDocument").iter_errors(
+                {**golden, "documentKind": "threat-model"}
+            )
+        )
+        == []
+    )
 
 
 @pytest.mark.trace("FR-018-AC-15", "TC-244")

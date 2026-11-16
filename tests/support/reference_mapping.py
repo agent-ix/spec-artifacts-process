@@ -13,8 +13,11 @@ rule removes (FR-011).
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -238,6 +241,33 @@ SYSML_ATTR = re.compile(
     r"(?P<type>[A-Za-z_][A-Za-z0-9_]*)\s*\[(?P<mult>[^\]]*)\]\s*(?:\{(?P<constraints>[^}]*)\})?\s*$"
 )
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+@lru_cache(maxsize=1)
+def kernel_scalar_names() -> frozenset[str]:
+    """Load the scalar vocabulary from semantic-core's installed schema."""
+    schema_path = (
+        Path(__file__).resolve().parents[2]
+        / "spec_artifacts_process"
+        / "semantic"
+        / "node_modules"
+        / "@agent-ix"
+        / "semantic-core"
+        / "generated"
+        / "json-schema"
+        / "KernelScalar.json"
+    )
+    try:
+        schema = json.loads(schema_path.read_text())
+        names = schema["enum"]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as error:
+        raise RuntimeError(
+            "semantic-core's generated KernelScalar schema is unavailable; "
+            "install the semantic package with `make semantic-install`"
+        ) from error
+    if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
+        raise RuntimeError("semantic-core's KernelScalar schema has no string enum")
+    return frozenset(names)
 
 
 class ReferenceMapper:
@@ -602,6 +632,17 @@ class ReferenceMapper:
         ]
         identity = "identity" in raw
         constraints: list[dict[str, Any]] = []
+
+        type_name = row["type"]
+        if type_name in kernel_scalar_names():
+            target = {"kind": "KernelScalar", "value": type_name}
+        elif type_name.startswith("ix://"):
+            target = {"kind": "SemanticId", "value": type_name}
+        else:
+            raise MappingFailure(
+                [MappingError(model, "properties", "unknown-type", line, type_name)]
+            )
+
         for item in raw:
             if item == "identity":
                 continue
@@ -609,14 +650,42 @@ class ReferenceMapper:
             keyword, value = keyword.strip(), value.strip()
             if keyword == "pattern":
                 constraints.append(
-                    {"keyword": "pattern", "regex": value, "dialect": "ecma-262"}
+                    {
+                        "kind": "PatternConstraint",
+                        "value": {
+                            "keyword": "pattern",
+                            "regex": value,
+                            "dialect": "ecma-262",
+                        },
+                    }
                 )
             elif keyword in ("minLength", "maxLength", "min", "max"):
-                constraints.append({"keyword": keyword, "value": int(value)})
+                kind = {
+                    "minLength": "MinLengthConstraint",
+                    "maxLength": "MaxLengthConstraint",
+                    "min": "MinConstraint",
+                    "max": "MaxConstraint",
+                }[keyword]
+                constraints.append(
+                    {
+                        "kind": kind,
+                        "value": {"keyword": keyword, "value": int(value)},
+                    }
+                )
             elif keyword == "format":
-                constraints.append({"keyword": "format", "name": f"ix:{value}"})
+                constraints.append(
+                    {
+                        "kind": "FormatConstraint",
+                        "value": {"keyword": "format", "name": f"ix:{value}"},
+                    }
+                )
             elif keyword == "nonEmpty":
-                constraints.append({"keyword": "nonEmpty"})
+                constraints.append(
+                    {
+                        "kind": "NonEmptyConstraint",
+                        "value": {"keyword": "nonEmpty"},
+                    }
+                )
             else:
                 raise MappingFailure(
                     [
@@ -627,7 +696,7 @@ class ReferenceMapper:
                 )
         decl: dict[str, Any] = {
             "name": row["name"],
-            "type": {"target": row["type"], "multiplicity": multiplicity},
+            "type": {"target": target, "multiplicity": multiplicity},
         }
         if identity:
             decl["identity"] = True

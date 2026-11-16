@@ -255,6 +255,8 @@ enum DossierKind {
   `risk-management`,
   `risk-management-plan`,
   `release-record`,
+  `threat-model`,
+  `records-of-processing`,
 }
 
 /** What a fix-verification row points at: an acceptance criterion or a test case. */
@@ -793,21 +795,23 @@ model Anomaly {
 
 /**
  * Dossier document record (archetype `DossierDocument`, FR-018): one generated
- * document of a submission dossier. The git commit that holds the file is its
- * identity, so the record has no `provenance` and no digest. `asOf` is required
- * for a requirements mapping matrix (`rmm`); a source-backed SOUP list
- * supplies it, while a SOUP gap document may omit it.
+ * document of a submission dossier. `version` is required for every kind
+ * except `records-of-processing`; `asOf` is required for a requirements mapping
+ * matrix (`rmm`). A source-backed SOUP list supplies `asOf`, while a SOUP gap
+ * document may omit it.
  */
 @extension("allOf", #[
   #{ `if`: #{ `properties`: #{ `documentKind`: #{ `const`: "rmm" } }, `required`: #["documentKind"] },
-     `then`: #{ `required`: #["asOf"] } }
+     `then`: #{ `required`: #["asOf"] } },
+  #{ `if`: #{ `properties`: #{ `documentKind`: #{ `not`: #{ `const`: "records-of-processing" } } }, `required`: #["documentKind"] },
+     `then`: #{ `required`: #["version"] } }
 ])
 model DossierDocument {
   id: NonEmptyText;
   title: NonEmptyText;
   type: "DossierDocument";
   object?: ObjectTypeName;
-  version: NonEmptyText;
+  version?: NonEmptyText;
   documentKind: DossierKind;
   generatedBy: "quoin dossier";
   asOf?: Rfc3339Instant;

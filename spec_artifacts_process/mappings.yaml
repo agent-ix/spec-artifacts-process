@@ -81,7 +81,7 @@ models:
     archetype: DossierDocument
     role: definition
     notes:
-      - "A generated document of a submission dossier. The commit holding the file is its identity, so this model has no `provenance` entry and no digest (FR-018)."
+      - "A generated document of a submission dossier. `version` is required except for `records-of-processing` (FR-018)."
     dropped_frontmatter_keys: [priority, owner, tags]
     properties:
       id: {kind: frontmatter, path: [id], required: true}
@@ -89,7 +89,7 @@ models:
       type: {kind: frontmatter, path: [type], required: true}
       object: {kind: frontmatter, path: [object]}
       relationships: {kind: frontmatter, path: [relationships]}
-      version: {kind: frontmatter, path: [version], required: true}
+      version: {kind: frontmatter, path: [version]}
       documentKind: {kind: frontmatter, path: [document_kind], required: true}
       generatedBy: {kind: frontmatter, path: [generated_by], required: true}
       asOf: {kind: frontmatter, path: [as_of]}

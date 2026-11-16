@@ -207,7 +207,7 @@ artifact_types:
         version:
           from: frontmatter_field
           path: [version]
-          required: true
+          required: false
         document_kind:
           from: frontmatter_field
           path: [document_kind]

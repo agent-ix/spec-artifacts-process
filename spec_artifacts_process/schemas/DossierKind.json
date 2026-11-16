@@ -12,7 +12,9 @@
     "anomalies",
     "risk-management",
     "risk-management-plan",
-    "release-record"
+    "release-record",
+    "threat-model",
+    "records-of-processing"
   ],
   "description": "The document a dossier carries; the record and frontmatter schemas both enumerate it (FR-018)."
 }

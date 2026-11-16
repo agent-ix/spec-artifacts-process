@@ -18,9 +18,12 @@
     {
       "constraints": [
         {
-          "dialect": "ecma-262",
-          "keyword": "pattern",
-          "regex": "^[a-z0-9][a-z0-9.-]*$"
+          "kind": "PatternConstraint",
+          "value": {
+            "dialect": "ecma-262",
+            "keyword": "pattern",
+            "regex": "^[a-z0-9][a-z0-9.-]*$"
+          }
         }
       ],
       "identity": true,
@@ -32,14 +35,20 @@
           "unique": false,
           "upper": 1
         },
-        "target": "String"
+        "target": {
+          "kind": "KernelScalar",
+          "value": "String"
+        }
       }
     },
     {
       "constraints": [
         {
-          "keyword": "minLength",
-          "value": 1
+          "kind": "MinLengthConstraint",
+          "value": {
+            "keyword": "minLength",
+            "value": 1
+          }
         }
       ],
       "name": "title",
@@ -50,14 +59,20 @@
           "unique": false,
           "upper": 1
         },
-        "target": "String"
+        "target": {
+          "kind": "KernelScalar",
+          "value": "String"
+        }
       }
     },
     {
       "constraints": [
         {
-          "keyword": "minLength",
-          "value": 1
+          "kind": "MinLengthConstraint",
+          "value": {
+            "keyword": "minLength",
+            "value": 1
+          }
         }
       ],
       "name": "edition",
@@ -68,14 +83,20 @@
           "unique": false,
           "upper": 1
         },
-        "target": "String"
+        "target": {
+          "kind": "KernelScalar",
+          "value": "String"
+        }
       }
     },
     {
       "constraints": [
         {
-          "keyword": "format",
-          "name": "ix:iri"
+          "kind": "FormatConstraint",
+          "value": {
+            "keyword": "format",
+            "name": "ix:iri"
+          }
         }
       ],
       "name": "link",
@@ -86,7 +107,10 @@
           "unique": false,
           "upper": 1
         },
-        "target": "String"
+        "target": {
+          "kind": "KernelScalar",
+          "value": "String"
+        }
       }
     },
     {
@@ -97,7 +121,10 @@
           "ordered": false,
           "unique": true
         },
-        "target": "String"
+        "target": {
+          "kind": "KernelScalar",
+          "value": "String"
+        }
       }
     }
   ],

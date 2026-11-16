@@ -226,6 +226,8 @@ type: TestMatrix
 | TC-243 | Fixtures with each of `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` validate with `quire validate` when their required fields are present. | Unit | P1 | FR-018-AC-14 | ✅ |
 | TC-244 | A `soup` gap document without `as_of` validates, one with a valid instant validates, and one with a malformed instant fails naming `as_of`. | Unit | P1 | FR-018-AC-15 | ✅ |
 | TC-245 | The emitted `DossierDocument` record schema accepts `documentKind: soup` with no `asOf` or a valid instant, and rejects a malformed instant. | Unit | P1 | FR-018-AC-16 | ✅ |
+| TC-246 | A `records-of-processing` dossier validates without `version` or `as_of`; the emitted record schema accepts `records-of-processing` without either field; both projected schemas include the kind. | Unit | P1 | FR-018-AC-18 | ✅ |
+| TC-247 | A `threat-model` dossier validates without `as_of`; the emitted record schema accepts the kind without `asOf`; the record-kind enum includes `threat-model`. | Unit | P1 | FR-018-AC-17 | ✅ |
 
 ## Option Permutation Matrix
 
