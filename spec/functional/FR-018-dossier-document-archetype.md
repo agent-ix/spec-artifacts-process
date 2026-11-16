@@ -15,6 +15,8 @@ relationships:
     type: "references"
   - target: "ix://agent-ix/quoin/FR-191"
     type: "references"
+  - target: "ix://agent-ix/quoin/FR-202"
+    type: "references"
 ---
 # FR-018: DossierDocument archetype for generated submission-dossier documents
 
@@ -50,7 +52,7 @@ document with no source binding and no `as_of`.
 
 - The `DossierDocument` frontmatter schema SHALL require `id`, `title`, `version`, `document_kind` and `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept only non-empty text for `id`, `title` and `version`.
-- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` or `release-record` for `document_kind`.
+- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan`, `release-record` or `threat-model` for `document_kind`.
 - The `DossierDocument` frontmatter schema SHALL accept only `quoin dossier` for `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept `as_of` only as an RFC 3339 `date-time` instant in its upper-case `T` and `Z` form.
 - Where `document_kind` is `rmm`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
@@ -85,9 +87,10 @@ document with no source binding and no `as_of`.
 | FR-018-AC-14 | Fixtures using `document_kind` values `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan` and `release-record` each validate with `quire validate` when their required fields are present. | Test |
 | FR-018-AC-15 | A `soup` fixture with no `as_of` validates as a gap document; the same fixture with a valid RFC 3339 `as_of` validates, while a malformed `as_of` fails `quire validate` naming `as_of`. | Test |
 | FR-018-AC-16 | The emitted record schema accepts a `soup` record both without `asOf` and with a valid RFC 3339 `asOf`, and rejects a malformed `asOf`. | Test |
+| FR-018-AC-17 | A fixture with `document_kind: threat-model` and `id: DOS-TM` validates with `quire validate` without `as_of`; the emitted record schema accepts `documentKind: threat-model` with no `asOf`; the record `document_kind` enum contains `threat-model`. | Test |
 
 ## Dependencies
 
 - **Upstream**: [FR-001](./FR-001-module-manifest-activates.md), [FR-009](./FR-009-emitted-json-schemas.md), [FR-011](./FR-011-markdown-record-mapping.md), [FR-012](./FR-012-executable-skeletons.md), quire-cli [FR-034](ix://agent-ix/quire-cli/FR-034)
-- **Downstream**: quoin [FR-191](ix://agent-ix/quoin/FR-191) and its M2 content requirements [FR-196](ix://agent-ix/quoin/FR-196), [FR-197](ix://agent-ix/quoin/FR-197), [FR-198](ix://agent-ix/quoin/FR-198), [FR-199](ix://agent-ix/quoin/FR-199), [FR-200](ix://agent-ix/quoin/FR-200), [FR-201](ix://agent-ix/quoin/FR-201).
+- **Downstream**: quoin [FR-191](ix://agent-ix/quoin/FR-191) and its M2 content requirements [FR-196](ix://agent-ix/quoin/FR-196), [FR-197](ix://agent-ix/quoin/FR-197), [FR-198](ix://agent-ix/quoin/FR-198), [FR-199](ix://agent-ix/quoin/FR-199), [FR-200](ix://agent-ix/quoin/FR-200), [FR-201](ix://agent-ix/quoin/FR-201), and its M3 threat-model content requirement [FR-202](ix://agent-ix/quoin/FR-202).
 - **Merge order**: quoin FR-191 defines the producer and precedes this archetype.
