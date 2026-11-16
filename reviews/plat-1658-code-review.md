@@ -3,7 +3,7 @@ id: SR-20261115175470
 title: "PLAT-1658 spec-artifacts-process PR161 code-review"
 type: SpecReview
 analysis: code-review
-scope: "agent-ix/spec-artifacts-process PR161 @d79b938 over origin/main; changed DossierDocument schema/TypeSpec/mapping/manifest/skeleton/example and tests/test_dossier_document.py"
+scope: "agent-ix/spec-artifacts-process PR161 @9b1cc9f over origin/main; DossierDocument schema/TypeSpec/mapping/manifest/skeleton/example, Standard.record.json, tests/support/reference_mapping.py, tests/test_dossier_document.py, tests/test_markdown_mappings.py"
 review_set: subset
 relationships:
   - target: "ix://agent-ix/spec-artifacts-process/FR-018"
@@ -31,3 +31,11 @@ Ticket: PLAT-1658. Code review of PR #161's dossier-kind enum and conditional ve
 | --- | --- | --- |
 | FND-001 | fixed | Commit 8f92751 adds TC-247 to spec/tests.md with FR-018-AC-17, and the Quire 0.46.0 matrix now binds the new threat-model test to that criterion. |
 | FND-002 | fixed | Commit 8f92751 adds TC-246 to spec/tests.md with FR-018-AC-18, and the Quire 0.46.0 matrix now binds both records-of-processing tests to that criterion. |
+
+## New findings (disposition pass 2)
+
+Round 2 at 9b1cc9f verified the updated DossierDocument golden against the skeleton and the Standard TypeRef oracle against semantic-core 0.4.4. The focused golden/Standard mapping checks passed (15 passed). The three ADR failures recorded in the PR were reproduced on clean `origin/main` with the same environment; the ADR tests, fixtures, conftest and ADR declaration are unchanged in this diff.
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | high | The test oracle re-declares the complete `KernelScalar` enum from `@agent-ix/semantic-core@0.4.4`'s generated schema in a local constant, creating a second source of truth. | tests/support/reference_mapping.py:241-255 |

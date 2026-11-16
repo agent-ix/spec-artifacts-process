@@ -19,6 +19,7 @@ from conftest import (
     MAPPINGS_SCHEMA_PATH,
     PACKAGE_ROOT,
     SCHEMAS_DIR,
+    SEMANTIC_CORE_DIR,
     SKELETONS_DIR,
     artifact_type_names,
     frontmatter,
@@ -192,6 +193,21 @@ def test_the_golden_record_is_reproduced_exactly(mapper, model: str):
     path = SKELETONS_DIR / f"{model}.md"
     record = build(mapper, model, path.read_text(), f"skeletons/{path.name}")
     assert record == golden(model)
+
+
+@pytest.mark.trace("TC-115")
+def test_kernel_scalar_targets_follow_the_installed_semantic_core_schema(mapper):
+    scalar_schema = json.loads((SEMANTIC_CORE_DIR / "KernelScalar.json").read_text())
+    for scalar in scalar_schema["enum"]:
+        field = mapper._to_field(
+            "Standard",
+            {"name": "value", "type": scalar, "multiplicity": "1..1"},
+            1,
+        )
+        assert field["type"]["target"] == {
+            "kind": "KernelScalar",
+            "value": scalar,
+        }
 
 
 @pytest.mark.trace("TC-115")

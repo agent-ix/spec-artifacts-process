@@ -13,8 +13,11 @@ rule removes (FR-011).
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -238,21 +241,33 @@ SYSML_ATTR = re.compile(
     r"(?P<type>[A-Za-z_][A-Za-z0-9_]*)\s*\[(?P<mult>[^\]]*)\]\s*(?:\{(?P<constraints>[^}]*)\})?\s*$"
 )
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-KERNEL_SCALARS = frozenset(
-    {
-        "UUID",
-        "Boolean",
-        "Integer",
-        "Decimal",
-        "Float32",
-        "Float64",
-        "String",
-        "Timestamp",
-        "Duration",
-        "Bytes",
-        "JsonObject",
-    }
-)
+
+
+@lru_cache(maxsize=1)
+def kernel_scalar_names() -> frozenset[str]:
+    """Load the scalar vocabulary from semantic-core's installed schema."""
+    schema_path = (
+        Path(__file__).resolve().parents[2]
+        / "spec_artifacts_process"
+        / "semantic"
+        / "node_modules"
+        / "@agent-ix"
+        / "semantic-core"
+        / "generated"
+        / "json-schema"
+        / "KernelScalar.json"
+    )
+    try:
+        schema = json.loads(schema_path.read_text())
+        names = schema["enum"]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as error:
+        raise RuntimeError(
+            "semantic-core's generated KernelScalar schema is unavailable; "
+            "install the semantic package with `make semantic-install`"
+        ) from error
+    if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
+        raise RuntimeError("semantic-core's KernelScalar schema has no string enum")
+    return frozenset(names)
 
 
 class ReferenceMapper:
@@ -619,7 +634,7 @@ class ReferenceMapper:
         constraints: list[dict[str, Any]] = []
 
         type_name = row["type"]
-        if type_name in KERNEL_SCALARS:
+        if type_name in kernel_scalar_names():
             target = {"kind": "KernelScalar", "value": type_name}
         elif type_name.startswith("ix://"):
             target = {"kind": "SemanticId", "value": type_name}
