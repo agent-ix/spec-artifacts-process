@@ -241,7 +241,7 @@ def test_records_of_processing_validates_without_a_version(tmp_path: Path):
 
 
 @pytest.mark.trace("FR-018-AC-17", "TC-247")
-def test_threat_model_validates_without_as_of(tmp_path: Path):
+def test_threat_model_validates_without_as_of(tmp_path: Path, schema_registry):
     document = tmp_path / "threat-model.md"
     document.write_text(m2_document("threat-model"))
     result = quire_validate(document, scope=tmp_path)
