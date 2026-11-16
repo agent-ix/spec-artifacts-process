@@ -202,6 +202,33 @@ def test_the_two_standard_forms_declare_the_same_fields(mapper):
     )
     assert table["properties"] == fence["properties"]
     assert table["invariants"] == fence["invariants"]
+    properties = {field["name"]: field for field in table["properties"]}
+    assert properties["code"]["type"]["target"] == {
+        "kind": "KernelScalar",
+        "value": "String",
+    }
+    assert properties["code"]["constraints"] == [
+        {
+            "kind": "PatternConstraint",
+            "value": {
+                "keyword": "pattern",
+                "regex": "^[a-z0-9][a-z0-9.-]*$",
+                "dialect": "ecma-262",
+            },
+        }
+    ]
+    assert properties["title"]["constraints"] == [
+        {
+            "kind": "MinLengthConstraint",
+            "value": {"keyword": "minLength", "value": 1},
+        }
+    ]
+    assert properties["link"]["constraints"] == [
+        {
+            "kind": "FormatConstraint",
+            "value": {"keyword": "format", "name": "ix:iri"},
+        }
+    ]
     # Provenance differs by construction: the two files are different bytes.
     for record in (table, fence):
         record.pop("provenance")

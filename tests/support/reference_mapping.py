@@ -238,6 +238,21 @@ SYSML_ATTR = re.compile(
     r"(?P<type>[A-Za-z_][A-Za-z0-9_]*)\s*\[(?P<mult>[^\]]*)\]\s*(?:\{(?P<constraints>[^}]*)\})?\s*$"
 )
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+KERNEL_SCALARS = frozenset(
+    {
+        "UUID",
+        "Boolean",
+        "Integer",
+        "Decimal",
+        "Float32",
+        "Float64",
+        "String",
+        "Timestamp",
+        "Duration",
+        "Bytes",
+        "JsonObject",
+    }
+)
 
 
 class ReferenceMapper:
@@ -602,21 +617,52 @@ class ReferenceMapper:
         ]
         identity = "identity" in raw
         constraints: list[dict[str, Any]] = []
+
+        type_name = row["type"]
+        if type_name in KERNEL_SCALARS:
+            target = {"kind": "KernelScalar", "value": type_name}
+        elif type_name.startswith("ix://"):
+            target = {"kind": "SemanticId", "value": type_name}
+        else:
+            raise MappingFailure(
+                [MappingError(model, "properties", "unknown-type", line, type_name)]
+            )
+
         for item in raw:
             if item == "identity":
                 continue
             keyword, _, value = item.partition(":")
             keyword, value = keyword.strip(), value.strip()
             if keyword == "pattern":
-                constraints.append(
-                    {"keyword": "pattern", "regex": value, "dialect": "ecma-262"}
-                )
+                constraints.append({
+                    "kind": "PatternConstraint",
+                    "value": {
+                        "keyword": "pattern",
+                        "regex": value,
+                        "dialect": "ecma-262",
+                    },
+                })
             elif keyword in ("minLength", "maxLength", "min", "max"):
-                constraints.append({"keyword": keyword, "value": int(value)})
+                kind = {
+                    "minLength": "MinLengthConstraint",
+                    "maxLength": "MaxLengthConstraint",
+                    "min": "MinConstraint",
+                    "max": "MaxConstraint",
+                }[keyword]
+                constraints.append({
+                    "kind": kind,
+                    "value": {"keyword": keyword, "value": int(value)},
+                })
             elif keyword == "format":
-                constraints.append({"keyword": "format", "name": f"ix:{value}"})
+                constraints.append({
+                    "kind": "FormatConstraint",
+                    "value": {"keyword": "format", "name": f"ix:{value}"},
+                })
             elif keyword == "nonEmpty":
-                constraints.append({"keyword": "nonEmpty"})
+                constraints.append({
+                    "kind": "NonEmptyConstraint",
+                    "value": {"keyword": "nonEmpty"},
+                })
             else:
                 raise MappingFailure(
                     [
@@ -627,7 +673,7 @@ class ReferenceMapper:
                 )
         decl: dict[str, Any] = {
             "name": row["name"],
-            "type": {"target": row["type"], "multiplicity": multiplicity},
+            "type": {"target": target, "multiplicity": multiplicity},
         }
         if identity:
             decl["identity"] = True
