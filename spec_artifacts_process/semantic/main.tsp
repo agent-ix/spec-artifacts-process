@@ -255,6 +255,8 @@ enum DossierKind {
   `risk-management`,
   `risk-management-plan`,
   `release-record`,
+  `threat-model`,
+  `records-of-processing`,
 }
 
 /** What a fix-verification row points at: an acceptance criterion or a test case. */
@@ -800,14 +802,16 @@ model Anomaly {
  */
 @extension("allOf", #[
   #{ `if`: #{ `properties`: #{ `documentKind`: #{ `const`: "rmm" } }, `required`: #["documentKind"] },
-     `then`: #{ `required`: #["asOf"] } }
+     `then`: #{ `required`: #["asOf"] } },
+  #{ `if`: #{ `properties`: #{ `documentKind`: #{ `not`: #{ `const`: "records-of-processing" } } }, `required`: #["documentKind"] },
+     `then`: #{ `required`: #["version"] } }
 ])
 model DossierDocument {
   id: NonEmptyText;
   title: NonEmptyText;
   type: "DossierDocument";
   object?: ObjectTypeName;
-  version: NonEmptyText;
+  version?: NonEmptyText;
   documentKind: DossierKind;
   generatedBy: "quoin dossier";
   asOf?: Rfc3339Instant;

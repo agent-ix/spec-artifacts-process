@@ -45,7 +45,6 @@
     "id",
     "title",
     "type",
-    "version",
     "documentKind",
     "generatedBy",
     "body"
@@ -69,6 +68,25 @@
       "then": {
         "required": [
           "asOf"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "documentKind": {
+            "not": {
+              "const": "records-of-processing"
+            }
+          }
+        },
+        "required": [
+          "documentKind"
+        ]
+      },
+      "then": {
+        "required": [
+          "version"
         ]
       }
     }

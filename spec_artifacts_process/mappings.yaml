@@ -89,7 +89,7 @@ models:
       type: {kind: frontmatter, path: [type], required: true}
       object: {kind: frontmatter, path: [object]}
       relationships: {kind: frontmatter, path: [relationships]}
-      version: {kind: frontmatter, path: [version], required: true}
+      version: {kind: frontmatter, path: [version]}
       documentKind: {kind: frontmatter, path: [document_kind], required: true}
       generatedBy: {kind: frontmatter, path: [generated_by], required: true}
       asOf: {kind: frontmatter, path: [as_of]}

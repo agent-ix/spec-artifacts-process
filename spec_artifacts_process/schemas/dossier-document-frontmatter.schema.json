@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["id", "title", "type", "version", "document_kind", "generated_by"],
+  "required": ["id", "title", "type", "document_kind", "generated_by"],
   "additionalProperties": true,
   "properties": {
     "id": {
@@ -20,7 +20,7 @@
       "minLength": 1
     },
     "document_kind": {
-      "enum": ["srs", "architecture", "trace-matrix", "rmm", "verification-report", "soup", "anomalies", "risk-management", "risk-management-plan", "release-record"]
+      "enum": ["srs", "architecture", "trace-matrix", "rmm", "verification-report", "soup", "anomalies", "risk-management", "risk-management-plan", "release-record", "threat-model", "records-of-processing"]
     },
     "generated_by": {
       "const": "quoin dossier"
@@ -53,6 +53,15 @@
         "required": ["document_kind"]
       },
       "then": { "required": ["as_of"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "document_kind": { "not": { "const": "records-of-processing" } }
+        },
+        "required": ["document_kind"]
+      },
+      "then": { "required": ["version"] }
     }
   ]
 }

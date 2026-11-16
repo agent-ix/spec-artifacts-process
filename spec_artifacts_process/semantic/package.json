@@ -11,7 +11,7 @@
     "check": "node scripts/generate.mjs --check"
   },
   "dependencies": {
-    "@agent-ix/semantic-core": "0.3.3"
+    "@agent-ix/semantic-core": "0.4.4"
   },
   "devDependencies": {
     "@agent-ix/quire-cli": "0.45.0",
