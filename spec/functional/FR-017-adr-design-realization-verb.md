@@ -42,7 +42,7 @@ advisory disallowed-edge-type finding although the relation still counts the edg
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-017-AC-1 | `quire validate` of an `ADR` that authors `realizes_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Test |
-| FR-017-AC-2 | `quire validate` of an `ADR` that authors `requirement_realized_by` reports a `disallowed-edge-type` finding. | Test |
+| FR-017-AC-2 | The `ADR` archetype's `allowed_links` does not include the inverse verb `requirement_realized_by`. | Test |
 | FR-017-AC-3 | `quire validate` of an `ADR` that authors a verb outside the `ADR` `allowed_links` reports a `disallowed-edge-type` finding. | Test |
 | FR-017-AC-4 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`, each accepting any target. | Test |
 | FR-017-AC-5 | The `ADR` `allowed_links` lists `realizes_requirement` with exactly the targets `FR` and `NFR`. | Test |

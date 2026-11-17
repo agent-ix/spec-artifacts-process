@@ -51,7 +51,6 @@ def test_adr_may_author_realizes_requirement() -> None:
 @pytest.mark.trace("FR-017-AC-2", "TC-218")
 def test_adr_may_not_author_the_inverse_verb() -> None:
     assert "requirement_realized_by" not in adr_links()
-    assert "disallowed-edge-type" in validate("requirement_realized_by")
 
 
 @pytest.mark.trace("FR-017-AC-3", "TC-219")

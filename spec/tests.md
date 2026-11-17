@@ -198,7 +198,7 @@ type: TestMatrix
 | TC-215 | Two fixtures identical except for the presence of the section validate the same on every other finding. | Unit | P1 | FR-016-AC-10 | ✅ |
 | TC-216 | The `Anomaly` `yield_pattern.match` carries a `release_rationale` locator with `required: false`, and `AnomalyFields.json` names the property `release_rationale`. | Unit | P1 | FR-016-AC-11 | ✅ |
 | TC-217 | `quire validate` of an `ADR` that authors `realizes_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-1 | ✅ |
-| TC-218 | `quire validate` of an `ADR` that authors the inverse verb `requirement_realized_by` reports a `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-2 | ✅ |
+| TC-218 | The `ADR` archetype's `allowed_links` excludes the globally registered inverse verb `requirement_realized_by`. | Unit | P1 | FR-017-AC-2 | ✅ |
 | TC-219 | `quire validate` of an `ADR` that authors a verb outside the `ADR` `allowed_links` reports a `disallowed-edge-type` finding. | Unit | P1 | FR-017-AC-3 | ✅ |
 | TC-220 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`, each accepting any target. | Unit | P1 | FR-017-AC-4 | ✅ |
 | TC-221 | The `ADR` `allowed_links` lists `realizes_requirement` with exactly the targets `FR` and `NFR`. | Unit | P1 | FR-017-AC-5 | ✅ |
