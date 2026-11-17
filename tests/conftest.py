@@ -81,8 +81,8 @@ def ix_module(name: str) -> str:
         "IX_FILAMENT_MODULES_PATH); the rows that load it fail rather than "
         "skip, because a skipped row is not coverage. The sibling modules "
         "spec-artifacts-iso and spec-objects-architecture must be installed; "
-        "spec-objects-architecture must be a release that declares "
-        "`realizes_requirement` (its FR-010)."
+        "spec-artifacts-iso owns `covers`, and spec-objects-architecture "
+        "must be a release that declares `realizes_requirement` (its FR-010)."
     )
     return str(path)
 

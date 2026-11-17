@@ -6,26 +6,19 @@ import json
 import subprocess
 
 import pytest
-from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT, run_quire
+from conftest import MANIFEST_PATH, REPO_ROOT, run_quire
 from support.strict_yaml import load_yaml_strict
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "adr"
 
 
 def validate(name: str) -> str:
-    result = subprocess.run(
-        [
-            "quire",
-            "validate",
-            "--module",
-            str(PACKAGE_ROOT),
-            "--scope",
-            str(FIXTURES),
-            str(FIXTURES / f"adr-{name}.md"),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
+    result = run_quire(
+        "validate",
+        "--scope",
+        str(FIXTURES),
+        str(FIXTURES / f"adr-{name}.md"),
+        siblings=("spec-artifacts-iso", "spec-objects-architecture"),
     )
     return result.stdout + result.stderr
 
