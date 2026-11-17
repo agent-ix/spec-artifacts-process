@@ -6,19 +6,31 @@ import json
 import subprocess
 
 import pytest
-from conftest import MANIFEST_PATH, REPO_ROOT, run_quire
+from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT, ix_module, run_quire
 from support.strict_yaml import load_yaml_strict
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "adr"
+SIBLINGS = ("spec-artifacts-iso", "spec-objects-architecture")
 
 
 def validate(name: str) -> str:
-    result = run_quire(
-        "validate",
-        "--scope",
-        str(FIXTURES),
-        str(FIXTURES / f"adr-{name}.md"),
-        siblings=("spec-artifacts-iso", "spec-objects-architecture"),
+    modules = [
+        module for owner in SIBLINGS for module in ("--module", ix_module(owner))
+    ]
+    result = subprocess.run(
+        [
+            "quire",
+            "validate",
+            *modules,
+            "--module",
+            str(PACKAGE_ROOT),
+            "--scope",
+            str(FIXTURES),
+            str(FIXTURES / f"adr-{name}.md"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
     )
     return result.stdout + result.stderr
 
@@ -56,7 +68,6 @@ def test_adr_keeps_its_previous_verbs() -> None:
 
 CORPUS = REPO_ROOT / "tests" / "fixtures" / "design_edges"
 MEMBER = "agent-ix/design-fixture"
-SIBLINGS = ("spec-artifacts-iso", "spec-objects-architecture")
 
 
 def bundle(kind: str, *extra: str) -> subprocess.CompletedProcess:
