@@ -6,6 +6,7 @@ Requirement FR-010.
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 
 import pytest
 from conftest import (
@@ -13,8 +14,10 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     artifact_type_names,
+    ix_module,
     run_quire,
 )
+from support.strict_yaml import load_yaml_strict
 
 ADMITTED_SEMANTIC_KEYS = {
     "contract_version",
@@ -56,24 +59,45 @@ def test_the_module_loads_with_every_declared_archetype(quire_engine):
 
 @pytest.mark.trace("TC-152", "FR-010-AC-10")
 def test_every_allowed_link_verb_is_registered(manifest):
-    """Each allowed relationship verb has a local edge-type registration."""
+    """Process owns its verbs; shared verbs resolve through their canonical modules."""
     allowed_verbs = {
         verb
         for artifact_type in manifest["artifact_types"]
         for verb in artifact_type.get("allowed_links", {})
     }
-    registered_verbs = set(manifest.get("edge_types", {}))
-    assert allowed_verbs <= registered_verbs
+    external_owners = {
+        "covers": "spec-artifacts-iso",
+        "realizes_requirement": "spec-objects-architecture",
+    }
+    local_verbs = allowed_verbs - external_owners.keys()
+    process_verbs = set(manifest.get("edge_types", {}))
+    assert local_verbs <= process_verbs
+    assert not (external_owners.keys() & process_verbs)
+
+    resolved_manifests = {
+        owner: load_yaml_strict((Path(ix_module(owner)) / "manifest.yaml").read_text())
+        for owner in external_owners.values()
+    }
+    for verb, owner in external_owners.items():
+        assert verb in resolved_manifests[owner].get(
+            "edge_types", {}
+        ), f"{owner} must own the canonical {verb!r} declaration"
+        assert (
+            sum(
+                verb in owner_manifest.get("edge_types", {})
+                for owner_manifest in resolved_manifests.values()
+            )
+            == 1
+        )
 
     result = run_quire(
         "validate",
         str(REPO_ROOT / "tests" / "fixtures" / "adr" / "adr-realizes_requirement.md"),
+        siblings=("spec-artifacts-iso", "spec-objects-architecture"),
     )
     assert result.returncode == 0, result.stderr
-    unknown_edge_types = [
-        line for line in result.stderr.splitlines() if "UnknownEdgeType:" in line
-    ]
-    assert not unknown_edge_types
+    assert "UnknownEdgeType:" not in result.stderr, result.stderr
+    assert "DuplicateEdgeType:" not in result.stderr, result.stderr
 
 
 @pytest.mark.trace("TC-094", "FR-010-AC-6")

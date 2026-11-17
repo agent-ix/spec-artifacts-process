@@ -1942,19 +1942,17 @@ verification_catalog:
     tooling: [eval harness]
 
 # ── Edge-type registry (quire-rs FR-040) ─────────────────────────────────
-# Every artifact type's allowed_links verbs are registered here so Quire can
-# validate the module's relationship vocabulary without relying on another
-# loaded module.
+# Process-specific relationship verbs are registered here. `covers` is owned
+# by spec-artifacts-iso and `realizes_requirement` by
+# spec-objects-architecture; consumers load those canonical owners alongside
+# this module when resolving the corresponding artifact links.
 edge_types:
   # structural
   contains: { description: "Composition; the source owns the target's lifecycle.", category: structural, inverse: contained_in, composite: true }
   # dependency
   blocks: { description: "Source blocks progress on or resolution of the target.", category: dependency, inverse: blocked_by }
   depends_on: { description: "Requires the target to exist/function.", category: dependency }
-  # realization
-  realizes_requirement: { description: "An ADR records the design decision that realizes the target requirement.", category: realization }
   # traceability
-  covers: { description: "A test/matrix covers the target requirement.", category: traceability, inverse: covered_by }
   found_in: { description: "A finding was identified in the target.", category: traceability }
   references: { description: "Loose, untyped linkage.", category: traceability }
   relates_to: { description: "Loose associative link between decisions/records.", category: traceability }
