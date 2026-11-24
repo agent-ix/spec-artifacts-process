@@ -109,6 +109,32 @@ class TestFeatureRiskRating:
             "risk_acceptability",
         }
 
+    @pytest.mark.trace("FR-025-AC-2")
+    def test_invalid_rating_missing_rater_and_extra_fields_fail(self) -> None:
+        """Reject invalid enum values, missing identity and computed fields.
+
+        Assumptions:
+            Each candidate begins as otherwise-valid supplier metadata.
+        Criteria:
+            Invalid rating, absent named rater, and extra score each fail
+            frontmatter validation.
+
+        Trace: FR-025-AC-2
+        """
+        validator = Draft202012Validator(
+            frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
+        )
+        invalid_value = rating("supplier", "rates_feature")
+        invalid_value["rating"] = "medium"
+        missing_rater = rating("supplier", "rates_feature")
+        del missing_rater["rated_by"]
+        computed_value = rating("supplier", "rates_feature")
+        computed_value["score"] = 3
+
+        assert list(validator.iter_errors(invalid_value))
+        assert list(validator.iter_errors(missing_rater))
+        assert list(validator.iter_errors(computed_value))
+
     @pytest.mark.trace("FR-024-AC-4")
     @pytest.mark.parametrize(
         "tool",
