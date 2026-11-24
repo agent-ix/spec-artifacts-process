@@ -44,8 +44,7 @@
             "allOf": [
               {"contains": {"properties": {"type": {"const": "rates_feature"}}, "required": ["type"]}},
               {"contains": {"properties": {"type": {"const": "uses_intended_use"}, "target": {"pattern": "^ix://[^/]+/[^/]+/IU-[0-9]{3}$"}}, "required": ["type", "target"]}, "minContains": 1, "maxContains": 1},
-              {"not": {"contains": {"properties": {"type": {"const": "re_rates"}}, "required": ["type"]}}]
-          }
+              {"not": {"contains": {"properties": {"type": {"const": "re_rates"}}, "required": ["type"]}}}]
           }
         }
       }
