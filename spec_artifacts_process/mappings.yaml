@@ -61,6 +61,49 @@ not_modelled:
     reason: "Which acts count as verification versus validation is an assurance decision this module consumes rather than declares."
 
 models:
+  IntendedUse:
+    archetype: IntendedUse
+    role: definition
+    dropped_frontmatter_keys: []
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      tool: {kind: frontmatter, path: [tool], required: true}
+      relationships: {kind: frontmatter, path: [relationships], required: true}
+      provenance: {kind: provenance, required: true}
+      purpose: {kind: section, heading: Purpose, required: true}
+      recordsProduced: {kind: section, heading: Records produced, required: true}
+      whoReliesOnThem: {kind: section, heading: Who relies on them, required: true}
+      limits: {kind: section, heading: Limits, required: true}
+      operatingContext: {kind: section, heading: Operating context, required: true}
+
+  FeatureRiskRating:
+    archetype: FeatureRiskRating
+    role: definition
+    dropped_frontmatter_keys: []
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      title: {kind: frontmatter, path: [title], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      scope: {kind: frontmatter, path: [scope], required: true}
+      rating: {kind: frontmatter, path: [rating], required: true}
+      ratedBy: {kind: frontmatter, path: [rated_by], required: true}
+      intendedUse: {kind: frontmatter, path: [intended_use], required: true}
+      relationships: {kind: frontmatter, path: [relationships], required: true}
+      provenance: {kind: provenance, required: true}
+      featureAssessments:
+        kind: typed-table
+        heading: Feature assessments
+        required: true
+        columns: [Requirement, Failure mode, Detection]
+        fields:
+          Requirement: {property: requirement, parse: text}
+          Failure mode: {property: failureMode, parse: text}
+          Detection: {property: detection, parse: text}
+      rationale: {kind: section, heading: Rationale, required: true}
+      assuranceActivities: {kind: section, heading: Assurance activities, required: true}
+
   ADR:
     archetype: ADR
     role: definition

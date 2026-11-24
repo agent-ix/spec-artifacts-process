@@ -64,6 +64,51 @@ grammars:
   - finding
   - feedback
 artifact_types:
+- name: IntendedUse
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/intended-use-frontmatter.schema.json
+  data_schema:
+    schema: schemas/IntendedUse.json
+  defaults:
+    id_pattern: IU-{next:03d}
+  allowed_links:
+    references: [IntendedUse]
+  examples: [examples/IntendedUse.md]
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        purpose: {from: section_body, after_heading: Purpose, required: true}
+        records_produced: {from: section_body, after_heading: Records produced, required: true}
+        who_relies_on_them: {from: section_body, after_heading: Who relies on them, required: true}
+        limits: {from: section_body, after_heading: Limits, required: true}
+        operating_context: {from: section_body, after_heading: Operating context, required: true}
+- name: FeatureRiskRating
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/feature-risk-rating-frontmatter.schema.json
+  data_schema:
+    schema: schemas/FeatureRiskRating.json
+  defaults:
+    id_pattern: FRR-{next:03d}
+  allowed_links:
+    rates_feature: [FR]
+    re_rates: [FeatureRiskRating]
+    references: [IntendedUse]
+  examples: [examples/FeatureRiskRating.md]
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        feature_assessments:
+          from: table_row
+          under_section: Feature assessments
+          required: true
+          multiple: true
+          assert:
+            columns: [Requirement, Failure mode, Detection]
+            min_rows: 1
+        rationale: {from: section_body, after_heading: Rationale, required: true}
+        assurance_activities: {from: section_body, after_heading: Assurance activities, required: true}
 - name: ADR
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
@@ -963,6 +1008,14 @@ lint_rules:
 # coverage rollup how to read the same columns, so a contract and its coverage
 # computation cannot drift (CR-015 / CR-016).
 traceability:
+  required_relations:
+  - name: fr-has-risk-rating
+    from: FR
+    where: {field: scope, values: [supplier]}
+    edges: [rates_feature]
+    to: [FeatureRiskRating]
+    direction: incoming
+    check: feature-without-risk-rating
   # ── What is NOT traceable source ──
   #
   # Path globs under the **code** root naming fixture trees that hold no
@@ -2149,6 +2202,10 @@ verification_catalog:
 # spec-objects-architecture; consumers load those canonical owners alongside
 # this module when resolving the corresponding artifact links.
 edge_types:
+  rates_feature: {description: "A feature risk rating assesses a functional requirement.", category: traceability, inverse: rated_by_rating}
+  rated_by_rating: {description: "A functional requirement is assessed by a feature risk rating.", category: traceability, inverse: rates_feature}
+  re_rates: {description: "An adopter feature risk rating reassesses a supplier rating.", category: traceability, inverse: rerated_by}
+  rerated_by: {description: "A supplier feature risk rating is reassessed by an adopter rating.", category: traceability, inverse: re_rates}
   # structural
   contains: { description: "Composition; the source owns the target's lifecycle.", category: structural, inverse: contained_in, composite: true }
   # dependency

@@ -185,6 +185,15 @@ enum AnalysisKind {
   specCorrectness: "spec-correctness",
 }
 
+/** Scope of a human-authored FeatureRiskRating. */
+enum FeatureRatingScope { supplier, adopter }
+
+/** Human-authored feature rating. No default or computed value is defined. */
+enum FeatureRatingValue { high_process_risk, not_high_process_risk }
+
+/** Initial tool-validation packages covered by this module. */
+enum IntendedUseTool { quoin, quireRs: "quire-rs", quireCli: "quire-cli", engineeringAssurance: "engineering-assurance", filamentAnalyze: "filament-analyze" }
+
 /** How much of the spec a SpecReview covered. */
 enum ReviewSet {
   base,
@@ -773,6 +782,45 @@ model RubricCheckRow {
 // ---------------------------------------------------------------------------
 
 /** Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run. */
+/** Supplier-authored account of one package's intended operating use. */
+model IntendedUse {
+  id: @pattern("^IU-[0-9]+$") string;
+  title: NonEmptyText;
+  type: "IntendedUse";
+  tool: IntendedUseTool;
+  relationships: Relationship[];
+  provenance: Provenance;
+  purpose: Section;
+  recordsProduced: Section;
+  whoReliesOnThem: Section;
+  limits: Section;
+  operatingContext: Section;
+}
+
+/** One named person's rating and evidence for one or more features. */
+model FeatureRiskRating {
+  id: @pattern("^FRR-[0-9]+$") string;
+  title: NonEmptyText;
+  type: "FeatureRiskRating";
+  scope: FeatureRatingScope;
+  rating: FeatureRatingValue;
+  ratedBy: NamedText;
+  intendedUse: NonEmptyText;
+  relationships: Relationship[];
+  provenance: Provenance;
+  featureAssessments: FeatureAssessmentRow[];
+  rationale: Section;
+  assuranceActivities: Section;
+}
+
+/** Failure mode and detection evidence for one rated requirement. */
+model FeatureAssessmentRow {
+  requirement: NonEmptyText;
+  failureMode: NonEmptyText;
+  detection: NonEmptyText;
+  line: LineNumber;
+}
+
 model ADR {
   id: UpperDocId;
   title: NonEmptyText;
