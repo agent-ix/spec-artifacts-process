@@ -228,6 +228,8 @@ type: TestMatrix
 | TC-245 | The emitted `DossierDocument` record schema accepts `documentKind: soup` with no `asOf` or a valid instant, and rejects a malformed instant. | Unit | P1 | FR-018-AC-16 | ✅ |
 | TC-246 | A `records-of-processing` dossier validates without `version` or `as_of`; the emitted record schema accepts `records-of-processing` without either field; both projected schemas include the kind. | Unit | P1 | FR-018-AC-18 | ✅ |
 | TC-247 | A `threat-model` dossier validates without `as_of`; the emitted record schema accepts the kind without `asOf`; the record-kind enum includes `threat-model`. | Unit | P1 | FR-018-AC-17 | ✅ |
+| TC-248 | The `ADR` `allowed_links` lists `segregates_for_requirement` with exactly the targets `FR` and `NFR`, does not list `requirement_segregated_by`, and keeps `realizes_requirement`. | Unit | P1 | FR-019-AC-1, FR-019-AC-2, FR-019-AC-3 | ✅ |
+| TC-249 | `quire validate` of an `ADR` that authors `segregates_for_requirement` toward a requirement reports no `disallowed-edge-type` finding, and one that authors `requirement_segregated_by` reports one. | Unit | P1 | FR-019-AC-4, FR-019-AC-5 | ✅ |
 
 ## Option Permutation Matrix
 

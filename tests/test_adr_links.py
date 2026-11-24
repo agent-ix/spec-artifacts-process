@@ -144,3 +144,17 @@ def test_relations_report_the_adr_as_realizing_fr_and_nfr() -> None:
         row = rows[(relation, requirement)]
         assert row["state"] == "covered"
         assert [(e["id"], e["archetype"]) for e in row["linked"]] == [(adr, "ADR")]
+
+
+@pytest.mark.trace("FR-019-AC-1", "FR-019-AC-2", "FR-019-AC-3", "TC-248")
+def test_adr_lists_the_segregation_verb_not_its_inverse() -> None:
+    links = adr_links()
+    assert links["segregates_for_requirement"] == ["FR", "NFR"]
+    assert "requirement_segregated_by" not in links
+    assert links["realizes_requirement"] == ["FR", "NFR"]
+
+
+@pytest.mark.trace("FR-019-AC-4", "FR-019-AC-5", "TC-249")
+def test_adr_authoring_the_segregation_verb_draws_no_disallowed_edge_type() -> None:
+    assert "disallowed-edge-type" not in validate("segregates_for_requirement")
+    assert "disallowed-edge-type" in validate("requirement_segregated_by")
