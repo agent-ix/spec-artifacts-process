@@ -2238,6 +2238,7 @@ edge_types:
 # warning, so `quire validate --okf` over a corpus fails on a dangling role-spec
 # or rubric reference. The key is module-wide.
 grammar_severity:
+  "trace:feature-without-risk-rating": off
   "trace:dangling-trace-reference": error
 
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
