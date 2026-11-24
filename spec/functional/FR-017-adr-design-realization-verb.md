@@ -47,8 +47,8 @@ advisory disallowed-edge-type finding although the relation still counts the edg
 | FR-017-AC-4 | `supersedes`, `superseded_by`, `relates_to` and `depends_on` are all still in the `ADR` `allowed_links`, each accepting any target. | Test |
 | FR-017-AC-5 | The `ADR` `allowed_links` lists `realizes_requirement` with exactly the targets `FR` and `NFR`. | Test |
 | FR-017-AC-6 | `quire validate --okf` of an `ADR` that authors `realizes_requirement` toward an `FR` and one that authors it toward an `NFR` reports neither `disallowed-edge-type` nor `disallowed-edge-target` for either. (The target list itself is guarded by AC-5.) | Test |
-| FR-017-AC-7 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward a part reports an advisory `disallowed-edge-target` warning (the run's exit status is unchanged by it) naming the `ADR` id, the part and its object type `part`. | Test |
-| FR-017-AC-8 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward an id no document has exits non-zero with an error-level `dangling-reference` line naming the `ADR` file and the id, and no other error. | Test |
+| FR-017-AC-7 | `quire validate --okf` of an `ADR` that authors `realizes_requirement` toward a part reports an advisory `disallowed-edge-target` warning (the run's exit status is unchanged by it; `--strict` promotes it to an error) naming the `ADR` id, the part and its object type `part`. | Test |
+| FR-017-AC-8 | `quire validate --okf --strict` of an `ADR` that authors `realizes_requirement` toward an id no document has exits non-zero with an error-level `dangling-reference` line naming the `ADR` file and the id, and no other error than the AC-7 `disallowed-edge-target` finding that `--strict` promotes. | Test |
 | FR-017-AC-9 | Over a corpus holding an `FR` and an `NFR` each realized by an `ADR`, `quire relations --json` reports each as `covered` with that `ADR` (archetype `ADR`) in `linked`. | Test |
 
 ## Dependencies

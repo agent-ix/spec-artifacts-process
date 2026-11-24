@@ -34,7 +34,7 @@ the advisory `disallowed-edge-type` finding although the relation still counts t
 
 - The `ADR` `allowed_links` SHALL include `segregates_for_requirement`, authored by the ADR toward the requirement it segregates, with exactly the targets `FR` and `NFR`.
 - The `ADR` `allowed_links` SHALL NOT include `requirement_segregated_by`, which a requirement authors toward the element.
-- The `ADR` `allowed_links` SHALL keep `realizes_requirement` and every verb it listed before this requirement.
+- The `ADR` `allowed_links` SHALL keep `realizes_requirement`. The earlier verbs stay as [FR-017-AC-4](./FR-017-adr-design-realization-verb.md) states.
 
 ## Acceptance Criteria
 
@@ -44,7 +44,6 @@ the advisory `disallowed-edge-type` finding although the relation still counts t
 | FR-019-AC-2 | The `ADR` `allowed_links` does not include `requirement_segregated_by`. | Test |
 | FR-019-AC-3 | The `ADR` `allowed_links` still lists `realizes_requirement` with the targets `FR` and `NFR`. | Test |
 | FR-019-AC-4 | `quire validate` of an `ADR` that authors `segregates_for_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Test |
-| FR-019-AC-5 | `quire validate` of an `ADR` that authors the inverse `requirement_segregated_by` reports a `disallowed-edge-type` finding. | Test |
 
 ## Dependencies
 
