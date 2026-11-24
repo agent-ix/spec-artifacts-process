@@ -200,7 +200,13 @@ enum FeatureRatingScope { supplier, adopter }
 enum FeatureRatingValue { high_process_risk, not_high_process_risk }
 
 /** Initial tool-validation packages covered by this module. */
-enum IntendedUseTool { quoin, quireRs: "quire-rs", quireCli: "quire-cli", engineeringAssurance: "engineering-assurance", filamentAnalyze: "filament-analyze" }
+enum IntendedUseTool {
+  quoin,
+  quireRs: "quire-rs",
+  quireCli: "quire-cli",
+  engineeringAssurance: "engineering-assurance",
+  filamentAnalyze: "filament-analyze",
+}
 
 /** How much of the spec a SpecReview covered. */
 enum ReviewSet {
@@ -789,7 +795,6 @@ model RubricCheckRow {
 // Artifact models (exported)
 // ---------------------------------------------------------------------------
 
-/** Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run. */
 /** Supplier-authored account of one package's intended operating use. */
 model IntendedUse {
   id: IntendedUseId;
@@ -843,6 +848,7 @@ model AssuranceActivityRow {
   line: LineNumber;
 }
 
+/** Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run. */
 model ADR {
   id: UpperDocId;
   title: NonEmptyText;
