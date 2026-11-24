@@ -6,7 +6,14 @@ import json
 from pathlib import Path
 
 import pytest
-from conftest import EXAMPLES_DIR, MANIFEST_PATH, REPO_ROOT, SCHEMAS_DIR, SKELETONS_DIR, quire_validate
+from conftest import (
+    EXAMPLES_DIR,
+    MANIFEST_PATH,
+    REPO_ROOT,
+    SCHEMAS_DIR,
+    SKELETONS_DIR,
+    quire_validate,
+)
 from jsonschema import Draft202012Validator
 from support.strict_yaml import load_yaml_strict
 
@@ -54,7 +61,8 @@ def test_rating_rejects_relationships_from_the_other_scope(scope: str, verb: str
 
 @pytest.mark.trace("FR-024-AC-4")
 @pytest.mark.parametrize(
-    "tool", ["quoin", "quire-rs", "quire-cli", "engineering-assurance", "filament-analyze"]
+    "tool",
+    ["quoin", "quire-rs", "quire-cli", "engineering-assurance", "filament-analyze"],
 )
 def test_intended_use_schema_admits_the_initial_tool_set(tool: str) -> None:
     schema = frontmatter_schema("intended-use-frontmatter.schema.json")
