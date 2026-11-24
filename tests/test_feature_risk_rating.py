@@ -392,8 +392,13 @@ class TestFeatureRiskRating:
         ).replace("FR-009", "FR-001")
         (rating_dir / "adopter-rerating.md").write_text(adopter)
 
+        documents = tuple(
+            str(path) for path in sorted((tmp_path / "spec").rglob("*.md"))
+        )
+
         default = run_quire(
-            "validate", "--scope", str(tmp_path), siblings=("spec-artifacts-iso",)
+            "validate", "--scope", str(tmp_path), *documents,
+            siblings=("spec-artifacts-iso",)
         )
         enabled = run_quire(
             "validate",
@@ -401,6 +406,7 @@ class TestFeatureRiskRating:
             "trace:feature-without-risk-rating=error",
             "--scope",
             str(tmp_path),
+            *documents,
             siblings=("spec-artifacts-iso",),
         )
 
@@ -599,8 +605,8 @@ class TestFeatureRiskRating:
             "A duplicate supplier rating identifies the FR and every conflicting rating id and exits with status 1.",
             "A `rated_more_than_once` status",
             "A missing or non-directory `DIR/spec/` returns a command error",
-            "Quoin's [FR-217](ix://agent-ix/quoin/FR-217) validation-report command",
-            "Quoin's [FR-220](ix://agent-ix/quoin/FR-220) external-tools configuration index",
+            "Quoin [FR-217](ix://agent-ix/quoin/FR-217) SHALL produce the validation report containing external tool versions.",
+            "Quoin [FR-220](ix://agent-ix/quoin/FR-220) SHALL define the external-tools configuration index referenced by that report.",
         ):
             assert contract in spec
 
