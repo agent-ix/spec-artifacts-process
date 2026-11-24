@@ -25,3 +25,4 @@ description: "Index of artifacts in this directory."
 * [FR-016: Anomaly release rationale: a human-authored, named reason for releasing with an anomaly open](./FR-016-anomaly-release-rationale.md)
 * [FR-017: ADR may author the design-realization verb](./FR-017-adr-design-realization-verb.md)
 * [FR-018: DossierDocument archetype for generated submission-dossier documents](./FR-018-dossier-document-archetype.md)
+* [FR-019: ADR may author the segregation design verb](./FR-019-adr-segregation-verb.md)

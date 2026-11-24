@@ -10,7 +10,7 @@ from conftest import MANIFEST_PATH, PACKAGE_ROOT, REPO_ROOT, ix_module, run_quir
 from support.strict_yaml import load_yaml_strict
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "adr"
-SIBLINGS = ("spec-artifacts-iso", "spec-objects-architecture")
+SIBLINGS = ("spec-artifacts-iso", "spec-objects-security", "spec-objects-architecture")
 
 
 def validate(name: str) -> str:
@@ -96,7 +96,8 @@ def test_adr_realizing_fr_and_nfr_draws_no_disallowed_edge() -> None:
 
 @pytest.mark.trace("FR-017-AC-7", "TC-223")
 def test_adr_realizing_a_part_draws_the_advisory_finding_naming_the_ids() -> None:
-    result = bundle("invalid", "--strict")
+    result = bundle("invalid")
+    assert result.returncode == 0, result.stderr
     wrong = [ln for ln in result.stderr.splitlines() if "disallowed-edge-target" in ln]
     assert len(wrong) == 1
     assert wrong[0].startswith("warning:")
@@ -119,7 +120,14 @@ def test_adr_realizing_a_missing_id_fails_strict_with_a_located_error() -> None:
     assert errors
     assert all("ADR-003.md" in ln and "FR-999" in ln for ln in errors)
     assert any("'realizes_requirement'" in ln for ln in errors)
-    assert f"{len(errors)} OKF bundle validation error(s)" in result.stderr
+    # `--strict` also promotes the AC-7 target finding to an error, and nothing else.
+    promoted = [
+        ln
+        for ln in result.stderr.splitlines()
+        if ln.startswith("[") and "[disallowed-edge-target]" in ln
+    ]
+    assert len(promoted) == 1 and "ADR-004" in promoted[0], promoted
+    assert f"{len(errors) + 1} OKF bundle validation error(s)" in result.stderr
 
 
 @pytest.mark.trace("FR-017-AC-9", "TC-225")
@@ -144,3 +152,16 @@ def test_relations_report_the_adr_as_realizing_fr_and_nfr() -> None:
         row = rows[(relation, requirement)]
         assert row["state"] == "covered"
         assert [(e["id"], e["archetype"]) for e in row["linked"]] == [(adr, "ADR")]
+
+
+@pytest.mark.trace("FR-019-AC-1", "FR-019-AC-2", "FR-019-AC-3", "TC-248")
+def test_adr_lists_the_segregation_verb_not_its_inverse() -> None:
+    links = adr_links()
+    assert links["segregates_for_requirement"] == ["FR", "NFR"]
+    assert "requirement_segregated_by" not in links
+    assert links["realizes_requirement"] == ["FR", "NFR"]
+
+
+@pytest.mark.trace("FR-019-AC-4", "TC-249")
+def test_adr_authoring_the_segregation_verb_draws_no_disallowed_edge_type() -> None:
+    assert "disallowed-edge-type" not in validate("segregates_for_requirement")
