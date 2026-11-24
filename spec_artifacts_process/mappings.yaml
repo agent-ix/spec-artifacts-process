@@ -73,7 +73,14 @@ models:
       relationships: {kind: frontmatter, path: [relationships], required: true}
       provenance: {kind: provenance, required: true}
       purpose: {kind: section, heading: Purpose, required: true}
-      recordsProduced: {kind: section, heading: Records produced, required: true}
+      recordsProduced:
+        kind: typed-table
+        heading: Records produced
+        required: true
+        columns: [Record kind, Command that writes it]
+        fields:
+          Record kind: {property: recordKind, parse: text}
+          Command that writes it: {property: command, parse: text}
       whoReliesOnThem: {kind: section, heading: Who relies on them, required: true}
       limits: {kind: section, heading: Limits, required: true}
       operatingContext: {kind: section, heading: Operating context, required: true}
@@ -102,7 +109,14 @@ models:
           Failure mode: {property: failureMode, parse: text}
           Detection: {property: detection, parse: text}
       rationale: {kind: section, heading: Rationale, required: true}
-      assuranceActivities: {kind: section, heading: Assurance activities, required: true}
+      assuranceActivities:
+        kind: typed-table
+        heading: Assurance activities
+        required: true
+        columns: [Activity, Acceptance criterion]
+        fields:
+          Activity: {property: activity, parse: text}
+          Acceptance criterion: {property: acceptanceCriterion, parse: text}
 
   ADR:
     archetype: ADR

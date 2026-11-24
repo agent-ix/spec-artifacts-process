@@ -79,7 +79,14 @@ artifact_types:
     yield_pattern:
       match:
         purpose: {from: section_body, after_heading: Purpose, required: true}
-        records_produced: {from: section_body, after_heading: Records produced, required: true}
+        records_produced:
+          from: table_row
+          under_section: Records produced
+          required: true
+          multiple: true
+          assert:
+            columns: [Record kind, Command that writes it]
+            min_rows: 1
         who_relies_on_them: {from: section_body, after_heading: Who relies on them, required: true}
         limits: {from: section_body, after_heading: Limits, required: true}
         operating_context: {from: section_body, after_heading: Operating context, required: true}
@@ -108,7 +115,14 @@ artifact_types:
             columns: [Requirement, Failure mode, Detection]
             min_rows: 1
         rationale: {from: section_body, after_heading: Rationale, required: true}
-        assurance_activities: {from: section_body, after_heading: Assurance activities, required: true}
+        assurance_activities:
+          from: table_row
+          under_section: Assurance activities
+          required: true
+          multiple: true
+          assert:
+            columns: [Activity, Acceptance criterion]
+            min_rows: 1
 - name: ADR
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json

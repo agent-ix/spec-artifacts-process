@@ -799,7 +799,7 @@ model IntendedUse {
   relationships: Relationship[];
   provenance: Provenance;
   purpose: Section;
-  recordsProduced: Section;
+  recordsProduced: RecordProducedRow[];
   whoReliesOnThem: Section;
   limits: Section;
   operatingContext: Section;
@@ -818,7 +818,7 @@ model FeatureRiskRating {
   provenance: Provenance;
   featureAssessments: FeatureAssessmentRow[];
   rationale: Section;
-  assuranceActivities: Section;
+  assuranceActivities: AssuranceActivityRow[];
 }
 
 /** Failure mode and detection evidence for one rated requirement. */
@@ -826,6 +826,20 @@ model FeatureAssessmentRow {
   requirement: NonEmptyText;
   failureMode: NonEmptyText;
   detection: NonEmptyText;
+  line: LineNumber;
+}
+
+/** One record kind and the command that produces it. */
+model RecordProducedRow {
+  recordKind: NonEmptyText;
+  command: NonEmptyText;
+  line: LineNumber;
+}
+
+/** One selected assurance activity and its acceptance criterion. */
+model AssuranceActivityRow {
+  activity: NonEmptyText;
+  acceptanceCriterion: NonEmptyText;
   line: LineNumber;
 }
 
