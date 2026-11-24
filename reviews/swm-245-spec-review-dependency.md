@@ -51,3 +51,4 @@ None is circular, and the order FR-020, then FR-021, then FR-022 is sound. Exter
 | FND-002 | fixed | Round 1: FR-022 cites SWM-249, which exists in Linear ("Quoin: RoleSpec version-bump-vs-base and skill-citation checks"), in its Behavior and Dependencies. |
 | FND-003 | fixed | Round 1: the Dependencies of FR-021 and FR-022 state that dev-team installs this module and pins the version it installs. FR-023 states the same for rubrics. |
 | FND-004 | fixed | Round 1: FR-020 frontmatter adds `depends_on` FR-009, FR-011 and FR-012. |
+| FND-005 | fixed | Round 2 (head cf82041): FR-023 frontmatter adds `depends_on` FR-011 and FR-012, and its Dependencies list both, for the `Rubric` mapping entry and skeleton. |
