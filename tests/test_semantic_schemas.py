@@ -174,3 +174,12 @@ def test_a_missing_toolchain_names_the_component_and_the_install(tmp_path: Path)
     assert result.returncode != 0
     assert "make semantic-install" in result.stderr
     assert "semantic-core" in result.stderr or "tsp" in result.stderr
+
+
+@pytest.mark.trace("TC-196", "FR-003-AC-17", "FR-013-AC-9")
+def test_testcase_status_is_optional_in_the_emitted_record_schema():
+    """FR-003-AC-17/FR-013-AC-9: status-free rows remain representable in the
+    record contract, while an authored status still has its typed schema."""
+    schema = json.loads((SCHEMAS_DIR / "TestCaseRow.json").read_text())
+    assert "status" not in schema["required"]
+    assert schema["properties"]["status"]["$ref"].endswith("/CoverageStatus.json")

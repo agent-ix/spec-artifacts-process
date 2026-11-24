@@ -21,7 +21,8 @@
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/TraceCell.json"
     },
     "status": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/CoverageStatus.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/CoverageStatus.json",
+      "description": "Optional authored tracking annotation; criterion coverage is computed from requirements and test tags."
     },
     "line": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/LineNumber.json"
@@ -32,7 +33,6 @@
     "title",
     "type",
     "tracesTo",
-    "status",
     "line"
   ],
   "unevaluatedProperties": {

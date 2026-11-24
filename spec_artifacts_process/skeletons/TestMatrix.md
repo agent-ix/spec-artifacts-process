@@ -9,9 +9,9 @@ type: TestMatrix
      see that skeleton.
 
      Contract (manifest body_extraction asserts, validated by `quire validate`):
-     - REQUIRED: `Test Case Summary` (columns exactly
-       Test ID | Title | Type | Priority | Traces To | Status), with
-       >= 1 data row.
+     - REQUIRED: `Test Case Summary` with Test ID, Title, Type, Priority,
+       Traces To and at least one data row. `Priority` and `Status` are optional
+       columns; an authored Status remains vocabulary-validated.
      - Requirement-to-criterion-to-test coverage is NOT authored here. Read it
        from `quire matrix`, which computes it from the criteria and the tests'
        trace tags; a hand-kept coverage table can only drift from it.
@@ -25,8 +25,10 @@ type: TestMatrix
      - `Type` is one of Unit | Integration | E2E | Property | Fuzz | Benchmark |
        Static | Compile | Snapshot | Manual | Eval | Inspection | Analysis |
        Demonstration. What kind of testing a row records is this column's job.
-     - `Status` is a marker FIRST, optionally followed by the note that says
-       why: ✅ | ❌ | 🚧 | ⛔. `⚠️` IS NOT VALID and is not an oversight: it was
+     - An optional `Status` column is a tracking annotation, not evidence used
+       by `quire matrix` to compute criterion coverage. If present, each value
+       is a marker FIRST, optionally followed by the note that says why:
+       ✅ | ❌ | 🚧 | ⛔. `⚠️` IS NOT VALID and is not an oversight: it was
        retired because `traceability.status` classed it as nothing, so every row
        carrying it was exempt from the status-lie check by construction. If a
        skill or a template tells you `⚠️` is a status, that is the defect
@@ -41,9 +43,9 @@ type: TestMatrix
 
 ## Test Case Summary
 
-| Test ID | Title | Type | Priority | Traces To | Status |
-|---------|-------|------|----------|-----------|--------|
-| TC-001 | A matching digest persists the artifact | Unit | P0 | FR-001-AC-1 | ✅ |
-| TC-002 | A mismatched digest rejects the import and names both digests | Unit | P0 | FR-001-AC-2 | ✅ |
-| TC-003 | Import throughput holds at the declared threshold | Benchmark | P2 | FR-003-AC-1 | 🚧 not yet run at scale |
-| TC-004 | Digest computed before any transform | Unit | P1 | - | ⛔ superseded by TC-001 |
+| Test ID | Title | Type | Priority | Traces To |
+|---------|-------|------|----------|-----------|
+| TC-001 | A matching digest persists the artifact | Unit | P0 | FR-001-AC-1 |
+| TC-002 | A mismatched digest rejects the import and names both digests | Unit | P0 | FR-001-AC-2 |
+| TC-003 | Import throughput holds at the declared threshold | Benchmark | P2 | FR-003-AC-1 |
+| TC-004 | Digest computed before any transform | Unit | P1 | - |

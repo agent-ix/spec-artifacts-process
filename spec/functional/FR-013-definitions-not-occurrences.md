@@ -43,9 +43,9 @@ from the schema alone which concept a document owns.
   or a named command was declared as the source of evidence, not what a particular run produced.
 - No emitted model SHALL declare a property naming a run identifier, a run timestamp, a duration, a
   pass/fail count, a log location, or an artefact produced by a run.
-- The `TestMatrix` model SHALL carry a row's `Status` marker as the authored coverage claim it is,
-  never as an execution result; whether the claim is true is decided by the coverage rollup
-  against the evidence store, outside this module.
+- The `spec-artifacts-process` module SHALL treat an authored `TestMatrix` `Status` marker as an
+  optional tracking annotation and SHALL NOT treat it as execution evidence or require it for
+  criterion coverage; `quire matrix` computes criterion coverage from requirements and test tags.
 - The `Inspections` model SHALL carry a row's `Commit` and `Verdict` as the authored record of an
   inspection act — who performed it, against which commit, with what verdict — because that record
   *is* the evidence for a method that produces no source symbol rather than a transcription of a
@@ -88,6 +88,7 @@ from the schema alone which concept a document owns.
 | FR-013-AC-5 | `TestMatrix` and `TestMatrixIndex` rows carry their trace tokens as an ordered list, and a matrix record answers "which criteria does this row claim to cover" without re-parsing the cell. | Test (TC-124) |
 | FR-013-AC-6 | `mappings.yaml` records the run-record concepts this module does not model and names their owner. | Test (TC-125) |
 | FR-013-AC-8 | A reviewer has read every emitted model's property documentation and recorded that none *means* a run outcome under a different name. A test can check names; only a reader can check meaning, and presenting that judgement as a test would be the fabrication this module's own escape-cause vocabulary exists to name. | Inspection (TC-143) |
+| FR-013-AC-9 | A TestMatrix row may omit `Status`; when present it is an authored tracking annotation, and criterion coverage is computed from requirements and test tags without requiring that value | Test (TC-196) |
 
 ## Dependencies
 

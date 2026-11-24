@@ -36,8 +36,9 @@ validation engine's cross-reference job and is out of scope here.
 - `body_extraction` **SHALL NOT** declare a `Functional Requirement Coverage`
   extraction, required or optional (PLAT-1499).
 - `body_extraction` **SHALL** require a `Test Case Summary` `table_row`
-  extraction with columns exactly
-  `Test ID | Title | Type | Priority | Traces To | Status` and at least one row.
+  extraction with columns `Test ID | Title | Type | Priority | Traces To | Status`
+  and at least one row. `Priority` and `Status` are optional columns; all other
+  listed columns are required. The matrix MAY omit `Status` entirely.
 - The `Test ID` column **SHALL** be the id column and match
   `^(TC|IT)(-[A-Za-z0-9]+)+$` with at least one numeric segment. This admits the
   plain `TC-NNN` form, the template's `TC-INT-NNN`/lettered variants, and the
@@ -62,8 +63,8 @@ validation engine's cross-reference job and is out of scope here.
   `column_choices` to exactly `P0 | P1 | P2 | P3 | P4`, where P0 = must-pass
   blocker, P1 = critical path, P2 = standard, P3 = low, and
   P4 = nice-to-have/deferred (CR-018).
-- The `Status` column **SHALL** be constrained via `column_patterns` to a
-  leading status marker followed by an optional note:
+- When a `TestMatrix` includes a `Status` column, each Status cell **SHALL** match the `column_patterns`
+  assert for a leading status marker followed by an optional note:
   `^(✅|❌|🚧|⛔)(\s+.*)?$`. The marker carries the class and the note carries
   why — `🚧 scale evidence deferred` says something the bare marker cannot, and
   6 repo families already author decorated statuses. `⛔` marks a retired row.
@@ -73,6 +74,9 @@ validation engine's cross-reference job and is out of scope here.
   ([FR-050](ix://agent-ix/quire-rs/spec/functional/FR-050) CR-015) — the
   contract and the rollup SHALL NOT declare the vocabulary independently
   (CR-016).
+- `Status` is an optional authored tracking annotation. Criterion coverage is
+  computed by `quire matrix` from requirements and test tags; a hand-authored
+  `Status` value is not required to establish that coverage.
 - Each `Traces To` cell **SHALL** be constrained via the Quire
   `column_patterns` assert to one or more comma-separated trace tokens, each
   matching a `<KIND>-<N>` id with an optional `-<SUBKIND>-<M>` sub-id, where
@@ -172,7 +176,7 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-2 | A doc missing the `Test Case Summary` table fails with reason `missing`; a `Test Case Summary` with a header and zero data rows fails with reason `assert`, and one with exactly one data row passes | Test (TC-001, TC-016) |
 | FR-003-AC-3 | A `Type` cell outside the core evidence vocabulary and the module's declared extensions fails via `column_choices` (reason `assert`); every core value and every declared extension passes | Test (TC-001) |
 | FR-003-AC-4 | A `Test ID` cell not matching `^(TC\|IT)(-[A-Za-z0-9]+)+$` with a numeric segment fails validation; the segmented ecosystem forms (`TC-060-01`, `TC-SB-001`, `TC-001-HEADER-PARSE`) pass, as does an `IT-NNN` id (CR-019); a prefix naming no declared archetype (`BENCH-001`, `AUDIT-001`, `SB-001`, `TCX-001`) fails | Test (TC-001) |
-| FR-003-AC-5 | A `Status` cell not headed by one of `✅ ❌ 🚧 ⛔` fails via `column_patterns`; a marker followed by a note (`✅ Complete`, `🚧 scale evidence deferred`) passes. A `⚠️`-headed cell **fails**: the marker is retired, because `🚧` already carries that meaning and the contract had been admitting a value `traceability.status` classed as nothing (CR-031) | Test (TC-001, TC-008) |
+| FR-003-AC-5 | When `Status` is authored, a cell not headed by one of `✅ ❌ 🚧 ⛔` fails via `column_patterns`; a marker followed by a note (`✅ Complete`, `🚧 scale evidence deferred`) passes. A `⚠️`-headed cell **fails**: the marker is retired, because `🚧` already carries that meaning and the contract had been admitting a value `traceability.status` classed as nothing (CR-031) | Test (TC-001, TC-008) |
 | FR-003-AC-6 | A `Traces To` cell that is not comma-separated `<KIND>-<N>` tokens (with an optional `-<SUBKIND>-<M>` sub-id, a same-prefix range, or a trailing parenthetical note) fails via `column_patterns`; the contract enumerates no kind names | Test (TC-001) |
 | FR-003-AC-7 | A `TestMatrix` doc validates whether or not it carries a `Stakeholder Requirement Coverage`, `User Story Coverage` or `Non-Functional Requirement Coverage` section, and no column set of such a section is asserted | Test (TC-014, TC-015) |
 | FR-003-AC-8 | Test-case rows are extracted as one record per row (`multiple: true`) | Test (TC-001) |
@@ -183,6 +187,8 @@ validation engine's cross-reference job and is out of scope here.
 | FR-003-AC-13 | A `TestMatrix` doc validates whether or not it carries a `Functional Requirement Coverage` section, and no column set of such a section is asserted | Test (TC-003) |
 | FR-003-AC-14 | The shipped `TestMatrix` skeleton emits no `Functional Requirement Coverage` section, and its authoring comment states that requirement-to-criterion coverage is read from `quire matrix`, never authored | Test (TC-194) |
 | FR-003-AC-15 | The `TestMatrix` manifest entry declares extractions for the `Test Case Summary` only; it declares none for the functional, stakeholder, user-story or non-functional coverage tables | Inspection (TC-017) |
+| FR-003-AC-16 | A `Test Case Summary` with no `Status` column validates; when the column is present, each value still passes the declared marker pattern and an unrecognized value fails | Test (TC-195, TC-009) |
+| FR-003-AC-17 | Criterion coverage remains computable from requirements and test tags when the authored `Status` column is absent; `Status` is not required as a hand-authored coverage value | Test (TC-196) |
 
 > **PLAT-1499 note (2026-11-12):** the computed matrix is the single source of
 > functional coverage.

@@ -306,7 +306,7 @@ models:
     archetype: TestMatrix
     role: definition
     notes:
-      - "Every Status marker is the AUTHORED coverage claim, never an execution result. Whether the claim is true is decided by the coverage rollup against the evidence store, outside this module (FR-013)."
+      - "An optional Status marker is an AUTHORED tracking annotation, never execution evidence or an input to criterion coverage, which `quire matrix` computes from requirements and test tags (FR-013, PLAT-1155)."
       - "The `Traces To` cell is the module's `token` mapping: the two authoring shorthands are expanded into the tokens they abbreviate, a parenthesised remainder is carried as `note`, and a lone `-` becomes an empty list with `noTrace: true`."
     dropped_frontmatter_keys: [okf_version, description]
     properties:
@@ -321,7 +321,7 @@ models:
         heading: Test Case Summary
         required: true
         columns: [Test ID, Title, Type, Priority, Traces To, Status]
-        optional_columns: [Priority]
+        optional_columns: [Priority, Status]
         id_column: Test ID
         fields:
           Test ID: {property: id, parse: id}

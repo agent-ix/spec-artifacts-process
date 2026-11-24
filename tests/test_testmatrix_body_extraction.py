@@ -76,6 +76,13 @@ def test_conforming_matrix_validates() -> None:
     assert_valid("conforming.md")
 
 
+@pytest.mark.trace("TC-195", "FR-003-AC-16", "FR-003-AC-17", "FR-013-AC-9")
+def test_status_column_may_be_omitted() -> None:
+    """TC-195 (FR-003-AC-16, FR-003-AC-17): Status-free Test Case Summary rows
+    validate, while their ids and trace cells remain present and constrained."""
+    assert_valid("status-column-omitted.md")
+
+
 @pytest.mark.trace("TC-014", "FR-003-AC-7")
 def test_no_coverage_section_of_any_kind_is_required() -> None:
     """TC-014 (FR-003-AC-7): the stakeholder, user-story and non-functional

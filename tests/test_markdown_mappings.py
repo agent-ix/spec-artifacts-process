@@ -326,10 +326,10 @@ def test_traces_to_rejects_the_forms_the_pattern_rejects(cell: str):
     assert parse_traces(cell) is None
 
 
-@pytest.mark.trace("TC-103")
-def test_an_omitted_optional_column_yields_no_key(mapper):
-    """CR-018: many ecosystem matrices author no priority anywhere. The
-    record must omit the key, never synthesise a value."""
+@pytest.mark.trace("TC-103", "FR-003-AC-16", "FR-013-AC-9")
+def test_omitted_optional_priority_and_status_yield_no_keys(mapper):
+    """CR-018/PLAT-1155: omitted matrix columns produce no synthesized record
+    values for priority or tracking status."""
     text = skeleton("TestMatrix.md")
     lines = []
     for line in text.split("\n"):
@@ -339,7 +339,7 @@ def test_an_omitted_optional_column_yields_no_key(mapper):
             or set(line.strip()) <= set("|- ")
         ):
             cells = line.split("|")
-            if len(cells) == 8:
+            if len(cells) == 7:
                 del cells[4]
                 line = "|".join(cells)
         lines.append(line)
@@ -347,6 +347,7 @@ def test_an_omitted_optional_column_yields_no_key(mapper):
     assert record["testCases"], "the stripped matrix still declares rows"
     for row in record["testCases"]:
         assert "priority" not in row
+        assert "status" not in row
 
 
 @pytest.mark.trace("TC-108")
