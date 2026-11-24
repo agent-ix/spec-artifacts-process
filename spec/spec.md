@@ -28,6 +28,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 - The Module manifest and the contributions it declares: 7 process archetypes (adr, plan, review, spec-review, test-matrix, dossier-document, standard), 1 grammar (process-artifacts), and the 14 artifact types the manifest declares (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrixIndex, TestMatrix, Standard, SuiteRegistry, Inspections, Anomaly, DossierDocument).
 - The `Anomaly` artifact type: its state, resolution, named closer and safety-impact assessment, fix verification and release rationale (US-003, FR-014, FR-015, FR-016, NFR-001).
+- The `IntendedUse` and `FeatureRiskRating` artifact types for human-authored tool risk decisions, including failure-mode and detection information, supplier ratings and adopter re-ratings (FR-024 through FR-027, NFR-002).
 - The `ADR` archetype's `allowed_links`, including the design-realization verb (FR-017) and the segregation verb (FR-019).
 - The `DossierDocument` artifact type for generated submission-dossier documents: required identity and kind members, an RFC 3339 `as_of` required for a requirements mapping matrix, the vulnerability-management plan document kind, and no digest or `provenance` because the commit is the identity (FR-018).
 - The templates and schemas this module ships for agent CLI generators (minijinja-cli).
@@ -96,6 +97,13 @@ contract sits on top of those: FR-009 emits one JSON Schema per declared artifac
 TypeSpec source, FR-010 declares the contract in the manifest,
 FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fixtures with
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
+
+FR-024 and FR-025 define supplier intended-use statements and human-authored feature ratings,
+including per-feature failure and detection information and separate adopter re-ratings. FR-026
+defines supplier-rating completeness and duplicate checks; FR-027 defines acceptance through a
+named person's signed decision. NFR-002 keeps these decisions human-owned and prevents the module
+from deriving or assigning ratings, scores, product criticality, software safety classes or
+acceptance.
 
 ## References
 

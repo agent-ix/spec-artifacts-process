@@ -30,3 +30,7 @@ description: "Index of artifacts in this directory."
 * [FR-021: RoleSpec trace targets and cross-row integrity: rules, evaluations, objectives, metrics](./FR-021-rolespec-trace-and-cross-row-checks.md)
 * [FR-022: RoleSpec checks that need history or other files: owner, and the worked example gate](./FR-022-rolespec-lint-ownership.md)
 * [FR-023: Rubric archetype: versioned checks that judgement evaluations cite](./FR-023-rubric-archetype.md)
+* [FR-024: IntendedUse archetype for a tool's stated operating purpose](./FR-024-intended-use-archetype.md)
+* [FR-025: FeatureRiskRating records human-owned risk and detection evidence](./FR-025-feature-risk-rating-archetype.md)
+* [FR-026: Feature risk rating completeness and duplicate detection](./FR-026-feature-rating-completeness.md)
+* [FR-027: A named person accepts a feature risk rating by signed commit](./FR-027-human-acceptance-of-risk-ratings.md)
