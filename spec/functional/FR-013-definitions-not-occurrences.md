@@ -43,9 +43,9 @@ from the schema alone which concept a document owns.
   or a named command was declared as the source of evidence, not what a particular run produced.
 - No emitted model SHALL declare a property naming a run identifier, a run timestamp, a duration, a
   pass/fail count, a log location, or an artefact produced by a run.
-- A `TestMatrix` row MAY carry an authored `Status` marker as a tracking annotation. The marker
-  SHALL NOT be represented as execution evidence or as an input required for criterion coverage,
-  which `quire matrix` computes from requirements and test tags.
+- The `spec-artifacts-process` module SHALL treat an authored `TestMatrix` `Status` marker as an
+  optional tracking annotation and SHALL NOT treat it as execution evidence or require it for
+  criterion coverage; `quire matrix` computes criterion coverage from requirements and test tags.
 - The `Inspections` model SHALL carry a row's `Commit` and `Verdict` as the authored record of an
   inspection act — who performed it, against which commit, with what verdict — because that record
   *is* the evidence for a method that produces no source symbol rather than a transcription of a

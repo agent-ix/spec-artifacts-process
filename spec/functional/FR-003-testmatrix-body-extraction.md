@@ -63,8 +63,8 @@ validation engine's cross-reference job and is out of scope here.
   `column_choices` to exactly `P0 | P1 | P2 | P3 | P4`, where P0 = must-pass
   blocker, P1 = critical path, P2 = standard, P3 = low, and
   P4 = nice-to-have/deferred (CR-018).
-- When authored, the optional `Status` column **SHALL** be constrained via `column_patterns` to a
-  leading status marker followed by an optional note:
+- When a `TestMatrix` includes a `Status` column, each Status cell **SHALL** match the `column_patterns`
+  assert for a leading status marker followed by an optional note:
   `^(✅|❌|🚧|⛔)(\s+.*)?$`. The marker carries the class and the note carries
   why — `🚧 scale evidence deferred` says something the bare marker cannot, and
   6 repo families already author decorated statuses. `⛔` marks a retired row.

@@ -755,6 +755,67 @@ def _quire_coverage(tmp_path: pathlib.Path, files: dict[str, str]) -> dict:
     return json.loads(result.stdout)
 
 
+@pytest.mark.trace("TC-196", "FR-003-AC-17", "FR-013-AC-9")
+def test_quire_matrix_computes_criterion_coverage_without_status(
+    tmp_path: pathlib.Path,
+) -> None:
+    """FR-003-AC-17/FR-013-AC-9: a Status-free TestMatrix still binds a tagged
+    test to its criterion, and `quire matrix` reports the computed coverage."""
+    spec = tmp_path / "spec"
+    tests = tmp_path / "tests"
+    spec.mkdir()
+    tests.mkdir()
+    (spec / "FR-001-example.md").write_text(
+        "---\nid: FR-001\ntitle: Example\ntype: FR\n---\n"
+        "# FR-001: Example\n\n## Acceptance Criteria\n\n"
+        "| ID | Criteria | Verification |\n"
+        "|----|----------|--------------|\n"
+        "| FR-001-AC-1 | Example criterion | Test |\n"
+    )
+    (spec / "tests.md").write_text(
+        "---\nid: TM-001\ntitle: Example matrix\ntype: TestMatrix\n---\n"
+        "# TM-001: Example matrix\n\n## Test Case Summary\n\n"
+        "| Test ID | Title | Type | Priority | Traces To |\n"
+        "|---------|-------|------|----------|-----------|\n"
+        "| TC-001 | Example test | Unit | P1 | FR-001-AC-1 |\n"
+    )
+    (tests / "test_example.py").write_text(
+        'import pytest\n\n@pytest.mark.trace("TC-001")\n'
+        "def test_example():\n    pass\n"
+    )
+
+    result = run_quire(
+        "matrix",
+        "--scope",
+        str(tmp_path),
+        "--format",
+        "json",
+        siblings=("spec-artifacts-iso",),
+    )
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+
+    criteria: list[dict] = []
+
+    def collect(value: object) -> None:
+        if isinstance(value, dict):
+            if value.get("id") == "FR-001-AC-1":
+                criteria.append(value)
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(report["coverage_matrix"])
+    assert len(criteria) == 1, "the criterion must appear once in the computed matrix"
+    assert criteria[0]["status"] == "tagged"
+    assert any(
+        binder["qualified_name"] == "test_example"
+        for binder in criteria[0]["binders"]
+    )
+
+
 def _edges(report: dict) -> set[tuple[str, str, str, str]]:
     return {
         (e["path"], e["symbol"], e["trace_id"], e["form"])
