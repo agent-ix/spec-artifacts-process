@@ -81,6 +81,8 @@ Disposition pass 1 was checked against fix head cc809ce.
 | FND-007 | deferred | SWM-247 has a scope note to re-point the AC-1 and AC-12 tests to `quire matrix` when capability 1 lands. |
 | FND-008 | fixed | The conditional needles now include the schema path (`allOf/0/then`, `allOf/1/then/pattern`, `allOf/1/then/not`). |
 | FND-009 | fixed | id-lower-case, id-too-long, rubric-bad-id and rubric-version-zero each produce exactly one diagnostic. The cascades left in missing-id and rubric-missing-version are the engine's `unresolved-field` for an absent field, which a fixture cannot avoid. |
+| FND-010 | fixed | Round 2, head 85d21a8. The US-001 and US-002 tokens are removed from TC-001, TC-002, TC-005 and TC-100. The `traces-to` reference resolves only to acceptance-criterion targets, so those tokens never resolved and never reached the matrix; US-001 and US-002 keep their lineage through FR-003/FR-004 and FR-009 to FR-013 `satisfies`. TC-037's `-AC-2` became FR-005-AC-2, the same criterion. `quire validate --okf` over the repo exits 0, and the PR body records the consumer-facing change. |
+| FND-011 | fixed | Round 2, head 85d21a8. The skeleton now reads "Allowed relationship verbs: satisfies, depends_on." The regenerated golden record changes only the provenance digest in examples/RoleSpec.record.json, and the golden-record tests pass. |
 
 ## New findings (disposition pass 1)
 
