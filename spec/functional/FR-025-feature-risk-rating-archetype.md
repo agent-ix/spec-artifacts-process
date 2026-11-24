@@ -70,7 +70,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-025-AC-1 | A supplier rating with an allowed enum value, named rater, valid IntendedUse reference, one `rates_feature` target, a corresponding feature-assessment row, `Rationale` and `Assurance activities` validates. | Test |
-| FR-025-AC-2 | A rating with `rating: medium`, a missing `rated_by`, missing `Rationale`, no `rates_feature` target or a missing feature-assessment row fails validation naming the invalid or missing member. | Test |
+| FR-025-AC-2 | A supplier rating with `rating: medium`, a missing `rated_by`, missing `Rationale`, no `rates_feature` target or a missing feature-assessment row fails validation naming the invalid or missing member. An adopter rating without `re_rates` also fails. | Test |
 | FR-025-AC-3 | A rating with two `rates_feature` targets validates only when it has a separate failure-mode and detection row for each target. | Test |
 | FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates; a missing supplier link, a link to a supplier rating covering a different requirement, or an adopter `rates_feature` edge fails validation. | Test |
 | FR-025-AC-5 | An adopter rating does not change the supplier record when the two documents have different ratings or rationales. | Demonstration |
