@@ -20,7 +20,7 @@ A judgement evaluation in a role spec cites a rubric check as `<rubric>@<version
 
 ## Inputs
 
-- A Markdown file with `type: Rubric`, kept with the role specs under `spec/roles/`.
+- A Markdown file with `type: Rubric`, kept in dev-team at `spec/rubrics/<rubric>.md`, inside the spec root so `quire matrix` reads it and apart from `spec/roles/`. The rubrics now in `skills/team-retro/references/` move there when this ships.
 
 ## Outputs
 
@@ -54,4 +54,4 @@ A judgement evaluation in a role spec cites a rubric check as `<rubric>@<version
 - [FR-004](./FR-004-traceability-declaration.md) for the trace-target and document-reference mechanics.
 - [FR-020](./FR-020-rolespec-archetype.md), which defines the reference form, and [FR-021](./FR-021-rolespec-trace-and-cross-row-checks.md), which declares the `Evaluations` reference to `rubric-check`.
 - dev-team FR-006, which defines judgement evaluations.
-- Open question for the owner: where rubric files live in dev-team (the archetype assumes `spec/roles/` so `quire matrix` reads them).
+- dev-team moves its rubrics from `skills/team-retro/references/` to `spec/rubrics/` and installs this module to validate them.
