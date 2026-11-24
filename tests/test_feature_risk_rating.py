@@ -33,9 +33,7 @@ def rating(scope: str, verb: str) -> dict:
         "rating": "not_high_process_risk",
         "rated_by": "Named Reviewer",
         "intended_use": "IU-001",
-        "relationships": [
-            {"target": "ix://agent-ix/example/FR-001", "type": verb}
-        ],
+        "relationships": [{"target": "ix://agent-ix/example/FR-001", "type": verb}],
     }
 
 
@@ -47,7 +45,9 @@ class TestFeatureRiskRating:
         ("scope", "verb"),
         [("supplier", "rates_feature"), ("adopter", "re_rates")],
     )
-    def test_valid_relationships_match_rating_scope(self, scope: str, verb: str) -> None:
+    def test_valid_relationships_match_rating_scope(
+        self, scope: str, verb: str
+    ) -> None:
         """Accept only each rating scope's relationship kind.
 
         Assumptions:
