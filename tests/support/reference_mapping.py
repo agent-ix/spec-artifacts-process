@@ -298,6 +298,19 @@ class ReferenceMapper:
                 return locator.get("assert") or {}
         return {}
 
+    def _interpolated(self, pattern: str | None) -> str | None:
+        """An assert pattern with its `{field}` tokens replaced by the document's
+        own frontmatter values, regex-escaped (quire-rs FR-034). A repetition
+        quantifier such as `{2}` starts with a digit and is left alone."""
+        if pattern is None:
+            return None
+        values = getattr(self, "_frontmatter_values", {})
+
+        def substitute(match: re.Match[str]) -> str:
+            return re.escape(str(values[match.group(1)]))
+
+        return re.sub(r"\{([A-Za-z_][A-Za-z0-9_]*)\}", substitute, pattern)
+
     # -- entry point -------------------------------------------------------
 
     def build(
@@ -305,6 +318,7 @@ class ReferenceMapper:
     ) -> dict[str, Any]:
         spec = self.mappings["models"][model]
         doc = Document.parse(text, path, source_identity)
+        self._frontmatter_values = doc.frontmatter or {}
         errors: list[MappingError] = []
         record: dict[str, Any] = {}
         for prop, entry in spec["properties"].items():
@@ -493,7 +507,7 @@ class ReferenceMapper:
                     continue
                 row[name] = cell
             elif parse == "id":
-                pattern = asserts.get("id_pattern")
+                pattern = self._interpolated(asserts.get("id_pattern"))
                 if pattern and not re.fullmatch(pattern, cell):
                     errors.append(MappingError(model, prop, "id-pattern", line, cell))
                     ok = False

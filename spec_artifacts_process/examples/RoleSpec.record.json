@@ -1,0 +1,62 @@
+{
+  "evaluations": [
+    {
+      "cadence": "tick",
+      "comparator": "=",
+      "evaluator": "evaluator",
+      "evidenceSource": "ledger",
+      "id": "ROLE-R01-E1",
+      "line": 65,
+      "method": "deterministic",
+      "queryOrRubric": "ledger.example_violations",
+      "rule": "ROLE-R01",
+      "trigger": "ledger.example_trigger",
+      "unit": "ticks",
+      "value": "0"
+    }
+  ],
+  "id": "ROLE",
+  "metrics": [
+    {
+      "direction": "lower",
+      "evidenceSource": "ledger",
+      "id": "ROLE-M01",
+      "line": 47,
+      "name": "Example metric",
+      "query": "ledger.example_metric",
+      "target": "30",
+      "unit": "minutes/day"
+    }
+  ],
+  "objectives": [
+    {
+      "id": "ROLE-O01",
+      "line": 53,
+      "metrics": "ROLE-M01",
+      "objective": "Example objective"
+    }
+  ],
+  "provenance": {
+    "digest": "sha256:85b5dd539d1ed7c84445aa2056a4b7102808c481c988ea8d2d42938cfc55b44f",
+    "path": "skeletons/RoleSpec.md"
+  },
+  "relationships": [
+    {
+      "target": "ix://agent-ix/dev-team/FR-006",
+      "type": "satisfies"
+    }
+  ],
+  "role": "role-name",
+  "rules": [
+    {
+      "class": "example-class",
+      "id": "ROLE-R01",
+      "line": 59,
+      "objective": "ROLE-O01",
+      "rule": "The role SHALL do the example thing.",
+      "source": "Example incident"
+    }
+  ],
+  "type": "RoleSpec",
+  "version": 1
+}

@@ -5,8 +5,8 @@
  * stale. Everything else ending in `.json` is a projection.
  */
 
-/** The hand-authored `record_validation` schemas of an extracted record (FR-014). */
-export const HAND_AUTHORED = new Set(["AnomalyFields.json"]);
+/** The hand-authored `record_validation` schemas of an extracted record (FR-014, FR-020). */
+export const HAND_AUTHORED = new Set(["AnomalyFields.json", "RoleSpecFields.json"]);
 
 export function isProjection(name) {
   return (

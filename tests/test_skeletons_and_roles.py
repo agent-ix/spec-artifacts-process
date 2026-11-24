@@ -44,6 +44,8 @@ EXPECTED_ROLES = {
     "TestMatrixIndex": "definition",
     "TestMatrix": "definition",
     "Standard": "definition",
+    "RoleSpec": "definition",
+    "Rubric": "definition",
     "SuiteRegistry": "evidence-act",
     "Inspections": "evidence-act",
 }

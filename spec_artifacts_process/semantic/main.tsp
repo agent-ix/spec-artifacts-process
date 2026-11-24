@@ -597,6 +597,177 @@ model FeedbackAnchor {
 }
 
 // ---------------------------------------------------------------------------
+// RoleSpec and Rubric (FR-020, FR-023)
+// ---------------------------------------------------------------------------
+
+/** A role spec's `id`: the role's rule prefix, 2 to 6 upper-case letters (`MIND`). */
+@pattern("^[A-Z]{2,6}$")
+scalar RolePrefix extends string;
+
+/** A rubric's `id`: a lower-case slug starting with `rubric-`. */
+@pattern("^rubric-[a-z0-9]+(-[a-z0-9]+)*$")
+scalar RubricId extends string;
+
+/** A positive integer document version. */
+@minValue(1)
+scalar DocVersion extends int32;
+
+/** A metric row id, `<PREFIX>-M01`. The row's prefix must equal the frontmatter `id`; that is the archetype's assert, not this pattern's. */
+@pattern("^[A-Z]{2,6}-M[0-9]{2}$")
+scalar MetricId extends string;
+
+/** An objective row id, `<PREFIX>-O01`. */
+@pattern("^[A-Z]{2,6}-O[0-9]{2}$")
+scalar ObjectiveId extends string;
+
+/** A rule row id, `<PREFIX>-R01`. */
+@pattern("^[A-Z]{2,6}-R[0-9]{2}$")
+scalar RuleId extends string;
+
+/** An evaluation row id, `<PREFIX>-R01-E1`. */
+@pattern("^[A-Z]{2,6}-R[0-9]{2}-E[0-9]+$")
+scalar EvaluationId extends string;
+
+/** A query registered with the evaluator, `<source>.<name>`; whether it is registered is the evaluator's binding check. */
+@pattern("^[a-z][a-z0-9-]*\\.[a-z][a-z0-9_]*$")
+scalar QueryRef extends string;
+
+/** A versioned rubric check reference, `<rubric>@<version>#<check-slug>`. Also the id of a rubric check. */
+@pattern("^[a-z][a-z0-9-]*@[0-9]+#[a-z][a-z0-9-]*$")
+scalar RubricCheckRef extends string;
+
+/** A threshold value as authored: a decimal number. Carried as text so the cell is not rewritten. */
+@pattern("^-?[0-9]+(\\.[0-9]+)?$")
+scalar NumericText extends string;
+
+/** The sources an evaluator reads evidence from. The vocabulary of the `Evidence source` columns. */
+enum EvidenceSource {
+  ledger,
+  relayReceipts: "relay-receipts",
+  hookEvents: "hook-events",
+  linear,
+  github,
+  transcript,
+  ixBoardMetric: "ix-board-metric",
+}
+
+/** Which way a metric improves. */
+enum MetricDirection {
+  higher,
+  lower,
+}
+
+/** How an evaluation is decided: by a registered query, or by judgement against a rubric. */
+enum EvaluationMethod {
+  deterministic,
+  judgement,
+}
+
+/** How often an evaluation runs. */
+enum EvaluationCadence {
+  tick,
+  sessionEnd: "session-end",
+  threeHours: "3h",
+  daily,
+  weekly,
+}
+
+/** A threshold comparator. */
+enum Comparator {
+  lt: "<",
+  le: "<=",
+  eq: "=",
+  ge: ">=",
+  gt: ">",
+}
+
+/** Who decides an evaluation: the evaluator for a deterministic row, the director or team-retro for a judgement row. */
+enum EvaluatorKind {
+  evaluator,
+  director,
+  `team-retro`,
+}
+
+/** One `## Metrics` row: a measured quantity and where its evidence comes from. */
+model MetricRow {
+  id: MetricId;
+  /** free text: what is measured. */
+  name: NonEmptyText;
+  evidenceSource: EvidenceSource;
+  query: QueryRef;
+  /** free text: the unit of the measure. */
+  unit: NonEmptyText;
+  /** free text: the target as authored. */
+  target: NonEmptyText;
+  direction: MetricDirection;
+  line: LineNumber;
+}
+
+/** One `## Objectives` row: what the role is for and the metrics that show it. */
+model ObjectiveRow {
+  id: ObjectiveId;
+  /** free text: the objective. */
+  objective: NonEmptyText;
+  /** free text: the metric ids as authored; whether each resolves is a reference diagnostic. */
+  metrics: NonEmptyText;
+  line: LineNumber;
+}
+
+/** One `## Rules` row: a required or forbidden behavior, the objective it serves and the incident it came from. */
+model RuleRow {
+  id: RuleId;
+  /** free text: the rule statement. */
+  rule: NonEmptyText;
+  /** free text: the objective id as authored. */
+  objective: NonEmptyText;
+  /** free text: the failure class the rule guards against. */
+  class: NonEmptyText;
+  /** free text: the incident or source the rule came from. */
+  source: NonEmptyText;
+  line: LineNumber;
+}
+
+/**
+ * One `## Evaluations` row: how a rule is checked. A `deterministic` row names a
+ * query reference and is decided by the `evaluator`; a `judgement` row names a
+ * versioned rubric check, is decided by the `director` or `team-retro`, and never
+ * runs at cadence `tick`.
+ */
+@extension("allOf", #[
+  #{ `if`: #{ `properties`: #{ `method`: #{ `const`: "deterministic" } }, `required`: #["method"] },
+     `then`: #{ `properties`: #{ `evaluator`: #{ `const`: "evaluator" }, `queryOrRubric`: #{ `$ref`: "QueryRef.json" } } } },
+  #{ `if`: #{ `properties`: #{ `method`: #{ `const`: "judgement" } }, `required`: #["method"] },
+     `then`: #{ `properties`: #{ `evaluator`: #{ `enum`: #["director", "team-retro"] }, `queryOrRubric`: #{ `$ref`: "RubricCheckRef.json" }, `cadence`: #{ `not`: #{ `const`: "tick" } } } } }
+])
+model EvaluationRow {
+  id: EvaluationId;
+  /** free text: the rule id as authored. */
+  rule: NonEmptyText;
+  evidenceSource: EvidenceSource;
+  trigger: QueryRef;
+  method: EvaluationMethod;
+  /** A query reference when `method` is `deterministic`, a rubric check reference when `judgement`. */
+  queryOrRubric: string;
+  evaluator: EvaluatorKind;
+  comparator: Comparator;
+  value: NumericText;
+  /** free text: the unit of the threshold. */
+  unit: NonEmptyText;
+  cadence: EvaluationCadence;
+  line: LineNumber;
+}
+
+/** One `## Checks` row of a rubric: a versioned check id, what it asks and its scale. */
+model RubricCheckRow {
+  id: RubricCheckRef;
+  /** free text: what the check asks. */
+  check: NonEmptyText;
+  /** free text: the scoring scale. */
+  scale: NonEmptyText;
+  line: LineNumber;
+}
+
+// ---------------------------------------------------------------------------
 // Artifact models (exported)
 // ---------------------------------------------------------------------------
 
@@ -916,4 +1087,38 @@ model Inspections {
   type: "Inspections";
   provenance: Provenance;
   @minItems(1) inspections: InspectionRow[];
+}
+
+/**
+ * Role spec (archetype `RoleSpec`). A **definition**: what a role is for, which
+ * behavior it requires or forbids, and how each statement is checked. It records
+ * no evaluation result (FR-013).
+ */
+model RoleSpec {
+  id: RolePrefix;
+  /** free text: the role name. */
+  role: NonEmptyText;
+  type: "RoleSpec";
+  version: DocVersion;
+  /** Absent when the author declared none; the frontmatter schema does not require the key (FR-011-AC-15). */
+  relationships?: Relationship[];
+  provenance: Provenance;
+  @minItems(1) metrics: MetricRow[];
+  @minItems(1) objectives: ObjectiveRow[];
+  @minItems(1) rules: RuleRow[];
+  @minItems(1) evaluations: EvaluationRow[];
+}
+
+/**
+ * Rubric (archetype `Rubric`). A **definition**: the versioned checks that
+ * judgement evaluations in a role spec cite. It records no score (FR-013).
+ */
+model Rubric {
+  id: RubricId;
+  type: "Rubric";
+  version: DocVersion;
+  /** Absent when the author declared none; the frontmatter schema does not require the key (FR-011-AC-15). */
+  relationships?: Relationship[];
+  provenance: Provenance;
+  @minItems(1) checks: RubricCheckRow[];
 }

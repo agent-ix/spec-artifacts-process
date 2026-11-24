@@ -414,3 +414,94 @@ models:
           Verdict: {property: verdict, parse: enum}
           Note: {property: note, parse: text}
 
+  RoleSpec:
+    archetype: RoleSpec
+    role: definition
+    notes:
+      - "A role stated as typed tables: what it is for, which behavior it requires or forbids, and how each statement is checked. It records no evaluation result (FR-013)."
+      - "Row ids carry the frontmatter `id` as their prefix, so the locators' `id_pattern` interpolates it; the vocabularies of the enum columns are the manifest's `column_choices` and the model's enums, restated nowhere in this file."
+    dropped_frontmatter_keys: [title, object, status]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      role: {kind: frontmatter, path: [role], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      version: {kind: frontmatter, path: [version], required: true}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      metrics:
+        kind: typed-table
+        heading: Metrics
+        required: true
+        columns: [ID, Name, Evidence source, Query, Unit, Target, Direction]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Name: {property: name, parse: text}
+          Evidence source: {property: evidenceSource, parse: enum}
+          Query: {property: query, parse: text}
+          Unit: {property: unit, parse: text}
+          Target: {property: target, parse: text}
+          Direction: {property: direction, parse: enum}
+      objectives:
+        kind: typed-table
+        heading: Objectives
+        required: true
+        columns: [ID, Objective, Metrics]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Objective: {property: objective, parse: text}
+          Metrics: {property: metrics, parse: text}
+      rules:
+        kind: typed-table
+        heading: Rules
+        required: true
+        columns: [ID, Rule, Objective, Class, Source]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Rule: {property: rule, parse: text}
+          Objective: {property: objective, parse: text}
+          Class: {property: class, parse: text}
+          Source: {property: source, parse: text}
+      evaluations:
+        kind: typed-table
+        heading: Evaluations
+        required: true
+        columns: [ID, Rule, Evidence source, Trigger, Method, Query or rubric, Evaluator, Comparator, Value, Unit, Cadence]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Rule: {property: rule, parse: text}
+          Evidence source: {property: evidenceSource, parse: enum}
+          Trigger: {property: trigger, parse: text}
+          Method: {property: method, parse: enum}
+          Query or rubric: {property: queryOrRubric, parse: text}
+          Evaluator: {property: evaluator, parse: text}
+          Comparator: {property: comparator, parse: enum}
+          Value: {property: value, parse: text}
+          Unit: {property: unit, parse: text}
+          Cadence: {property: cadence, parse: enum}
+
+  Rubric:
+    archetype: Rubric
+    role: definition
+    notes:
+      - "The versioned checks that judgement evaluations in a role spec cite. It records no score (FR-013)."
+    dropped_frontmatter_keys: [title, object, status]
+    properties:
+      id: {kind: frontmatter, path: [id], required: true}
+      type: {kind: frontmatter, path: [type], required: true}
+      version: {kind: frontmatter, path: [version], required: true}
+      relationships: {kind: frontmatter, path: [relationships]}
+      provenance: {kind: provenance, required: true}
+      checks:
+        kind: typed-table
+        heading: Checks
+        required: true
+        columns: [ID, Check, Scale]
+        id_column: ID
+        fields:
+          ID: {property: id, parse: id}
+          Check: {property: check, parse: text}
+          Scale: {property: scale, parse: text}

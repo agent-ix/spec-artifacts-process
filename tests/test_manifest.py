@@ -258,6 +258,10 @@ def test_testmatrix_contract_does_not_widen_the_manifest() -> None:
         # FR-018: DossierDocument asserts that its identity and kind members are
         # present; the vocabularies stay in its frontmatter schema alone.
         "DossierDocument",
+        # FR-020 / FR-023: RoleSpec and Rubric assert their table shapes and
+        # vocabularies, so each carries a contract by design.
+        "RoleSpec",
+        "Rubric",
         # Per FR-012 in #78 `Standard` gains the typed declaration sections. Both
         # locators are `required: false`, which is the whole compatibility
         # story: every Standard document in every consuming repository
