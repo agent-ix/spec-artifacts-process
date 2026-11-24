@@ -209,4 +209,6 @@ class TestFeatureRiskRating:
             "direction": "incoming",
             "check": "feature-without-risk-rating",
         }
-        assert manifest["grammar_severity"]["trace:feature-without-risk-rating"] == "off"
+        assert (
+            manifest["grammar_severity"]["trace:feature-without-risk-rating"] is False
+        )
