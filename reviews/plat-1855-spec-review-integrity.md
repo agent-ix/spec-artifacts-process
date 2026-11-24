@@ -24,3 +24,10 @@ Ticket: PLAT-1855. Integrity review of the new FR-019, its index and scope entri
 | --- | --- | --- | --- |
 | FND-001 | high | FR-019-AC-5 says `quire validate` of an `ADR` that authors `requirement_segregated_by` reports `disallowed-edge-type`. quire-rs FR-041-AC-2 makes a declared inverse label type-allowed regardless of the archetype's `allowed_links`. Once spec-objects-architecture FR-016 declares the verb with that inverse, which is the state this FR exists for, the ADR draws no finding (measured with architecture PR #60 head beff9a8). The AC is true only while the verb is undeclared, so it is not a property of this module. FR-017 keeps the inverse at manifest level only (FR-017-AC-2), which FR-019-AC-2 already copies. Fix: delete AC-5 and its TC-249 clause. | spec/functional/FR-019-adr-segregation-verb.md:47, spec/tests.md:232 |
 | FND-002 | low | The third Behavior bullet requires the `ADR` `allowed_links` to keep "every verb it listed before this requirement", but AC-3 checks only `realizes_requirement`. FR-017-AC-4 already guards the four older verbs. Fix: narrow the bullet to `realizes_requirement`, or cite FR-017-AC-4. | spec/functional/FR-019-adr-segregation-verb.md:37 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | f1e2472 deletes FR-019-AC-5 and narrows TC-249 to FR-019-AC-4. No reference to FR-019-AC-5 remains in spec/ or tests/, and `quoin matrix` lists FR-019-AC-1..4 only. |
+| FND-002 | fixed | f1e2472: the third Behavior bullet now reads "The `ADR` `allowed_links` SHALL keep `realizes_requirement`. The earlier verbs stay as [FR-017-AC-4](./FR-017-adr-design-realization-verb.md) states." |

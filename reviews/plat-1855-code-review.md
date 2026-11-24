@@ -32,3 +32,10 @@ Pre-existing failures (outside this diff): `test_adr_realizing_a_part_draws_the_
 | --- | --- | --- | --- |
 | FND-001 | high | `test_adr_authoring_the_segregation_verb_draws_no_disallowed_edge_type` asserts `disallowed-edge-type` for an ADR authoring `requirement_segregated_by`. Under quire-rs FR-041 Tier-1 any declared inverse label is type-allowed on every archetype, so once spec-objects-architecture declares the verb (PR #60) the finding disappears and the test fails (measured with PR #60 head beff9a8). It passes today only because the verb is undeclared. The FR-017 precedent asserts the inverse only at manifest level (FR-017-AC-2). Fix: drop the inverse validate assertion and the `adr-requirement_segregated_by.md` fixture, with FR-019-AC-5. | tests/test_adr_links.py:157-160, tests/fixtures/adr/adr-requirement_segregated_by.md |
 | FND-002 | low | Until spec-objects-architecture declares `segregates_for_requirement`, every quire run that loads this module with architecture origin/main prints an `UnknownEdgeType` registry diagnostic (exit 0). Merge after spec-objects-architecture PR #60. | spec_artifacts_process/manifest.yaml:80 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | f1e2472 removes the inverse assertion and `tests/fixtures/adr/adr-requirement_segregated_by.md`; the test is now tagged `FR-019-AC-4`, `TC-249` only. `tests/test_adr_links.py` passes 11/11 with origin/main iso, security and architecture modules and with architecture PR #60 head beff9a8 (quire 0.52.0). Deleting the `segregates_for_requirement` line still fails TC-248 and TC-249 under PR #60. |
+| FND-002 | fixed | The PR #163 body now states "Merge order: merge AFTER spec-objects-architecture #60" and explains the `UnknownEdgeType` advisory. |
