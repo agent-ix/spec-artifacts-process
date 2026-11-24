@@ -35,3 +35,14 @@ FR-021's single SHALL statements (lines 19 and 30) are ubiquitous and conform.
 | FND-004 | low | "A rule whose evaluations are all `judgement` SHALL be reported as a warning" names no agent (`quality:agentless-passive`). | spec/functional/FR-020-rolespec-archetype.md:47 |
 | FND-005 | low | One statement carries two obligations: "This module SHALL declare … and SHALL implement neither check" (`ears:non-singular`). | spec/functional/FR-022-rolespec-lint-ownership.md:25 |
 | FND-006 | medium | Two binding SHALLs have Quoin as their subject ("Quoin SHALL require a strictly higher `version`", "Quoin SHALL report any cited rule id"). Quoin is outside this module, no AC here verifies them, and the sentence "Deleting a rule … requires the same bump" carries no modal at all. These obligations belong in a Quoin requirement. Here they should be stated as an allocation, for example "This module SHALL NOT implement …; the check is allocated to Quoin (ticket)". | spec/functional/FR-022-rolespec-lint-ownership.md:23-24 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head 23335ff): FR-020 lines 39-41 split the statement into three, one SHALL each. |
+| FND-002 | fixed | Round 1: FR-020 line 23 now reads "which behavior it requires or forbids", with no `must`. |
+| FND-003 | fixed | Round 1: the row-conditional statement now has an agent: "The `RoleSpec` record schema SHALL apply the following to each evaluation row" (FR-020 line 57). |
+| FND-004 | fixed | Round 1: the passive SHALL is removed. The all-judgement warning is now a check entry in FR-021 line 42 that names its computation. |
+| FND-005 | fixed | Round 1: FR-022 lines 25-26 split the statement into two SHALLs. |
+| FND-006 | fixed | Round 1: FR-022 lines 23-24 are now "Allocation" entries to Quoin (SWM-249) with no SHALL on Quoin. `quire validate` on FR-020 to FR-023 now reports no grammar warnings. |

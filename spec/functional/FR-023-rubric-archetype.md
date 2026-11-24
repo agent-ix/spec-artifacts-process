@@ -9,6 +9,10 @@ relationships:
     type: "depends_on"
   - target: "ix://agent-ix/spec-artifacts-process/FR-004"
     type: "depends_on"
+  - target: "ix://agent-ix/spec-artifacts-process/FR-011"
+    type: "depends_on"
+  - target: "ix://agent-ix/spec-artifacts-process/FR-012"
+    type: "depends_on"
   - target: "ix://agent-ix/dev-team/FR-006"
     type: "implements"
 ---
@@ -53,5 +57,6 @@ A judgement evaluation in a role spec cites a rubric check as `<rubric>@<version
 
 - [FR-004](./FR-004-traceability-declaration.md) for the trace-target and document-reference mechanics.
 - [FR-020](./FR-020-rolespec-archetype.md), which defines the reference form, and [FR-021](./FR-021-rolespec-trace-and-cross-row-checks.md), which declares the `Evaluations` reference to `rubric-check`.
+- [FR-011](./FR-011-markdown-record-mapping.md) for the `Rubric` mapping entry and [FR-012](./FR-012-executable-skeletons.md) for the `Rubric` skeleton.
 - dev-team FR-006, which defines judgement evaluations.
 - dev-team moves its rubrics from `skills/team-retro/references/` to `spec/rubrics/` and installs this module to validate them.

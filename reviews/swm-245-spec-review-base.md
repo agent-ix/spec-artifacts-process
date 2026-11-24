@@ -52,3 +52,13 @@ FR-020 matches decision 3: the prefix is 2 to 6 upper-case letters. `quire valid
 | FND-003 | medium | "Query reference" is never defined. A deterministic evaluation needs "a query reference, not a rubric reference", but no shape is given. dev-team FR-006 also requires `Trigger` to be a deterministic query reference, while FR-020 requires only that it is non-empty. FR-020-AC-3 therefore cannot distinguish a query reference from free text, and a prose Trigger validates. | spec/functional/FR-020-rolespec-archetype.md:43,45 |
 | FND-004 | low | The metric-query distinctness check also compares a metric's `Query` with every evaluation `Trigger`. dev-team FR-006 forbids only equality with an evaluation's query, because the rule would then be correlated with its own violation count. A trigger is not a violation count, so this goes beyond the stated intent, and FR-021-AC-6 does not test the Trigger half. | spec/functional/FR-021-rolespec-trace-and-cross-row-checks.md:38,59 |
 | FND-005 | low | FR-020 requires exactly four tables but does not say whether other sections are allowed. The worked minder spec, which FR-022-AC-1 and AC-4 require to validate, has a `## Purpose` section. If extra sections are rejected, the acceptance fixture fails. | spec/functional/FR-020-rolespec-archetype.md:28,34 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head 23335ff): the new FR-023 declares a `Rubric` archetype, with `version` in frontmatter and check ids `<id>@<version>#<slug>` minted by the `rubric-check` target. FR-021 resolves the reference through `dangling-trace-reference` (line 44), capability 5 is removed, and AC-10 is rewritten. |
+| FND-002 | fixed | Round 1: FR-020 line 42 declares `allowed_links` of `satisfies`, `depends_on` and `implements`, and FR-020-AC-12 tests it. |
+| FND-003 | fixed | Round 1: FR-020 line 53 defines a query reference as `<source>.<name>` with the pattern `^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$`. Line 54 requires the metric `Query` and the evaluation `Trigger` to be query references, and AC-3 tests free text in both. |
+| FND-004 | fixed | Round 1: FR-021 line 41 compares only `Query or rubric` and states why `Trigger` is excluded. AC-6 tests that a Trigger-only match validates. |
+| FND-005 | fixed | Round 1: FR-020 line 43 accepts sections beyond the four tables, such as `Purpose`, and FR-020-AC-11 tests it. |

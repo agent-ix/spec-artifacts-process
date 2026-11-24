@@ -33,3 +33,12 @@ Every FR-020 Behavior statement has at least one AC (AC-1 to AC-10). Every FR-02
 | FND-002 | medium | The evidence posture of the `role-metric` trace target is not stated. Rule and objective targets are `reference-only` and `role-evaluation` is evidence-bearing. Under the manifest's default (`source`), every metric id would join the criterion denominator and show as untested in `quire matrix`, although nothing binds metrics. | spec/functional/FR-021-rolespec-trace-and-cross-row-checks.md:27 |
 | FND-003 | medium | FR-021-AC-2 says "exits nonzero from the matrix-based lint" but does not name the command. This module ships no lint. The dev-team FR-007 lint is computed by `quire matrix` and `quoin gap-analysis`. A test author cannot tell which invocation must exit nonzero or which repository the test belongs to. | spec/functional/FR-021-rolespec-trace-and-cross-row-checks.md:55 |
 | FND-004 | low | FR-022-AC-1 verifies a file in dev-team (`spec/roles/minder.md`), so no test in this repository can discharge it as `Test`. FR-022-AC-4 already covers the module-local copy. AC-1 is a cross-repository acceptance gate and should say so, for example as Demonstration in dev-team. | spec/functional/FR-022-rolespec-lint-ownership.md:32 |
+
+## Dispositions
+
+| FND | Outcome | Reason |
+| --- | --- | --- |
+| FND-001 | fixed | Round 1 (head 23335ff): the all-judgement warning has moved to FR-021 line 42, which notes its dependency on capability 1. FR-021-AC-11 tests it. FR-020-AC-4 now covers only cadence `tick`, and the FR-020 scope sentence points to FR-021. |
+| FND-002 | fixed | Round 1: FR-021 line 29 declares the metric target `reference-only`, outside the criterion denominator. FR-021-AC-12 tests that no metric appears as untested. |
+| FND-003 | fixed | Round 1: FR-021-AC-2 names `quire matrix --format json` in a consuming repository and allocates the exit-status lint to Quoin (SWM-249) or dev-team. |
+| FND-004 | fixed | Round 1: FR-022-AC-1 is now Demonstration, run in the dev-team repository. |
