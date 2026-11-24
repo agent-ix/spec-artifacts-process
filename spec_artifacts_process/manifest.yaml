@@ -100,7 +100,7 @@ artifact_types:
   allowed_links:
     rates_feature: [FR]
     re_rates: [FeatureRiskRating]
-    references: [IntendedUse]
+    uses_intended_use: [IntendedUse]
   examples: [examples/FeatureRiskRating.md]
   lint_rules_ref: []
   body_extraction:
@@ -1307,6 +1307,16 @@ traceability:
   # so such a cell contributes its first token only. The row is still backed
   # when that token is backed; it just under-counts the rest.
   document_references:
+  - name: feature-assessment-requirement
+    archetype: FeatureRiskRating
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Feature assessments
+    column: Requirement
+    row_id_column: Requirement
+    pattern: '\b(FR-[0-9]{3})\b'
+    targets: [requirement-document]
+    expand_ranges: false
+    strip_annotations: false
   # An inspection names the obligation it discharges. Reusing the existing
   # criterion targets means a typo in that cell dangles like any other broken
   # reference, instead of recording an act against nothing (#34).
@@ -2219,6 +2229,8 @@ edge_types:
   rated_by_rating: {description: "A functional requirement is assessed by a feature risk rating.", category: traceability, inverse: rates_feature}
   re_rates: {description: "An adopter feature risk rating reassesses a supplier rating.", category: traceability, inverse: rerated_by}
   rerated_by: {description: "A supplier feature risk rating is reassessed by an adopter rating.", category: traceability, inverse: re_rates}
+  uses_intended_use: {description: "A supplier rating is evaluated under an IntendedUse record.", category: traceability, inverse: used_by_rating}
+  used_by_rating: {description: "An IntendedUse record provides context for a supplier rating.", category: traceability, inverse: uses_intended_use}
   # structural
   contains: { description: "Composition; the source owns the target's lifecycle.", category: structural, inverse: contained_in, composite: true }
   # dependency

@@ -96,7 +96,7 @@ models:
       scope: {kind: frontmatter, path: [scope], required: true}
       rating: {kind: frontmatter, path: [rating], required: true}
       ratedBy: {kind: frontmatter, path: [rated_by], required: true}
-      intendedUse: {kind: frontmatter, path: [intended_use], required: true}
+      intendedUse: {kind: frontmatter, path: [intended_use]}
       relationships: {kind: frontmatter, path: [relationships], required: true}
       provenance: {kind: provenance, required: true}
       featureAssessments:
@@ -105,7 +105,7 @@ models:
         required: true
         columns: [Requirement, Failure mode, Detection]
         fields:
-          Requirement: {property: requirement, parse: text}
+          Requirement: {property: requirement, parse: id}
           Failure mode: {property: failureMode, parse: text}
           Detection: {property: detection, parse: text}
       rationale: {kind: section, heading: Rationale, required: true}

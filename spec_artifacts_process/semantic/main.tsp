@@ -52,12 +52,16 @@ scalar UpperDocId extends string;
 scalar MixedDocId extends string;
 
 /** IntendedUse document identifier. */
-@pattern("^IU-[0-9]+$")
+@pattern("^IU-[0-9]{3}$")
 scalar IntendedUseId extends string;
 
 /** FeatureRiskRating document identifier. */
-@pattern("^FRR-[0-9]+$")
+@pattern("^FRR-[0-9]{3}$")
 scalar FeatureRiskRatingId extends string;
+
+/** Functional requirement id used by a feature-assessment row. */
+@pattern("^FR-[0-9]{3}$")
+scalar FeatureRequirementId extends string;
 
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
@@ -818,7 +822,7 @@ model FeatureRiskRating {
   scope: FeatureRatingScope;
   rating: FeatureRatingValue;
   ratedBy: NamedText;
-  intendedUse: NonEmptyText;
+  intendedUse?: NonEmptyText;
   relationships: Relationship[];
   provenance: Provenance;
   featureAssessments: FeatureAssessmentRow[];
@@ -828,7 +832,7 @@ model FeatureRiskRating {
 
 /** Failure mode and detection evidence for one rated requirement. */
 model FeatureAssessmentRow {
-  requirement: NonEmptyText;
+  requirement: FeatureRequirementId;
   failureMode: NonEmptyText;
   detection: NonEmptyText;
   line: LineNumber;

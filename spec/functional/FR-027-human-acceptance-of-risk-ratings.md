@@ -3,6 +3,8 @@ id: FR-027
 title: "A named person accepts a feature risk rating by signed commit"
 type: FR
 relationships:
+  - target: "ix://agent-ix/spec-artifacts-process/StR-001"
+    type: "satisfies"
   - target: "ix://agent-ix/spec-artifacts-process/FR-025"
     type: "depends_on"
   - target: "ix://agent-ix/engineering-assurance/FR-036"
@@ -21,19 +23,36 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 - The commit that last changed the rating document.
 - The `rated_by` principal from the rating.
 - An allowed-signers configuration for engineering-assurance `signature-verify`.
+- A versioned `engineering-assurance.signature-verify-request/v1` request.
 
 ## Outputs
 
 - An acceptance result of `accepted` or `not_accepted` with a reason.
+- External-tool version and configuration-index evidence in the Quoin validation report.
 
 ## Behavior
 
-- The validation workflow SHALL report a rating as `accepted` only when `engineering-assurance signature-verify` reports `signed_valid` and `mapping: mapped`, the verified principal equals `rated_by`, and the commit contains the trailer `Signed-off-meaning: feature-risk-rating-accepted`.
-- The validation workflow SHALL report a rating as `not_accepted` when its commit is unsigned, its signer is unknown or unmapped, its verified principal differs from `rated_by`, or the meaning trailer is missing.
+- The acceptance workflow SHALL send the `engineering-assurance.signature-verify-request/v1` request to `engineering-assurance signature-verify`.
+- The request SHALL contain exactly the `protocol`, `repository`, `revision`, `kind` and `allowed_signers` members defined by engineering-assurance [FR-036](ix://agent-ix/engineering-assurance/FR-036).
+- The workflow SHALL accept only an `engineering-assurance.signature-verify-result/v1` response with `status: signed_valid` and `signer.mapping: mapped`.
+- The workflow SHALL validate the response's `protocol`, `status`, `kind`, `signer.mapping`, `signer.principal` and `signed_off_meaning` members before evaluating acceptance.
+- The workflow SHALL report a rating as `accepted` only when the verified principal equals `rated_by` and the commit contains the exact trailer `Signed-off-meaning: feature-risk-rating-accepted`.
+- The workflow SHALL require `signed_off_meaning.presence: present` and exactly one value equal to `feature-risk-rating-accepted`.
+- The workflow SHALL report a rating as `not_accepted` when the verifier returns any status other than `signed_valid`.
+- The validation workflow SHALL report a rating as `not_accepted` when its commit is unsigned.
+- The validation workflow SHALL report a rating as `not_accepted` when its signer is unknown or unmapped.
+- The validation workflow SHALL report a rating as `not_accepted` when its verified principal differs from `rated_by`.
+- The validation workflow SHALL report a rating as `not_accepted` when the meaning trailer is missing.
 - A `not_accepted` result SHALL name the failed condition.
+- The workflow SHALL report a rating as `not_accepted` when the verifier process cannot start, exits unexpectedly, times out, or returns malformed output.
+- The workflow SHALL report a rating as `not_accepted` when the allowed-signers file is unavailable, unreadable or malformed.
+- Engineering-assurance FR-037's `signature_verify_allowed_signers_invalid` machine error and exit status 2 SHALL never produce an `accepted` result.
+- The workflow SHALL reject a response whose protocol is not `engineering-assurance.signature-verify-result/v1` or whose required response members are malformed or absent.
 - The rating document SHALL NOT store a commit id or digest as its identity; the repository history is the record of which commit changed it.
 - The rule SHALL apply to both supplier ratings and adopter re-ratings.
 - The validation workflow SHALL NOT infer a person's acceptance from the rating value or its evidence.
+- Quoin [FR-217](ix://agent-ix/quoin/FR-217) SHALL produce the validation report containing external tool versions.
+- Quoin [FR-220](ix://agent-ix/quoin/FR-220) SHALL define the external-tools configuration index referenced by that report.
 
 ## Acceptance Criteria
 
@@ -44,7 +63,12 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 | FR-027-AC-3 | A commit signed by a key not in allowed-signers is reported as `not_accepted` with a reason naming the signer mapping failure. | Test |
 | FR-027-AC-4 | A signed commit whose verified principal differs from `rated_by` is reported as `not_accepted` with a reason naming the mismatch. | Test |
 | FR-027-AC-5 | A signed commit without the exact acceptance trailer is reported as `not_accepted` with reason `meaning_missing`. | Test |
-| FR-027-AC-6 | The acceptance result for supplier and adopter ratings depends on the same signature conditions and records no commit id or digest in the rating file. | Inspection |
+| FR-027-AC-6 | The acceptance result for supplier and adopter ratings depends on the same signature conditions and the rating schema records no commit id or digest. | Test |
+| FR-027-AC-7 | The workflow sends exactly the versioned FR-036 request members and accepts only the versioned FR-036 result protocol. | Test |
+| FR-027-AC-8 | A verifier process error, timeout, or malformed response produces `not_accepted` and names the verifier failure. | Test |
+| FR-027-AC-9 | Missing, unreadable or malformed allowed-signers input produces `not_accepted`; FR-037's `signature_verify_allowed_signers_invalid` error never produces acceptance. | Test |
+| FR-027-AC-10 | A response with a wrong protocol or missing/malformed required result members produces `not_accepted`. | Test |
+| FR-027-AC-11 | The Quoin validation report identifies the versions of external tools and references their FR-220 configuration-index entries. | Test |
 
 ## Dependencies
 

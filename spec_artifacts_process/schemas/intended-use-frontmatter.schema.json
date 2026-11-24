@@ -4,7 +4,7 @@
   "required": ["id", "title", "type", "tool", "relationships"],
   "additionalProperties": false,
   "properties": {
-    "id": {"type": "string", "pattern": "^IU-[0-9]+$"},
+    "id": {"type": "string", "pattern": "^IU-[0-9]{3}$"},
     "title": {"type": "string", "minLength": 1},
     "type": {"const": "IntendedUse"},
     "tool": {"enum": ["quoin", "quire-rs", "quire-cli", "engineering-assurance", "filament-analyze"]},

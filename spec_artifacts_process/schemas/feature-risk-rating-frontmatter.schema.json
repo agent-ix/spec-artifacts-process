@@ -8,12 +8,11 @@
     "scope",
     "rating",
     "rated_by",
-    "intended_use",
     "relationships"
   ],
   "additionalProperties": false,
   "properties": {
-    "id": {"type": "string", "pattern": "^FRR-[0-9]+$"},
+    "id": {"type": "string", "pattern": "^FRR-[0-9]{3}$"},
     "title": {"type": "string", "minLength": 1},
     "type": {"const": "FeatureRiskRating"},
     "scope": {"enum": ["supplier", "adopter"]},
@@ -29,7 +28,7 @@
         "additionalProperties": false,
         "properties": {
           "target": {"type": "string", "pattern": "^ix://"},
-          "type": {"enum": ["rates_feature", "re_rates", "references"]},
+          "type": {"enum": ["rates_feature", "re_rates", "uses_intended_use"]},
           "cardinality": {"type": "string"}
         }
       }
@@ -39,10 +38,13 @@
     {
       "if": {"properties": {"scope": {"const": "supplier"}}},
       "then": {
+        "not": {"required": ["intended_use"]},
         "properties": {
           "relationships": {
-            "contains": {"properties": {"type": {"const": "rates_feature"}}},
-            "not": {"contains": {"properties": {"type": {"const": "re_rates"}}}}
+            "allOf": [
+              {"contains": {"properties": {"type": {"const": "rates_feature"}}, "required": ["type"]}},
+              {"contains": {"properties": {"type": {"const": "uses_intended_use"}, "target": {"pattern": "^ix://[^/]+/[^/]+/IU-[0-9]{3}$"}}, "required": ["type", "target"]}, "minContains": 1, "maxContains": 1},
+              {"not": {"contains": {"properties": {"type": {"const": "re_rates"}}, "required": ["type"]}}]
           }
         }
       }
@@ -50,10 +52,14 @@
     {
       "if": {"properties": {"scope": {"const": "adopter"}}},
       "then": {
+        "required": ["intended_use"],
         "properties": {
           "relationships": {
-            "contains": {"properties": {"type": {"const": "re_rates"}}},
-            "not": {"contains": {"properties": {"type": {"const": "rates_feature"}}}}
+            "contains": {"properties": {"type": {"const": "re_rates"}}, "required": ["type"]},
+            "not": {"anyOf": [
+              {"contains": {"properties": {"type": {"const": "rates_feature"}}, "required": ["type"]}},
+              {"contains": {"properties": {"type": {"const": "uses_intended_use"}}, "required": ["type"]}}
+            ]}
           }
         }
       }

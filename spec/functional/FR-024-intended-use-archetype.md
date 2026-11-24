@@ -3,6 +3,8 @@ id: FR-024
 title: "IntendedUse archetype for a tool's stated operating purpose"
 type: FR
 relationships:
+  - target: "ix://agent-ix/spec-artifacts-process/StR-001"
+    type: "satisfies"
   - target: "ix://agent-ix/spec-artifacts-process/FR-009"
     type: "depends_on"
   - target: "ix://agent-ix/spec-artifacts-process/FR-011"
@@ -38,8 +40,9 @@ A person who rates a tool feature needs a stable account of what the tool is mea
 - `Records produced` SHALL name each record kind and the command that writes it.
 - `Limits` SHALL state which conclusions the tool does not establish, including that the tool is not a compliance oracle and does not decide product or clinical safety.
 - `Operating context` SHALL describe material inputs, execution environments and external tools used by the package.
-- An `IntendedUse` document SHALL identify external tools used by the package.
-- The validation report SHALL identify the versions and configurations of those tools.
+- An `IntendedUse` document SHALL identify each external tool used by the package.
+- Quoin's [FR-217](ix://agent-ix/quoin/FR-217) validation-report command SHALL report each external tool's version and its configuration-index reference.
+- Quoin's [FR-220](ix://agent-ix/quoin/FR-220) external-tools configuration index SHALL provide the referenced tool configuration.
 - The document SHALL use generic language.
 - The document MAY name the public FDA guidance "Computer Software Assurance for Production and Quality System Software" as context.
 - The document SHALL NOT reproduce that guidance's text.
@@ -53,6 +56,9 @@ A person who rates a tool feature needs a stable account of what the tool is mea
 | FR-024-AC-3 | An unknown frontmatter field fails validation with a diagnostic naming the field. | Test |
 | FR-024-AC-4 | A valid intended-use fixture for each of `quoin`, `quire-rs`, `quire-cli`, `engineering-assurance` and `filament-analyze` validates. | Test |
 | FR-024-AC-5 | A statement that omits a material limit or claims the tool decides product or clinical safety fails its content review criteria. | Inspection |
+| FR-024-AC-6 | The `tool` vocabulary contains exactly the five named initial tools. | Test |
+| FR-024-AC-7 | The validation report identifies the version and configuration-index entry for each external tool declared by the applicable `IntendedUse`. | Test |
+| FR-024-AC-8 | An `IntendedUse` id has the form `IU-NNN` with exactly three digits. | Test |
 
 ## Dependencies
 

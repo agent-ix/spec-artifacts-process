@@ -5,9 +5,10 @@ type: FeatureRiskRating
 scope: supplier
 rating: not_high_process_risk
 rated_by: <named person>
-intended_use: IU-001
 relationships:
-  - target: ix://agent-ix/example/FR-001
+  - target: ix://agent-ix/spec-artifacts-process/IU-001
+    type: uses_intended_use
+  - target: ix://agent-ix/spec-artifacts-process/FR-024
     type: rates_feature
 ---
 # <feature group> risk rating
