@@ -29,3 +29,4 @@ description: "Index of artifacts in this directory."
 * [FR-020: RoleSpec archetype: a role as typed tables of metrics, objectives, rules and evaluations](./FR-020-rolespec-archetype.md)
 * [FR-021: RoleSpec trace targets and cross-row integrity: rules, evaluations, objectives, metrics](./FR-021-rolespec-trace-and-cross-row-checks.md)
 * [FR-022: RoleSpec checks that need history or other files: owner, and the worked example gate](./FR-022-rolespec-lint-ownership.md)
+* [FR-023: Rubric archetype: versioned checks that judgement evaluations cite](./FR-023-rubric-archetype.md)

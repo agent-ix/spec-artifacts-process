@@ -20,16 +20,18 @@ Two lint checks in [dev-team FR-007](ix://agent-ix/dev-team/FR-007) read somethi
 
 ## Behavior
 
-- Version bump against base: owned by Quoin, not this module. For a `RoleSpec` whose Metrics, Objectives, Rules or Evaluations rows differ from the merge base with the default branch, Quoin SHALL require a strictly higher `version` and name the changed table. Deleting a rule with its evaluations requires the same bump.
-- Skill citation scan: owned by Quoin, not this module. For each skill whose frontmatter has `role_spec_version`, Quoin SHALL report any cited rule id absent from the role spec at that version, read from the base history of the role spec, and fail.
-- This module SHALL declare for the `RoleSpec` archetype that `version` is the field these checks read, and SHALL implement neither check.
-- The worked example `docs/examples/minder-role-spec.md` in dev-team, once moved to `spec/roles/minder.md`, SHALL validate with exit code 0 under `quire validate --scope . "spec/**/*.md"` with this module installed, and a copy ships in this module's examples as the positive fixture for FR-020 and FR-021.
+- Allocation, version bump against base: the check is allocated to Quoin (SWM-249). A change to any Metrics, Objectives, Rules or Evaluations row against the merge base with the default branch needs a strictly higher `version`, and a rule deleted with its evaluations needs the same bump. This module states the check and does not implement it.
+- Allocation, skill citation scan: the check is allocated to Quoin (SWM-249). A cited rule id absent from the role spec at the skill's `role_spec_version` is reported and fails the lint. This module states the check and does not implement it.
+- This module SHALL NOT contain code that compares a role spec with a base revision or reads skill frontmatter.
+- The `RoleSpec` documentation in this module SHALL name `version` as the field these checks read and Quoin as their owner.
+- The dev-team repository SHALL validate the worked example `docs/examples/minder-role-spec.md`, once moved to `spec/roles/minder.md`, with exit code 0 under `quire validate --scope . "spec/**/*.md"` with this module installed.
+- This module SHALL ship a copy of the worked example as the positive fixture for FR-020 and FR-021.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-022-AC-1 | The dev-team minder role spec at `spec/roles/minder.md`, validated with this module installed, exits 0 and reports no error. | Test |
+| FR-022-AC-1 | Run in the dev-team repository with this module installed, `quire validate --scope . "spec/**/*.md"` over `spec/roles/minder.md` exits 0 and reports no error. | Demonstration |
 | FR-022-AC-2 | This repository contains no code that compares a role spec with a base revision or scans skill frontmatter. | Inspection |
 | FR-022-AC-3 | The module's `RoleSpec` documentation names Quoin as the owner of the version-bump and skill-citation checks and names `version` as the field they read. | Inspection |
 | FR-022-AC-4 | A copy of the worked minder spec is the module's positive `RoleSpec` fixture and validates with the module's own `quire validate`. | Test |
@@ -37,5 +39,6 @@ Two lint checks in [dev-team FR-007](ix://agent-ix/dev-team/FR-007) read somethi
 ## Dependencies
 
 - [FR-020](./FR-020-rolespec-archetype.md) and [FR-021](./FR-021-rolespec-trace-and-cross-row-checks.md).
-- Quoin, the owner of the version-bump and skill-citation checks (ticket to be filed in the Quoin project).
+- SWM-249, the Quoin ticket for the version-bump and skill-citation checks.
 - dev-team FR-007 and the move of the worked example (dev-team#30).
+- dev-team installs this module to validate `spec/roles/`, and pins the module version it installs.
