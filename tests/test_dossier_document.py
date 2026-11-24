@@ -284,3 +284,24 @@ def test_soup_record_accepts_optional_as_of(schema_registry):
     assert list(validator.iter_errors(soup)) == []
     assert list(validator.iter_errors({**soup, "asOf": "2026-11-01T00:00:00Z"})) == []
     assert list(validator.iter_errors({**soup, "asOf": "2026-11-01"})) != []
+
+
+@pytest.mark.trace("FR-018-AC-19", "TC-248")
+def test_vulnerability_management_plan_kind_is_valid_in_frontmatter_and_record(
+    schema_registry,
+):
+    """The vulnerability-management plan kind validates in both document forms."""
+    result = validate(VALID / "vulnerability-management-plan.md")
+    assert result.returncode == 0, result.stderr
+
+    kind = "vulnerability-management-plan"
+    frontmatter_kinds = schema("dossier-document-frontmatter.schema.json")[
+        "properties"
+    ]["document_kind"]["enum"]
+    record_kinds = schema("DossierKind.json")["enum"]
+    assert kind in frontmatter_kinds
+    assert kind in record_kinds
+
+    golden = json.loads((EXAMPLES_DIR / "DossierDocument.record.json").read_text())
+    plan = {**golden, "documentKind": kind}
+    assert list(schema_registry("DossierDocument").iter_errors(plan)) == []
