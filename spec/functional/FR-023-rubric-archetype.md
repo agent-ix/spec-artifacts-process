@@ -40,7 +40,7 @@ A judgement evaluation in a role spec cites a rubric check as `<rubric>@<version
 - The `Rubric` archetype SHALL require a `Checks` table with at least one row.
 - The `Rubric` archetype SHALL assert that each `ID` cell matches `^<id>@<version>#[a-z][a-z0-9-]*$`, with the frontmatter `id` and `version` interpolated, so a check id always carries the rubric's current version.
 - The manifest SHALL declare a trace target `rubric-check` over archetype `Rubric`, section `Checks`, id column `ID`, with `evidence: reference-only`, excluding `tests/**`, `tests_integration/**` and `fixtures/**`.
-- The `Rubric` manifest entry SHALL declare `allowed_links` of `satisfies`, `depends_on` and `implements`.
+- The `Rubric` manifest entry SHALL declare `allowed_links` of `satisfies` and `depends_on`.
 - The module SHALL ship a `Rubric` mapping entry with role `definition` (FR-011) and a skeleton (FR-012).
 
 ## Acceptance Criteria

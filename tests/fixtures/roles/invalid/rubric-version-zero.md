@@ -1,0 +1,12 @@
+---
+id: rubric-minder
+version: 0
+type: Rubric
+---
+# Rubric: minder
+
+## Checks
+
+| ID | Check | Scale |
+|----|-------|-------|
+| rubric-minder@0#failed-probe | A failed or timed-out probe was recorded as a defect in the tick and routed to an owner, rather than read as healthy. | 0 not recorded, 1 recorded not routed, 2 recorded and routed |

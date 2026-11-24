@@ -1,0 +1,17 @@
+{
+  "checks": [
+    {
+      "check": "Whether the behavior under judgement occurred.",
+      "id": "rubric-example@1#example-check",
+      "line": 27,
+      "scale": "0 absent, 1 partial, 2 present"
+    }
+  ],
+  "id": "rubric-example",
+  "provenance": {
+    "digest": "sha256:43f1c2ca3ee900836d49c9948ce30ba1150a6e0a0ef2da86b331bca504af0266",
+    "path": "skeletons/Rubric.md"
+  },
+  "type": "Rubric",
+  "version": 1
+}

@@ -692,6 +692,123 @@ artifact_types:
   allowed_links: []
   examples: []
   lint_rules_ref: []
+- name: RoleSpec
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/role-spec-frontmatter.schema.json
+  data_schema:
+    schema: schemas/RoleSpec.json
+  # FR-020. The shape and per-cell vocabularies are the `assert` facets below;
+  # the conditional rules of an evaluation row (a deterministic row's evaluator
+  # and query, a judgement row's evaluator, rubric reference and cadence) are
+  # `record_validation`'s, because `column_patterns` reads one cell in
+  # isolation. The `version` field is what Quoin's version-bump and
+  # skill-citation checks read (FR-022); this module implements neither.
+  record_validation:
+    schema: schemas/RoleSpecFields.json
+    locate_absence_at: evaluations
+  allowed_links:
+  - satisfies
+  - depends_on
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        metrics:
+          from: table_row
+          under_section: Metrics
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Name, Evidence source, Query, Unit, Target, Direction]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-M\d{2}$'
+            column_choices:
+              Evidence source: &evidence_sources [ledger, relay-receipts, hook-events, linear, github, transcript, ix-board-metric]
+              Direction: [higher, lower]
+            column_patterns:
+              Name: '\S'
+              Query: &query_ref '^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$'
+              Unit: '\S'
+              Target: '\S'
+        objectives:
+          from: table_row
+          under_section: Objectives
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Objective, Metrics]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-O\d{2}$'
+            column_patterns:
+              Objective: '\S'
+              Metrics: '\S'
+        rules:
+          from: table_row
+          under_section: Rules
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Rule, Objective, Class, Source]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-R\d{2}$'
+            column_patterns:
+              Rule: '\S'
+              Objective: '\S'
+              Class: '\S'
+              Source: '\S'
+        evaluations:
+          from: table_row
+          under_section: Evaluations
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Rule, Evidence source, Trigger, Method, Query or rubric, Evaluator, Comparator, Value, Unit, Cadence]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-R\d{2}-E\d+$'
+            column_choices:
+              Evidence source: *evidence_sources
+              Method: [deterministic, judgement]
+              Comparator: ['<', '<=', '=', '>=', '>']
+              Cadence: [tick, session-end, 3h, daily, weekly]
+            column_patterns:
+              Rule: '\S'
+              Trigger: *query_ref
+              Value: '^-?[0-9]+(\.[0-9]+)?$'
+              Unit: '\S'
+- name: Rubric
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/rubric-frontmatter.schema.json
+  data_schema:
+    schema: schemas/Rubric.json
+  allowed_links:
+  - satisfies
+  - depends_on
+  examples: []
+  lint_rules_ref: []
+  # FR-023. Each check id carries the rubric id and version, so a rubric edit
+  # that bumps `version` without renumbering its checks fails here and a role
+  # spec still citing the old version dangles.
+  body_extraction:
+    yield_pattern:
+      match:
+        checks:
+          from: table_row
+          under_section: Checks
+          required: true
+          multiple: true
+          assert:
+            columns: [ID, Check, Scale]
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}@{version}#[a-z][a-z0-9-]*$'
+            column_patterns:
+              Check: '\S'
+              Scale: '\S'
 doc_kinds:
 - adr
 - dossier-document
@@ -1049,6 +1166,47 @@ traceability:
     section: Inspections
     id_column: ID
     required: false
+  # ── RoleSpec and Rubric (FR-021, FR-023) ──
+  #
+  # A rule is a requirement and an evaluation is its criterion. Only the
+  # evaluation is evidence-bearing; metrics, objectives, rules and rubric checks
+  # are referenceable ids that no test binds, so they stay out of the criterion
+  # denominator. `required: false` because a repository with no role specs is
+  # not defective.
+  - name: role-metric
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Metrics
+    id_column: ID
+    required: false
+    evidence: reference-only
+  - name: role-objective
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Objectives
+    id_column: ID
+    required: false
+    evidence: reference-only
+  - name: role-rule
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Rules
+    id_column: ID
+    required: false
+    evidence: reference-only
+  - name: role-evaluation
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Evaluations
+    id_column: ID
+    required: false
+  - name: rubric-check
+    archetype: Rubric
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Checks
+    id_column: ID
+    required: false
+    evidence: reference-only
   # Requirement documents stay archetype-bound — but archetype binding requires
   # scope exclusion, because fixtures are legitimately typed. A test fixture
   # that exercises the `FR` contract *is* `type: FR`; that is what makes it a
@@ -1121,6 +1279,49 @@ traceability:
     - constraint
     expand_ranges: false
     strip_annotations: true
+  # FR-021: the cells of a role spec that name another row. Each pattern admits
+  # only its own `<PREFIX>-<letter><number>` shape, so a reference resolves only
+  # against the target it names. An undefined id is `dangling-trace-reference`.
+  - name: role-objective-metrics
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Objectives
+    column: Metrics
+    row_id_column: ID
+    pattern: '\b([A-Z]{2,6}-M\d{2})\b'
+    targets: [role-metric]
+    expand_ranges: false
+    strip_annotations: false
+  - name: role-rule-objective
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Rules
+    column: Objective
+    row_id_column: ID
+    pattern: '\b([A-Z]{2,6}-O\d{2})\b'
+    targets: [role-objective]
+    expand_ranges: false
+    strip_annotations: false
+  - name: role-evaluation-rule
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Evaluations
+    column: Rule
+    row_id_column: ID
+    pattern: '\b([A-Z]{2,6}-R\d{2})\b'
+    targets: [role-rule]
+    expand_ranges: false
+    strip_annotations: false
+  - name: role-evaluation-rubric
+    archetype: RoleSpec
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Evaluations
+    column: Query or rubric
+    row_id_column: ID
+    pattern: '([a-z][a-z0-9-]*@[0-9]+#[a-z][a-z0-9-]*)'
+    targets: [rubric-check]
+    expand_ranges: false
+    strip_annotations: false
   # Most `Verification` cells carry no test id at all — a sweep over quire-rs,
   # quoin and this repo found 285 bare `Test`, 99 `Test (TC-nnn)`, and ~100
   # naming a file rather than an id (`Test (org.test.ts)`), plus `Eval (EV-nnn)`.
@@ -1958,9 +2159,16 @@ edge_types:
   references: { description: "Loose, untyped linkage.", category: traceability }
   relates_to: { description: "Loose associative link between decisions/records.", category: traceability }
   reviews: { description: "A review assesses the target artifact.", category: traceability, inverse: reviewed_by }
+  satisfies: { description: "The source requirement or document satisfies the target need or requirement.", category: traceability }
   superseded_by: { description: "The source artifact was replaced by the target.", category: traceability }
   supersedes: { description: "Replaces a prior artifact.", category: traceability, inverse: superseded_by }
   verifies: { description: "Test/integration artifact verifies a requirement.", category: traceability }
+
+# FR-021: a reference to an undefined id is an error, not the engine's default
+# warning, so `quire validate --okf` over a corpus fails on a dangling role-spec
+# or rubric reference. The key is module-wide.
+grammar_severity:
+  "trace:dangling-trace-reference": error
 
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
 # `exports` names every artifact type carrying a `data_schema` reference.
@@ -1989,6 +2197,8 @@ semantic:
   - Standard
   - SuiteRegistry
   - Inspections
+  - RoleSpec
+  - Rubric
   imports: {}
   targets:
   - json-schema
