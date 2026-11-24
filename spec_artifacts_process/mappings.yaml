@@ -149,6 +149,7 @@ models:
       version: {kind: frontmatter, path: [version]}
       documentKind: {kind: frontmatter, path: [document_kind], required: true}
       generatedBy: {kind: frontmatter, path: [generated_by], required: true}
+      producerIdentity: {kind: frontmatter, path: [producer_identity], required: true}
       asOf: {kind: frontmatter, path: [as_of]}
       body: {kind: section, whole_body: true, required: true}
 

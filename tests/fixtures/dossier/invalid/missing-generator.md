@@ -4,6 +4,9 @@ title: "Software Requirements Specification"
 type: DossierDocument
 version: "1.0"
 document_kind: srs
+producer_identity:
+  name: quoin
+  version: "0.36.8"
 ---
 # Software Requirements Specification
 

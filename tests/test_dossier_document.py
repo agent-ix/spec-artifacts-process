@@ -94,6 +94,38 @@ def test_generated_by_must_be_quoin_dossier(name: str):
     fails_naming(INVALID / f"{name}.md", "generated_by")
 
 
+@pytest.mark.trace("FR-018-AC-20", "TC-249")
+@pytest.mark.parametrize(
+    "name",
+    [
+        "missing-producer-identity",
+        "missing-producer-name",
+        "missing-producer-version",
+        "bad-producer-name",
+        "empty-producer-version",
+        "extra-producer-member",
+    ],
+)
+def test_producer_identity_requires_exact_quoin_name_and_version(name: str):
+    """Invalid or incomplete producer identities fail at the producer field."""
+    fails_naming(INVALID / f"{name}.md", "producer_identity")
+
+
+@pytest.mark.trace("FR-018-AC-20", "TC-249")
+def test_producer_identity_is_preserved_in_the_projected_record(
+    mapper, schema_registry
+):
+    """The producer name and version map unchanged to the closed record schema."""
+    text = (VALID / "srs.md").read_text()
+    record = mapper.build("DossierDocument", text, "srs.md")
+    identity = {"name": "quoin", "version": "0.36.8"}
+
+    assert record["producerIdentity"] == identity
+    assert list(schema_registry("DossierDocument").iter_errors(record)) == []
+    invalid = {**record, "producerIdentity": {**identity, "revision": "abc123"}}
+    assert list(schema_registry("DossierDocument").iter_errors(invalid)) != []
+
+
 @pytest.mark.trace("FR-018-AC-5", "TC-234")
 def test_the_archetype_declares_no_digest_hash_revision_or_provenance(mappings):
     frontmatter_names = schema("dossier-document-frontmatter.schema.json")["properties"]
@@ -211,6 +243,9 @@ def m2_document(kind: str, *, as_of: bool = False) -> str:
         'version: "1.0"\n'
         f"document_kind: {kind}\n"
         "generated_by: quoin dossier\n"
+        "producer_identity:\n"
+        "  name: quoin\n"
+        '  version: "0.36.8"\n'
         f"{instant}"
         "---\n"
         "# M2 document\n"
@@ -236,6 +271,9 @@ def test_records_of_processing_validates_without_a_version(tmp_path: Path):
         "type: DossierDocument\n"
         "document_kind: records-of-processing\n"
         "generated_by: quoin dossier\n"
+        "producer_identity:\n"
+        "  name: quoin\n"
+        '  version: "0.36.8"\n'
         "---\n"
         "# Records of Processing\n"
     )

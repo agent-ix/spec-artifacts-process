@@ -460,6 +460,11 @@ model TraceCell {
  * `target` is the authored reference token and is absent for a `None` row whose
  * `Target` is `-`. Whether a token resolves is a diagnostic, not part of the record.
  */
+model DossierProducerIdentity {
+  name: "quoin";
+  version: NonEmptyText;
+}
+
 @extension("allOf", #[
   #{ `if`: #{ `properties`: #{ `kind`: #{ `const`: "None" } }, `required`: #["kind"] },
      `then`: #{ `not`: #{ `required`: #["target"] } },
@@ -1067,6 +1072,7 @@ model DossierDocument {
   version?: NonEmptyText;
   documentKind: DossierKind;
   generatedBy: "quoin dossier";
+  producerIdentity: DossierProducerIdentity;
   asOf?: Rfc3339Instant;
   /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
   relationships?: Relationship[];
