@@ -2239,6 +2239,8 @@ semantic:
   contract_version: 1.0.0
   package: agent-ix/spec-artifacts-process
   exports:
+  - IntendedUse
+  - FeatureRiskRating
   - ADR
   - Anomaly
   - DossierDocument

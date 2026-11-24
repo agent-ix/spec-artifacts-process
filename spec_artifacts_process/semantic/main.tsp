@@ -51,6 +51,14 @@ scalar UpperDocId extends string;
 @pattern("^[A-Za-z]{2,4}-[0-9]+$")
 scalar MixedDocId extends string;
 
+/** IntendedUse document identifier. */
+@pattern("^IU-[0-9]+$")
+scalar IntendedUseId extends string;
+
+/** FeatureRiskRating document identifier. */
+@pattern("^FRR-[0-9]+$")
+scalar FeatureRiskRatingId extends string;
+
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
 scalar StandardDocId extends string;
@@ -784,7 +792,7 @@ model RubricCheckRow {
 /** Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run. */
 /** Supplier-authored account of one package's intended operating use. */
 model IntendedUse {
-  id: @pattern("^IU-[0-9]+$") string;
+  id: IntendedUseId;
   title: NonEmptyText;
   type: "IntendedUse";
   tool: IntendedUseTool;
@@ -799,7 +807,7 @@ model IntendedUse {
 
 /** One named person's rating and evidence for one or more features. */
 model FeatureRiskRating {
-  id: @pattern("^FRR-[0-9]+$") string;
+  id: FeatureRiskRatingId;
   title: NonEmptyText;
   type: "FeatureRiskRating";
   scope: FeatureRatingScope;

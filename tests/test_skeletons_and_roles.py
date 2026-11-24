@@ -32,6 +32,8 @@ from conftest import (
 # records that a human or a named command was declared as the source of
 # evidence. Neither is a run.
 EXPECTED_ROLES = {
+    "IntendedUse": "definition",
+    "FeatureRiskRating": "definition",
     "ADR": "definition",
     "Plan": "definition",
     "DossierDocument": "definition",

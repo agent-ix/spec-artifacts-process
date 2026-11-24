@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
-from conftest import MANIFEST_PATH, SCHEMAS_DIR
+from conftest import EXAMPLES_DIR, MANIFEST_PATH, REPO_ROOT, SCHEMAS_DIR, SKELETONS_DIR, quire_validate
 from jsonschema import Draft202012Validator
 from support.strict_yaml import load_yaml_strict
 
@@ -65,6 +66,21 @@ def test_intended_use_schema_admits_the_initial_tool_set(tool: str) -> None:
         "relationships": [],
     }
     assert list(Draft202012Validator(schema).iter_errors(document)) == []
+
+
+@pytest.mark.trace("FR-024-AC-1", "FR-025-AC-1")
+@pytest.mark.parametrize(
+    "path",
+    [
+        SKELETONS_DIR / "IntendedUse.md",
+        SKELETONS_DIR / "FeatureRiskRating.md",
+        EXAMPLES_DIR / "IntendedUse.md",
+        EXAMPLES_DIR / "FeatureRiskRating.md",
+    ],
+)
+def test_authored_skeletons_and_examples_validate(path: Path) -> None:
+    result = quire_validate(path, scope=REPO_ROOT)
+    assert result.returncode == 0, result.stderr
 
 
 @pytest.mark.trace("FR-026-AC-1", "FR-026-AC-5")
