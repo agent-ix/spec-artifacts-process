@@ -1011,7 +1011,6 @@ traceability:
   required_relations:
   - name: fr-has-risk-rating
     from: FR
-    where: {field: scope, values: [supplier]}
     edges: [rates_feature]
     to: [FeatureRiskRating]
     direction: incoming

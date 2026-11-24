@@ -31,6 +31,7 @@ A tool repository's feature list is complete only when each functional requireme
 - The module SHALL declare the edge `rates_feature` from `FeatureRiskRating` to a functional requirement and its inverse `rated_by_rating`.
 - The module SHALL declare a required-relation rule named `fr-has-risk-rating` from `FR`, over `rates_feature`, to `FeatureRiskRating`, with incoming direction and check `feature-without-risk-rating`.
 - The rule SHALL consider only records whose `scope` is `supplier`.
+- Only supplier `FeatureRiskRating` records carry `rates_feature` relationships to FRs. Adopter records carry `re_rates` relationships to supplier ratings and inherit their feature set without creating FR edges.
 - An adopter re-rating SHALL neither satisfy nor duplicate a supplier rating.
 - The check's default severity SHALL be `off`.
 - The validator SHALL apply the check at severity `error` when invoked with `quire validate --severity trace:feature-without-risk-rating=error`.

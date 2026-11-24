@@ -45,9 +45,9 @@ A tool supplier and an adopter can assess the same feature under different inten
 - An adopter rating's `intended_use` field SHALL identify the adopter's own intended-use subject in the engineering-assurance integrator package.
 - This module SHALL NOT redefine the adopter's intended-use subject or copy the adopter configuration.
 - The module SHALL declare the edge `re_rates` from adopter `FeatureRiskRating` to supplier `FeatureRiskRating`, with inverse `rerated_by`.
-- A supplier rating SHALL carry one or more `rates_feature` relationships to functional requirements.
-- An adopter rating SHALL carry one or more `rates_feature` relationships to functional requirements.
-- An adopter rating SHALL carry one or more `re_rates` relationships to supplier `FeatureRiskRating` records covering those same requirements.
+- A supplier rating SHALL carry one or more `rates_feature` relationships to functional requirements and SHALL NOT carry a `re_rates` relationship.
+- An adopter rating SHALL carry one or more `re_rates` relationships to supplier `FeatureRiskRating` records covering those same requirements and SHALL NOT carry a `rates_feature` relationship.
+- The schema SHALL reject relationships that do not match the rating's `scope`.
 - Every target requirement SHALL have one row in a required `Feature assessments` table with columns `Requirement`, `Failure mode` and `Detection`.
 - The failure-mode cell SHALL describe a plausible failure of that feature and its effect on records named by the applicable intended use.
 - The detection cell SHALL identify the activity or observation by which the failure can be found.
@@ -72,7 +72,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 | FR-025-AC-1 | A supplier rating with an allowed enum value, named rater, valid IntendedUse reference, one `rates_feature` target, a corresponding feature-assessment row, `Rationale` and `Assurance activities` validates. | Test |
 | FR-025-AC-2 | A rating with `rating: medium`, a missing `rated_by`, missing `Rationale`, no `rates_feature` target or a missing feature-assessment row fails validation naming the invalid or missing member. | Test |
 | FR-025-AC-3 | A rating with two `rates_feature` targets validates only when it has a separate failure-mode and detection row for each target. | Test |
-| FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates; a missing supplier link or a link to a supplier rating covering a different requirement fails validation. | Test |
+| FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates; a missing supplier link, a link to a supplier rating covering a different requirement, or an adopter `rates_feature` edge fails validation. | Test |
 | FR-025-AC-5 | An adopter rating does not change the supplier record when the two documents have different ratings or rationales. | Demonstration |
 | FR-025-AC-6 | The schema rejects a calculated score, product-criticality field or software-safety-class field; no mapping in the module assigns those values or a rating. | Test |
 | FR-025-AC-7 | The feature-assessment data names a failure mode and a detection activity, and leaves any TCL, TQL or T-class determination to the adopter. | Inspection |

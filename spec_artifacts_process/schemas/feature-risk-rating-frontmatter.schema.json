@@ -12,5 +12,9 @@
     "rated_by": {"type": "string", "minLength": 1},
     "intended_use": {"type": "string", "minLength": 1},
     "relationships": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["target", "type"], "additionalProperties": false, "properties": {"target": {"type": "string", "pattern": "^ix://"}, "type": {"enum": ["rates_feature", "re_rates", "references"]}, "cardinality": {"type": "string"}}}}
-  }
+  },
+  "allOf": [
+    {"if": {"properties": {"scope": {"const": "supplier"}}}, "then": {"properties": {"relationships": {"contains": {"properties": {"type": {"const": "rates_feature"}}}, "not": {"contains": {"properties": {"type": {"const": "re_rates"}}}}}}},
+    {"if": {"properties": {"scope": {"const": "adopter"}}}, "then": {"properties": {"relationships": {"contains": {"properties": {"type": {"const": "re_rates"}}}, "not": {"contains": {"properties": {"type": {"const": "rates_feature"}}}}}}}
+  ]
 }
