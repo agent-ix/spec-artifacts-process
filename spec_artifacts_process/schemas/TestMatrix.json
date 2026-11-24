@@ -44,5 +44,5 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "Leaf matrix record (archetype `TestMatrix`). Every `Status` marker is the\n**authored coverage claim**, never an execution result; whether the claim is\ntrue is decided by the coverage rollup against the evidence store, outside\nthis module (FR-013)."
+  "description": "Leaf matrix record (archetype `TestMatrix`). An optional `Status` marker is\nan authored tracking annotation, never execution evidence or an input to\ncriterion coverage, which `quire matrix` computes from requirements and test\ntags (FR-013, PLAT-1155)."
 }

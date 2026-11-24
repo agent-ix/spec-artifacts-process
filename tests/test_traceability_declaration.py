@@ -17,6 +17,7 @@ import subprocess
 
 import pytest
 import yaml
+from conftest import run_quire
 from support.strict_yaml import load_yaml_strict
 
 import spec_artifacts_process as pack
@@ -780,7 +781,7 @@ def test_quire_matrix_computes_criterion_coverage_without_status(
         "| TC-001 | Example test | Unit | P1 | FR-001-AC-1 |\n"
     )
     (tests / "test_example.py").write_text(
-        'import pytest\n\n@pytest.mark.trace("TC-001")\n'
+        'import pytest\n\n@pytest.mark.trace("TC-001", "FR-001-AC-1")\n'
         "def test_example():\n    pass\n"
     )
 
