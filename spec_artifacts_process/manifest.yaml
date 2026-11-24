@@ -709,7 +709,6 @@ artifact_types:
   allowed_links:
   - satisfies
   - depends_on
-  - implements
   examples: []
   lint_rules_ref: []
   body_extraction:
@@ -726,11 +725,11 @@ artifact_types:
             id_column: ID
             id_pattern: '^{id}-M\d{2}$'
             column_choices:
-              Evidence source: [ledger, relay-receipts, hook-events, linear, github, transcript, ix-board-metric]
+              Evidence source: &evidence_sources [ledger, relay-receipts, hook-events, linear, github, transcript, ix-board-metric]
               Direction: [higher, lower]
             column_patterns:
               Name: '\S'
-              Query: '^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$'
+              Query: &query_ref '^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$'
               Unit: '\S'
               Target: '\S'
         objectives:
@@ -772,13 +771,13 @@ artifact_types:
             id_column: ID
             id_pattern: '^{id}-R\d{2}-E\d+$'
             column_choices:
-              Evidence source: [ledger, relay-receipts, hook-events, linear, github, transcript, ix-board-metric]
+              Evidence source: *evidence_sources
               Method: [deterministic, judgement]
               Comparator: ['<', '<=', '=', '>=', '>']
               Cadence: [tick, session-end, 3h, daily, weekly]
             column_patterns:
               Rule: '\S'
-              Trigger: '^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$'
+              Trigger: *query_ref
               Value: '^-?[0-9]+(\.[0-9]+)?$'
               Unit: '\S'
 - name: Rubric
@@ -789,7 +788,6 @@ artifact_types:
   allowed_links:
   - satisfies
   - depends_on
-  - implements
   examples: []
   lint_rules_ref: []
   # FR-023. Each check id carries the rubric id and version, so a rubric edit
@@ -2161,9 +2159,16 @@ edge_types:
   references: { description: "Loose, untyped linkage.", category: traceability }
   relates_to: { description: "Loose associative link between decisions/records.", category: traceability }
   reviews: { description: "A review assesses the target artifact.", category: traceability, inverse: reviewed_by }
+  satisfies: { description: "The source requirement or document satisfies the target need or requirement.", category: traceability }
   superseded_by: { description: "The source artifact was replaced by the target.", category: traceability }
   supersedes: { description: "Replaces a prior artifact.", category: traceability, inverse: superseded_by }
   verifies: { description: "Test/integration artifact verifies a requirement.", category: traceability }
+
+# FR-021: a reference to an undefined id is an error, not the engine's default
+# warning, so `quire validate --okf` over a corpus fails on a dangling role-spec
+# or rubric reference. The key is module-wide.
+grammar_severity:
+  "trace:dangling-trace-reference": error
 
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
 # `exports` names every artifact type carrying a `data_schema` reference.

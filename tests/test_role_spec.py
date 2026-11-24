@@ -59,13 +59,15 @@ def messages(result: subprocess.CompletedProcess, path: Path) -> list[str]:
     ]
 
 
-def fails_naming(name: str, needle: str) -> None:
+def fails_naming(name: str, needle: str | tuple[str, ...]) -> None:
+    """The fixture fails, and one diagnostic carries every text in `needle`."""
+    needles = (needle,) if isinstance(needle, str) else needle
     path = INVALID / f"{name}.md"
     result = validate(path)
     assert result.returncode != 0, result.stderr
     found = messages(result, path)
     assert found, result.stderr
-    assert any(needle in m for m in found), found
+    assert any(all(n in m for n in needles) for m in found), found
 
 
 def validates(path: Path, scope: Path) -> None:
@@ -93,13 +95,9 @@ def coverage(corpus: Path) -> dict:
     return json.loads(result.stdout)
 
 
-def bundle_findings(corpus: Path, kind: str) -> list[str]:
-    """The `kind` findings of `quire validate --okf` over a corpus.
-
-    `--okf` reports a reference to an undefined id as a warning, so a clean exit
-    does not mean there is no finding.
-    """
-    result = subprocess.run(
+def bundle(corpus: Path) -> subprocess.CompletedProcess:
+    """`quire validate --okf` over a corpus: the run that resolves references."""
+    return subprocess.run(
         [
             "quire",
             "validate",
@@ -113,11 +111,32 @@ def bundle_findings(corpus: Path, kind: str) -> list[str]:
         text=True,
         check=False,
     )
-    return [line for line in result.stderr.splitlines() if f"[{kind}]" in line]
 
 
 def dangling(corpus: Path) -> list[str]:
-    return bundle_findings(corpus, "dangling-trace-reference")
+    return [
+        line
+        for line in bundle(corpus).stderr.splitlines()
+        if "[dangling-trace-reference]" in line
+    ]
+
+
+def strict(path: Path, scope: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--strict",
+            "--module",
+            str(PACKAGE_ROOT),
+            "--scope",
+            str(scope),
+            str(path),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
 
 
 def manifest_type(manifest: dict, name: str) -> dict:
@@ -125,14 +144,36 @@ def manifest_type(manifest: dict, name: str) -> dict:
 
 
 # Each case: fixture name and the text the diagnostic must carry.
-ROLE_SPEC_CASES: dict[str, list[tuple[str, str]]] = {
+ROLE_SPEC_CASES: dict[str, list[tuple[str, str | tuple[str, ...]]]] = {
     "FR-020-AC-1": [
         ("missing-evaluations", "evaluations"),
         ("missing-metrics", "metrics"),
+        ("missing-objectives", "objectives"),
+        ("missing-rules", "rules"),
         ("missing-column", "Metrics"),
+        ("metrics-missing-column", "Direction"),
+        ("rules-missing-column", "Source"),
+        ("evaluations-missing-column", "Cadence"),
+        ("metrics-misordered-columns", "do not match asserted columns"),
+        ("objectives-misordered-columns", "do not match asserted columns"),
+        ("rules-misordered-columns", "do not match asserted columns"),
+        ("evaluations-misordered-columns", "do not match asserted columns"),
         ("missing-version", "version"),
         ("missing-role", "role"),
-        ("empty-table", "objectives"),
+        ("missing-id", '"id" is a required property'),
+        ("empty-table", "at least 1"),
+        ("empty-metrics", "at least 1"),
+        ("empty-rules", "at least 1"),
+        ("empty-evaluations", "at least 1"),
+        ("metric-empty-name", ("MIND-M01", "'Name'")),
+        ("metric-empty-unit", ("MIND-M01", "'Unit'")),
+        ("metric-empty-target", ("MIND-M01", "'Target'")),
+        ("objective-empty-objective", ("MIND-O01", "'Objective'")),
+        ("rule-empty-rule", ("MIND-R01", "'Rule'")),
+        ("rule-empty-objective", ("MIND-R01", "'Objective'")),
+        ("rule-empty-class", ("MIND-R01", "'Class'")),
+        ("rule-empty-source", ("MIND-R01", "'Source'")),
+        ("evaluation-empty-rule", ("MIND-R06-E1", "'Rule'")),
     ],
     "FR-020-AC-2": [
         ("bad-eval-evidence-source", "telepathy"),
@@ -142,15 +183,15 @@ ROLE_SPEC_CASES: dict[str, list[tuple[str, str]]] = {
         ("bad-method", "heuristic"),
     ],
     "FR-020-AC-3": [
-        ("deterministic-empty-query", "MIND-R06-E1"),
-        ("deterministic-rubric-ref", "MIND-R06-E1"),
-        ("deterministic-free-text", "MIND-R06-E1"),
-        ("judgement-not-rubric-ref", "MIND-R02-E2"),
+        ("deterministic-empty-query", ("MIND-R06-E1", "allOf/0/then")),
+        ("deterministic-rubric-ref", ("MIND-R06-E1", "allOf/0/then")),
+        ("deterministic-free-text", ("MIND-R06-E1", "allOf/0/then")),
+        ("judgement-not-rubric-ref", ("MIND-R02-E2", "allOf/1/then/pattern")),
         ("empty-trigger", "'Trigger'"),
         ("free-text-trigger", "when the loop is removed"),
         ("free-text-metric-query", "p90 of latency"),
     ],
-    "FR-020-AC-4": [("judgement-tick", "MIND-R02-E2")],
+    "FR-020-AC-4": [("judgement-tick", ("MIND-R02-E2", "allOf/1/then/not"))],
     "FR-020-AC-5": [
         ("metric-id-wrong-prefix", "OTHR-M02"),
         ("rule-id-bad-shape", "MIND-R6"),
@@ -163,8 +204,8 @@ ROLE_SPEC_CASES: dict[str, list[tuple[str, str]]] = {
         ("empty-unit", "'Unit'"),
     ],
     "FR-020-AC-7": [
-        ("judgement-wrong-evaluator", "MIND-R02-E2"),
-        ("deterministic-wrong-evaluator", "MIND-R01-E1"),
+        ("judgement-wrong-evaluator", ("MIND-R02-E2", "allOf/1/then/pattern")),
+        ("deterministic-wrong-evaluator", ("MIND-R01-E1", "allOf/0/then")),
     ],
     "FR-020-AC-8": [
         ("version-zero", "version"),
@@ -175,12 +216,15 @@ ROLE_SPEC_CASES: dict[str, list[tuple[str, str]]] = {
     "FR-021-AC-4": [("objective-empty-metrics", "MIND-O02")],
 }
 
-RUBRIC_CASES: dict[str, list[tuple[str, str]]] = {
+RUBRIC_CASES: dict[str, list[tuple[str, str | tuple[str, ...]]]] = {
     "FR-023-AC-1": [
         ("rubric-missing-version", "version"),
+        ("rubric-missing-id", '"id" is a required property'),
         ("rubric-missing-checks", "checks"),
         ("rubric-missing-column", "Scale"),
-        ("rubric-empty-table", "checks"),
+        ("rubric-empty-table", "at least 1"),
+        ("rubric-empty-check", ("rubric-minder@1#failed-probe", "'Check'")),
+        ("rubric-empty-scale", ("rubric-minder@1#failed-probe", "'Scale'")),
         ("rubric-bad-id", "at id"),
         ("rubric-version-zero", "version"),
     ],
@@ -192,13 +236,13 @@ RUBRIC_CASES: dict[str, list[tuple[str, str]]] = {
 }
 
 
-def _params(cases: dict[str, list[tuple[str, str]]], ac: str):
+def _params(cases, ac: str):
     return [pytest.param(n, needle, id=n) for n, needle in cases[ac]]
 
 
 @pytest.mark.trace("FR-020-AC-1")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-1"))
-def test_missing_table_column_or_member_fails_naming_it(name: str, needle: str):
+def test_missing_table_column_or_member_fails_naming_it(name: str, needle):
     fails_naming(name, needle)
 
 
@@ -209,21 +253,21 @@ def test_the_worked_minder_spec_validates():
 
 @pytest.mark.trace("FR-020-AC-2")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-2"))
-def test_a_value_outside_a_closed_enum_fails_naming_the_cell(name: str, needle: str):
+def test_a_value_outside_a_closed_enum_fails_naming_the_cell(name: str, needle):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-020-AC-3")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-3"))
 def test_query_references_and_rubric_references_are_checked_by_method(
-    name: str, needle: str
+    name: str, needle
 ):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-020-AC-4")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-4"))
-def test_a_judgement_evaluation_never_runs_every_tick(name: str, needle: str):
+def test_a_judgement_evaluation_never_runs_every_tick(name: str, needle):
     fails_naming(name, needle)
 
 
@@ -235,50 +279,53 @@ def test_a_role_spec_may_carry_a_purpose_section():
 
 
 @pytest.mark.trace("FR-020-AC-12")
-def test_the_role_spec_links_are_exactly_three_verbs(manifest):
+def test_the_role_spec_links_are_exactly_two_verbs_and_both_are_registered(manifest):
     assert manifest_type(manifest, "RoleSpec")["allowed_links"] == [
         "satisfies",
         "depends_on",
-        "implements",
     ]
+    assert {"satisfies", "depends_on"} <= set(manifest["edge_types"])
 
 
 @pytest.mark.trace("FR-020-AC-12")
-def test_another_relationship_verb_is_reported_on_a_role_spec():
-    # The engine reports an unlisted verb as a warning (`disallowed-edge-type`),
-    # the same severity it gives every archetype's `allowed_links` miss.
+def test_another_relationship_verb_fails_under_strict_and_valid_specs_pass():
+    # Without `--strict` the engine reports an unlisted verb as a warning
+    # (`disallowed-edge-type`, exit 0); that is a quire-rs gap (SWM-248), so the
+    # failure is pinned under `--strict`.
     path = INVALID / "bad-link-verb.md"
-    found = [
-        line
-        for line in validate(path).stderr.splitlines()
-        if str(path) in line and "[disallowed-edge-type]" in line
-    ]
-    assert any("'supersedes'" in line for line in found)
+    result = strict(path, INVALID)
+    assert result.returncode == 3, result.stderr
+    assert any(
+        str(path) in line
+        and "[disallowed-edge-type]" in line
+        and "'supersedes'" in line
+        for line in result.stderr.splitlines()
+    ), result.stderr
+    ok = strict(MINDER, VALID)
+    assert ok.returncode == 0, ok.stderr
 
 
 @pytest.mark.trace("FR-020-AC-5")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-5"))
-def test_a_row_id_with_the_wrong_prefix_or_shape_fails_naming_the_id(
-    name: str, needle: str
-):
+def test_a_row_id_with_the_wrong_prefix_or_shape_fails_naming_the_id(name: str, needle):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-020-AC-6")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-6"))
-def test_a_threshold_is_a_known_comparator_a_number_and_a_unit(name: str, needle: str):
+def test_a_threshold_is_a_known_comparator_a_number_and_a_unit(name: str, needle):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-020-AC-7")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-7"))
-def test_the_evaluator_follows_the_method(name: str, needle: str):
+def test_the_evaluator_follows_the_method(name: str, needle):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-020-AC-8")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-020-AC-8"))
-def test_version_and_id_have_their_declared_shape(name: str, needle: str):
+def test_version_and_id_have_their_declared_shape(name: str, needle):
     fails_naming(name, needle)
 
 
@@ -294,13 +341,13 @@ def test_every_negative_fixture_is_one_declared_case():
         for cases in (ROLE_SPEC_CASES, RUBRIC_CASES)
         for group in cases.values()
         for name, _ in group
-    } | {"bad-link-verb", "rubric-bad-link-verb"}
+    } | {"bad-link-verb", "rubric-bad-link-verb", "shape-and-record-defect"}
     assert {p.stem for p in INVALID.glob("*.md")} == declared
 
 
 @pytest.mark.trace("FR-021-AC-4")
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-021-AC-4"))
-def test_an_objective_with_no_metric_fails_naming_the_objective(name: str, needle: str):
+def test_an_objective_with_no_metric_fails_naming_the_objective(name: str, needle):
     fails_naming(name, needle)
 
 
@@ -356,6 +403,7 @@ def test_a_reference_to_an_undefined_row_dangles(
     found = dangling(CORPUS / case)
     assert len(found) == 1, found
     assert f"'{missing}'" in found[0] and f"row '{referencing}'" in found[0]
+    assert bundle(CORPUS / case).returncode == 3
 
 
 @pytest.mark.trace("FR-021-AC-8")
@@ -377,11 +425,13 @@ def test_a_rubric_reference_that_resolves_to_no_check_dangles(case: str):
     assert len(found) == 1, found
     assert "'rubric-minder@1#failed-probe'" in found[0]
     assert "row 'MIND-R02-E2'" in found[0]
+    assert bundle(CORPUS / case).returncode == 3
 
 
 @pytest.mark.trace("FR-021-AC-10", "FR-023-AC-3")
 def test_the_rubric_reference_in_the_minder_spec_resolves():
     assert dangling(VALID) == []
+    assert bundle(VALID).returncode == 0
     resolved = [
         row
         for row in coverage(VALID)["unbacked_rows"]
@@ -404,17 +454,13 @@ def test_the_fixture_rubric_validates():
 
 @pytest.mark.trace("FR-023-AC-1")
 @pytest.mark.parametrize("name,needle", _params(RUBRIC_CASES, "FR-023-AC-1"))
-def test_a_rubric_missing_a_member_table_or_column_fails_naming_it(
-    name: str, needle: str
-):
+def test_a_rubric_missing_a_member_table_or_column_fails_naming_it(name: str, needle):
     fails_naming(name, needle)
 
 
 @pytest.mark.trace("FR-023-AC-2")
 @pytest.mark.parametrize("name,needle", _params(RUBRIC_CASES, "FR-023-AC-2"))
-def test_a_check_id_must_carry_the_rubric_name_version_and_a_slug(
-    name: str, needle: str
-):
+def test_a_check_id_must_carry_the_rubric_name_version_and_a_slug(name: str, needle):
     fails_naming(name, needle)
 
 
@@ -433,20 +479,24 @@ def test_the_rubric_skeleton_validates():
 
 
 @pytest.mark.trace("FR-023-AC-5")
-def test_another_relationship_verb_is_reported_on_a_rubric():
+def test_another_relationship_verb_fails_a_rubric_under_strict():
     path = INVALID / "rubric-bad-link-verb.md"
-    found = [
-        line
-        for line in validate(path).stderr.splitlines()
-        if str(path) in line and "[disallowed-edge-type]" in line
-    ]
-    assert any("'supersedes'" in line for line in found)
+    result = strict(path, INVALID)
+    assert result.returncode == 3, result.stderr
+    assert any(
+        str(path) in line
+        and "[disallowed-edge-type]" in line
+        and "'supersedes'" in line
+        for line in result.stderr.splitlines()
+    ), result.stderr
+    ok = strict(RUBRIC, VALID)
+    assert ok.returncode == 0, ok.stderr
 
 
 @pytest.mark.trace("FR-023-AC-1")
 def test_the_rubric_manifest_entry_declares_its_check_target_and_links(manifest):
     entry = manifest_type(manifest, "Rubric")
-    assert entry["allowed_links"] == ["satisfies", "depends_on", "implements"]
+    assert entry["allowed_links"] == ["satisfies", "depends_on"]
     targets = {t["name"]: t for t in manifest["traceability"]["trace_targets"]}
     check = targets["rubric-check"]
     assert (check["archetype"], check["section"], check["id_column"]) == (
@@ -455,3 +505,26 @@ def test_the_rubric_manifest_entry_declares_its_check_target_and_links(manifest)
         "ID",
     )
     assert check["evidence"] == "reference-only"
+
+
+@pytest.mark.trace("FR-021-AC-3")
+def test_a_dangling_reference_is_an_error_by_module_declaration(manifest):
+    assert manifest["grammar_severity"]["trace:dangling-trace-reference"] == "error"
+
+
+def test_shape_and_record_defects_are_reported_in_two_passes():
+    """The engine runs `record_validation` only after every `assert` passes, so a
+    fixture with a bad cadence (assert) and a wrong evaluator (record) reports
+    only the cadence until it is fixed. FR-020 asks for one run; that is a
+    quire-rs gap (SWM-248), pinned here so a change in the engine is noticed."""
+    path = INVALID / "shape-and-record-defect.md"
+    found = messages(validate(path), path)
+    assert any("'Cadence'" in m for m in found), found
+    assert not any("record-invalid" in m for m in found), found
+
+
+def test_each_vocabulary_and_query_pattern_is_written_once_in_the_manifest():
+    text = (PACKAGE_ROOT / "manifest.yaml").read_text()
+    assert text.count("relay-receipts") == 1
+    assert text.count("session-end") == 1
+    assert text.count("^[a-z][a-z0-9-]*\\.[a-z][a-z0-9_]*$") == 1

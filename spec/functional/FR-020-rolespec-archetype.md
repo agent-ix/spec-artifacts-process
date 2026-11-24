@@ -39,7 +39,7 @@ This requirement covers the document shape and the checks that read one row or o
 - The `RoleSpec` frontmatter schema SHALL require `id`, `role`, `version` and `type`.
 - The `RoleSpec` frontmatter schema SHALL accept `id` only as an upper-case prefix of 2 to 6 letters.
 - The `RoleSpec` frontmatter schema SHALL accept `version` only as an integer of at least 1.
-- The `RoleSpec` manifest entry SHALL declare `allowed_links` of `satisfies`, `depends_on` and `implements`.
+- The `RoleSpec` manifest entry SHALL declare `allowed_links` of `satisfies` and `depends_on`, and the module SHALL register `satisfies` in its `edge_types`.
 - The `RoleSpec` archetype SHALL accept sections other than the four tables, such as `Purpose`. The archetype asserts nothing about those sections.
 - The `RoleSpec` archetype SHALL require the four tables, each with exactly these columns in order:
   - `Metrics`: `ID`, `Name`, `Evidence source`, `Query`, `Unit`, `Target`, `Direction`.
@@ -67,7 +67,7 @@ This requirement covers the document shape and the checks that read one row or o
 | FR-020-AC-3 | A deterministic evaluation whose `Query or rubric` is empty, is a rubric reference or is free text, a judgement evaluation whose `Query or rubric` is not of the form `<rubric>@<version>#<check-slug>`, and an evaluation whose `Trigger` is empty or free text each fail. A metric whose `Query` is free text fails. | Test |
 | FR-020-AC-4 | A judgement evaluation with cadence `tick` fails. | Test |
 | FR-020-AC-11 | A role spec carrying a `## Purpose` section in addition to the four tables validates. | Test |
-| FR-020-AC-12 | The `RoleSpec` manifest entry declares `allowed_links` of exactly `satisfies`, `depends_on` and `implements`, and a `RoleSpec` with any other relationship verb fails. | Test |
+| FR-020-AC-12 | The `RoleSpec` manifest entry declares `allowed_links` of exactly `satisfies` and `depends_on`, and `quire validate --strict` exits nonzero on a `RoleSpec` with any other relationship verb. Without `--strict` the engine reports the verb as a warning (quire-rs gap, SWM-248). | Test |
 | FR-020-AC-5 | A row id whose prefix differs from the frontmatter `id`, or whose shape differs from its table's id pattern, fails naming the id. | Test |
 | FR-020-AC-6 | A threshold with a comparator outside the five accepted, a non-numeric `Value`, or an empty `Unit` fails. | Test |
 | FR-020-AC-7 | A judgement evaluation whose `Evaluator` is neither `director` nor `team-retro`, and a deterministic evaluation whose `Evaluator` is not `evaluator`, each fail. | Test |
