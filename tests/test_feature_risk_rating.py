@@ -576,7 +576,8 @@ class TestFeatureRiskRating:
         """
         spec = (REPO_ROOT / "spec/functional/FR-026-feature-rating-completeness.md").read_text()
         for contract in (
-            "quoin validation ratings --repo DIR [--json]",
+            "quoin validation ratings --repo DIR --repo-id ORG/REPO [--json]",
+            "The command SHALL NOT inspect Git remotes or require a Git repository.",
             "FR-ID: STATUS (rating IDs: ID[, ID…])",
             'exactly the top-level members `features` and `unreadable`',
             'Each object in `features` SHALL contain exactly `feature_id`',

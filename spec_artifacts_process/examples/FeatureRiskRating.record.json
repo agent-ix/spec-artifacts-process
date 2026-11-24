@@ -1,0 +1,42 @@
+{
+  "id": "FRR-001",
+  "title": "Quoin validation feature risk rating",
+  "type": "FeatureRiskRating",
+  "scope": "supplier",
+  "rating": "not_high_process_risk",
+  "ratedBy": "Example Reviewer",
+  "relationships": [
+    {
+      "target": "ix://agent-ix/spec-artifacts-process/IU-001",
+      "type": "uses_intended_use"
+    },
+    {
+      "target": "ix://agent-ix/spec-artifacts-process/FR-009",
+      "type": "rates_feature"
+    }
+  ],
+  "provenance": {
+    "path": "examples/FeatureRiskRating.md",
+    "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "featureAssessments": [
+    {
+      "requirement": "FR-009",
+      "failureMode": "An invalid schema may allow malformed records to appear valid.",
+      "detection": "Run schema validation against invalid and valid fixtures.",
+      "line": 15
+    }
+  ],
+  "rationale": {
+    "text": "The named reviewer selected this rating for the stated repository-validation use.",
+    "startLine": 17,
+    "endLine": 17
+  },
+  "assuranceActivities": [
+    {
+      "activity": "Validate representative valid and invalid records.",
+      "acceptanceCriterion": "Invalid records fail with a diagnostic naming the violated contract.",
+      "line": 21
+    }
+  ]
+}

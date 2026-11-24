@@ -22,6 +22,7 @@ count adopter re-ratings as supplier ratings.
 ## Inputs
 
 - A repository directory containing `spec/functional/` and `FeatureRiskRating` documents.
+- The required repository identity `--repo-id ORG/REPO`, independent of the local checkout's Git configuration.
 - The optional `--json` output selection.
 
 ## Outputs
@@ -32,7 +33,9 @@ count adopter re-ratings as supplier ratings.
 
 ## Behavior
 
-- Quoin SHALL expose the command `quoin validation ratings --repo DIR [--json]`.
+- Quoin SHALL expose the command `quoin validation ratings --repo DIR --repo-id ORG/REPO [--json]`.
+- `--repo-id` SHALL identify the repository namespace used to resolve artifact relationship targets.
+- The command SHALL NOT inspect Git remotes or require a Git repository.
 - The command SHALL read requirements and rating records under `DIR/spec/`.
 - The command SHALL return a command error and a non-zero exit when `DIR/spec/` is absent or is not a directory.
 - The command SHALL include every functional requirement in the ratings result.
@@ -79,7 +82,7 @@ count adopter re-ratings as supplier ratings.
 | FR-026-AC-4 | When two supplier ratings target the same FR, the duplicate diagnostic names that FR and both rating ids. | Test |
 | FR-026-AC-5 | An adopter rating for an otherwise unrated FR does not satisfy the supplier completeness rule. | Test |
 | FR-026-AC-6 | An adopter rating for an FR with one supplier rating is not counted as a duplicate supplier rating. | Test |
-| FR-026-AC-7 | The command accepts `quoin validation ratings --repo DIR` and reads the repository's `spec/` bundle. | Test |
+| FR-026-AC-7 | The command accepts `quoin validation ratings --repo DIR --repo-id ORG/REPO` and reads the repository's `spec/` bundle without inspecting Git remotes. | Test |
 | FR-026-AC-8 | Human output emits each FR status and its rating ids in the specified line format, and emits the specified empty-set message when no FR exists. | Test |
 | FR-026-AC-9 | JSON stdout is one object with exactly the top-level members `features` and `unreadable`. | Test |
 | FR-026-AC-10 | Each JSON feature row has exactly `feature_id`, `status` and `rating_ids`, with the declared status vocabulary and id-list cardinality. | Test |
