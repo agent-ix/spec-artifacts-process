@@ -494,7 +494,8 @@ model TestCaseRow {
   /** Absent where the matrix omits the whole column, which the archetype allows (CR-018); never synthesised. */
   priority?: Priority;
   tracesTo: TraceCell;
-  status: CoverageStatus;
+  /** Optional authored tracking annotation; criterion coverage is computed from requirements and test tags. */
+  status?: CoverageStatus;
   line: LineNumber;
 }
 
@@ -1015,10 +1016,10 @@ model TestMatrixIndex {
 }
 
 /**
- * Leaf matrix record (archetype `TestMatrix`). Every `Status` marker is the
- * **authored coverage claim**, never an execution result; whether the claim is
- * true is decided by the coverage rollup against the evidence store, outside
- * this module (FR-013).
+ * Leaf matrix record (archetype `TestMatrix`). An optional `Status` marker is
+ * an authored tracking annotation, never execution evidence or an input to
+ * criterion coverage, which `quire matrix` computes from requirements and test
+ * tags (FR-013, PLAT-1155).
  */
 model TestMatrix {
   id: UpperDocId;

@@ -464,7 +464,9 @@ artifact_types:
             # of them forever or force an invented priority into each. The column
             # stays declared, and its values stay constrained when authored;
             # only its presence is optional (quire-rs FR-033-AC-14/15).
-            optional_columns: [Priority]
+            # Status is an optional authored tracking annotation (PLAT-1155),
+            # not an input to criterion coverage computed from test tags.
+            optional_columns: [Priority, Status]
             min_rows: 1
             id_column: Test ID
             # CR-016: segmented ids the ecosystem authors (TC-060-01,

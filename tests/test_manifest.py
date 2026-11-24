@@ -114,9 +114,9 @@ def test_spec_review_analysis_admits_both_review_families() -> None:
 
 @pytest.mark.trace("FR-003")
 def test_testmatrix_body_extraction_contract() -> None:
-    """FR-003: the TestMatrix contract is manifest data — required coverage +
-    summary tables, the Test ID pattern, and the Type/Priority/Status/Traces To
-    cell vocabularies. The behavioural side is
+    """FR-003: the TestMatrix contract is manifest data — a required
+    Test Case Summary table, the Test ID pattern, and the
+    Type/Priority/Status/Traces To cell vocabularies. The behavioural side is
     `test_testmatrix_body_extraction.py`, which drives `quire validate`."""
     manifest = load_yaml_strict(MANIFEST_PATH.read_text())
     tm = next(t for t in manifest["artifact_types"] if t["name"] == "TestMatrix")
@@ -133,6 +133,8 @@ def test_testmatrix_body_extraction_contract() -> None:
         "Traces To",
         "Status",
     ]
+    assert cases["assert"]["optional_columns"] == ["Priority", "Status"]
+    assert "Status" in cases["assert"]["column_patterns"]
     assert cases["assert"]["id_column"] == "Test ID"
     # CR-019: the prefix set mirrors the declared evidence archetypes (`TC`,
     # `IT`) — not a list of test kinds, which is the `Type` column's job.
