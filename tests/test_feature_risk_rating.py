@@ -580,7 +580,14 @@ class TestFeatureRiskRating:
 
         Trace: FR-024-AC-7, FR-027-AC-13, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
         """
-        spec = (REPO_ROOT / "spec/functional/FR-026-feature-rating-completeness.md").read_text()
+        spec = "\n".join(
+            (REPO_ROOT / f"spec/functional/{name}").read_text()
+            for name in (
+                "FR-024-intended-use-archetype.md",
+                "FR-026-feature-rating-completeness.md",
+                "FR-027-human-acceptance-of-risk-ratings.md",
+            )
+        )
         for contract in (
             "quoin validation ratings --repo DIR --repo-id ORG/REPO [--json]",
             "The command SHALL NOT inspect Git remotes or require a Git repository.",
