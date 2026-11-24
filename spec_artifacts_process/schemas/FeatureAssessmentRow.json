@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "requirement": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRequirementId.json"
     },
     "failureMode": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"

@@ -61,12 +61,14 @@ A tool supplier and an adopter can assess the same feature under different inten
 - Every target requirement SHALL have one corresponding `Feature assessments` row.
 - A `Feature assessments` table SHALL NOT contain a row for a requirement the rating does not target.
 - A `Feature assessments` table SHALL NOT contain more than one row for the same requirement.
-- The failure-mode cell SHALL describe a plausible failure of that feature and its effect on records named by the applicable intended use.
+- The failure-mode cell SHALL describe a plausible failure of that feature.
+- The failure-mode cell SHALL describe the effect on records named by the applicable intended use.
 - The detection cell SHALL identify the activity or observation by which the failure can be found.
 - The document SHALL contain a `Rationale` section.
 - The document SHALL contain an `Assurance activities` section.
 - The rationale SHALL explain why the rating fits the intended use.
-- Assurance activities SHALL identify each selected test, inspection or analysis and the acceptance criterion it addresses.
+- Assurance activities SHALL identify each selected test, inspection or analysis.
+- Each assurance activity SHALL identify the acceptance criterion it addresses.
 - A rating document MAY cover multiple requirements.
 - When one rating covers multiple requirements, its rating SHALL apply to each target.
 - When one rating covers multiple requirements, its rationale SHALL apply to each target.

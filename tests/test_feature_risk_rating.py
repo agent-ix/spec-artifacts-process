@@ -447,7 +447,7 @@ class TestFeatureRiskRating:
         assert unknown_result.returncode != 0
         assert "unknown" in unknown_result.stderr
 
-    @pytest.mark.trace("FR-025-AC-10")
+    @pytest.mark.trace("FR-025-AC-10", "FR-025-AC-13")
     def test_assessment_requirement_is_typed_as_an_existing_fr(self, tmp_path: Path) -> None:
         """Reject a table requirement reference that names no FR.
 
@@ -498,7 +498,9 @@ class TestFeatureRiskRating:
         missing_intended_use = content.replace("/FR-024", "/IU-999")
         missing_path = tmp_path / "missing-intended-use.md"
         missing_path.write_text(missing_intended_use)
-        missing_result = quire_validate(missing_path, scope=REPO_ROOT)
+        missing_result = run_quire(
+            "validate", "--strict", "--scope", str(REPO_ROOT), str(missing_path)
+        )
         assert missing_result.returncode != 0
         assert "IU-999" in missing_result.stderr
 
@@ -514,8 +516,10 @@ class TestFeatureRiskRating:
 
         Trace: FR-025-AC-4, FR-025-AC-5
         """
-        supplier_text = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text()
-        adopter_text = supplier_text.replace("FRR-001", "FRR-002").replace(
+        supplier_text = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text().replace(
+            "FRR-001", "FRR-700"
+        )
+        adopter_text = supplier_text.replace("FRR-700", "FRR-701").replace(
             "scope: supplier", "scope: adopter\nintended_use: Integrator production context"
         )
         adopter_text = adopter_text.replace(
@@ -523,7 +527,7 @@ class TestFeatureRiskRating:
             "",
         ).replace(
             "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
-            "ix://agent-ix/spec-artifacts-process/FRR-001\n    type: re_rates",
+            "ix://agent-ix/spec-artifacts-process/FRR-700\n    type: re_rates",
         )
         adopter_text = adopter_text.replace(
             "rating: not_high_process_risk", "rating: high_process_risk"
@@ -546,6 +550,7 @@ class TestFeatureRiskRating:
 
     @pytest.mark.trace(
         "FR-024-AC-7",
+        "FR-027-AC-13",
         "FR-026-AC-7",
         "FR-026-AC-8",
         "FR-026-AC-9",
@@ -567,9 +572,7 @@ class TestFeatureRiskRating:
             Command, human output, JSON envelope, unreadable diagnostics,
             duplicate failure and read-only behavior remain specified.
 
-        Trace: FR-024-AC-7, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10,
-        FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14,
-        FR-026-AC-15, FR-026-AC-16
+        Trace: FR-024-AC-7, FR-027-AC-13, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
         """
         spec = (REPO_ROOT / "spec/functional/FR-026-feature-rating-completeness.md").read_text()
         for contract in (
@@ -592,6 +595,7 @@ class TestFeatureRiskRating:
             "An unreadable input SHALL make the result partial.",
             "A partial result due to unreadable input SHALL exit with status 1.",
             "A partial result due to duplicate supplier ratings SHALL exit with status 1.",
+            "A duplicate supplier rating identifies the FR and every conflicting rating id and exits with status 1.",
             "A `rated_more_than_once` status",
             "A missing or non-directory `DIR/spec/` returns a command error",
             "Quoin's [FR-217](ix://agent-ix/quoin/FR-217) validation-report command",
