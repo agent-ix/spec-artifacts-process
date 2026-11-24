@@ -65,3 +65,26 @@ What is sound:
 3. **A disallowed verb is a warning with exit 0.** This is an engine limitation. In the module now: assert `--strict` exits 3 and record AC-12 as partial (FND-002).
 4. **record_validation runs only after the shape asserts are clean.** This is an engine limitation (FND-006).
 5. **Dangling references show only under `--okf` and only as warnings.** The module must change this now: declare the `trace:dangling-trace-reference` error severity and assert exit 3. Engine capabilities are still needed for a per-declaration severity and for the check in plain `quire validate` (FND-001).
+
+## Dispositions
+
+Disposition pass 1 was checked against fix head cc809ce.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The manifest now declares `grammar_severity: {"trace:dangling-trace-reference": error}`. `test_a_reference_to_an_undefined_row_dangles` asserts that `quire validate --okf` exits 3. The per-declaration severity and the check in plain `quire validate` stay with SWM-247. |
+| FND-002 | fixed | By lead decision, FR-020-AC-12 now requires `quire validate --strict` to exit nonzero. Both bad-verb tests pin exit 3 and assert that the valid fixtures exit 0 under `--strict`. The engine severity key for `disallowed-edge-type` is on SWM-248. |
+| FND-003 | deferred | The in-manifest copies are removed: `&evidence_sources`, `&query_ref` and a test that counts them. The TypeSpec and RoleSpecFields.json copies remain until the SWM-248 schema-`$ref` capability lands. FR-020-AC-9 still fails on inspection until then. |
+| FND-004 | fixed | `satisfies` is registered in `edge_types` and `implements` is dropped, with FR-020 and FR-023 amended by lead decision. `test_every_allowed_link_verb_is_registered` now fails only on the pre-existing `segregates_for_requirement`, the same as origin/main. |
+| FND-005 | fixed | 28 fixtures were added and 4 changed. Each one was run, and each fails on the intended table, column, cell or field. |
+| FND-006 | deferred | SWM-248 tracks same-run reporting. `test_shape_and_record_defects_are_reported_in_two_passes` pins the current two-pass behaviour. |
+| FND-007 | deferred | SWM-247 has a scope note to re-point the AC-1 and AC-12 tests to `quire matrix` when capability 1 lands. |
+| FND-008 | fixed | The conditional needles now include the schema path (`allOf/0/then`, `allOf/1/then/pattern`, `allOf/1/then/not`). |
+| FND-009 | fixed | id-lower-case, id-too-long, rubric-bad-id and rubric-version-zero each produce exactly one diagnostic. The cascades left in missing-id and rubric-missing-version are the engine's `unresolved-field` for an absent field, which a fixture cannot avoid. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-010 | medium | The module-wide `trace:dangling-trace-reference: error` key turns `quire validate --okf` over this repository from exit 0 to exit 3. Five dangling `traces-to` references already exist in spec/tests.md: TC-001, TC-002 and TC-005 cite US-001, TC-100 cites US-002 and TC-037 cites AC-2. Every consumer that runs this module under OKF inherits the same change. The PR does not mention it, and nothing fixes those five references. | spec_artifacts_process/manifest.yaml:2170, spec/tests.md:12, spec/tests.md:46 |
+| FND-011 | low | The RoleSpec skeleton still lists `implements` as an allowed verb, which contradicts the amended FR-020. An author who follows it gets a `disallowed-edge-type` warning, and a failure under `--strict`. | spec_artifacts_process/skeletons/RoleSpec.md:19 |

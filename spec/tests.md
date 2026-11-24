@@ -9,11 +9,11 @@ type: TestMatrix
 
 | Test ID | Title | Type | Priority | Traces To | Status |
 |---------|-------|------|----------|-----------|--------|
-| TC-001 | Conforming TestMatrix validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8, US-001 | ✅ |
-| TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2, US-001 | ✅ |
+| TC-001 | Conforming TestMatrix validates; test-case rows extracted one record per row | Unit | P0 | FR-003-AC-1, FR-003-AC-8 | ✅ |
+| TC-002 | Doc missing the Test Case Summary table fails with reason `missing` | Unit | P0 | FR-003-AC-2 | ✅ |
 | TC-003 | A `TestMatrix` doc validates with no `Functional Requirement Coverage` section, and with one carrying any column set, since the contract declares no functional-coverage extraction (PLAT-1499) | Unit | P1 | FR-003-AC-13 | ✅ |
 | TC-004 | Type vocabulary permutation: Unit, Integration, E2E, Property each accepted | Unit | P1 | FR-003-AC-3 | ✅ |
-| TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3, US-001 | ✅ |
+| TC-005 | Type cell outside the vocabulary (e.g. `Manual`) fails via `column_choices` (reason `assert`) | Unit | P0 | FR-003-AC-3 | ✅ |
 | TC-006 | Test ID shape permutation: `TC-001`, `TC-INT-010`, `TC-INT-010a` each accepted | Unit | P1 | FR-003-AC-4 | ✅ |
 | TC-007 | Malformed Test ID (`TC1`, `tc-001`, `TC-`, `TCX-001`) fails validation | Unit | P0 | FR-003-AC-4 | ✅ |
 | TC-008 | Status marker permutation: ✅, ❌, 🚧, ⛔ each accepted bare, and a ⚠️-headed cell fails (CR-031) | Unit | P1 | FR-003-AC-5 | ✅ |
@@ -43,7 +43,7 @@ type: TestMatrix
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
 | TC-036 | Every trace target and document reference declares a non-empty `exclude` covering every test-tree convention (`tests/**`, `tests_integration/**`, `fixtures/**`), so a typed fixture — `FR`/`NFR` or `TestMatrix` — mints no id in a consuming repo (CR-025, widened CR-062) | Unit | P0 | FR-004-AC-9 | ✅ |
-| TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, -AC-2 | ✅ |
+| TC-037 | Task `track` is a declared optional string with `minLength: 1` and no enum; `track: C` validates, `track: ""`, a non-string and a null fail | Unit | P1 | FR-005-AC-1, FR-005-AC-2 | ✅ |
 | TC-038 | Scope guard: no `Track` archetype or artifact type is declared, and Task keeps its schema ref, id pattern and `depends_on`/`verifies`/`references` links (CR-026) | Unit | P1 | FR-005-AC-3 | ✅ |
 | TC-039 | There is exactly one entry per kind of table — `test-case`, `traces-to` — never one per matrix filename, so a nested matrix is reached by what it is rather than by what it is called (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
 | TC-040 | The manifest declares `SuiteRegistry` with its frontmatter schema and a `body_extraction` asserting the five columns, `min_rows: 1` and the `^SUITE-\d+$` id pattern — structured, doc-scoped, never a kebab slug (FR-006) | Unit | P0 | FR-006-AC-1 | ✅ |
@@ -93,7 +93,7 @@ type: TestMatrix
 | TC-097 | `mappings.yaml` validates against `mappings.schema.json`, and every emitted model has an entry declaring the authority and round-trip policy | Unit | P0 | FR-011-AC-1 | ✅ |
 | TC-098 | Every model property is named by exactly one mapping entry and every entry names a declared property — the mapping is total in both directions | Unit | P0 | FR-011-AC-2, FR-011-CON-2 | ✅ |
 | TC-099 | Every section and column `mappings.yaml` names is declared by that type's `body_extraction` | Unit | P0 | FR-011-AC-3, FR-011-CON-1 | ✅ |
-| TC-100 | For each shipped skeleton the reference mapping builds a record that validates against its emitted schema and equals the shipped golden record byte for byte | Unit | P0 | FR-011-AC-4, US-002 | ✅ |
+| TC-100 | For each shipped skeleton the reference mapping builds a record that validates against its emitted schema and equals the shipped golden record byte for byte | Unit | P0 | FR-011-AC-4 | ✅ |
 | TC-101 | A `Status` cell carrying a marker and a note splits into `marker` and `note`; a bare marker yields no `note` | Unit | P1 | FR-011-AC-5 | ✅ |
 | TC-102 | The `Traces To` parse expands the elided-parent and slash shorthands, carries a parenthesised remainder as `note`, and maps a lone `-` to an empty list with `noTrace: true` | Unit | P0 | FR-011-AC-6 | ✅ |
 | TC-103 | A table omitting a declared optional column yields rows without that key rather than a synthesised value | Unit | P1 | FR-011-AC-7 | ✅ |

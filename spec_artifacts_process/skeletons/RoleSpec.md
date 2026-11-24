@@ -16,7 +16,7 @@ relationships:
      - Frontmatter: `type: RoleSpec`; `id` is the role's rule prefix, 2 to 6
        upper-case letters; `role` is the role name; `version` is an integer >= 1.
        Quoin's version-bump and skill-citation checks read `version` (FR-022).
-     - Allowed relationship verbs: satisfies, depends_on, implements.
+     - Allowed relationship verbs: satisfies, depends_on.
      - REQUIRED (level 2), each a table with >= 1 row and these exact headers:
        Metrics:     ID | Name | Evidence source | Query | Unit | Target | Direction
        Objectives:  ID | Objective | Metrics

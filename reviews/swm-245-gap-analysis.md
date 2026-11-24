@@ -57,3 +57,19 @@ No reverse gaps or stubs were found. The changed Python (`tests/support/referenc
 - Reverse gaps: none. Stubs: none.
 - Semantic review: skipped as a separate pass. The intent checks that matter are in SR-913.
 - Plan completion: not assessed
+
+## Dispositions
+
+Disposition pass 1 was checked against fix head cc809ce.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | FR-020-AC-12 was amended by lead decision to the `--strict` form. Two tests pin exit 3 on the bad verb and exit 0 on the valid fixtures. |
+| FND-002 | deferred | FR-020-AC-9 still fails on inspection. The in-manifest copies are gone, and the TypeSpec single-home capability is tracked on SWM-248. |
+| FND-003 | deferred | FR-021-AC-2 waits on SWM-247 capability 1, and the PR body lists it as deferred. |
+| FND-004 | deferred | FR-021-AC-5 waits on SWM-247 capability 2. |
+| FND-005 | deferred | FR-021-AC-6 waits on SWM-248 capability 3. |
+| FND-006 | deferred | FR-021-AC-7 waits on SWM-248 capability 4. |
+| FND-007 | deferred | FR-021-AC-11 waits on SWM-247 capability 1. |
+| FND-008 | fixed | 28 new and 4 revised negative fixtures. Each fails for its intended reason (verified by running every one). |
+| FND-009 | deferred | FR-022-AC-1 is a Demonstration that runs in dev-team after the minder spec moves to spec/roles/. |
