@@ -59,6 +59,22 @@ def test_rating_rejects_relationships_from_the_other_scope(scope: str, verb: str
     assert list(validator.iter_errors(rating(scope, verb)))
 
 
+@pytest.mark.trace("FR-025-AC-6", "NFR-002")
+def test_rating_is_human_authored_and_has_no_computed_risk_fields() -> None:
+    schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
+    assert "default" not in schema["properties"]["rating"]
+    assert schema["additionalProperties"] is False
+    names = set(schema["properties"])
+    assert not names & {
+        "score",
+        "risk_score",
+        "threshold",
+        "product_criticality",
+        "software_safety_class",
+        "risk_acceptability",
+    }
+
+
 @pytest.mark.trace("FR-024-AC-4")
 @pytest.mark.parametrize(
     "tool",
