@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRiskRating.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRiskRatingId.json"
+    },
+    "title": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "type": {
+      "type": "string",
+      "const": "FeatureRiskRating"
+    },
+    "scope": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRatingScope.json"
+    },
+    "rating": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRatingValue.json"
+    },
+    "ratedBy": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NamedText.json"
+    },
+    "intendedUse": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Relationship.json"
+      }
+    },
+    "provenance": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Provenance.json"
+    },
+    "featureAssessments": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureAssessmentRow.json"
+      }
+    },
+    "rationale": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Section.json"
+    },
+    "assuranceActivities": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/AssuranceActivityRow.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "type",
+    "scope",
+    "rating",
+    "ratedBy",
+    "relationships",
+    "provenance",
+    "featureAssessments",
+    "rationale",
+    "assuranceActivities"
+  ],
+  "unevaluatedProperties": {
+    "not": {}
+  },
+  "description": "One named person's rating and evidence for one or more features."
+}

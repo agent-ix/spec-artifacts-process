@@ -1,0 +1,38 @@
+{
+  "id": "IU-001",
+  "title": "Quoin intended use",
+  "type": "IntendedUse",
+  "tool": "quoin",
+  "relationships": [],
+  "provenance": {
+    "path": "examples/IntendedUse.md",
+    "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "purpose": {
+    "text": "Quoin validates declared engineering artifacts and reports structural findings.",
+    "startLine": 5,
+    "endLine": 5
+  },
+  "recordsProduced": [
+    {
+      "recordKind": "Validation report",
+      "command": "quoin validate",
+      "line": 11
+    }
+  ],
+  "whoReliesOnThem": {
+    "text": "Repository maintainers use validation reports to find issues.",
+    "startLine": 14,
+    "endLine": 14
+  },
+  "limits": {
+    "text": "The tool is not a compliance oracle and does not decide product or clinical safety.",
+    "startLine": 18,
+    "endLine": 18
+  },
+  "operatingContext": {
+    "text": "The command reads repository documents and module manifests in a local environment.",
+    "startLine": 22,
+    "endLine": 22
+  }
+}

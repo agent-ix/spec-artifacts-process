@@ -51,6 +51,18 @@ scalar UpperDocId extends string;
 @pattern("^[A-Za-z]{2,4}-[0-9]+$")
 scalar MixedDocId extends string;
 
+/** IntendedUse document identifier. */
+@pattern("^IU-[0-9]{3}$")
+scalar IntendedUseId extends string;
+
+/** FeatureRiskRating document identifier. */
+@pattern("^FRR-[0-9]{3}$")
+scalar FeatureRiskRatingId extends string;
+
+/** Functional requirement id used by a feature-assessment row. */
+@pattern("^FR-[0-9]{3}$")
+scalar FeatureRequirementId extends string;
+
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
 scalar StandardDocId extends string;
@@ -183,6 +195,21 @@ enum AnalysisKind {
   criterionStrength: "criterion-strength",
   codeReview: "code-review",
   specCorrectness: "spec-correctness",
+}
+
+/** Scope of a human-authored FeatureRiskRating. */
+enum FeatureRatingScope { supplier, adopter }
+
+/** Human-authored feature rating. No default or computed value is defined. */
+enum FeatureRatingValue { high_process_risk, not_high_process_risk }
+
+/** Initial tool-validation packages covered by this module. */
+enum IntendedUseTool {
+  quoin,
+  quireRs: "quire-rs",
+  quireCli: "quire-cli",
+  engineeringAssurance: "engineering-assurance",
+  filamentAnalyze: "filament-analyze",
 }
 
 /** How much of the spec a SpecReview covered. */
@@ -772,6 +799,59 @@ model RubricCheckRow {
 // ---------------------------------------------------------------------------
 // Artifact models (exported)
 // ---------------------------------------------------------------------------
+
+/** Supplier-authored account of one package's intended operating use. */
+model IntendedUse {
+  id: IntendedUseId;
+  title: NonEmptyText;
+  type: "IntendedUse";
+  tool: IntendedUseTool;
+  relationships: Relationship[];
+  provenance: Provenance;
+  purpose: Section;
+  recordsProduced: RecordProducedRow[];
+  whoReliesOnThem: Section;
+  limits: Section;
+  operatingContext: Section;
+}
+
+/** One named person's rating and evidence for one or more features. */
+model FeatureRiskRating {
+  id: FeatureRiskRatingId;
+  title: NonEmptyText;
+  type: "FeatureRiskRating";
+  scope: FeatureRatingScope;
+  rating: FeatureRatingValue;
+  ratedBy: NamedText;
+  intendedUse?: NonEmptyText;
+  relationships: Relationship[];
+  provenance: Provenance;
+  featureAssessments: FeatureAssessmentRow[];
+  rationale: Section;
+  assuranceActivities: AssuranceActivityRow[];
+}
+
+/** Failure mode and detection evidence for one rated requirement. */
+model FeatureAssessmentRow {
+  requirement: FeatureRequirementId;
+  failureMode: NonEmptyText;
+  detection: NonEmptyText;
+  line: LineNumber;
+}
+
+/** One record kind and the command that produces it. */
+model RecordProducedRow {
+  recordKind: NonEmptyText;
+  command: NonEmptyText;
+  line: LineNumber;
+}
+
+/** One selected assurance activity and its acceptance criterion. */
+model AssuranceActivityRow {
+  activity: NonEmptyText;
+  acceptanceCriterion: NonEmptyText;
+  line: LineNumber;
+}
 
 /** Architecture decision record (archetype `ADR`). A definition: it records a decision, never a run. */
 model ADR {

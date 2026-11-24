@@ -64,6 +64,65 @@ grammars:
   - finding
   - feedback
 artifact_types:
+- name: IntendedUse
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/intended-use-frontmatter.schema.json
+  data_schema:
+    schema: schemas/IntendedUse.json
+  defaults:
+    id_pattern: IU-{next:03d}
+  allowed_links:
+    references: [IntendedUse]
+  examples: [examples/IntendedUse.md]
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        purpose: {from: section_body, after_heading: Purpose, required: true}
+        records_produced:
+          from: table_row
+          under_section: Records produced
+          required: true
+          multiple: true
+          assert:
+            columns: [Record kind, Command that writes it]
+            min_rows: 1
+        who_relies_on_them: {from: section_body, after_heading: Who relies on them, required: true}
+        limits: {from: section_body, after_heading: Limits, required: true}
+        operating_context: {from: section_body, after_heading: Operating context, required: true}
+- name: FeatureRiskRating
+  grammar_ref: process-artifacts
+  frontmatter_schema_ref: schemas/feature-risk-rating-frontmatter.schema.json
+  data_schema:
+    schema: schemas/FeatureRiskRating.json
+  defaults:
+    id_pattern: FRR-{next:03d}
+  allowed_links:
+    rates_feature: [FR]
+    re_rates: [FeatureRiskRating]
+    uses_intended_use: [IntendedUse]
+  examples: [examples/FeatureRiskRating.md]
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        feature_assessments:
+          from: table_row
+          under_section: Feature assessments
+          required: true
+          multiple: true
+          assert:
+            columns: [Requirement, Failure mode, Detection]
+            min_rows: 1
+        rationale: {from: section_body, after_heading: Rationale, required: true}
+        assurance_activities:
+          from: table_row
+          under_section: Assurance activities
+          required: true
+          multiple: true
+          assert:
+            columns: [Activity, Acceptance criterion]
+            min_rows: 1
 - name: ADR
   grammar_ref: process-artifacts
   frontmatter_schema_ref: schemas/adr-frontmatter.schema.json
@@ -965,6 +1024,13 @@ lint_rules:
 # coverage rollup how to read the same columns, so a contract and its coverage
 # computation cannot drift (CR-015 / CR-016).
 traceability:
+  required_relations:
+  - name: fr-has-risk-rating
+    from: FR
+    edges: [rates_feature]
+    to: [FeatureRiskRating]
+    direction: incoming
+    check: feature-without-risk-rating
   # ── What is NOT traceable source ──
   #
   # Path globs under the **code** root naming fixture trees that hold no
@@ -1243,6 +1309,16 @@ traceability:
   # so such a cell contributes its first token only. The row is still backed
   # when that token is backed; it just under-counts the rest.
   document_references:
+  - name: feature-assessment-requirement
+    archetype: FeatureRiskRating
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    section: Feature assessments
+    column: Requirement
+    row_id_column: Requirement
+    pattern: '\b(FR-[0-9]{3})\b'
+    targets: [requirement-document]
+    expand_ranges: false
+    strip_annotations: false
   # An inspection names the obligation it discharges. Reusing the existing
   # criterion targets means a typo in that cell dangles like any other broken
   # reference, instead of recording an act against nothing (#34).
@@ -2151,6 +2227,12 @@ verification_catalog:
 # spec-objects-architecture; consumers load those canonical owners alongside
 # this module when resolving the corresponding artifact links.
 edge_types:
+  rates_feature: {description: "A feature risk rating assesses a functional requirement.", category: traceability, inverse: rated_by_rating}
+  rated_by_rating: {description: "A functional requirement is assessed by a feature risk rating.", category: traceability, inverse: rates_feature}
+  re_rates: {description: "An adopter feature risk rating reassesses a supplier rating.", category: traceability, inverse: rerated_by}
+  rerated_by: {description: "A supplier feature risk rating is reassessed by an adopter rating.", category: traceability, inverse: re_rates}
+  uses_intended_use: {description: "A supplier rating is evaluated under an IntendedUse record.", category: traceability, inverse: used_by_rating}
+  used_by_rating: {description: "An IntendedUse record provides context for a supplier rating.", category: traceability, inverse: uses_intended_use}
   # structural
   contains: { description: "Composition; the source owns the target's lifecycle.", category: structural, inverse: contained_in, composite: true }
   # dependency
@@ -2170,6 +2252,7 @@ edge_types:
 # warning, so `quire validate --okf` over a corpus fails on a dangling role-spec
 # or rubric reference. The key is module-wide.
 grammar_severity:
+  "trace:feature-without-risk-rating": off
   "trace:dangling-trace-reference": error
 
 # ── Semantic module contract (quoin FR-070, agent-ix/spec-artifacts-process#78) ──
@@ -2185,6 +2268,8 @@ semantic:
   contract_version: 1.0.0
   package: agent-ix/spec-artifacts-process
   exports:
+  - IntendedUse
+  - FeatureRiskRating
   - ADR
   - Anomaly
   - DossierDocument
