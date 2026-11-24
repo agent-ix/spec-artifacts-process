@@ -14,7 +14,8 @@
     "risk-management-plan",
     "release-record",
     "threat-model",
-    "records-of-processing"
+    "records-of-processing",
+    "vulnerability-management-plan"
   ],
   "description": "The document a dossier carries; the record and frontmatter schemas both enumerate it (FR-018)."
 }

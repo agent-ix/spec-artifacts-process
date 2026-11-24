@@ -27,7 +27,9 @@ relationships:
 `quoin dossier` ([quoin FR-191](ix://agent-ix/quoin/FR-191)) writes its source-derived
 documents into a repository, and `quire export` renders them. Both need a
 document type that validates, so this module declares the artifact type
-`DossierDocument`.
+`DossierDocument`. Its document kinds include the vulnerability-management plan
+that records a tool's vulnerability intake, coordination, remediation and
+communication process.
 
 `quire export` reads `title`, `id` and, for document kinds that use it, `version`
 from its committed input ([quire-cli FR-034](ix://agent-ix/quire-cli/FR-034)). The records-of-processing
@@ -56,7 +58,7 @@ document with no source binding and no `as_of`.
 - The `DossierDocument` frontmatter schema SHALL require `id`, `title`, `document_kind` and `generated_by`.
 - For every `document_kind` other than `records-of-processing`, the frontmatter schema SHALL require a non-empty `version`. For `records-of-processing`, `version` SHALL be optional and, when present, non-empty.
 - The `DossierDocument` frontmatter schema SHALL accept only non-empty text for `id`, `title` and any present `version`.
-- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan`, `release-record`, `threat-model` or `records-of-processing` for `document_kind`.
+- The `DossierDocument` frontmatter schema SHALL accept only `srs`, `architecture`, `trace-matrix`, `rmm`, `verification-report`, `soup`, `anomalies`, `risk-management`, `risk-management-plan`, `release-record`, `threat-model`, `records-of-processing` or `vulnerability-management-plan` for `document_kind`.
 - The `DossierDocument` frontmatter schema SHALL accept only `quoin dossier` for `generated_by`.
 - The `DossierDocument` frontmatter schema SHALL accept `as_of` only as an RFC 3339 `date-time` instant in its upper-case `T` and `Z` form.
 - Where `document_kind` is `rmm`, the `DossierDocument` frontmatter schema SHALL require `as_of`.
@@ -93,6 +95,7 @@ document with no source binding and no `as_of`.
 | FR-018-AC-16 | The emitted record schema accepts a `soup` record both without `asOf` and with a valid RFC 3339 `asOf`, and rejects a malformed `asOf`. | Test |
 | FR-018-AC-17 | A fixture with `document_kind: threat-model` and `id: DOS-TM` validates with `quire validate` without `as_of`; the emitted record schema accepts `documentKind: threat-model` with no `asOf`; the record `document_kind` enum contains `threat-model`. | Test |
 | FR-018-AC-18 | A fixture with `document_kind: records-of-processing` and `id: DOS-ROP` validates without `version` or `as_of`; the emitted record schema accepts `documentKind: records-of-processing` with neither `version` nor `asOf`; both projected schemas contain the new enum member. | Test |
+| FR-018-AC-19 | A fixture with `document_kind: vulnerability-management-plan`, a non-empty `version`, and `generated_by: quoin dossier` validates with `quire validate`; the emitted record schema accepts `documentKind: vulnerability-management-plan`; the frontmatter and record kind vocabularies contain that member. | Test |
 
 ## Dependencies
 

@@ -257,6 +257,7 @@ enum DossierKind {
   `release-record`,
   `threat-model`,
   `records-of-processing`,
+  `vulnerability-management-plan`,
 }
 
 /** What a fix-verification row points at: an acceptance criterion or a test case. */
