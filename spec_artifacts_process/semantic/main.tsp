@@ -460,11 +460,6 @@ model TraceCell {
  * `target` is the authored reference token and is absent for a `None` row whose
  * `Target` is `-`. Whether a token resolves is a diagnostic, not part of the record.
  */
-model DossierProducerIdentity {
-  name: "quoin";
-  version: NonEmptyText;
-}
-
 @extension("allOf", #[
   #{ `if`: #{ `properties`: #{ `kind`: #{ `const`: "None" } }, `required`: #["kind"] },
      `then`: #{ `not`: #{ `required`: #["target"] } },
@@ -1049,6 +1044,12 @@ model Anomaly {
   @minItems(1) verification?: VerificationRow[];
   /** Absent when the section is absent; an engineer's written reason, never filled in by a tool (FR-016). */
   @minItems(1) releaseRationale?: ReleaseRationaleRow[];
+}
+
+/** Quoin tool identity written to each generated dossier document. */
+model DossierProducerIdentity {
+  name: "quoin";
+  version: NonEmptyText;
 }
 
 /**
