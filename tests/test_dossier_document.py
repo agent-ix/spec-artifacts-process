@@ -50,7 +50,11 @@ def fails_naming(path: Path, field: str, *, scope: Path = FIXTURES) -> None:
     found = messages(result, path)
     assert found, result.stderr
     assert any(
-        f'"{field}"' in m or f"at {field})" in m or f"'{field}'" in m for m in found
+        f'"{field}"' in m
+        or f"at {field})" in m
+        or f"at {field}." in m
+        or f"'{field}'" in m
+        for m in found
     ), found
 
 

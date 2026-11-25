@@ -26,6 +26,9 @@
       "type": "string",
       "const": "quoin dossier"
     },
+    "producerIdentity": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/DossierProducerIdentity.json"
+    },
     "asOf": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Rfc3339Instant.json"
     },
@@ -47,6 +50,7 @@
     "type",
     "documentKind",
     "generatedBy",
+    "producerIdentity",
     "body"
   ],
   "unevaluatedProperties": {
