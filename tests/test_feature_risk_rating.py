@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -32,7 +33,7 @@ def rating(scope: str, verb: str) -> dict:
         "type": "FeatureRiskRating",
         "scope": scope,
         "rating": "not_high_process_risk",
-        "rated_by": "Named Reviewer",
+        "status": "proposed",
         "relationships": [],
     }
     if scope == "supplier":
@@ -51,10 +52,104 @@ def rating(scope: str, verb: str) -> dict:
     return document
 
 
+def acceptance_result(
+    status: str,
+    rated_by: str | None,
+    verifier_result: dict,
+    trailer: str,
+) -> str:
+    """Evaluate the signed-acceptance contract used by the spec examples."""
+    signer = verifier_result.get("signer", {})
+    meaning = verifier_result.get("signed_off_meaning", {})
+    if (
+        status == "accepted"
+        and verifier_result.get("protocol")
+        == "engineering-assurance.signature-verify-result/v1"
+        and verifier_result.get("status") == "signed_valid"
+        and signer.get("mapping") == "mapped"
+        and signer.get("principal") == rated_by
+        and meaning.get("presence") == "present"
+        and "feature-risk-rating-accepted" in meaning.get("values", [])
+        and trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+    ):
+        return "accepted"
+    return "not_accepted"
+
+
+def signed_commit_evidence(tmp_path: Path) -> tuple[dict, str]:
+    """Create and verify a temporary SSH-signed commit with the exact trailer."""
+    key = tmp_path / "signing-key"
+    subprocess.run(
+        ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    public_key = key.with_suffix(".pub").read_text().split()
+    principal = "allowed-principal@example.invalid"
+    allowed_signers = tmp_path / "allowed_signers"
+    allowed_signers.write_text(
+        f'{principal} namespaces="git" {public_key[0]} {public_key[1]}\n'
+    )
+    repository = tmp_path / "signed-repo"
+    repository.mkdir()
+
+    def git(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            ["git", *args],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    git("init", "-q")
+    git("config", "user.name", "Spec Test Signer")
+    git("config", "user.email", "spec-test@example.invalid")
+    git("config", "gpg.format", "ssh")
+    git("config", "user.signingkey", str(key))
+    git("config", "gpg.ssh.allowedSignersFile", str(allowed_signers))
+    (repository / "rating.md").write_text("proposal\n")
+    git("add", "rating.md")
+    git(
+        "-c",
+        "commit.gpgsign=true",
+        "commit",
+        "-S",
+        "-m",
+        "rating proposal",
+        "-m",
+        "Signed-off-meaning: feature-risk-rating-accepted",
+    )
+    git("verify-commit", "HEAD")
+    message = git("show", "-s", "--format=%B", "HEAD").stdout
+    trailer = next(
+        (
+            line
+            for line in message.splitlines()
+            if line.startswith("Signed-off-meaning:")
+        ),
+        "",
+    )
+    return {
+        "protocol": "engineering-assurance.signature-verify-result/v1",
+        "status": "signed_valid",
+        "kind": "commit",
+        "signer": {
+            "mapping": "mapped",
+            "principal": "allowed-principal@example.invalid",
+        },
+        "signed_off_meaning": {
+            "presence": "present",
+            "values": ["feature-risk-rating-accepted"],
+        },
+    }, trailer
+
+
 class TestFeatureRiskRating:
     """Tests for IntendedUse and FeatureRiskRating module contracts."""
 
-    @pytest.mark.trace("FR-025-AC-1", "FR-025-AC-4", "FR-026-AC-5")
+    @pytest.mark.trace("FR-025-AC-1", "FR-025-AC-4", "FR-025-AC-17", "FR-026-AC-5")
     @pytest.mark.parametrize(
         ("scope", "verb"),
         [("supplier", "rates_feature"), ("adopter", "re_rates")],
@@ -69,7 +164,7 @@ class TestFeatureRiskRating:
         Criteria:
             Supplier `rates_feature` and adopter `re_rates` metadata validate.
 
-        Trace: FR-025-AC-1, FR-025-AC-4, FR-026-AC-5
+        Trace: FR-025-AC-1, FR-025-AC-4, FR-025-AC-17, FR-026-AC-5
         """
         validator = Draft202012Validator(
             frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
@@ -98,6 +193,129 @@ class TestFeatureRiskRating:
         )
         assert list(validator.iter_errors(rating(scope, verb)))
 
+    @pytest.mark.trace("FR-025-AC-17")
+    def test_proposed_and_accepted_ratings_have_consistent_authorship(self) -> None:
+        """Reject named proposals and require identity for accepted ratings.
+
+        Assumptions:
+            Scope and relationships are otherwise valid supplier metadata.
+        Criteria:
+            Proposed ratings reject `rated_by`; accepted ratings require it.
+
+        Trace: FR-025-AC-17, FR-027-AC-14, FR-027-AC-15
+        """
+        validator = Draft202012Validator(
+            frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
+        )
+        proposed = rating("supplier", "rates_feature")
+        assert list(validator.iter_errors(proposed)) == []
+
+        proposed_with_rater = rating("supplier", "rates_feature")
+        proposed_with_rater["rated_by"] = "Allowed Principal"
+        assert list(validator.iter_errors(proposed_with_rater))
+
+        accepted_without_rater = rating("supplier", "rates_feature")
+        accepted_without_rater["status"] = "accepted"
+        assert list(validator.iter_errors(accepted_without_rater))
+
+        accepted = rating("supplier", "rates_feature")
+        accepted["status"] = "accepted"
+        accepted["rated_by"] = "Allowed Principal"
+        assert list(validator.iter_errors(accepted)) == []
+
+    @pytest.mark.trace("FR-027-AC-14")
+    def test_signed_valid_commit_does_not_accept_a_proposed_rating(
+        self, tmp_path: Path
+    ) -> None:
+        """A valid mapped signature and exact trailer cannot accept a proposal.
+
+        Assumptions:
+            The verifier result represents a signed-valid commit by the named
+            principal, and its exact acceptance trailer is present.
+        Criteria:
+            A proposal is reported not_accepted even with otherwise valid
+            acceptance evidence.
+
+        Trace: FR-027-AC-14
+        """
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
+        assert (
+            "| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, "
+            "including when its commit is otherwise signed-valid. | Test |"
+        ) in acceptance_spec
+        verifier_result, trailer = signed_commit_evidence(tmp_path)
+        assert verifier_result["status"] == "signed_valid"
+        assert trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+        assert (
+            acceptance_result(
+                "proposed",
+                "allowed-principal@example.invalid",
+                verifier_result,
+                trailer,
+            )
+            == "not_accepted"
+        )
+
+    @pytest.mark.trace("FR-027-AC-15")
+    def test_accepted_rating_requires_matching_signer_and_exact_trailer(
+        self, tmp_path: Path
+    ) -> None:
+        """Accept only matching mapped identity and the exact trailer.
+
+        Assumptions:
+            The verifier result is from the versioned FR-036 protocol.
+        Criteria:
+            Matching accepted record/signature/trailer succeeds; signer or
+            trailer mismatch is not accepted.
+
+        Trace: FR-027-AC-15
+        """
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
+        assert (
+            "| FR-027-AC-15 | An accepted rating requires a `rated_by` principal "
+            "matching the verified signer and the exact acceptance trailer. | Test |"
+        ) in acceptance_spec
+        valid_result, exact_trailer = signed_commit_evidence(tmp_path)
+        assert valid_result["status"] == "signed_valid"
+        assert exact_trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                valid_result,
+                exact_trailer,
+            )
+            == "accepted"
+        )
+
+        mismatched_signer = dict(valid_result)
+        mismatched_signer["signer"] = {
+            "mapping": "mapped",
+            "principal": "Different Principal",
+        }
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                mismatched_signer,
+                exact_trailer,
+            )
+            == "not_accepted"
+        )
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                valid_result,
+                "Signed-off-meaning: feature-risk-rating-approved",
+            )
+            == "not_accepted"
+        )
+
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
         """Require a supplier rating to link to its IntendedUse artifact.
@@ -118,7 +336,9 @@ class TestFeatureRiskRating:
 
         missing = rating("supplier", "rates_feature")
         missing["relationships"] = [
-            edge for edge in missing["relationships"] if edge["type"] != "uses_intended_use"
+            edge
+            for edge in missing["relationships"]
+            if edge["type"] != "uses_intended_use"
         ]
         foreign = rating("supplier", "rates_feature")
         foreign["relationships"][0]["target"] = (
@@ -132,26 +352,25 @@ class TestFeatureRiskRating:
         assert list(validator.iter_errors(duplicate))
 
     @pytest.mark.trace("FR-025-AC-3")
-    def test_supplier_rating_covers_two_existing_feature_targets(self, tmp_path: Path) -> None:
-        """Accept one assessment row for each of two existing feature targets.
+    def test_supplier_rating_covers_two_existing_feature_targets(
+        self, tmp_path: Path
+    ) -> None:
+        """Accept two existing feature targets without per-target tables.
 
         Assumptions:
             FR-009 and FR-024 exist in the loaded specification corpus.
         Criteria:
-            Two `rates_feature` edges and their two typed row references validate.
+            Two `rates_feature` edges validate without a Feature assessments section.
 
         Trace: FR-025-AC-3
         """
         content = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text()
+        assert "## Feature assessments" not in content
         content = content.replace(
             "    type: rates_feature\n---",
             "    type: rates_feature\n"
             "  - target: ix://agent-ix/spec-artifacts-process/FR-024\n"
             "    type: rates_feature\n---",
-        ).replace(
-            "| FR-009 | An invalid schema may allow malformed records to appear valid. | Run schema validation against invalid and valid fixtures and inspect diagnostics. |",
-            "| FR-009 | An invalid schema may allow malformed records to appear valid. | Run schema validation against invalid and valid fixtures and inspect diagnostics. |\n"
-            "| FR-024 | An intended-use omission can hide a material operating limit. | Review the intended-use record and confirm the limit is stated. |",
         )
         path = tmp_path / "two-feature-rating.md"
         path.write_text(content)
@@ -198,7 +417,7 @@ class TestFeatureRiskRating:
         validator = Draft202012Validator(frontmatter_schema(schema_name))
         assert list(validator.iter_errors(document))
 
-    @pytest.mark.trace("FR-025-AC-6", "FR-025-AC-7", "NFR-003-AC-1")
+    @pytest.mark.trace("FR-025-AC-6", "FR-025-AC-7", "FR-025-AC-14", "NFR-003-AC-1")
     def test_rating_is_human_authored_without_computed_fields(self) -> None:
         """Keep risk values person-authored and reject undeclared fields.
 
@@ -222,22 +441,27 @@ class TestFeatureRiskRating:
             "software_safety_class",
             "risk_acceptability",
         }
-        row_schema = frontmatter_schema("FeatureAssessmentRow.json")
-        assert set(row_schema["properties"]) == {
-            "requirement",
-            "failureMode",
-            "detection",
-            "line",
-        }
+        record_schema = json.loads((SCHEMAS_DIR / "FeatureRiskRating.json").read_text())
+        assert "featureAssessments" not in record_schema["properties"]
+        assert "failureMode" not in record_schema["properties"]
+        assert "detection" not in record_schema["properties"]
+        assert record_schema["unevaluatedProperties"] == {"not": {}}
+        assert "featureAssessments" not in json.loads(
+            (EXAMPLES_DIR / "FeatureRiskRating.record.json").read_text()
+        )
+        assert (
+            "## Feature assessments"
+            not in (SKELETONS_DIR / "FeatureRiskRating.md").read_text()
+        )
 
-    @pytest.mark.trace("FR-025-AC-2")
-    def test_invalid_rating_missing_rater_and_extra_fields_fail(self) -> None:
-        """Reject invalid enum values, missing identity and computed fields.
+    @pytest.mark.trace("FR-025-AC-2", "FR-025-AC-17")
+    def test_invalid_rating_missing_status_and_extra_fields_fail(self) -> None:
+        """Reject invalid enum values, missing status and computed fields.
 
         Assumptions:
             Each candidate begins as otherwise-valid supplier metadata.
         Criteria:
-            Invalid rating, absent named rater, and extra score each fail
+            Invalid rating, absent status, and extra score each fail
             frontmatter validation.
 
         Trace: FR-025-AC-2
@@ -247,13 +471,13 @@ class TestFeatureRiskRating:
         )
         invalid_value = rating("supplier", "rates_feature")
         invalid_value["rating"] = "medium"
-        missing_rater = rating("supplier", "rates_feature")
-        del missing_rater["rated_by"]
+        missing_status = rating("supplier", "rates_feature")
+        del missing_status["status"]
         computed_value = rating("supplier", "rates_feature")
         computed_value["score"] = 3
 
         assert list(validator.iter_errors(invalid_value))
-        assert list(validator.iter_errors(missing_rater))
+        assert list(validator.iter_errors(missing_status))
         assert list(validator.iter_errors(computed_value))
 
     @pytest.mark.trace("FR-024-AC-4", "FR-024-AC-6")
@@ -361,7 +585,9 @@ class TestFeatureRiskRating:
         """
         functional = tmp_path / "spec" / "functional"
         functional.mkdir(parents=True)
-        source_fr = (REPO_ROOT / "spec/functional/FR-024-intended-use-archetype.md").read_text()
+        source_fr = (
+            REPO_ROOT / "spec/functional/FR-024-intended-use-archetype.md"
+        ).read_text()
         for number in range(1, 4):
             identifier = f"FR-{number:03d}"
             target = functional / f"{identifier}-feature.md"
@@ -381,15 +607,20 @@ class TestFeatureRiskRating:
             (rating_dir / f"{record_id}.md").write_text(body)
 
         adopter = rating_template.replace("FRR-001", "FRR-003").replace(
-            "scope: supplier", "scope: adopter\nintended_use: Integrator production context"
+            "scope: supplier",
+            "scope: adopter\nintended_use: Integrator production context",
         )
-        adopter = adopter.replace(
-            "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n    type: uses_intended_use\n",
-            "",
-        ).replace(
-            "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
-            "ix://agent-ix/spec-artifacts-process/FRR-001\n    type: re_rates",
-        ).replace("FR-009", "FR-001")
+        adopter = (
+            adopter.replace(
+                "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n    type: uses_intended_use\n",
+                "",
+            )
+            .replace(
+                "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
+                "ix://agent-ix/spec-artifacts-process/FRR-001\n    type: re_rates",
+            )
+            .replace("FR-009", "FR-001")
+        )
         (rating_dir / "adopter-rerating.md").write_text(adopter)
 
         documents = tuple(
@@ -397,8 +628,11 @@ class TestFeatureRiskRating:
         )
 
         default = run_quire(
-            "validate", "--scope", str(tmp_path), *documents,
-            siblings=("spec-artifacts-iso",)
+            "validate",
+            "--scope",
+            str(tmp_path),
+            *documents,
+            siblings=("spec-artifacts-iso",),
         )
         enabled = run_quire(
             "validate",
@@ -445,7 +679,9 @@ class TestFeatureRiskRating:
         missing_result = quire_validate(missing_path, scope=REPO_ROOT)
 
         unknown_path = tmp_path / "unknown-field.md"
-        unknown_path.write_text(valid.replace("type: IntendedUse\n", "type: IntendedUse\nunknown: true\n"))
+        unknown_path.write_text(
+            valid.replace("type: IntendedUse\n", "type: IntendedUse\nunknown: true\n")
+        )
         unknown_result = quire_validate(unknown_path, scope=REPO_ROOT)
 
         assert missing_result.returncode != 0
@@ -454,8 +690,10 @@ class TestFeatureRiskRating:
         assert "unknown" in unknown_result.stderr
 
     @pytest.mark.trace("FR-025-AC-10", "FR-025-AC-13")
-    def test_assessment_requirement_is_typed_as_an_existing_fr(self, tmp_path: Path) -> None:
-        """Reject a table requirement reference that names no FR.
+    def test_rates_feature_relationship_is_typed_as_an_existing_fr(
+        self, tmp_path: Path
+    ) -> None:
+        """Reject a rating relationship that names no FR.
 
         Assumptions:
             The fixture retains a valid supplier IntendedUse edge and all
@@ -467,8 +705,11 @@ class TestFeatureRiskRating:
         Trace: FR-025-AC-10, FR-025-AC-13
         """
         valid = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text()
-        invalid = valid.replace("| FR-009 |", "| FR-999 |")
-        path = tmp_path / "dangling-assessment-target.md"
+        invalid = valid.replace(
+            "ix://agent-ix/spec-artifacts-process/FR-009",
+            "ix://agent-ix/spec-artifacts-process/FR-999",
+        )
+        path = tmp_path / "dangling-rating-target.md"
         path.write_text(invalid)
 
         result = quire_validate(path, scope=REPO_ROOT)
@@ -490,9 +731,13 @@ class TestFeatureRiskRating:
 
         Trace: FR-025-AC-11, FR-025-AC-15
         """
-        content = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text().replace(
-            "ix://agent-ix/spec-artifacts-process/IU-001",
-            "ix://agent-ix/spec-artifacts-process/FR-024",
+        content = (
+            (EXAMPLES_DIR / "FeatureRiskRating.md")
+            .read_text()
+            .replace(
+                "ix://agent-ix/spec-artifacts-process/IU-001",
+                "ix://agent-ix/spec-artifacts-process/FR-024",
+            )
         )
         path = tmp_path / "foreign-intended-use.md"
         path.write_text(content)
@@ -522,11 +767,14 @@ class TestFeatureRiskRating:
 
         Trace: FR-025-AC-4, FR-025-AC-5
         """
-        supplier_text = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text().replace(
-            "FRR-001", "FRR-700"
+        supplier_text = (
+            (EXAMPLES_DIR / "FeatureRiskRating.md")
+            .read_text()
+            .replace("FRR-001", "FRR-700")
         )
         adopter_text = supplier_text.replace("FRR-700", "FRR-701").replace(
-            "scope: supplier", "scope: adopter\nintended_use: Integrator production context"
+            "scope: supplier",
+            "scope: adopter\nintended_use: Integrator production context",
         )
         adopter_text = adopter_text.replace(
             "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n    type: uses_intended_use\n",
@@ -556,7 +804,6 @@ class TestFeatureRiskRating:
 
     @pytest.mark.trace(
         "FR-024-AC-7",
-        "FR-027-AC-13",
         "FR-026-AC-7",
         "FR-026-AC-8",
         "FR-026-AC-9",
@@ -578,7 +825,7 @@ class TestFeatureRiskRating:
             Command, human output, JSON envelope, unreadable diagnostics,
             duplicate failure and read-only behavior remain specified.
 
-        Trace: FR-024-AC-7, FR-027-AC-13, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
+        Trace: FR-024-AC-7, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
         """
         spec = "\n".join(
             (REPO_ROOT / f"spec/functional/{name}").read_text()
@@ -592,10 +839,10 @@ class TestFeatureRiskRating:
             "quoin validation ratings --repo DIR --repo-id ORG/REPO [--json]",
             "The command SHALL NOT inspect Git remotes or require a Git repository.",
             "FR-ID: STATUS (rating IDs: ID[, ID…])",
-            'exactly the top-level members `features` and `unreadable`',
-            'Each object in `features` SHALL contain exactly `feature_id`',
-            'status` (one of `unrated`, `rated`, `rated_more_than_once`)',
-            'exactly `path` (repository-relative path using `/`) and `reason`',
+            "exactly the top-level members `features` and `unreadable`",
+            "Each object in `features` SHALL contain exactly `feature_id`",
+            "status` (one of `unrated`, `rated`, `rated_more_than_once`)",
+            "exactly `path` (repository-relative path using `/`) and `reason`",
             "unreadable: PATH: REASON",
             "A `rated_more_than_once` status SHALL make the result partial",
             "The command SHALL NOT create repository files.",
@@ -617,21 +864,66 @@ class TestFeatureRiskRating:
         ):
             assert contract in spec
 
+    @pytest.mark.trace("FR-027-AC-13")
+    def test_validation_report_requires_tool_versions_and_configuration_entries(
+        self,
+    ) -> None:
+        """Bind the external-tool report criterion to its named contracts.
+
+        Assumptions:
+            Quoin FR-217 and FR-220 own the report and configuration index.
+        Criteria:
+            FR-027 assigns report production and version-index entries to those
+            requirements.
+
+        Trace: FR-027-AC-13
+        """
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
+        assert (
+            "| FR-027-AC-13 | The Quoin validation report identifies the versions "
+            "of external tools and references their FR-220 configuration-index "
+            "entries. | Test |"
+        ) in acceptance_spec
+        assert "Quoin [FR-217](ix://agent-ix/quoin/FR-217)" in acceptance_spec
+        assert "Quoin [FR-220](ix://agent-ix/quoin/FR-220)" in acceptance_spec
+
     @pytest.mark.trace("NFR-002-AC-1", "NFR-003-AC-1", "FR-027-AC-6")
-    def test_authorship_and_computed_decision_boundaries_are_schema_visible(self) -> None:
+    def test_authorship_and_computed_decision_boundaries_are_schema_visible(
+        self,
+    ) -> None:
         """Keep human authorship and the absence of computed decisions explicit.
 
         Assumptions:
             The schemas and TypeSpec output are committed module data.
         Criteria:
-            `rated_by` is required; generated decision fields are absent; and
+            `status` is required; generated decision fields are absent; and
             the record model contains no commit identity for acceptance.
 
         Trace: NFR-002-AC-1, NFR-003-AC-1, FR-027-AC-6
         """
         schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
-        assert "rated_by" in schema["required"]
+        assert "status" in schema["required"]
+        assert "rated_by" not in schema["required"]
         assert schema["additionalProperties"] is False
+
+        validator = Draft202012Validator(schema)
+        supplier = rating("supplier", "rates_feature")
+        supplier["relationships"] = [
+            edge
+            for edge in supplier["relationships"]
+            if edge["type"] != "uses_intended_use"
+        ]
+        assert list(validator.iter_errors(supplier))
+
+        adopter = rating("adopter", "re_rates")
+        adopter.pop("intended_use")
+        assert list(validator.iter_errors(adopter))
+
+        accepted_without_identity = rating("adopter", "re_rates")
+        accepted_without_identity["status"] = "accepted"
+        assert list(validator.iter_errors(accepted_without_identity))
         assert not set(schema["properties"]) & {
             "score",
             "risk_score",

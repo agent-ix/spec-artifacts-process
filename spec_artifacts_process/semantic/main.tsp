@@ -59,10 +59,6 @@ scalar IntendedUseId extends string;
 @pattern("^FRR-[0-9]{3}$")
 scalar FeatureRiskRatingId extends string;
 
-/** Functional requirement id used by a feature-assessment row. */
-@pattern("^FR-[0-9]{3}$")
-scalar FeatureRequirementId extends string;
-
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
 scalar StandardDocId extends string;
@@ -202,6 +198,9 @@ enum FeatureRatingScope { supplier, adopter }
 
 /** Human-authored feature rating. No default or computed value is defined. */
 enum FeatureRatingValue { high_process_risk, not_high_process_risk }
+
+/** Lifecycle of a feature risk rating record. */
+enum FeatureRiskRatingStatus { proposed, accepted }
 
 /** Initial tool-validation packages covered by this module. */
 enum IntendedUseTool {
@@ -815,28 +814,20 @@ model IntendedUse {
   operatingContext: Section;
 }
 
-/** One named person's rating and evidence for one or more features. */
+/** One rating with its proposal/acceptance status and covered requirements. */
 model FeatureRiskRating {
   id: FeatureRiskRatingId;
   title: NonEmptyText;
   type: "FeatureRiskRating";
   scope: FeatureRatingScope;
   rating: FeatureRatingValue;
-  ratedBy: NamedText;
+  status: FeatureRiskRatingStatus;
+  ratedBy?: NamedText;
   intendedUse?: NonEmptyText;
   relationships: Relationship[];
   provenance: Provenance;
-  featureAssessments: FeatureAssessmentRow[];
   rationale: Section;
   assuranceActivities: AssuranceActivityRow[];
-}
-
-/** Failure mode and detection evidence for one rated requirement. */
-model FeatureAssessmentRow {
-  requirement: FeatureRequirementId;
-  failureMode: NonEmptyText;
-  detection: NonEmptyText;
-  line: LineNumber;
 }
 
 /** One record kind and the command that produces it. */

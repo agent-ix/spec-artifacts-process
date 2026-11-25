@@ -19,12 +19,12 @@ relationships:
 
 ## Statement
 
-The module SHALL record every feature-risk rating and its supporting failure-mode and detection information with the identity of the named person who supplied them.
+The module SHALL record the applicable intended-use context for every feature-risk rating, and the accepting person's identity for every accepted rating.
 
 ## Scope
 
 - Applies to `IntendedUse` and `FeatureRiskRating` documents and validation rules defined by FR-024 through FR-026.
-- Adopters may use the recorded information with other evidence to make their own TCL, TQL or T-class determination for their intended use.
+- Adopters may use the rating and other evidence to make their own TCL, TQL or T-class determination for their intended use.
 
 ## Rationale
 
@@ -34,14 +34,14 @@ Risk decisions belong to the person responsible for the intended use. Keeping th
 
 | Metric | Target | Threshold | Method |
 |--------|--------|-----------|--------|
-| Feature ratings traceable to a named human and an intended-use context | 100% | 100% | Test |
+| Accepted feature ratings traceable to a named human and all ratings traceable to an intended-use context | 100% | 100% | Test |
 
 ## Verification
 
-Validate supplier and adopter fixtures to confirm each rating retains its named author and intended-use context.
+Validate supplier and adopter fixtures to confirm each rating retains its intended-use context and accepted ratings retain the accepting person's identity.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| NFR-002-AC-1 | Every supplier and adopter rating requires a named rater and its applicable intended-use context. | Test |
+| NFR-002-AC-1 | Every supplier and adopter rating requires its applicable intended-use context; accepted ratings also require the accepting person's identity. | Test |

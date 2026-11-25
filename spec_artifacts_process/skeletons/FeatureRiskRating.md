@@ -4,7 +4,7 @@ title: <feature group> risk rating for <intended use>
 type: FeatureRiskRating
 scope: supplier
 rating: not_high_process_risk
-rated_by: <named person>
+status: proposed
 relationships:
   - target: ix://agent-ix/spec-artifacts-process/IU-001
     type: uses_intended_use
@@ -13,15 +13,9 @@ relationships:
 ---
 # <feature group> risk rating
 
-## Feature assessments
-
-| Requirement | Failure mode | Detection |
-|---|---|---|
-| FR-001 | <Describe a plausible failure and its effect on intended-use records.> | <Identify the activity or observation that detects it.> |
-
 ## Rationale
 
-<Explain why the person-assigned rating fits this intended use.>
+<Explain why the rating fits this intended use.>
 
 ## Assurance activities
 

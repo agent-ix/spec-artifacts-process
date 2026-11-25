@@ -22,6 +22,7 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 
 - The commit that last changed the rating document.
 - The `rated_by` principal from the rating.
+- The rating's `status`.
 - An allowed-signers configuration for engineering-assurance `signature-verify`.
 - A versioned `engineering-assurance.signature-verify-request/v1` request.
 
@@ -41,7 +42,8 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 - The request's `allowed_signers` SHALL be an absolute path to the required allowed-signers file.
 - The workflow SHALL accept only an `engineering-assurance.signature-verify-result/v1` response with `status: signed_valid` and `signer.mapping: mapped`.
 - The workflow SHALL validate the response's `protocol`, `status`, `kind`, `signer.mapping`, `signer.principal` and `signed_off_meaning` members before evaluating acceptance.
-- The workflow SHALL report a rating as `accepted` only when the verified principal equals `rated_by` and the commit contains the exact trailer `Signed-off-meaning: feature-risk-rating-accepted`.
+- The workflow SHALL report a rating as `accepted` only when its status is `accepted`, the verified principal equals `rated_by`, and the commit contains the exact trailer `Signed-off-meaning: feature-risk-rating-accepted`.
+- The workflow SHALL report a rating as `not_accepted` when its status is `proposed`.
 - The workflow SHALL require `signed_off_meaning.presence: present`.
 - The workflow SHALL require `signed_off_meaning.values` to include `feature-risk-rating-accepted`.
 - The workflow SHALL report a rating as `not_accepted` when the verifier returns any status other than `signed_valid`.
@@ -81,6 +83,8 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 | FR-027-AC-11 | Missing, unreadable or malformed allowed-signers input produces `not_accepted`; FR-037's `signature_verify_allowed_signers_invalid` error never produces acceptance. | Test |
 | FR-027-AC-12 | A response with a wrong protocol or missing/malformed required result members produces `not_accepted`. | Test |
 | FR-027-AC-13 | The Quoin validation report identifies the versions of external tools and references their FR-220 configuration-index entries. | Test |
+| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, including when its commit is otherwise signed-valid. | Test |
+| FR-027-AC-15 | An accepted rating requires a `rated_by` principal matching the verified signer and the exact acceptance trailer. | Test |
 
 ## Dependencies
 
