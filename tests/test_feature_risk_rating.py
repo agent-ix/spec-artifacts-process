@@ -98,22 +98,26 @@ class TestFeatureRiskRating:
         )
         assert list(validator.iter_errors(rating(scope, verb)))
 
-    @pytest.mark.trace("FR-025-AC-17")
+    @pytest.mark.trace("FR-025-AC-17", "FR-027-AC-14", "FR-027-AC-15")
     def test_proposed_and_accepted_ratings_have_consistent_authorship(self) -> None:
-        """Allow an unnamed proposal and require identity for accepted ratings.
+        """Reject named proposals and require identity for accepted ratings.
 
         Assumptions:
             Scope and relationships are otherwise valid supplier metadata.
         Criteria:
-            Proposed ratings omit `rated_by`; accepted ratings require it.
+            Proposed ratings reject `rated_by`; accepted ratings require it.
 
-        Trace: FR-025-AC-17
+        Trace: FR-025-AC-17, FR-027-AC-14, FR-027-AC-15
         """
         validator = Draft202012Validator(
             frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
         )
         proposed = rating("supplier", "rates_feature")
         assert list(validator.iter_errors(proposed)) == []
+
+        proposed_with_rater = rating("supplier", "rates_feature")
+        proposed_with_rater["rated_by"] = "Allowed Principal"
+        assert list(validator.iter_errors(proposed_with_rater))
 
         accepted_without_rater = rating("supplier", "rates_feature")
         accepted_without_rater["status"] = "accepted"
@@ -123,6 +127,18 @@ class TestFeatureRiskRating:
         accepted["status"] = "accepted"
         accepted["rated_by"] = "Allowed Principal"
         assert list(validator.iter_errors(accepted)) == []
+
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
+        assert (
+            "| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, "
+            "including when its commit is otherwise signed-valid. | Test |"
+        ) in acceptance_spec
+        assert (
+            "| FR-027-AC-15 | An accepted rating requires a `rated_by` principal "
+            "matching the verified signer and the exact acceptance trailer. | Test |"
+        ) in acceptance_spec
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
@@ -691,6 +707,23 @@ class TestFeatureRiskRating:
         assert "status" in schema["required"]
         assert "rated_by" not in schema["required"]
         assert schema["additionalProperties"] is False
+
+        validator = Draft202012Validator(schema)
+        supplier = rating("supplier", "rates_feature")
+        supplier["relationships"] = [
+            edge
+            for edge in supplier["relationships"]
+            if edge["type"] != "uses_intended_use"
+        ]
+        assert list(validator.iter_errors(supplier))
+
+        adopter = rating("adopter", "re_rates")
+        adopter.pop("intended_use")
+        assert list(validator.iter_errors(adopter))
+
+        accepted_without_identity = rating("adopter", "re_rates")
+        accepted_without_identity["status"] = "accepted"
+        assert list(validator.iter_errors(accepted_without_identity))
         assert not set(schema["properties"]) & {
             "score",
             "risk_score",

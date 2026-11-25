@@ -82,9 +82,9 @@ A rating is a person's judgement about a stated intended use. The module SHALL d
 | FR-027-AC-10 | Verifier output that cannot be parsed produces `not_accepted` with a verifier failure reason. | Test |
 | FR-027-AC-11 | Missing, unreadable or malformed allowed-signers input produces `not_accepted`; FR-037's `signature_verify_allowed_signers_invalid` error never produces acceptance. | Test |
 | FR-027-AC-12 | A response with a wrong protocol or missing/malformed required result members produces `not_accepted`. | Test |
-| FR-027-AC-13 | A rating marked `proposed` is reported `not_accepted`, including when its commit is otherwise signed-valid. | Test |
-| FR-027-AC-14 | An accepted rating requires a `rated_by` principal matching the verified signer and the exact acceptance trailer. | Test |
 | FR-027-AC-13 | The Quoin validation report identifies the versions of external tools and references their FR-220 configuration-index entries. | Test |
+| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, including when its commit is otherwise signed-valid. | Test |
+| FR-027-AC-15 | An accepted rating requires a `rated_by` principal matching the verified signer and the exact acceptance trailer. | Test |
 
 ## Dependencies
 
