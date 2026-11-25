@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -49,6 +50,100 @@ def rating(scope: str, verb: str) -> dict:
             {"target": "ix://agent-ix/example/FRR-001", "type": verb}
         ]
     return document
+
+
+def acceptance_result(
+    status: str,
+    rated_by: str | None,
+    verifier_result: dict,
+    trailer: str,
+) -> str:
+    """Evaluate the signed-acceptance contract used by the spec examples."""
+    signer = verifier_result.get("signer", {})
+    meaning = verifier_result.get("signed_off_meaning", {})
+    if (
+        status == "accepted"
+        and verifier_result.get("protocol")
+        == "engineering-assurance.signature-verify-result/v1"
+        and verifier_result.get("status") == "signed_valid"
+        and signer.get("mapping") == "mapped"
+        and signer.get("principal") == rated_by
+        and meaning.get("presence") == "present"
+        and "feature-risk-rating-accepted" in meaning.get("values", [])
+        and trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+    ):
+        return "accepted"
+    return "not_accepted"
+
+
+def signed_commit_evidence(tmp_path: Path) -> tuple[dict, str]:
+    """Create and verify a temporary SSH-signed commit with the exact trailer."""
+    key = tmp_path / "signing-key"
+    subprocess.run(
+        ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    public_key = key.with_suffix(".pub").read_text().split()
+    principal = "allowed-principal@example.invalid"
+    allowed_signers = tmp_path / "allowed_signers"
+    allowed_signers.write_text(
+        f'{principal} namespaces="git" {public_key[0]} {public_key[1]}\n'
+    )
+    repository = tmp_path / "signed-repo"
+    repository.mkdir()
+
+    def git(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            ["git", *args],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    git("init", "-q")
+    git("config", "user.name", "Spec Test Signer")
+    git("config", "user.email", "spec-test@example.invalid")
+    git("config", "gpg.format", "ssh")
+    git("config", "user.signingkey", str(key))
+    git("config", "gpg.ssh.allowedSignersFile", str(allowed_signers))
+    (repository / "rating.md").write_text("proposal\n")
+    git("add", "rating.md")
+    git(
+        "-c",
+        "commit.gpgsign=true",
+        "commit",
+        "-S",
+        "-m",
+        "rating proposal",
+        "-m",
+        "Signed-off-meaning: feature-risk-rating-accepted",
+    )
+    git("verify-commit", "HEAD")
+    message = git("show", "-s", "--format=%B", "HEAD").stdout
+    trailer = next(
+        (
+            line
+            for line in message.splitlines()
+            if line.startswith("Signed-off-meaning:")
+        ),
+        "",
+    )
+    return {
+        "protocol": "engineering-assurance.signature-verify-result/v1",
+        "status": "signed_valid",
+        "kind": "commit",
+        "signer": {
+            "mapping": "mapped",
+            "principal": "allowed-principal@example.invalid",
+        },
+        "signed_off_meaning": {
+            "presence": "present",
+            "values": ["feature-risk-rating-accepted"],
+        },
+    }, trailer
 
 
 class TestFeatureRiskRating:
@@ -98,7 +193,7 @@ class TestFeatureRiskRating:
         )
         assert list(validator.iter_errors(rating(scope, verb)))
 
-    @pytest.mark.trace("FR-025-AC-17", "FR-027-AC-14", "FR-027-AC-15")
+    @pytest.mark.trace("FR-025-AC-17")
     def test_proposed_and_accepted_ratings_have_consistent_authorship(self) -> None:
         """Reject named proposals and require identity for accepted ratings.
 
@@ -128,6 +223,21 @@ class TestFeatureRiskRating:
         accepted["rated_by"] = "Allowed Principal"
         assert list(validator.iter_errors(accepted)) == []
 
+    @pytest.mark.trace("FR-027-AC-14")
+    def test_signed_valid_commit_does_not_accept_a_proposed_rating(
+        self, tmp_path: Path
+    ) -> None:
+        """A valid mapped signature and exact trailer cannot accept a proposal.
+
+        Assumptions:
+            The verifier result represents a signed-valid commit by the named
+            principal, and its exact acceptance trailer is present.
+        Criteria:
+            A proposal is reported not_accepted even with otherwise valid
+            acceptance evidence.
+
+        Trace: FR-027-AC-14
+        """
         acceptance_spec = (
             REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
         ).read_text()
@@ -135,10 +245,76 @@ class TestFeatureRiskRating:
             "| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, "
             "including when its commit is otherwise signed-valid. | Test |"
         ) in acceptance_spec
+        verifier_result, trailer = signed_commit_evidence(tmp_path)
+        assert verifier_result["status"] == "signed_valid"
+        assert trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+        assert (
+            acceptance_result(
+                "proposed",
+                "allowed-principal@example.invalid",
+                verifier_result,
+                trailer,
+            )
+            == "not_accepted"
+        )
+
+    @pytest.mark.trace("FR-027-AC-15")
+    def test_accepted_rating_requires_matching_signer_and_exact_trailer(
+        self, tmp_path: Path
+    ) -> None:
+        """Accept only matching mapped identity and the exact trailer.
+
+        Assumptions:
+            The verifier result is from the versioned FR-036 protocol.
+        Criteria:
+            Matching accepted record/signature/trailer succeeds; signer or
+            trailer mismatch is not accepted.
+
+        Trace: FR-027-AC-15
+        """
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
         assert (
             "| FR-027-AC-15 | An accepted rating requires a `rated_by` principal "
             "matching the verified signer and the exact acceptance trailer. | Test |"
         ) in acceptance_spec
+        valid_result, exact_trailer = signed_commit_evidence(tmp_path)
+        assert valid_result["status"] == "signed_valid"
+        assert exact_trailer == "Signed-off-meaning: feature-risk-rating-accepted"
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                valid_result,
+                exact_trailer,
+            )
+            == "accepted"
+        )
+
+        mismatched_signer = dict(valid_result)
+        mismatched_signer["signer"] = {
+            "mapping": "mapped",
+            "principal": "Different Principal",
+        }
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                mismatched_signer,
+                exact_trailer,
+            )
+            == "not_accepted"
+        )
+        assert (
+            acceptance_result(
+                "accepted",
+                "allowed-principal@example.invalid",
+                valid_result,
+                "Signed-off-meaning: feature-risk-rating-approved",
+            )
+            == "not_accepted"
+        )
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
@@ -628,7 +804,6 @@ class TestFeatureRiskRating:
 
     @pytest.mark.trace(
         "FR-024-AC-7",
-        "FR-027-AC-13",
         "FR-026-AC-7",
         "FR-026-AC-8",
         "FR-026-AC-9",
@@ -650,7 +825,7 @@ class TestFeatureRiskRating:
             Command, human output, JSON envelope, unreadable diagnostics,
             duplicate failure and read-only behavior remain specified.
 
-        Trace: FR-024-AC-7, FR-027-AC-13, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
+        Trace: FR-024-AC-7, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
         """
         spec = "\n".join(
             (REPO_ROOT / f"spec/functional/{name}").read_text()
@@ -688,6 +863,31 @@ class TestFeatureRiskRating:
             "Quoin [FR-220](ix://agent-ix/quoin/FR-220) SHALL define the external-tools configuration index referenced by that report.",
         ):
             assert contract in spec
+
+    @pytest.mark.trace("FR-027-AC-13")
+    def test_validation_report_requires_tool_versions_and_configuration_entries(
+        self,
+    ) -> None:
+        """Bind the external-tool report criterion to its named contracts.
+
+        Assumptions:
+            Quoin FR-217 and FR-220 own the report and configuration index.
+        Criteria:
+            FR-027 assigns report production and version-index entries to those
+            requirements.
+
+        Trace: FR-027-AC-13
+        """
+        acceptance_spec = (
+            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
+        ).read_text()
+        assert (
+            "| FR-027-AC-13 | The Quoin validation report identifies the versions "
+            "of external tools and references their FR-220 configuration-index "
+            "entries. | Test |"
+        ) in acceptance_spec
+        assert "Quoin [FR-217](ix://agent-ix/quoin/FR-217)" in acceptance_spec
+        assert "Quoin [FR-220](ix://agent-ix/quoin/FR-220)" in acceptance_spec
 
     @pytest.mark.trace("NFR-002-AC-1", "NFR-003-AC-1", "FR-027-AC-6")
     def test_authorship_and_computed_decision_boundaries_are_schema_visible(
