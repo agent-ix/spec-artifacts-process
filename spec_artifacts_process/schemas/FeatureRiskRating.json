@@ -37,12 +37,6 @@
     "provenance": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Provenance.json"
     },
-    "featureAssessments": {
-      "type": "array",
-      "items": {
-        "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureAssessmentRow.json"
-      }
-    },
     "rationale": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/Section.json"
     },
@@ -62,7 +56,6 @@
     "status",
     "relationships",
     "provenance",
-    "featureAssessments",
     "rationale",
     "assuranceActivities"
   ],

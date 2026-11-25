@@ -13,12 +13,6 @@ relationships:
 ---
 # Quoin validation feature risk rating
 
-## Feature assessments
-
-| Requirement |
-|---|
-| FR-009 |
-
 ## Rationale
 
 The example rating is a human judgement and is not calculated.

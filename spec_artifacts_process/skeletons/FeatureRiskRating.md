@@ -13,12 +13,6 @@ relationships:
 ---
 # <feature group> risk rating
 
-## Feature assessments
-
-| Requirement |
-|---|
-| FR-001 |
-
 ## Rationale
 
 <Explain why the rating fits this intended use.>

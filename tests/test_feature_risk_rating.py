@@ -163,22 +163,23 @@ class TestFeatureRiskRating:
     def test_supplier_rating_covers_two_existing_feature_targets(
         self, tmp_path: Path
     ) -> None:
-        """Accept one assessment row for each of two existing feature targets.
+        """Accept two existing feature targets without per-target tables.
 
         Assumptions:
             FR-009 and FR-024 exist in the loaded specification corpus.
         Criteria:
-            Two `rates_feature` edges and their two typed row references validate.
+            Two `rates_feature` edges validate without a Feature assessments section.
 
         Trace: FR-025-AC-3
         """
         content = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text()
+        assert "## Feature assessments" not in content
         content = content.replace(
             "    type: rates_feature\n---",
             "    type: rates_feature\n"
             "  - target: ix://agent-ix/spec-artifacts-process/FR-024\n"
             "    type: rates_feature\n---",
-        ).replace("| FR-009 |", "| FR-009 |\n| FR-024 |")
+        )
         path = tmp_path / "two-feature-rating.md"
         path.write_text(content)
 
@@ -224,7 +225,7 @@ class TestFeatureRiskRating:
         validator = Draft202012Validator(frontmatter_schema(schema_name))
         assert list(validator.iter_errors(document))
 
-    @pytest.mark.trace("FR-025-AC-6", "FR-025-AC-7", "NFR-003-AC-1")
+    @pytest.mark.trace("FR-025-AC-6", "FR-025-AC-7", "FR-025-AC-14", "NFR-003-AC-1")
     def test_rating_is_human_authored_without_computed_fields(self) -> None:
         """Keep risk values person-authored and reject undeclared fields.
 
@@ -248,10 +249,18 @@ class TestFeatureRiskRating:
             "software_safety_class",
             "risk_acceptability",
         }
-        row_schema = frontmatter_schema("FeatureAssessmentRow.json")
-        assert set(row_schema["properties"]) == {"requirement", "line"}
-        assert row_schema["required"] == ["requirement", "line"]
-        assert row_schema["unevaluatedProperties"] == {"not": {}}
+        record_schema = json.loads((SCHEMAS_DIR / "FeatureRiskRating.json").read_text())
+        assert "featureAssessments" not in record_schema["properties"]
+        assert "failureMode" not in record_schema["properties"]
+        assert "detection" not in record_schema["properties"]
+        assert record_schema["unevaluatedProperties"] == {"not": {}}
+        assert "featureAssessments" not in json.loads(
+            (EXAMPLES_DIR / "FeatureRiskRating.record.json").read_text()
+        )
+        assert (
+            "## Feature assessments"
+            not in (SKELETONS_DIR / "FeatureRiskRating.md").read_text()
+        )
 
     @pytest.mark.trace("FR-025-AC-2", "FR-025-AC-17")
     def test_invalid_rating_missing_status_and_extra_fields_fail(self) -> None:
@@ -489,10 +498,10 @@ class TestFeatureRiskRating:
         assert "unknown" in unknown_result.stderr
 
     @pytest.mark.trace("FR-025-AC-10", "FR-025-AC-13")
-    def test_assessment_requirement_is_typed_as_an_existing_fr(
+    def test_rates_feature_relationship_is_typed_as_an_existing_fr(
         self, tmp_path: Path
     ) -> None:
-        """Reject a table requirement reference that names no FR.
+        """Reject a rating relationship that names no FR.
 
         Assumptions:
             The fixture retains a valid supplier IntendedUse edge and all
@@ -504,8 +513,11 @@ class TestFeatureRiskRating:
         Trace: FR-025-AC-10, FR-025-AC-13
         """
         valid = (EXAMPLES_DIR / "FeatureRiskRating.md").read_text()
-        invalid = valid.replace("| FR-009 |", "| FR-999 |")
-        path = tmp_path / "dangling-assessment-target.md"
+        invalid = valid.replace(
+            "ix://agent-ix/spec-artifacts-process/FR-009",
+            "ix://agent-ix/spec-artifacts-process/FR-999",
+        )
+        path = tmp_path / "dangling-rating-target.md"
         path.write_text(invalid)
 
         result = quire_validate(path, scope=REPO_ROOT)

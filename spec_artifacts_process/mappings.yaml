@@ -100,13 +100,6 @@ models:
       intendedUse: {kind: frontmatter, path: [intended_use]}
       relationships: {kind: frontmatter, path: [relationships], required: true}
       provenance: {kind: provenance, required: true}
-      featureAssessments:
-        kind: typed-table
-        heading: Feature assessments
-        required: true
-        columns: [Requirement]
-        fields:
-          Requirement: {property: requirement, parse: id}
       rationale: {kind: section, heading: Rationale, required: true}
       assuranceActivities:
         kind: typed-table

@@ -30,7 +30,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 
 ## Outputs
 
-- A validated rating record with explicit scope and covered requirements.
+- A validated rating record with explicit scope and typed relationships to its covered requirements.
 - A trace from an adopter re-rating to the supplier rating it reassesses.
 
 ## Behavior
@@ -59,12 +59,9 @@ A tool supplier and an adopter can assess the same feature under different inten
 - Each adopter `re_rates` target SHALL cover the same functional requirements as the adopter rating.
 - An adopter rating SHALL NOT carry a `rates_feature` relationship.
 - The schema SHALL reject relationships that do not match the rating's `scope`.
-- The `Feature assessments` table SHALL have only the `Requirement` column.
-- Every `Requirement` cell SHALL reference an existing functional requirement.
-- Every target requirement SHALL have one corresponding `Feature assessments` row.
-- A `Feature assessments` table SHALL NOT contain a row for a requirement the rating does not target.
-- A `Feature assessments` table SHALL NOT contain more than one row for the same requirement.
+- The `rates_feature` relationship SHALL identify every functional requirement covered by a supplier rating.
 - The rating record SHALL NOT carry per-requirement failure-mode or detection details.
+- The rating record SHALL NOT contain a `Feature assessments` section or corresponding property.
 - The document SHALL contain a `Rationale` section.
 - The document SHALL contain an `Assurance activities` section.
 - The rationale SHALL explain why the rating fits the intended use.
@@ -88,20 +85,20 @@ A tool supplier and an adopter can assess the same feature under different inten
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-025-AC-1 | A proposed supplier rating with an allowed enum value, no `rated_by`, valid IntendedUse reference, one `rates_feature` target, a corresponding feature-assessment row, `Rationale` and `Assurance activities` validates. | Test |
+| FR-025-AC-1 | A proposed supplier rating with an allowed enum value, no `rated_by`, valid IntendedUse reference, one `rates_feature` target, `Rationale` and `Assurance activities` validates. | Test |
 | FR-025-AC-2 | A supplier rating with `rating: medium` fails validation and names the invalid rating. | Test |
-| FR-025-AC-3 | A supplier rating with two `rates_feature` targets validates when both targets are existing FRs and both have assessment rows. | Test |
+| FR-025-AC-3 | A supplier rating with two `rates_feature` targets validates when both targets are existing FRs. | Test |
 | FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates. | Test |
 | FR-025-AC-5 | An adopter rating remains a separate document and does not alter its supplier rating's content. | Test |
 | FR-025-AC-6 | The schema rejects undeclared calculated-risk, product-criticality and software-safety-class fields. | Test |
-| FR-025-AC-7 | A rating record carries covered requirements and does not carry per-requirement failure-mode or detection details. | Test |
+| FR-025-AC-7 | A rating record carries covered requirements through relationships and does not carry per-requirement failure-mode or detection details. | Test |
 | FR-025-AC-8 | A supplier rating without a `uses_intended_use` relationship fails validation. | Test |
 | FR-025-AC-9 | A supplier rating with one `uses_intended_use` relationship to the repository's `IntendedUse` record validates. | Test |
-| FR-025-AC-10 | A requirement cell naming a missing FR fails with a dangling-reference diagnostic. | Test |
+| FR-025-AC-10 | A `rates_feature` relationship naming a missing FR fails with a dangling-reference diagnostic. | Test |
 | FR-025-AC-11 | A `uses_intended_use` target that does not use the `IU-NNN` identifier form fails schema validation. | Test |
 | FR-025-AC-12 | A supplier rating id has the form `FRR-NNN` with exactly three digits. | Test |
-| FR-025-AC-13 | The manifest types `Feature assessments.Requirement` references as FRs. | Test |
-| FR-025-AC-14 | Cross-checking assessment-row equality and uniqueness against relationship targets is declared as an SWM-248 engine gap, not as a local implemented validation. | Inspection |
+| FR-025-AC-13 | The manifest restricts `rates_feature` relationships to FR targets. | Test |
+| FR-025-AC-14 | The FeatureRiskRating schema rejects feature-assessment properties and per-requirement details. | Test |
 | FR-025-AC-15 | A `uses_intended_use` relationship to a missing `IU-NNN` record fails with a dangling-reference diagnostic. | Test |
 | FR-025-AC-16 | A supplier rating with more than one `uses_intended_use` relationship fails schema validation. | Test |
 | FR-025-AC-17 | A proposed rating has `status: proposed` and no `rated_by`; an accepted rating requires `status: accepted` and `rated_by`. | Test |
@@ -111,4 +108,3 @@ A tool supplier and an adopter can assess the same feature under different inten
 - [FR-024](./FR-024-intended-use-archetype.md) defines supplier intended use.
 - [FR-026](./FR-026-feature-rating-completeness.md) requires exactly one supplier rating per functional requirement.
 - [FR-027](./FR-027-human-acceptance-of-risk-ratings.md) defines human acceptance.
-- Quire-rs [SWM-248](https://linear.app/agent-ix/issue/SWM-248) owns the missing cross-table equality and table-value uniqueness assertions; this module declares the typed reference but does not claim those engine checks are implemented.

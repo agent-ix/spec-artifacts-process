@@ -59,10 +59,6 @@ scalar IntendedUseId extends string;
 @pattern("^FRR-[0-9]{3}$")
 scalar FeatureRiskRatingId extends string;
 
-/** Functional requirement id used by a feature-assessment row. */
-@pattern("^FR-[0-9]{3}$")
-scalar FeatureRequirementId extends string;
-
 /** `Standard` document id; its frontmatter schema pins `^[A-Za-z]{2,}-[0-9]+$` (no upper bound on the prefix length). */
 @pattern("^[A-Za-z]{2,}-[0-9]+$")
 scalar StandardDocId extends string;
@@ -830,15 +826,8 @@ model FeatureRiskRating {
   intendedUse?: NonEmptyText;
   relationships: Relationship[];
   provenance: Provenance;
-  featureAssessments: FeatureAssessmentRow[];
   rationale: Section;
   assuranceActivities: AssuranceActivityRow[];
-}
-
-/** One requirement covered by a rating. */
-model FeatureAssessmentRow {
-  requirement: FeatureRequirementId;
-  line: LineNumber;
 }
 
 /** One record kind and the command that produces it. */

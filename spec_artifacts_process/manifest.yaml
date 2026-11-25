@@ -106,14 +106,6 @@ artifact_types:
   body_extraction:
     yield_pattern:
       match:
-        feature_assessments:
-          from: table_row
-          under_section: Feature assessments
-          required: true
-          multiple: true
-          assert:
-            columns: [Requirement]
-            min_rows: 1
         rationale: {from: section_body, after_heading: Rationale, required: true}
         assurance_activities:
           from: table_row
@@ -1309,16 +1301,6 @@ traceability:
   # so such a cell contributes its first token only. The row is still backed
   # when that token is backed; it just under-counts the rest.
   document_references:
-  - name: feature-assessment-requirement
-    archetype: FeatureRiskRating
-    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
-    section: Feature assessments
-    column: Requirement
-    row_id_column: Requirement
-    pattern: '\b(FR-[0-9]{3})\b'
-    targets: [requirement-document]
-    expand_ranges: false
-    strip_annotations: false
   # An inspection names the obligation it discharges. Reusing the existing
   # criterion targets means a typo in that cell dangles like any other broken
   # reference, instead of recording an act against nothing (#34).

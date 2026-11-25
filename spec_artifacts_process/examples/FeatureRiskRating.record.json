@@ -19,12 +19,6 @@
     "path": "examples/FeatureRiskRating.md",
     "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
-  "featureAssessments": [
-    {
-      "requirement": "FR-009",
-      "line": 15
-    }
-  ],
   "rationale": {
     "text": "The example rating is a human judgment for the stated repository-validation use.",
     "startLine": 17,
