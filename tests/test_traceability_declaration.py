@@ -232,11 +232,11 @@ def test_matrix_entries_are_not_enumerated_per_filename(traceability: dict) -> N
     ), f"one entry per table kind, not per filename: {matrix_entries}"
 
 
-@pytest.mark.trace("TC-030", "FR-004-AC-3")
+@pytest.mark.trace("FR-004-AC-3")
 def test_one_templated_marker_per_language(traceability: dict) -> None:
-    """TC-030 (FR-004-AC-3): a marker without a `template` yields no migration
-    suggestion — FR-051 emits one only "where the equivalent marker is
-    derivable", and the template is what makes it derivable."""
+    """FR-004-AC-3: a marker without a `template` yields no migration suggestion
+    — FR-051 emits one only "where the equivalent marker is derivable", and the
+    template is what makes it derivable."""
     markers = traceability["trace_tags"]["markers"]
     by_language = {m["language"]: m for m in markers}
 
@@ -248,13 +248,13 @@ def test_one_templated_marker_per_language(traceability: dict) -> None:
         re.compile(marker["pattern"])
 
 
-@pytest.mark.trace("FR-004-AC-3")
+@pytest.mark.trace("TC-030", "FR-004-AC-3")
 def test_shell_marker_is_a_comment_form_gated_by_entry_paths(
     traceability: dict,
 ) -> None:
-    """FR-004-AC-3 (quire-rs FR-051-AC-38, AC-42, AC-43): shell has no attribute
-    syntax, so its canonical marker is a `#` comment, and only a script under an
-    `entry_paths` glob may bind."""
+    """TC-030 (FR-004-AC-3, quire-rs FR-051-AC-38, AC-42, AC-43): shell has no
+    attribute syntax, so its canonical marker is a `#` comment, and only a
+    script under an `entry_paths` glob may bind."""
     (form,) = [
         m for m in traceability["trace_tags"]["markers"] if m["language"] == "shell"
     ]
