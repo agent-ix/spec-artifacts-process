@@ -932,15 +932,15 @@ object_types:
     references: []
 
 # ── Declarative lint rules (quire-rs FR-036) ───────────────────────────────
-# PLAT-1079: TC ids are retired ecosystem-wide (epic PLAT-1076) — a criterion
-# is bound to its evidence by trace tag now, not by a `TC-…`/`IT-…` id sitting
-# in the `Verification` cell, so a lingering one is stale data. This is a
+# PLAT-1079: TC ids in `Verification` cells remain a transitional warning
+# (epic PLAT-1076) — a criterion is bound to executable evidence by trace tag,
+# not by an id sitting in the cell. The reference targets below still resolve
+# declared TestMatrix, typed TC, and eval-row forms so a real test reference is
+# not also reported as dangling. This is a
 # `table_column_values` rule rather than a `document_references` change:
 # quire-rs rejects a `document_references` entry that declares an empty
-# `targets` at module load, so emptying `verification`/`nfr-verification`/
-# `interface-verification`'s `targets` was never an option — those three stay
-# untouched, bound to `test-case` exactly as before, and are retired later,
-# with the Test Matrix itself.
+# `targets` at module load, so the three Verification references retain the
+# complete test-case target set while the warning remains in force.
 #
 # `severity: warning`, not `error`: this repository's own FR/NFR Acceptance
 # Criteria tables carry existing violations — `Test (TC-…)`/`Inspection
@@ -1082,9 +1082,9 @@ traceability:
   # path-bound too and could not read the nested
   # matrices they describe.
   #
-  # Nine declarations collapse to three. `spec/matrix.md` and `spec/evals.md`
-  # need no entry of their own: a matrix is reached by what it *is*, not by what
-  # it is called.
+  # The canonical TestMatrix is reached by its archetype, regardless of its
+  # filename. The separate `spec/evals.md` scenario table and typed TC documents
+  # use their own targets below because neither is a TestMatrix row.
   trace_targets:
   # FR-015: the ids an anomaly's assessment `Target` can name. Requirement and
   # hazard DOCUMENT ids are minted from each document's title heading
@@ -1122,6 +1122,25 @@ traceability:
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
     section: Test Case Summary
     id_column: Test ID
+  # Test cases are also authored as ISO TC documents. Their frontmatter ids
+  # are the identity; they are not TestMatrix rows and must not be duplicated
+  # into a hand-kept matrix to satisfy reference resolution.
+  - name: typed-test-case
+    archetype: TC
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    from: frontmatter_id
+    required: false
+    evidence: reference-only
+  # Quoin agent-behaviour evaluation scenarios are authored in an index table,
+  # separate from executable TestMatrix rows and typed TC documents.
+  - name: evaluation-scenario
+    archetype: index
+    exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
+    from: table_row
+    section: Scenarios
+    id_column: Eval
+    required: false
+    evidence: reference-only
   - name: acceptance-criterion
     archetype: FR
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1412,7 +1431,7 @@ traceability:
     column: Verification
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case]
+    targets: [test-case, typed-test-case, evaluation-scenario]
     expand_ranges: true
     strip_annotations: false
   - name: nfr-verification
@@ -1422,7 +1441,7 @@ traceability:
     column: Verification
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case]
+    targets: [test-case, typed-test-case, evaluation-scenario]
     expand_ranges: true
     strip_annotations: false
   # quire-rs#460: `interface` documents carry the same Verification column as
@@ -1435,7 +1454,7 @@ traceability:
     column: Verification
     row_id_column: ID
     pattern: '\b((?:TC|IT)(?:-[A-Za-z0-9]+)*-\d+[A-Za-z0-9]*)\b'
-    targets: [test-case]
+    targets: [test-case, typed-test-case, evaluation-scenario]
     expand_ranges: true
     strip_annotations: false
   - name: traces-to
@@ -1484,11 +1503,11 @@ traceability:
     column: Target
     row_id_column: Kind
     pattern: '([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*)'
-    targets: [acceptance-criterion, nfr-acceptance-criterion, test-case, requirement-document, nfr-document, hazard-document]
+    targets: [acceptance-criterion, nfr-acceptance-criterion, test-case, typed-test-case, evaluation-scenario, requirement-document, nfr-document, hazard-document]
     kind_column: Kind
     kind_targets:
       Criterion: [acceptance-criterion, nfr-acceptance-criterion]
-      Test: [test-case]
+      Test: [test-case, typed-test-case, evaluation-scenario]
     expand_ranges: false
     strip_annotations: false
 
