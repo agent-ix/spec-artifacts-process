@@ -19,12 +19,12 @@ relationships:
 
 ## Statement
 
-The module SHALL record every feature-risk rating and its supporting failure-mode and detection information with the identity of the named person who supplied them.
+The module SHALL record every feature-risk rating with the identity of its author and the applicable intended-use context.
 
 ## Scope
 
 - Applies to `IntendedUse` and `FeatureRiskRating` documents and validation rules defined by FR-024 through FR-026.
-- Adopters may use the recorded information with other evidence to make their own TCL, TQL or T-class determination for their intended use.
+- Adopters may use the rating and other evidence to make their own TCL, TQL or T-class determination for their intended use.
 
 ## Rationale
 

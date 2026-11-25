@@ -6,24 +6,16 @@
     "requirement": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRequirementId.json"
     },
-    "failureMode": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
-    },
-    "detection": {
-      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NonEmptyText.json"
-    },
     "line": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/LineNumber.json"
     }
   },
   "required": [
     "requirement",
-    "failureMode",
-    "detection",
     "line"
   ],
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "Failure mode and detection evidence for one rated requirement."
+  "description": "One requirement covered by a rating."
 }

@@ -15,13 +15,13 @@ relationships:
 
 ## Feature assessments
 
-| Requirement | Failure mode | Detection |
-|---|---|---|
-| FR-001 | <Describe a plausible failure and its effect on intended-use records.> | <Identify the activity or observation that detects it.> |
+| Requirement |
+|---|
+| FR-001 |
 
 ## Rationale
 
-<Explain why the person-assigned rating fits this intended use.>
+<Explain why the rating fits this intended use.>
 
 ## Assurance activities
 

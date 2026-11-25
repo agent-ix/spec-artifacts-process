@@ -15,13 +15,13 @@ relationships:
 
 ## Feature assessments
 
-| Requirement | Failure mode | Detection |
-|---|---|---|
-| FR-009 | An invalid schema may allow malformed records to appear valid. | Run schema validation against invalid and valid fixtures and inspect diagnostics. |
+| Requirement |
+|---|
+| FR-009 |
 
 ## Rationale
 
-The named reviewer selected this rating for the stated repository-validation use. The rating is a human judgement and is not calculated.
+The example rating is a human judgement and is not calculated.
 
 ## Assurance activities
 

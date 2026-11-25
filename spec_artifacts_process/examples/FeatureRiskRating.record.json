@@ -22,13 +22,11 @@
   "featureAssessments": [
     {
       "requirement": "FR-009",
-      "failureMode": "An invalid schema may allow malformed records to appear valid.",
-      "detection": "Run schema validation against invalid and valid fixtures.",
       "line": 15
     }
   ],
   "rationale": {
-    "text": "The named reviewer selected this rating for the stated repository-validation use.",
+    "text": "The example rating is a human judgment for the stated repository-validation use.",
     "startLine": 17,
     "endLine": 17
   },

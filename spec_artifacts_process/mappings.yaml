@@ -103,11 +103,9 @@ models:
         kind: typed-table
         heading: Feature assessments
         required: true
-        columns: [Requirement, Failure mode, Detection]
+        columns: [Requirement]
         fields:
           Requirement: {property: requirement, parse: id}
-          Failure mode: {property: failureMode, parse: text}
-          Detection: {property: detection, parse: text}
       rationale: {kind: section, heading: Rationale, required: true}
       assuranceActivities:
         kind: typed-table

@@ -815,7 +815,7 @@ model IntendedUse {
   operatingContext: Section;
 }
 
-/** One named person's rating and evidence for one or more features. */
+/** One person's rating and covered requirements. */
 model FeatureRiskRating {
   id: FeatureRiskRatingId;
   title: NonEmptyText;
@@ -831,11 +831,9 @@ model FeatureRiskRating {
   assuranceActivities: AssuranceActivityRow[];
 }
 
-/** Failure mode and detection evidence for one rated requirement. */
+/** One requirement covered by a rating. */
 model FeatureAssessmentRow {
   requirement: FeatureRequirementId;
-  failureMode: NonEmptyText;
-  detection: NonEmptyText;
   line: LineNumber;
 }
 

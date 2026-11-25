@@ -148,11 +148,7 @@ class TestFeatureRiskRating:
             "    type: rates_feature\n"
             "  - target: ix://agent-ix/spec-artifacts-process/FR-024\n"
             "    type: rates_feature\n---",
-        ).replace(
-            "| FR-009 | An invalid schema may allow malformed records to appear valid. | Run schema validation against invalid and valid fixtures and inspect diagnostics. |",
-            "| FR-009 | An invalid schema may allow malformed records to appear valid. | Run schema validation against invalid and valid fixtures and inspect diagnostics. |\n"
-            "| FR-024 | An intended-use omission can hide a material operating limit. | Review the intended-use record and confirm the limit is stated. |",
-        )
+        ).replace("| FR-009 |", "| FR-009 |\n| FR-024 |")
         path = tmp_path / "two-feature-rating.md"
         path.write_text(content)
 
@@ -223,12 +219,9 @@ class TestFeatureRiskRating:
             "risk_acceptability",
         }
         row_schema = frontmatter_schema("FeatureAssessmentRow.json")
-        assert set(row_schema["properties"]) == {
-            "requirement",
-            "failureMode",
-            "detection",
-            "line",
-        }
+        assert set(row_schema["properties"]) == {"requirement", "line"}
+        assert row_schema["required"] == ["requirement", "line"]
+        assert row_schema["unevaluatedProperties"] == {"not": {}}
 
     @pytest.mark.trace("FR-025-AC-2")
     def test_invalid_rating_missing_rater_and_extra_fields_fail(self) -> None:

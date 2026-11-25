@@ -66,5 +66,5 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "One named person's rating and evidence for one or more features."
+  "description": "One person's rating and covered requirements."
 }

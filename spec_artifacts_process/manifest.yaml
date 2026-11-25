@@ -112,7 +112,7 @@ artifact_types:
           required: true
           multiple: true
           assert:
-            columns: [Requirement, Failure mode, Detection]
+            columns: [Requirement]
             min_rows: 1
         rationale: {from: section_body, after_heading: Rationale, required: true}
         assurance_activities:

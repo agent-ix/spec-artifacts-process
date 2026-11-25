@@ -1,6 +1,6 @@
 ---
 id: FR-025
-title: "FeatureRiskRating records human-owned risk and detection evidence"
+title: "FeatureRiskRating records human-owned risk ratings"
 type: FR
 relationships:
   - target: "ix://agent-ix/spec-artifacts-process/StR-001"
@@ -16,11 +16,11 @@ relationships:
   - target: "ix://agent-ix/spec-artifacts-process/FR-024"
     type: "depends_on"
 ---
-# FR-025: FeatureRiskRating records human-owned risk and detection evidence
+# FR-025: FeatureRiskRating records human-owned risk ratings
 
 ## Description
 
-A tool supplier and an adopter can assess the same feature under different intended uses. The module SHALL declare a `FeatureRiskRating` artifact type that records a named person's risk rating and per-feature failure and detection information, while keeping supplier ratings and adopter re-ratings distinct.
+A tool supplier and an adopter can assess the same feature under different intended uses. The module SHALL declare a `FeatureRiskRating` artifact type that records a person's risk rating and the requirements it covers, while keeping supplier ratings and adopter re-ratings distinct.
 
 ## Inputs
 
@@ -30,7 +30,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 
 ## Outputs
 
-- A validated rating record with explicit scope and per-feature evidence.
+- A validated rating record with explicit scope and covered requirements.
 - A trace from an adopter re-rating to the supplier rating it reassesses.
 
 ## Behavior
@@ -56,14 +56,12 @@ A tool supplier and an adopter can assess the same feature under different inten
 - Each adopter `re_rates` target SHALL cover the same functional requirements as the adopter rating.
 - An adopter rating SHALL NOT carry a `rates_feature` relationship.
 - The schema SHALL reject relationships that do not match the rating's `scope`.
-- The `Feature assessments` table SHALL have the columns `Requirement`, `Failure mode` and `Detection`.
+- The `Feature assessments` table SHALL have only the `Requirement` column.
 - Every `Requirement` cell SHALL reference an existing functional requirement.
 - Every target requirement SHALL have one corresponding `Feature assessments` row.
 - A `Feature assessments` table SHALL NOT contain a row for a requirement the rating does not target.
 - A `Feature assessments` table SHALL NOT contain more than one row for the same requirement.
-- The failure-mode cell SHALL describe a plausible failure of that feature.
-- The failure-mode cell SHALL describe the effect on records named by the applicable intended use.
-- The detection cell SHALL identify the activity or observation by which the failure can be found.
+- The rating record SHALL NOT carry per-requirement failure-mode or detection details.
 - The document SHALL contain a `Rationale` section.
 - The document SHALL contain an `Assurance activities` section.
 - The rationale SHALL explain why the rating fits the intended use.
@@ -79,7 +77,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 - The records SHALL contain no product-criticality value.
 - The records SHALL contain no assigned software-safety-class value.
 - The records SHALL contain no computed rating.
-- The adopter MAY use the recorded failure-mode and detection information with other evidence to make its own TCL, TQL or T-class determination.
+- The adopter MAY use the rating and other evidence to make its own TCL, TQL or T-class determination.
 - This module SHALL define no formula or mapping for those determinations.
 - This ticket specifies the rating data. Human acceptance of a rating is specified by [FR-027](./FR-027-human-acceptance-of-risk-ratings.md).
 
@@ -93,7 +91,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 | FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates. | Test |
 | FR-025-AC-5 | An adopter rating remains a separate document and does not alter its supplier rating's content. | Test |
 | FR-025-AC-6 | The schema rejects undeclared calculated-risk, product-criticality and software-safety-class fields. | Test |
-| FR-025-AC-7 | The feature-assessment data records a failure mode and a detection activity without assigning a TCL, TQL or T-class determination. | Test |
+| FR-025-AC-7 | A rating record carries covered requirements and does not carry per-requirement failure-mode or detection details. | Test |
 | FR-025-AC-8 | A supplier rating without a `uses_intended_use` relationship fails validation. | Test |
 | FR-025-AC-9 | A supplier rating with one `uses_intended_use` relationship to the repository's `IntendedUse` record validates. | Test |
 | FR-025-AC-10 | A requirement cell naming a missing FR fails with a dangling-reference diagnostic. | Test |

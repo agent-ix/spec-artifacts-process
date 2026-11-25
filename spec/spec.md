@@ -28,7 +28,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 - The Module manifest and the contributions it declares: 7 process archetypes (adr, plan, review, spec-review, test-matrix, dossier-document, standard), 1 grammar (process-artifacts), and the 14 artifact types the manifest declares (ADR, Plan, Task, Review, SpecReview, Finding, Feedback, TestMatrixIndex, TestMatrix, Standard, SuiteRegistry, Inspections, Anomaly, DossierDocument).
 - The `Anomaly` artifact type: its state, resolution, named closer and safety-impact assessment, fix verification and release rationale (US-003, FR-014, FR-015, FR-016, NFR-001).
-- The `IntendedUse` and `FeatureRiskRating` artifact types for human-authored tool risk decisions, including failure-mode and detection information, supplier ratings and adopter re-ratings (FR-024 through FR-027, NFR-002 and NFR-003).
+- The `IntendedUse` and `FeatureRiskRating` artifact types for human-authored tool risk decisions, supplier ratings and adopter re-ratings (FR-024 through FR-027, NFR-002 and NFR-003).
 - The `ADR` archetype's `allowed_links`, including the design-realization verb (FR-017) and the segregation verb (FR-019).
 - The `DossierDocument` artifact type for generated submission-dossier documents: required identity and kind members, an RFC 3339 `as_of` required for a requirements mapping matrix, the vulnerability-management plan document kind, and no digest or `provenance` because the commit is the identity (FR-018).
 - The templates and schemas this module ships for agent CLI generators (minijinja-cli).
@@ -38,7 +38,7 @@ This document specifies the requirements for spec-artifacts-process, a Filament 
 
 - The filament-core-service activation machinery that registers the Module, referenced here only by relationship.
 - Deployment topology and infrastructure of the target cluster.
-- Changing the meaning of any archetype this module already publishes. This module owns the contracts every repository in the programme validates against, so tightening or loosening an existing pattern is a build break everywhere; In particular `⚠️` stays out of the `Status` vocabulary — it was retired by CR-031 because a row carrying it was exempt from the status-lie check by construction (quire-rs CR-083). The `quoin:spec-matrix` skill still documents it as valid; the skill is the defect and is filed as `agent-ix/quoin#337`.
+- Unrelated changes to existing archetypes. This module owns the contracts every repository in the programme validates against, so each behavior change is scoped to its owning requirement. In particular `⚠️` stays out of the `Status` vocabulary — it was retired by CR-031 because a row carrying it was exempt from the status-lie check by construction (quire-rs CR-083). The `quoin:spec-matrix` skill still documents it as valid; the skill is the defect and is filed as `agent-ix/quoin#337`.
 - Editing any corpus repository. The advisory sweep and the corpus promotion are `agent-ix/quoin#291`; this specification's consumer measurement reads two repositories and writes to neither.
 - Generated-language fixtures (Rust, TypeScript, Python) for the process types: produced by the TypeSpec frontend and compiler core (`agent-ix/filament-core-data#21`, `#22`, `#23`) and published only behind the promotion gate (`agent-ix/quoin#290`); the semantic-core language packages are `agent-ix/filament-core-data#11`. None is produced or faked here.
 - An engine-side extractor that builds a process record from Markdown. `quire.validate_document` validates a *declaration* record on the `object:` axis and never reaches an artifact-type record; the FR-011 reference mapping is this module's test oracle, and the extractor is quire-rs work (`agent-ix/quire-rs#393`).
@@ -99,7 +99,7 @@ FR-011 publishes the Markdown mapping, FR-012 makes the skeletons executable fix
 negative counterparts, and FR-013 keeps authored definitions separate from execution occurrences.
 
 FR-024 and FR-025 define supplier intended-use statements and human-authored feature ratings,
-including per-feature failure and detection information and separate adopter re-ratings. FR-026
+including covered requirements and separate adopter re-ratings. FR-026
 defines supplier-rating completeness and duplicate checks; FR-027 defines acceptance through a
 named person's signed decision. NFR-002 requires named human authorship; NFR-003 excludes computed
 ratings, scores, criticality, safety classes and acceptability decisions.
