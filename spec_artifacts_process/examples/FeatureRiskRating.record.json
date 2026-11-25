@@ -4,7 +4,7 @@
   "type": "FeatureRiskRating",
   "scope": "supplier",
   "rating": "not_high_process_risk",
-  "ratedBy": "Example Reviewer",
+  "status": "proposed",
   "relationships": [
     {
       "target": "ix://agent-ix/spec-artifacts-process/IU-001",

@@ -19,6 +19,9 @@
     "rating": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRatingValue.json"
     },
+    "status": {
+      "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/FeatureRiskRatingStatus.json"
+    },
     "ratedBy": {
       "$ref": "https://schemas.agent-ix.org/agent-ix/spec-artifacts-process/NamedText.json"
     },
@@ -56,7 +59,7 @@
     "type",
     "scope",
     "rating",
-    "ratedBy",
+    "status",
     "relationships",
     "provenance",
     "featureAssessments",
@@ -66,5 +69,5 @@
   "unevaluatedProperties": {
     "not": {}
   },
-  "description": "One person's rating and covered requirements."
+  "description": "One rating with its proposal/acceptance status and covered requirements."
 }

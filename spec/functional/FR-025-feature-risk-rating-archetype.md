@@ -20,13 +20,13 @@ relationships:
 
 ## Description
 
-A tool supplier and an adopter can assess the same feature under different intended uses. The module SHALL declare a `FeatureRiskRating` artifact type that records a person's risk rating and the requirements it covers, while keeping supplier ratings and adopter re-ratings distinct.
+A tool supplier and an adopter can assess the same feature under different intended uses. The module SHALL declare a `FeatureRiskRating` artifact type that records a proposed or accepted rating and the requirements it covers, while keeping supplier ratings and adopter re-ratings distinct.
 
 ## Inputs
 
 - A Markdown document with `type: FeatureRiskRating`.
 - One or more target functional requirements.
-- A named rater and the intended-use context for the rating.
+- The intended-use context for the rating and, for an accepted rating, the accepting person's allowed-signers principal.
 
 ## Outputs
 
@@ -35,7 +35,10 @@ A tool supplier and an adopter can assess the same feature under different inten
 
 ## Behavior
 
-- The module SHALL require frontmatter fields `id`, `type`, `scope`, `rating`, `rated_by` and `relationships` for a `FeatureRiskRating` document.
+- The module SHALL require frontmatter fields `id`, `type`, `scope`, `rating`, `status` and `relationships` for a `FeatureRiskRating` document.
+- `status` SHALL be exactly `proposed` or `accepted`.
+- A proposed rating SHALL NOT have a `rated_by` field.
+- An accepted rating SHALL have a `rated_by` field naming its allowed-signers principal.
 - A supplier rating SHALL identify its intended use with the typed `uses_intended_use` relationship.
 - An adopter rating SHALL identify its intended use with the `intended_use` field.
 - The `id` field SHALL match `FRR-{next:03d}`.
@@ -44,7 +47,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 - The `rating` field SHALL equal `high_process_risk` or `not_high_process_risk`.
 - The schema SHALL reject every other `rating` value.
 - The schema SHALL declare no default `rating` value.
-- `rated_by` SHALL name the allowed-signers principal of the person who chose the rating.
+- When present, `rated_by` SHALL name the allowed-signers principal of the person who accepted the rating.
 - A supplier rating SHALL have exactly one `uses_intended_use` relationship to an `IntendedUse` record in the same tool repository.
 - An adopter rating's `intended_use` field SHALL identify the adopter's own intended-use subject in the engineering-assurance integrator package.
 - This module SHALL NOT redefine the adopter's intended-use subject or copy the adopter configuration.
@@ -85,7 +88,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-025-AC-1 | A supplier rating with an allowed enum value, named rater, valid IntendedUse reference, one `rates_feature` target, a corresponding feature-assessment row, `Rationale` and `Assurance activities` validates. | Test |
+| FR-025-AC-1 | A proposed supplier rating with an allowed enum value, no `rated_by`, valid IntendedUse reference, one `rates_feature` target, a corresponding feature-assessment row, `Rationale` and `Assurance activities` validates. | Test |
 | FR-025-AC-2 | A supplier rating with `rating: medium` fails validation and names the invalid rating. | Test |
 | FR-025-AC-3 | A supplier rating with two `rates_feature` targets validates when both targets are existing FRs and both have assessment rows. | Test |
 | FR-025-AC-4 | An adopter rating that identifies its own intended-use subject and re-rates a supplier record covering the same requirement validates. | Test |
@@ -101,6 +104,7 @@ A tool supplier and an adopter can assess the same feature under different inten
 | FR-025-AC-14 | Cross-checking assessment-row equality and uniqueness against relationship targets is declared as an SWM-248 engine gap, not as a local implemented validation. | Inspection |
 | FR-025-AC-15 | A `uses_intended_use` relationship to a missing `IU-NNN` record fails with a dangling-reference diagnostic. | Test |
 | FR-025-AC-16 | A supplier rating with more than one `uses_intended_use` relationship fails schema validation. | Test |
+| FR-025-AC-17 | A proposed rating has `status: proposed` and no `rated_by`; an accepted rating requires `status: accepted` and `rated_by`. | Test |
 
 ## Dependencies
 

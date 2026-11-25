@@ -19,7 +19,7 @@ relationships:
 
 ## Statement
 
-The module SHALL record every feature-risk rating with the identity of its author and the applicable intended-use context.
+The module SHALL record the applicable intended-use context for every feature-risk rating, and the accepting person's identity for every accepted rating.
 
 ## Scope
 
@@ -34,14 +34,14 @@ Risk decisions belong to the person responsible for the intended use. Keeping th
 
 | Metric | Target | Threshold | Method |
 |--------|--------|-----------|--------|
-| Feature ratings traceable to a named human and an intended-use context | 100% | 100% | Test |
+| Accepted feature ratings traceable to a named human and all ratings traceable to an intended-use context | 100% | 100% | Test |
 
 ## Verification
 
-Validate supplier and adopter fixtures to confirm each rating retains its named author and intended-use context.
+Validate supplier and adopter fixtures to confirm each rating retains its intended-use context and accepted ratings retain the accepting person's identity.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| NFR-002-AC-1 | Every supplier and adopter rating requires a named rater and its applicable intended-use context. | Test |
+| NFR-002-AC-1 | Every supplier and adopter rating requires its applicable intended-use context; accepted ratings also require the accepting person's identity. | Test |

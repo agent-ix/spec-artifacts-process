@@ -203,6 +203,9 @@ enum FeatureRatingScope { supplier, adopter }
 /** Human-authored feature rating. No default or computed value is defined. */
 enum FeatureRatingValue { high_process_risk, not_high_process_risk }
 
+/** Lifecycle of a feature risk rating record. */
+enum FeatureRiskRatingStatus { proposed, accepted }
+
 /** Initial tool-validation packages covered by this module. */
 enum IntendedUseTool {
   quoin,
@@ -815,14 +818,15 @@ model IntendedUse {
   operatingContext: Section;
 }
 
-/** One person's rating and covered requirements. */
+/** One rating with its proposal/acceptance status and covered requirements. */
 model FeatureRiskRating {
   id: FeatureRiskRatingId;
   title: NonEmptyText;
   type: "FeatureRiskRating";
   scope: FeatureRatingScope;
   rating: FeatureRatingValue;
-  ratedBy: NamedText;
+  status: FeatureRiskRatingStatus;
+  ratedBy?: NamedText;
   intendedUse?: NonEmptyText;
   relationships: Relationship[];
   provenance: Provenance;
