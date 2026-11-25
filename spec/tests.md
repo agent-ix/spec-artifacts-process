@@ -38,7 +38,7 @@ type: TestMatrix
 | TC-027 | `analysis` enum admits both review families: the nine spec analyses plus `code-review` and `spec-correctness` | Unit | P1 | FR-002-AC-6 | ✅ |
 | TC-028 | Trace targets mint test-case ids from the Test Matrix and criterion ids from FR and NFR | Unit | P0 | FR-004-AC-1 | ✅ |
 | TC-029 | Every trace target and document reference binds by `archetype` and declares no `document` key; matrix entries bind `TestMatrix` and additionally exclude test data (CR-062) | Unit | P0 | FR-004-AC-2 | ✅ |
-| TC-030 | Exactly one templated canonical marker per language (rust, python, typescript) | Unit | P1 | FR-004-AC-3 | ✅ |
+| TC-030 | Exactly one templated canonical marker per language, with shell entry paths limited to audit and selftest run scripts | Unit | P1 | FR-004-AC-3 | ✅ |
 | TC-032 | Every reference names declared targets only and its pattern compiles with a capture group | Unit | P1 | FR-004-AC-5 | ✅ |
 | TC-033 | `quire coverage` over this repo backs a non-zero count and mints no row from `tests/fixtures/` | Integration | P0 | FR-004-AC-6 | ✅ |
 | TC-034 | `vocabularies.test_type_column` is declared and `no_source_symbol` lists only test-type values that mint no symbol — `Eval` and `Manual` in, `Static`/`Benchmark`/`Compile` out (CR-002) | Unit | P0 | FR-004-AC-7 | ✅ |
