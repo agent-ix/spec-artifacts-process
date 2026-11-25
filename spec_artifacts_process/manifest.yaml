@@ -1507,8 +1507,8 @@ traceability:
     # nodes (quire-rs FR-051-AC-40..42). Only a script's `entry_point` binds, and
     # only where its path matches `entry_paths` (AC-38): a production script
     # that merely mentions a requirement in a comment verifies nothing. The
-    # globs name the audit scripts, which are tests of the repo in all but
-    # extension. A marker that binds nothing is reported (AC-44), not dropped.
+    # globs name audit scripts and selftest run scripts. A marker that binds
+    # nothing is reported (AC-44), not dropped.
     - name: shell-trace-comment
       language: shell
       syntax: comment
@@ -1516,6 +1516,7 @@ traceability:
       template: '# trace: {ids}'
       entry_paths:
       - 'scripts/audits/**/*.sh'
+      - 'selftest/**/run.sh'
     # ── implements: what code a requirement is ABOUT (quire-rs FR-062) ──
     #
     # A SEPARATE list from `markers`, and the separation is the whole point:

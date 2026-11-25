@@ -259,7 +259,29 @@ def test_shell_marker_is_a_comment_form_gated_by_entry_paths(
         m for m in traceability["trace_tags"]["markers"] if m["language"] == "shell"
     ]
     assert form["syntax"] == "comment"
-    assert form["entry_paths"] == ["scripts/audits/**/*.sh"]
+    assert form["entry_paths"] == [
+        "scripts/audits/**/*.sh",
+        "selftest/**/run.sh",
+    ]
+    in_scope = [
+        "scripts/audits/trace/trace-check.sh",
+        "selftest/coverage/run.sh",
+    ]
+    out_of_scope = ["src/bin/production-check.sh", "scripts/deploy.sh"]
+    assert all(
+        any(
+            pathlib.PurePosixPath(path).match(pattern)
+            for pattern in form["entry_paths"]
+        )
+        for path in in_scope
+    )
+    assert all(
+        not any(
+            pathlib.PurePosixPath(path).match(pattern)
+            for pattern in form["entry_paths"]
+        )
+        for path in out_of_scope
+    )
     match = re.search(form["pattern"], "# trace: FR-024-AC-9, TC-502")
     assert match and match.group(1) == "FR-024-AC-9, TC-502"
     assert not re.search(form["pattern"], "# trace is not a tag")
@@ -812,8 +834,7 @@ def test_quire_matrix_computes_criterion_coverage_without_status(
     assert len(criteria) == 1, "the criterion must appear once in the computed matrix"
     assert criteria[0]["status"] == "tagged"
     assert any(
-        binder["qualified_name"] == "test_example"
-        for binder in criteria[0]["binders"]
+        binder["qualified_name"] == "test_example" for binder in criteria[0]["binders"]
     )
 
 
