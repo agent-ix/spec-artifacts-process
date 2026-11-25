@@ -5,6 +5,9 @@ type: DossierDocument
 version: "1.0"
 document_kind: srs
 generated_by: hand
+producer_identity:
+  name: quoin
+  version: "0.36.8"
 ---
 # Software Requirements Specification
 

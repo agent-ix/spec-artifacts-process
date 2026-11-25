@@ -1046,6 +1046,12 @@ model Anomaly {
   @minItems(1) releaseRationale?: ReleaseRationaleRow[];
 }
 
+/** Quoin tool identity written to each generated dossier document. */
+model DossierProducerIdentity {
+  name: "quoin";
+  version: NonEmptyText;
+}
+
 /**
  * Dossier document record (archetype `DossierDocument`, FR-018): one generated
  * document of a submission dossier. `version` is required for every kind
@@ -1067,6 +1073,7 @@ model DossierDocument {
   version?: NonEmptyText;
   documentKind: DossierKind;
   generatedBy: "quoin dossier";
+  producerIdentity: DossierProducerIdentity;
   asOf?: Rfc3339Instant;
   /** Absent when the author declared none; the frontmatter schemas do not require the key, and the model must not require what the schema does not (FR-011-AC-15). */
   relationships?: Relationship[];

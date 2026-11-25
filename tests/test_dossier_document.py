@@ -50,7 +50,11 @@ def fails_naming(path: Path, field: str, *, scope: Path = FIXTURES) -> None:
     found = messages(result, path)
     assert found, result.stderr
     assert any(
-        f'"{field}"' in m or f"at {field})" in m or f"'{field}'" in m for m in found
+        f'"{field}"' in m
+        or f"at {field})" in m
+        or f"at {field}." in m
+        or f"'{field}'" in m
+        for m in found
     ), found
 
 
@@ -92,6 +96,61 @@ def test_document_kind_outside_enum_fails_naming_document_kind():
 @pytest.mark.parametrize("name", ["bad-generator", "missing-generator"])
 def test_generated_by_must_be_quoin_dossier(name: str):
     fails_naming(INVALID / f"{name}.md", "generated_by")
+
+
+@pytest.mark.trace("FR-018-AC-20")
+@pytest.mark.parametrize(
+    "name",
+    [
+        "missing-producer-identity",
+        "missing-producer-name",
+        "missing-producer-version",
+        "bad-producer-name",
+        "empty-producer-version",
+        "extra-producer-member",
+    ],
+)
+def test_producer_identity_requires_exact_quoin_name_and_version(name: str):
+    """Invalid or incomplete producer identities fail at the producer field."""
+    fails_naming(INVALID / f"{name}.md", "producer_identity")
+
+
+@pytest.mark.trace("FR-018-AC-21")
+def test_producer_identity_is_preserved_in_the_projected_record(mapper):
+    """The producer name and version map unchanged to the record."""
+    text = (VALID / "srs.md").read_text()
+    record = mapper.build("DossierDocument", text, "srs.md")
+    identity = {"name": "quoin", "version": "0.36.8"}
+
+    assert record["producerIdentity"] == identity
+
+
+@pytest.mark.trace("FR-018-AC-22")
+def test_projected_record_schema_requires_exact_producer_identity(
+    mapper, schema_registry
+):
+    """The projected record schema rejects missing or extra identity members."""
+    text = (VALID / "srs.md").read_text()
+    record = mapper.build("DossierDocument", text, "srs.md")
+    schema_validator = schema_registry("DossierDocument")
+
+    assert list(schema_validator.iter_errors(record)) == []
+    invalid_records = [
+        {key: value for key, value in record.items() if key != "producerIdentity"},
+        {**record, "producerIdentity": {"version": "0.36.8"}},
+        {**record, "producerIdentity": {"name": "quoin"}},
+        {
+            **record,
+            "producerIdentity": {
+                "name": "quoin",
+                "version": "0.36.8",
+                "extra": "not allowed",
+            },
+        },
+    ]
+
+    for invalid_record in invalid_records:
+        assert list(schema_validator.iter_errors(invalid_record))
 
 
 @pytest.mark.trace("FR-018-AC-5", "TC-234")
@@ -211,6 +270,9 @@ def m2_document(kind: str, *, as_of: bool = False) -> str:
         'version: "1.0"\n'
         f"document_kind: {kind}\n"
         "generated_by: quoin dossier\n"
+        "producer_identity:\n"
+        "  name: quoin\n"
+        '  version: "0.36.8"\n'
         f"{instant}"
         "---\n"
         "# M2 document\n"
@@ -236,6 +298,9 @@ def test_records_of_processing_validates_without_a_version(tmp_path: Path):
         "type: DossierDocument\n"
         "document_kind: records-of-processing\n"
         "generated_by: quoin dossier\n"
+        "producer_identity:\n"
+        "  name: quoin\n"
+        '  version: "0.36.8"\n'
         "---\n"
         "# Records of Processing\n"
     )
