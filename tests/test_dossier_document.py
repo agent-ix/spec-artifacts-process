@@ -98,7 +98,7 @@ def test_generated_by_must_be_quoin_dossier(name: str):
     fails_naming(INVALID / f"{name}.md", "generated_by")
 
 
-@pytest.mark.trace("FR-018-AC-20", "TC-249")
+@pytest.mark.trace("FR-018-AC-20")
 @pytest.mark.parametrize(
     "name",
     [
@@ -115,19 +115,42 @@ def test_producer_identity_requires_exact_quoin_name_and_version(name: str):
     fails_naming(INVALID / f"{name}.md", "producer_identity")
 
 
-@pytest.mark.trace("FR-018-AC-20", "TC-249")
-def test_producer_identity_is_preserved_in_the_projected_record(
-    mapper, schema_registry
-):
-    """The producer name and version map unchanged to the closed record schema."""
+@pytest.mark.trace("FR-018-AC-21")
+def test_producer_identity_is_preserved_in_the_projected_record(mapper):
+    """The producer name and version map unchanged to the record."""
     text = (VALID / "srs.md").read_text()
     record = mapper.build("DossierDocument", text, "srs.md")
     identity = {"name": "quoin", "version": "0.36.8"}
 
     assert record["producerIdentity"] == identity
-    assert list(schema_registry("DossierDocument").iter_errors(record)) == []
-    invalid = {**record, "producerIdentity": {**identity, "revision": "abc123"}}
-    assert list(schema_registry("DossierDocument").iter_errors(invalid)) != []
+
+
+@pytest.mark.trace("FR-018-AC-22")
+def test_projected_record_schema_requires_exact_producer_identity(
+    mapper, schema_registry
+):
+    """The projected record schema rejects missing or extra identity members."""
+    text = (VALID / "srs.md").read_text()
+    record = mapper.build("DossierDocument", text, "srs.md")
+    schema_validator = schema_registry("DossierDocument")
+
+    assert list(schema_validator.iter_errors(record)) == []
+    invalid_records = [
+        {key: value for key, value in record.items() if key != "producerIdentity"},
+        {**record, "producerIdentity": {"version": "0.36.8"}},
+        {**record, "producerIdentity": {"name": "quoin"}},
+        {
+            **record,
+            "producerIdentity": {
+                "name": "quoin",
+                "version": "0.36.8",
+                "extra": "not allowed",
+            },
+        },
+    ]
+
+    for invalid_record in invalid_records:
+        assert list(schema_validator.iter_errors(invalid_record))
 
 
 @pytest.mark.trace("FR-018-AC-5", "TC-234")
