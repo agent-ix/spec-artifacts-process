@@ -19,3 +19,9 @@ FR-018-AC-20 bundles several input rejection variants, exact field projection, a
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | medium | FR-018-AC-20 combines frontmatter and projected-record obligations | spec/functional/FR-018-dossier-document-archetype.md:109 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | A `DossierDocument` fixture with `producer_identity: {name: quoin, version: "0.36.8"}` validates; omitting `producer_identity`, omitting either member, using a name other than `quoin`, using an empty version, or adding a third member fails validation naming `producer_identity`. |

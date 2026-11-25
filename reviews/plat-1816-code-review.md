@@ -23,3 +23,9 @@ One medium test coverage defect: the new projected-record assertion checks an ex
 ## Review notes
 
 The changed schema/model/mapping agree on required `name` and `version`, constrain the name to `quoin`, and close the nested object against additional members. Existing frontmatter examples and invalid fixtures were updated consistently. The added mapping test verifies preserved values and rejects an extra nested member, but leaves the missing and incomplete nested record cases unasserted.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The projected `DossierDocument` record schema accepts a valid `producerIdentity` object and rejects a missing `producerIdentity`, missing `name`, missing `version`, or an additional member. |

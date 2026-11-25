@@ -32,3 +32,9 @@ The repository-wide computed matrix reports 102 untagged criteria (and no eviden
 - `quire coverage --scope . --json` reports 4 untracked symbols and 42 unmatched tags; none references FR-018-AC-20.
 - Reverse-gap and stub review was confined to changed model, mapping, schema, fixtures and test path; no new public runtime behavior was added. A whole-source inventory was not completed, so this artifact does not claim repository-wide reverse-gap or stub assurance.
 - Semantic review: skipped; no explicit opt-in was supplied.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | deferred | The 102 untagged criteria are repository-wide pre-existing gaps outside this narrow producer-identity PR and are not part of PLAT-1816 acceptance. Current computed matrix verifies all 22 FR-018 criteria, including AC-20 through AC-22, are tagged. The whole-repository gaps remain outside this PR. |
