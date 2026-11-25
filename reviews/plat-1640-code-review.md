@@ -20,3 +20,10 @@ Reviewed the shell trace entry-path change and its focused test. The entry-path 
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | medium | TC-030 claims entry-path coverage, but the test tagged TC-030 does not assert entry paths; the new path test lacks the TC-030 tag | spec/tests.md:41; tests/test_traceability_declaration.py:235-287 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | TC-030 now has its sole trace marker on the path-specific test, which asserts included audit/selftest paths and excluded production paths. |
+

@@ -20,3 +20,10 @@ Reviewed FR-004-AC-3, its Test Matrix case, and the manifest declaration. The ne
 | ID | Severity | Summary | Refs |
 | --- | --- | --- | --- |
 | FND-001 | medium | TC-030's updated description claims selftest path coverage, while its tagged test only checks marker count/templates; the new path-specific test is not tagged TC-030 | spec/tests.md:41; tests/test_traceability_declaration.py:235-287 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | TC-030 now has its sole trace marker on the path-specific test, which asserts included audit/selftest paths and excluded production paths. |
+
