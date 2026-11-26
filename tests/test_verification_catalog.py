@@ -230,7 +230,7 @@ def test_catalog_names_no_tool_outside_tooling() -> None:
             )
 
 
-@pytest.mark.trace("TC-055", "FR-007-AC-8")
+@pytest.mark.trace("TC-055", "FR-007-AC-8", "FR-007-AC-12")
 def test_tc055_obligation_sources_are_declared() -> None:
     """TC-055 (FR-007-AC-8): the engine's obligation machinery is inert until a
     module declares a source, so the declaration ships with the evidence layer
@@ -350,6 +350,7 @@ def test_tc150_constraint_obligations_are_derived() -> None:
 # this registry had no word for. They are added rather than forced into a near
 # neighbour, because a catalog whose nearest entry is wrong advises worse than
 # one that admits the gap.
+@pytest.mark.trace("TC-056", "FR-007-AC-9")
 def test_tc056_compile_time_and_dynamic_analysis_are_catalogued() -> None:
     catalog = _catalog()
 
@@ -377,6 +378,7 @@ def test_tc056_compile_time_and_dynamic_analysis_are_catalogued() -> None:
 # `Proptest` (a tool), `Unit Test` (a class synonym), `CI Gate` (a cadence).
 # The catalog must not make the same conflation, or the vocabulary it publishes
 # would license the cells it is supposed to correct.
+@pytest.mark.trace("TC-057", "FR-007-AC-10")
 def test_tc057_no_entry_names_a_tool_a_class_or_a_cadence() -> None:
     catalog = _catalog()
     ids = set(catalog)
@@ -424,7 +426,7 @@ def test_tc057_no_entry_names_a_tool_a_class_or_a_cadence() -> None:
             assert tool != (entry.get("evidence_kind") or "").lower()
 
 
-@pytest.mark.trace("FR-007")
+@pytest.mark.trace("TC-065", "FR-007-AC-11")
 def test_tc065_a_declared_hazard_advises_fault_injection() -> None:
     """FR-007 CR-006 (TC-065): the presence of a safety object is an
     applicability signal for fault injection.

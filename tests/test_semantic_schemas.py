@@ -72,7 +72,7 @@ def sandbox(tmp_path: Path) -> Path:
     return semantic
 
 
-@pytest.mark.trace("TC-081")
+@pytest.mark.trace("TC-081", "FR-009-AC-2")
 def test_every_projection_declares_the_id():
     base = MODULE_BASE
     for path in projections():
@@ -81,7 +81,7 @@ def test_every_projection_declares_the_id():
         assert schema["$id"] == f"{base}{path.name}"
 
 
-@pytest.mark.trace("TC-082")
+@pytest.mark.trace("TC-082", "FR-009-AC-3")
 def test_every_ref_resolves_to_a_sibling_or_to_semantic_core():
     base = MODULE_BASE
     shipped = {p.name for p in projections()}
@@ -95,7 +95,7 @@ def test_every_ref_resolves_to_a_sibling_or_to_semantic_core():
             ), f"{path.name} refs a missing sibling: {ref}"
 
 
-@pytest.mark.trace("TC-083", "FR-018-AC-12", "TC-241")
+@pytest.mark.trace("TC-083", "FR-009-AC-4", "FR-018-AC-12", "TC-241")
 def test_check_is_clean_and_fails_on_one_changed_byte(sandbox: Path):
     assert run_generator(["--check"], cwd=sandbox).returncode == 0
     victim = sandbox.parent / "schemas" / "SpecReview.json"
@@ -109,7 +109,7 @@ def test_check_is_clean_and_fails_on_one_changed_byte(sandbox: Path):
     ), "--check must not rewrite the file it reports"
 
 
-@pytest.mark.trace("TC-085")
+@pytest.mark.trace("TC-085", "FR-009-AC-6")
 def test_a_stale_projection_is_named_and_frontmatter_schemas_are_left_alone(
     sandbox: Path,
 ):
@@ -127,8 +127,8 @@ def test_a_stale_projection_is_named_and_frontmatter_schemas_are_left_alone(
         assert (schemas / name).read_text() == before[name]
 
 
-@pytest.mark.trace("TC-086")
-def test_the_wheel_and_the_npm_tree_carry_every_projection():
+@pytest.mark.trace("TC-086", "FR-009-AC-7")
+def test_the_wheel_and_the_npm_tree_carry_every_projection(tmp_path: Path):
     subprocess.run(
         ["make", "build"], cwd=str(REPO_ROOT), check=True, capture_output=True
     )
@@ -143,8 +143,35 @@ def test_the_wheel_and_the_npm_tree_carry_every_projection():
     assert "spec_artifacts_process/manifest.yaml" in names
     assert "spec_artifacts_process/mappings.yaml" in names
 
+    # Exercise the actual prepack staging script in a throwaway package root.
+    # The script copies the authoritative inner module beside package.json so
+    # the tarball's manifest-relative schema paths resolve.
+    staged_root = tmp_path / "npm-stage"
+    staged_root.mkdir(parents=True)
+    shutil.copy2(REPO_ROOT / "package.json", staged_root / "package.json")
+    shutil.copytree(REPO_ROOT / "scripts", staged_root / "scripts")
+    shutil.copytree(PACKAGE_ROOT, staged_root / "spec_artifacts_process")
+    result = subprocess.run(
+        ["node", "scripts/stage-npm.mjs"],
+        cwd=str(staged_root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert (staged_root / "manifest.yaml").read_bytes() == (
+        staged_root / "spec_artifacts_process" / "manifest.yaml"
+    ).read_bytes()
+    staged_schemas = staged_root / "schemas"
+    shipped_schemas = sorted(SCHEMAS_DIR.glob("*.json"))
+    assert {p.name for p in staged_schemas.glob("*.json")} == {
+        p.name for p in shipped_schemas
+    }
+    for path in shipped_schemas:
+        assert (staged_schemas / path.name).read_bytes() == path.read_bytes()
 
-@pytest.mark.trace("TC-087")
+
+@pytest.mark.trace("TC-087", "FR-009-AC-8", "FR-009-CON-3")
 def test_two_runs_are_byte_identical(sandbox: Path):
     first = run_generator([], cwd=sandbox)
     assert first.returncode == 0, first.stderr
@@ -158,7 +185,7 @@ def test_two_runs_are_byte_identical(sandbox: Path):
     } == snapshot
 
 
-@pytest.mark.trace("TC-132")
+@pytest.mark.trace("TC-132", "FR-009-AC-10")
 def test_a_missing_toolchain_names_the_component_and_the_install(tmp_path: Path):
     """No `node_modules` at all: the generator must say which component is
     missing and how to install it, rather than failing inside the compiler."""
