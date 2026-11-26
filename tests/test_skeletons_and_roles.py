@@ -83,7 +83,25 @@ def skeleton_for(model: str) -> Path:
     return SKELETONS_DIR / f"{model}.md"
 
 
-@pytest.mark.trace("TC-111")
+def validate_with_quire_cli(model: str, text: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--module",
+            str(PACKAGE_ROOT),
+            "--archetype",
+            model,
+            "-",
+        ],
+        input=text,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+@pytest.mark.trace("TC-111", "FR-012-AC-1")
 def test_every_declared_type_has_exactly_one_skeleton():
     present = {p.name for p in SKELETONS_DIR.glob("*.md")}
     expected = {f"{name}.md" for name in artifact_type_names()} | {"Standard.sysml.md"}
@@ -93,18 +111,17 @@ def test_every_declared_type_has_exactly_one_skeleton():
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-112")
-def test_every_skeleton_validates_against_its_own_archetype(quire_engine, path: Path):
+@pytest.mark.trace("TC-112", "FR-012-AC-2", "FR-012-AC-4", "FR-012-CON-1")
+def test_every_skeleton_validates_against_its_own_archetype(path: Path):
     """A skeleton that does not validate sends every author who copies it into a
     failure, which is why this runs the engine rather than re-reading the YAML."""
     model = frontmatter(path.read_text())["type"]
-    result = quire_engine.validate_document(model, str(PACKAGE_ROOT), path.read_text())
-    assert result["errors"] == [], result["errors"]
-    assert result["is_valid"] is True
+    result = validate_with_quire_cli(model, path.read_text())
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
-@pytest.mark.trace("TC-114")
+@pytest.mark.trace("TC-114", "FR-012-AC-4")
 def test_every_required_section_is_present_in_its_skeleton(manifest, model: str):
     entry = next(a for a in manifest["artifact_types"] if a["name"] == model)
     locators = ((entry.get("body_extraction") or {}).get("yield_pattern") or {}).get(
@@ -123,8 +140,8 @@ def test_every_required_section_is_present_in_its_skeleton(manifest, model: str)
         ), f"{model}.md is missing the required section {heading!r}"
 
 
-@pytest.mark.trace("TC-116")
-def test_the_added_standard_locators_are_optional_and_omittable(quire_engine, manifest):
+@pytest.mark.trace("TC-116", "FR-012-AC-6", "FR-012-CON-2")
+def test_the_added_standard_locators_are_optional_and_omittable(manifest):
     entry = next(a for a in manifest["artifact_types"] if a["name"] == "Standard")
     locators = entry["body_extraction"]["yield_pattern"]["match"]
     assert set(locators) == {"properties", "invariants"}
@@ -136,9 +153,8 @@ def test_the_added_standard_locators_are_optional_and_omittable(quire_engine, ma
         "# Standard-200: a standard with neither section\n\n"
         "## Description\n\nNothing typed here.\n"
     )
-    assert quire_engine.validate_document("Standard", str(PACKAGE_ROOT), bare)[
-        "is_valid"
-    ]
+    result = validate_with_quire_cli("Standard", bare)
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def _assert_no_fixtures_packaged(names: list[str]) -> None:
@@ -207,14 +223,14 @@ def test_no_fixture_mints_an_id():
     assert "tests/fixtures" not in coverage.stdout
 
 
-@pytest.mark.trace("TC-120", "FR-018-AC-7", "TC-236")
+@pytest.mark.trace("TC-120", "FR-013-AC-1", "FR-013-CON-1", "FR-018-AC-7", "TC-236")
 def test_every_model_carries_exactly_one_role(mappings):
     roles = {model: spec["role"] for model, spec in mappings["models"].items()}
     assert roles == EXPECTED_ROLES
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
-@pytest.mark.trace("TC-121")
+@pytest.mark.trace("TC-121", "FR-013-AC-2")
 def test_no_model_declares_a_run_property(model: str):
     """Walks the model and everything it `$ref`s, so a run property cannot hide
     one level down in a row type."""
@@ -240,7 +256,7 @@ def test_no_model_declares_a_run_property(model: str):
     assert unexplained == [], unexplained
 
 
-@pytest.mark.trace("TC-122")
+@pytest.mark.trace("TC-122", "FR-013-AC-3")
 def test_plan_and_task_declare_no_execution_property(mappings):
     for model in ("Plan", "Task"):
         properties = set(mappings["models"][model]["properties"])
@@ -257,7 +273,7 @@ def test_plan_and_task_declare_no_execution_property(mappings):
     assert "track" not in task["required"], "FR-005: `track` is optional"
 
 
-@pytest.mark.trace("TC-123")
+@pytest.mark.trace("TC-123", "FR-013-AC-4")
 def test_the_finding_document_and_the_findings_row_keep_distinct_namespaces(manifest):
     row = json.loads((SCHEMAS_DIR / "FindingRow.json").read_text())
     assert set(row["required"]) == {"id", "severity", "summary", "refs", "line"}
@@ -268,7 +284,7 @@ def test_the_finding_document_and_the_findings_row_keep_distinct_namespaces(mani
     assert document["defaults"]["id_pattern"].startswith("FIND-")
 
 
-@pytest.mark.trace("TC-124")
+@pytest.mark.trace("TC-124", "FR-013-AC-5")
 def test_matrix_rows_carry_their_trace_tokens_as_a_list(mapper):
     record = mapper.build(
         "TestMatrix", skeleton_for("TestMatrix").read_text(), "skeletons/TestMatrix.md"
@@ -281,7 +297,7 @@ def test_matrix_rows_carry_their_trace_tokens_as_a_list(mapper):
     assert "FR-001-AC-1" in claimed
 
 
-@pytest.mark.trace("TC-125")
+@pytest.mark.trace("TC-125", "FR-013-AC-6")
 def test_the_unmodelled_concepts_name_their_owner(mappings):
     entries = mappings["not_modelled"]
     assert len(entries) >= 3

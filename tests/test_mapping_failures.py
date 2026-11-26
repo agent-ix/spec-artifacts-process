@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from conftest import NEGATIVE_DIR, SKELETONS_DIR, frontmatter
+from conftest import NEGATIVE_DIR, REPO_ROOT, SKELETONS_DIR, frontmatter
 from support.reference_mapping import MappingFailure
 
 NEGATIVES = sorted(NEGATIVE_DIR.glob("*.md"))
@@ -46,7 +46,7 @@ def run(mapper, path: Path):
 
 
 @pytest.mark.parametrize("path", NEGATIVES, ids=lambda p: p.name)
-@pytest.mark.trace("TC-117", "FR-011-AC-8")
+@pytest.mark.trace("TC-117", "FR-011-AC-8", "FR-012-AC-7")
 def test_each_negative_fails_exactly_the_check_it_names(mapper, path: Path):
     front = frontmatter(path.read_text())
     assert front["expect"].startswith(
@@ -61,7 +61,7 @@ def test_each_negative_fails_exactly_the_check_it_names(mapper, path: Path):
     ), f"{path.name} expects {expected!r} and reported {raised.value.reasons}"
 
 
-@pytest.mark.trace("TC-118")
+@pytest.mark.trace("TC-118", "FR-012-AC-8")
 def test_the_negative_corpus_covers_every_stated_rejection():
     present = {p.name for p in NEGATIVES}
     assert (
@@ -73,8 +73,22 @@ def test_the_negative_corpus_covers_every_stated_rejection():
     ), f"uncovered rejections: {sorted(set(REQUIRED_REJECTIONS) - reasons)}"
 
 
+@pytest.mark.trace("FR-012-CON-3")
+def test_negative_fixtures_live_only_in_the_test_tree():
+    fixtures = []
+    for path in REPO_ROOT.rglob("*.md"):
+        if ".git" in path.parts:
+            continue
+        text = path.read_text()
+        if text.startswith("---\n") and "expect:" in text.split("---", 2)[1]:
+            fixtures.append(path)
+
+    assert fixtures
+    assert all(path.is_relative_to(NEGATIVE_DIR) for path in fixtures)
+
+
 @pytest.mark.parametrize("path", NEGATIVES, ids=lambda p: p.name)
-@pytest.mark.trace("TC-117")
+@pytest.mark.trace("TC-117", "FR-012-AC-7")
 def test_no_negative_fixture_passes(mapper, path: Path):
     with pytest.raises(MappingFailure):
         run(mapper, path)
