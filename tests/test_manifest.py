@@ -367,7 +367,7 @@ def test_repo_test_matrix_self_validates() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-@pytest.mark.trace("TC-037", "FR-005-AC-1")
+@pytest.mark.trace("TC-037", "FR-005-AC-1", "FR-005-AC-2")
 def test_task_schema_declares_track_property() -> None:
     """TC-037 (FR-005-AC-1/AC-2): the `track` label 230 task files already carry
     is a declared, optional string — not a key that passes because
