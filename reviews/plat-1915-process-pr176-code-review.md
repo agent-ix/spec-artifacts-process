@@ -66,3 +66,6 @@ Reviewed PR #176's trace additions and the corrected FR-012 Standard properties 
 
 | FND | outcome | reason |
 | --- | --- | --- |
+| FND-001 | fixed | The negative test now requires the reported reasons to equal the single declared reason. |
+| FND-002 | fixed | The test now asserts a three-token trace list in source order. |
+| FND-003 | fixed | The test now checks the four named run, binding, baseline, and freshness concepts against their owners. |

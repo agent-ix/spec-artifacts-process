@@ -68,3 +68,16 @@ Reviewed the changed FR-012 statement, Test Matrix rows, and all 21 eligible `Te
 
 | FND | outcome | reason |
 | --- | --- | --- |
+| FND-001 | fixed | AC-1 now checks each known canonical path directly from the declared artifact types instead of enumerating the directory. |
+| FND-002 | fixed | The rejection test now uses the explicit required fixture-name list and checks each case individually. |
+| FND-003 | fixed | The Standard syntax test opens the two named Standard forms rather than enumerating skeletons. |
+| FND-004 | fixed | The location test checks the explicit named negative fixture paths without scanning repository Markdown. |
+| FND-005 | fixed | The test now lists the declared artifact type names and the named `Standard.sysml` path, then constructs those canonical paths without a directory glob. |
+| FND-006 | fixed | FR-012-AC-10 now states the compatibility contract for non-Standard archetypes, and the test checks every declared non-Standard archetype's `Properties` and `Invariants` locators. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | high | The test bound to AC-2 still discovers its skeleton cases with a directory glob. | tests/test_skeletons_and_roles.py:111 |
+| FND-006 | medium | The revised AC-10 no longer excludes typed properties tables from non-Standard skeletons. | spec/functional/FR-012-executable-skeletons.md:115 |
