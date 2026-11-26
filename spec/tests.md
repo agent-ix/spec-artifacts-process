@@ -123,7 +123,7 @@ type: TestMatrix
 | TC-132 | With the TypeSpec toolchain uninstalled the generator exits non-zero naming the missing component and `make semantic-install`, rather than failing inside the compiler | Unit | P1 | FR-009-AC-10 | ✅ |
 | TC-135 | The refusal of an unknown `semantic` key names the key. STRICT EXPECTED FAILURE: both refusals are silent (quire-rs#221). The row is red by design and turns green only when the engine names them — never skipped | Unit | P0 | FR-010-AC-9 | ❌ strict expected failure: quire-rs#221 |
 | TC-137 | For every key an emitted model and that type's frontmatter schema both describe, the two agree on type and pattern — the migration does not replace one pair of drifting declarations with another | Unit | P0 | FR-011-AC-15 | ✅ |
-| TC-138 | The mapping totality walk terminates on the shipped models, which contain at least one reference cycle | Unit | P1 | FR-011-AC-16 | ✅ |
+| TC-138 | The mapping totality walk visits every reachable schema and terminates when a reference cycle is present | Unit | P1 | FR-011-AC-16 | ✅ |
 | TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | ✅ |
 | TC-140 | Every mapping kind named in `semantic.mappings` is used by at least one model property — no kind is declared aspirationally | Unit | P0 | FR-011-AC-18 | ✅ |
 | TC-141 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md` | Unit | P1 | FR-012-AC-10 | ✅ |
