@@ -322,6 +322,7 @@ class ReferenceMapper:
         errors: list[MappingError] = []
         record: dict[str, Any] = {}
         for prop, entry in spec["properties"].items():
+            prior_error_count = len(errors)
             try:
                 value = self._one(model, prop, entry, doc, errors)
             except MappingFailure as failure:
@@ -329,7 +330,7 @@ class ReferenceMapper:
                 continue
             if value is not None:
                 record[prop] = value
-            elif entry.get("required"):
+            elif entry.get("required") and len(errors) == prior_error_count:
                 errors.append(MappingError(model, prop, "missing", doc.body_start))
         if errors:
             raise MappingFailure(errors)
@@ -430,6 +431,7 @@ class ReferenceMapper:
                 return None
         rows: list[dict[str, Any]] = []
         seen: dict[str, int] = {}
+        data_row_count = 0
         for index in range(header_index + 1, span[1] + 1):
             line = doc.lines[index - 1]
             if not line.lstrip().startswith("|"):
@@ -439,6 +441,7 @@ class ReferenceMapper:
             cells = split_row(line)
             if is_separator(cells):
                 continue
+            data_row_count += 1
             if len(cells) != len(header):
                 errors.append(
                     MappingError(
@@ -469,7 +472,7 @@ class ReferenceMapper:
                     continue
                 seen[key] = index
             rows.append(row)
-        if not rows:
+        if data_row_count == 0:
             errors.append(
                 MappingError(model, prop, "min-rows", header_index, "0 data rows")
             )

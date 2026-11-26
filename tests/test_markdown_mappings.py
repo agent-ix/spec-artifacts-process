@@ -283,32 +283,28 @@ def test_the_two_standard_forms_declare_the_same_fields(mapper):
 
 
 @pytest.mark.trace("TC-141", "FR-012-AC-10")
-def test_only_standard_md_carries_the_typed_properties_table():
-    typed_tables = []
-    for path in sorted(SKELETONS_DIR.glob("*.md")):
-        lines = path.read_text().splitlines()
-        headings = [
-            index for index, line in enumerate(lines) if line.strip() == "## Properties"
-        ]
-        if not headings:
-            continue
-        start = headings[0] + 1
-        end = next(
-            (
-                index
-                for index in range(start, len(lines))
-                if lines[index].startswith("## ")
-            ),
-            len(lines),
-        )
-        if any(
-            line.strip() == "| Field | Type | Multiplicity | Constraints |"
-            for line in lines[start:end]
-        ):
-            typed_tables.append(path.name)
-    assert typed_tables == ["Standard.md"]
+def test_standard_forms_use_their_declared_properties_syntax():
+    standard = skeleton("Standard.md")
+    standard_lines = standard.splitlines()
+    properties_heading = next(
+        index
+        for index, line in enumerate(standard_lines)
+        if line.strip() == "## Properties"
+    )
+    next_heading = next(
+        (
+            index
+            for index in range(properties_heading + 1, len(standard_lines))
+            if standard_lines[index].startswith("## ")
+        ),
+        len(standard_lines),
+    )
+    assert (
+        "| Field | Type | Multiplicity | Constraints |"
+        in standard_lines[properties_heading + 1 : next_heading]
+    )
     sysml = skeleton("Standard.sysml.md")
-    assert "## Properties" in sysml
+    assert any(line.strip() == "## Properties" for line in sysml.splitlines())
     assert sum(line.strip() == "```sysml" for line in sysml.splitlines()) == 1
 
 

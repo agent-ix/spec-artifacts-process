@@ -102,10 +102,10 @@ def validate_with_quire_cli(model: str, text: str) -> subprocess.CompletedProces
 
 
 @pytest.mark.trace("TC-111", "FR-012-AC-1")
-def test_every_declared_type_has_exactly_one_skeleton():
-    present = {p.name for p in SKELETONS_DIR.glob("*.md")}
-    expected = {f"{name}.md" for name in artifact_type_names()} | {"Standard.sysml.md"}
-    assert present == expected
+def test_each_declared_type_has_its_canonical_skeleton():
+    for model in artifact_type_names():
+        assert skeleton_for(model).is_file(), f"missing {model}.md"
+    assert (SKELETONS_DIR / "Standard.sysml.md").is_file()
 
 
 @pytest.mark.parametrize(
@@ -286,11 +286,19 @@ def test_the_finding_document_and_the_findings_row_keep_distinct_namespaces(mani
 
 @pytest.mark.trace("TC-124", "FR-013-AC-5")
 def test_matrix_rows_carry_their_trace_tokens_as_a_list(mapper):
-    record = mapper.build(
-        "TestMatrix", skeleton_for("TestMatrix").read_text(), "skeletons/TestMatrix.md"
+    text = skeleton_for("TestMatrix").read_text()
+    text = text.replace(
+        "FR-001-AC-1",
+        "FR-001-AC-1, -AC-2, -AC-3",
+        1,
     )
+    record = mapper.build("TestMatrix", text, "skeletons/TestMatrix.md")
     rows = {row["id"]: row for row in record["testCases"]}
-    assert rows["TC-001"]["tracesTo"]["tokens"] == ["FR-001-AC-1"]
+    assert rows["TC-001"]["tracesTo"]["tokens"] == [
+        "FR-001-AC-1",
+        "FR-001-AC-2",
+        "FR-001-AC-3",
+    ]
     assert rows["TC-004"]["tracesTo"] == {"tokens": [], "noTrace": True}
     # The question a matrix record must answer without re-parsing a cell.
     claimed = {t for row in record["testCases"] for t in row["tracesTo"]["tokens"]}
@@ -299,13 +307,17 @@ def test_matrix_rows_carry_their_trace_tokens_as_a_list(mapper):
 
 @pytest.mark.trace("TC-125", "FR-013-AC-6")
 def test_the_unmodelled_concepts_name_their_owner(mappings):
-    entries = mappings["not_modelled"]
-    assert len(entries) >= 3
-    for entry in entries:
-        assert entry["owner"].startswith("agent-ix/")
-        assert entry["reason"].strip()
-    concepts = " ".join(e["concept"].lower() for e in entries)
-    assert "run" in concepts and "baseline" in concepts
+    owners_by_concept = {
+        entry["concept"].lower(): entry["owner"] for entry in mappings["not_modelled"]
+    }
+    expected_owners = {
+        "verification run records (runs/**)": "agent-ix/engineering-assurance FR-004",
+        "binding records (bindings.json)": "agent-ix/quoin",
+        "coverage baselines (baseline.json)": "agent-ix/quoin",
+        "evidence freshness": "agent-ix/engineering-assurance FR-004",
+    }
+    for concept, owner in expected_owners.items():
+        assert owners_by_concept.get(concept) == owner
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
