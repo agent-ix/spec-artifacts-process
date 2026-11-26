@@ -10,6 +10,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+import yaml
 from conftest import (
     MANIFEST_PATH,
     REPO_ROOT,
@@ -137,23 +138,42 @@ def test_an_unknown_key_is_refused(quire_engine, tmp_path):
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "FR-010-AC-9. quire refuses an unknown `semantic` key "
-        "SILENTLY: no diagnostic names the key or the path "
-        "(agent-ix/quire-rs#221). This row is red by design and "
-        "turns green the day the engine names them. It is never skipped, because a "
-        "skipped row is not coverage."
+        "FR-010-AC-9. quire-rs#221 silently drops a module with an unknown "
+        "`semantic` key, so no diagnostic names the key. This strict expected "
+        "failure turns green when the engine names it; it is never skipped."
     ),
 )
 @pytest.mark.trace("TC-135", "FR-010-AC-9")
 def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
-    module = tmp_path / "spec_artifacts_process"
-    module.mkdir(parents=True)
-    (module / "manifest.yaml").write_text(
-        MANIFEST_PATH.read_text().replace("semantic:\n", "semantic:\n  foo: bar\n", 1)
+    # Keep the input loadable by the declared Quire wheel: these two unrelated
+    # manifest forms landed after its supported schema version.
+    manifest = load_yaml_strict(MANIFEST_PATH.read_text())
+    manifest["traceability"]["trace_tags"].pop("formalizes", None)
+    manifest["grammar_severity"] = {
+        name: "off" if value is False else value
+        for name, value in manifest["grammar_severity"].items()
+    }
+
+    valid_root = tmp_path / "valid"
+    valid_module = valid_root / "spec_artifacts_process"
+    valid_module.mkdir(parents=True)
+    (valid_module / "manifest.yaml").write_text(
+        yaml.safe_dump(manifest, sort_keys=False)
     )
-    shutil.copytree(SCHEMAS_DIR, module / "schemas")
+    shutil.copytree(SCHEMAS_DIR, valid_module / "schemas")
+    expected_names = quire_engine.Registry.load_from([str(valid_root)]).archetype_names()
+    assert expected_names, "the control manifest must load before mutation"
+
+    manifest["semantic"]["foo"] = "bar"
+    invalid_root = tmp_path / "invalid"
+    invalid_module = invalid_root / "spec_artifacts_process"
+    invalid_module.mkdir(parents=True)
+    (invalid_module / "manifest.yaml").write_text(
+        yaml.safe_dump(manifest, sort_keys=False)
+    )
+    shutil.copytree(SCHEMAS_DIR, invalid_module / "schemas")
     try:
-        quire_engine.Registry.load_from([str(tmp_path)]).archetype_names()
+        quire_engine.Registry.load_from([str(invalid_root)]).archetype_names()
         diagnostic = capfd.readouterr()
         message = diagnostic.out + diagnostic.err
     except Exception as error:
