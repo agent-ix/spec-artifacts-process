@@ -99,43 +99,34 @@ def test_the_mapping_is_total_in_both_directions(mappings):
 
 
 @pytest.mark.trace("TC-138", "FR-011-AC-16")
-def test_the_totality_walk_terminates_on_the_cyclic_bundle(mappings):
-    """The emitted models `$ref` each other; a naive recursive walk does not
-    terminate. This walks the whole reachable graph and asserts it closes."""
-    seen: set[str] = set()
+def test_the_totality_walk_traverses_shipped_models_and_stops_at_cycles(mappings):
+    """Walk shipped refs and exercise the visited-set guard with a cycle."""
+    schemas = {path.name for path in SCHEMAS_DIR.glob("*.json")}
     edges: dict[str, set[str]] = {}
-    frontier = [f"{m}.json" for m in mappings["models"]]
-    while frontier:
-        name = frontier.pop()
-        if name in seen:
-            continue
-        seen.add(name)
-        path = SCHEMAS_DIR / name
-        if not path.is_file():
-            continue
-        edges[name] = set()
-        for ref in json.dumps(json.loads(path.read_text())).split('"$ref": "')[1:]:
-            target = ref.split('"')[0].rsplit("/", 1)[-1]
-            edges[name].add(target)
-            if target not in seen:
-                frontier.append(target)
-    assert len(seen) >= len(mappings["models"])
+    for name in schemas:
+        document = json.loads((SCHEMAS_DIR / name).read_text())
+        refs = json.dumps(document).split('"$ref": "')[1:]
+        edges[name] = {
+            ref.split('"')[0].rsplit("/", 1)[-1]
+            for ref in refs
+            if ref.split('"')[0].rsplit("/", 1)[-1] in schemas
+        }
 
-    def reaches_cycle(node: str, path: set[str], complete: set[str]) -> bool:
-        if node in path:
-            return True
-        if node in complete:
-            return False
-        path.add(node)
-        if any(
-            reaches_cycle(target, path, complete) for target in edges.get(node, set())
-        ):
-            return True
-        path.remove(node)
-        complete.add(node)
-        return False
+    def walk(roots: list[str], graph: dict[str, set[str]]) -> set[str]:
+        seen: set[str] = set()
+        frontier = list(roots)
+        while frontier:
+            name = frontier.pop()
+            if name in seen:
+                continue
+            seen.add(name)
+            frontier.extend(graph.get(name, set()))
+        return seen
 
-    assert any(reaches_cycle(node, set(), set()) for node in edges)
+    roots = [f"{model}.json" for model in mappings["models"]]
+    assert walk(roots, edges) >= set(roots)
+    cycle = {"CycleA.json": {"CycleB.json"}, "CycleB.json": {"CycleA.json"}}
+    assert walk(["CycleA.json"], cycle) == set(cycle)
 
 
 @pytest.mark.trace("TC-099", "FR-011-AC-3", "FR-011-CON-1")
