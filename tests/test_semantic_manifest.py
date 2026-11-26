@@ -144,7 +144,7 @@ def test_an_unknown_key_is_refused(quire_engine, tmp_path):
         "skipped row is not coverage."
     ),
 )
-@pytest.mark.trace("TC-135")
+@pytest.mark.trace("TC-135", "FR-010-AC-9")
 def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
     module = tmp_path / "spec_artifacts_process"
     module.mkdir(parents=True)
