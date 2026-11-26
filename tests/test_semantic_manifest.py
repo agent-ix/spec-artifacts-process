@@ -161,9 +161,9 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
         yaml.safe_dump(manifest, sort_keys=False)
     )
     shutil.copytree(SCHEMAS_DIR, valid_module / "schemas")
-    expected_names = (
-        quire_engine.Registry.load_from([str(valid_root)]).archetype_names()
-    )
+    expected_names = quire_engine.Registry.load_from(
+        [str(valid_root)]
+    ).archetype_names()
     assert expected_names, "the control manifest must load before mutation"
 
     manifest["semantic"]["foo"] = "bar"
