@@ -46,7 +46,7 @@ def run(mapper, path: Path):
 
 
 @pytest.mark.parametrize("path", NEGATIVES, ids=lambda p: p.name)
-@pytest.mark.trace("TC-117")
+@pytest.mark.trace("TC-117", "FR-011-AC-8")
 def test_each_negative_fails_exactly_the_check_it_names(mapper, path: Path):
     front = frontmatter(path.read_text())
     assert front["expect"].startswith(
@@ -80,7 +80,7 @@ def test_no_negative_fixture_passes(mapper, path: Path):
         run(mapper, path)
 
 
-@pytest.mark.trace("TC-104")
+@pytest.mark.trace("TC-104", "FR-011-AC-8")
 def test_prose_under_the_clause_section_is_an_empty_clause_list(mapper):
     """The section is optional and prose under it is commentary, not a defect."""
     text = (
@@ -93,7 +93,7 @@ def test_prose_under_the_clause_section_is_an_empty_clause_list(mapper):
     assert "invariants" not in record
 
 
-@pytest.mark.trace("TC-104")
+@pytest.mark.trace("TC-104", "FR-011-AC-8")
 def test_a_second_fence_in_one_subsection_is_reported(mapper):
     text = (
         '---\nid: Standard-101\ntitle: "two fences"\n'
@@ -107,7 +107,7 @@ def test_a_second_fence_in_one_subsection_is_reported(mapper):
     assert "second-fence" in raised.value.reasons
 
 
-@pytest.mark.trace("TC-104")
+@pytest.mark.trace("TC-104", "FR-011-AC-8")
 def test_an_unterminated_fence_is_reported(mapper):
     text = (
         '---\nid: Standard-102\ntitle: "unterminated"\n'
@@ -120,7 +120,7 @@ def test_an_unterminated_fence_is_reported(mapper):
     assert "unterminated-fence" in raised.value.reasons
 
 
-@pytest.mark.trace("TC-104")
+@pytest.mark.trace("TC-104", "FR-011-AC-8")
 def test_a_duplicate_clause_id_is_reported(mapper):
     text = (
         '---\nid: Standard-103\ntitle: "duplicate"\n'
@@ -134,7 +134,7 @@ def test_a_duplicate_clause_id_is_reported(mapper):
     assert "duplicate-clause-id" in raised.value.reasons
 
 
-@pytest.mark.trace("TC-106")
+@pytest.mark.trace("TC-106", "FR-011-AC-10")
 def test_three_independent_defects_are_reported_in_one_pass(mapper):
     """A mapper that stops at the first error makes a reviewer run it once per
     defect, which is how a third defect gets found in production."""
@@ -152,22 +152,30 @@ def test_three_independent_defects_are_reported_in_one_pass(mapper):
     with pytest.raises(MappingFailure) as raised:
         mapper.build("SpecReview", text, "three.md")
     reasons = raised.value.reasons
+    assert len(raised.value.errors) == 3
     assert {"id-pattern", "column-choices", "duplicate-row-id"} <= set(reasons)
-    assert all(error.line > 0 for error in raised.value.errors)
+    assert all(error.line > 0 and error.prop for error in raised.value.errors)
     assert all(error.model == "SpecReview" for error in raised.value.errors)
 
 
-@pytest.mark.trace("TC-107")
+@pytest.mark.trace("TC-107", "FR-011-AC-11")
 def test_duplicate_row_id_names_both_lines(mapper):
     path = NEGATIVE_DIR / "testmatrix-duplicate-row-id.md"
     with pytest.raises(MappingFailure) as raised:
         mapper.build("TestMatrix", path.read_text(), path.name)
     duplicate = next(e for e in raised.value.errors if e.reason == "duplicate-row-id")
-    assert "first at line" in duplicate.detail
-    assert duplicate.line > 0
+    row_lines = [
+        number
+        for number, line in enumerate(path.read_text().splitlines(), start=1)
+        if line.startswith("| TC-")
+    ]
+    assert len(row_lines) == 2
+    assert duplicate.line == row_lines[1]
+    assert duplicate.detail == f"TC-001 first at line {row_lines[0]}"
+    assert duplicate.model == "TestMatrix" and duplicate.prop
 
 
-@pytest.mark.trace("TC-139")
+@pytest.mark.trace("TC-139", "FR-011-AC-17")
 def test_row_ids_are_unique_per_table_not_per_document(mapper):
     """A TestMatrixIndex carries INT- and GAP- ids in different tables, and a
     document-scoped rule would reject conforming documents."""
@@ -180,7 +188,7 @@ def test_row_ids_are_unique_per_table_not_per_document(mapper):
     assert record["coverageGaps"][0]["id"] == "GAP-1"
 
 
-@pytest.mark.trace("TC-105")
+@pytest.mark.trace("TC-105", "FR-011-AC-9")
 def test_both_declaration_forms_in_one_document_build_no_record(mapper):
     path = NEGATIVE_DIR / "standard-both-forms.md"
     with pytest.raises(MappingFailure) as raised:

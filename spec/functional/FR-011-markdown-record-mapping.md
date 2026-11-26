@@ -127,7 +127,8 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
   namespaces are per table by construction. A document-scoped rule would reject conforming
   documents.
 - The totality walk that checks the mapping against the emitted models (CON-2) SHALL be
-  cycle-safe: the models `$ref` each other and a naive recursive walk does not terminate.
+  cycle-safe: it SHALL track visited schema references so a reference cycle cannot cause
+  repeated traversal.
 - The mapping SHALL treat `\|` inside a cell as a literal pipe rather than a column separator.
 - The mapping SHALL normalise `CRLF` to `LF` before slicing sections, so a Windows checkout
   produces the same record as a Unix one.
@@ -163,7 +164,7 @@ table header, renames no heading, reorders no column, and admits no vocabulary m
 | FR-011-AC-13 | A CRLF copy of a skeleton produces the same record as its LF original. | Test (TC-109) |
 | FR-011-AC-14 | Every frontmatter key a model does not declare is listed in that model's dropped key set. | Test (TC-110) |
 | FR-011-AC-15 | For every key an emitted model and that type's `frontmatter_schema_ref` both describe, the two agree on type and pattern — the drift this ticket exists to end is not replaced by a new pair of drifting declarations. | Test (TC-137) |
-| FR-011-AC-16 | The totality walk terminates on the shipped models, which contain at least one reference cycle. | Test (TC-138) |
+| FR-011-AC-16 | The totality walk visits every schema reachable from the emitted models and terminates when a reference cycle is present. | Test (TC-138) |
 | FR-011-AC-17 | Two rows sharing an id in **different** tables of one document are accepted; two in the same table are not. | Test (TC-139) |
 | FR-011-AC-18 | Every mapping kind named in `semantic.mappings` is used by at least one model property. | Test (TC-140) |
 
