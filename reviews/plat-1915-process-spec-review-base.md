@@ -26,3 +26,10 @@ Reviewed the FR-002 acceptance criteria and the TC-019..022 matrix rows changed 
 - FR-002-AC-1 through FR-002-AC-4 have direct behavioral tests and correct trace tags.
 - FR-002-AC-5 is verified by Inspection and is outside this test-only matrix update.
 - FR-005-AC-2's existing test exercises valid and invalid values and carries the criterion tag.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | TC-022 now uses the Integration test type. |
+

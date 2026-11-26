@@ -26,3 +26,10 @@ Reviewed the new SpecReview validation oracles, the added criterion tags, and th
 The new tests exercise the expected accept/reject boundaries for FR-002-AC-1..4. `test_task_schema_declares_track_property` already checks the schema validator against `track: C`, empty string, non-string, and null, so its new FR-005-AC-2 trace is supported. The TC-022 binder validates the source skeleton and confirms its packaged path exists in the built wheel. The AC-4 trace is correct.
 
 Focused verification passed: the five selected pytest cases, Ruff, and Black.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | TC-022 now uses the Integration test type. |
+
