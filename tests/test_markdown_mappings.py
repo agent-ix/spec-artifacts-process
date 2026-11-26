@@ -72,7 +72,7 @@ def build(mapper, model: str, text: str, path: str = "fixture.md") -> dict[str, 
     return record
 
 
-@pytest.mark.trace("TC-097")
+@pytest.mark.trace("TC-097", "FR-011-AC-1")
 def test_mappings_validates_against_its_own_schema(mappings):
     from jsonschema import Draft202012Validator
 
@@ -84,7 +84,7 @@ def test_mappings_validates_against_its_own_schema(mappings):
     assert set(mappings["models"]) == set(artifact_type_names())
 
 
-@pytest.mark.trace("TC-098")
+@pytest.mark.trace("TC-098", "FR-011-AC-2", "FR-011-CON-2")
 def test_the_mapping_is_total_in_both_directions(mappings):
     """Every model property is named exactly once, and every entry names a
     declared property. A one-directional check passes a mapping that describes a
@@ -98,11 +98,12 @@ def test_the_mapping_is_total_in_both_directions(mappings):
         )
 
 
-@pytest.mark.trace("TC-138")
+@pytest.mark.trace("TC-138", "FR-011-AC-16")
 def test_the_totality_walk_terminates_on_the_cyclic_bundle(mappings):
     """The emitted models `$ref` each other; a naive recursive walk does not
     terminate. This walks the whole reachable graph and asserts it closes."""
     seen: set[str] = set()
+    edges: dict[str, set[str]] = {}
     frontier = [f"{m}.json" for m in mappings["models"]]
     while frontier:
         name = frontier.pop()
@@ -112,14 +113,32 @@ def test_the_totality_walk_terminates_on_the_cyclic_bundle(mappings):
         path = SCHEMAS_DIR / name
         if not path.is_file():
             continue
+        edges[name] = set()
         for ref in json.dumps(json.loads(path.read_text())).split('"$ref": "')[1:]:
             target = ref.split('"')[0].rsplit("/", 1)[-1]
+            edges[name].add(target)
             if target not in seen:
                 frontier.append(target)
     assert len(seen) >= len(mappings["models"])
 
+    def reaches_cycle(node: str, path: set[str], complete: set[str]) -> bool:
+        if node in path:
+            return True
+        if node in complete:
+            return False
+        path.add(node)
+        if any(
+            reaches_cycle(target, path, complete) for target in edges.get(node, set())
+        ):
+            return True
+        path.remove(node)
+        complete.add(node)
+        return False
 
-@pytest.mark.trace("TC-099", "FR-011-CON-1")
+    assert any(reaches_cycle(node, set(), set()) for node in edges)
+
+
+@pytest.mark.trace("TC-099", "FR-011-AC-3", "FR-011-CON-1")
 def test_every_named_section_and_column_is_declared_by_the_manifest(mappings, manifest):
     """FR-011-CON-1: the mapping asserts no contract the manifest does not."""
     locators = {
@@ -154,7 +173,7 @@ def test_every_named_section_and_column_is_declared_by_the_manifest(mappings, ma
                 ), f"{model}.{prop} column list differs"
 
 
-@pytest.mark.trace("TC-140")
+@pytest.mark.trace("TC-140", "FR-011-AC-18")
 def test_every_declared_mapping_kind_is_used(mappings, semantic_block):
     """A kind declared and used by nothing is a declaration the engine cannot
     honour — the shape this repository has hit before (CR-037, CR-081)."""
@@ -174,7 +193,7 @@ def test_every_declared_mapping_kind_is_used(mappings, semantic_block):
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-100")
+@pytest.mark.trace("TC-100", "FR-011-AC-4")
 def test_each_skeleton_maps_to_a_record_that_validates(
     mapper, schema_registry, path: Path
 ):
@@ -185,7 +204,7 @@ def test_each_skeleton_maps_to_a_record_that_validates(
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
-@pytest.mark.trace("TC-142")
+@pytest.mark.trace("TC-142", "FR-011-AC-4")
 def test_the_golden_record_is_reproduced_exactly(mapper, model: str):
     """The committed record is the contract. There is deliberately no
     regenerate target: a mapping change that alters a record fails here and has
@@ -272,7 +291,7 @@ def test_exactly_one_skeleton_carries_a_properties_section():
         ("⛔ superseded by TC-001", {"marker": "⛔", "note": "superseded by TC-001"}),
     ],
 )
-@pytest.mark.trace("TC-101")
+@pytest.mark.trace("TC-101", "FR-011-AC-5")
 def test_status_splits_marker_from_note(cell: str, expected: dict):
     from support.reference_mapping import parse_status
 
@@ -280,7 +299,7 @@ def test_status_splits_marker_from_note(cell: str, expected: dict):
 
 
 @pytest.mark.parametrize("cell", ["⚠️ partial", "Done", "✅ Complete ⚠️", "partial ✅"])
-@pytest.mark.trace("TC-101")
+@pytest.mark.trace("TC-101", "FR-011-AC-5")
 def test_status_rejects_anything_but_a_leading_declared_marker(cell: str):
     from support.reference_mapping import parse_status
 
@@ -309,7 +328,7 @@ def test_status_rejects_anything_but_a_leading_declared_marker(cell: str):
         ),
     ],
 )
-@pytest.mark.trace("TC-102")
+@pytest.mark.trace("TC-102", "FR-011-AC-6")
 def test_traces_to_expands_both_shorthands(cell: str, expected: dict):
     from support.reference_mapping import parse_traces
 
@@ -319,14 +338,14 @@ def test_traces_to_expands_both_shorthands(cell: str, expected: dict):
 @pytest.mark.parametrize(
     "cell", ["FR-1; FR-2", "", "FR-", "-AC-1", "prose about FR-001"]
 )
-@pytest.mark.trace("TC-102")
+@pytest.mark.trace("TC-102", "FR-011-AC-6")
 def test_traces_to_rejects_the_forms_the_pattern_rejects(cell: str):
     from support.reference_mapping import parse_traces
 
     assert parse_traces(cell) is None
 
 
-@pytest.mark.trace("TC-103", "FR-003-AC-16", "FR-013-AC-9")
+@pytest.mark.trace("TC-103", "FR-003-AC-16", "FR-013-AC-9", "FR-011-AC-7")
 def test_omitted_optional_priority_and_status_yield_no_keys(mapper):
     """CR-018/PLAT-1155: omitted matrix columns produce no synthesized record
     values for priority or tracking status."""
@@ -350,7 +369,7 @@ def test_omitted_optional_priority_and_status_yield_no_keys(mapper):
         assert "status" not in row
 
 
-@pytest.mark.trace("TC-108")
+@pytest.mark.trace("TC-108", "FR-011-AC-12")
 def test_an_escaped_pipe_is_one_cell():
     from support.reference_mapping import split_row
 
@@ -367,7 +386,7 @@ def test_an_escaped_pipe_is_one_cell():
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-109")
+@pytest.mark.trace("TC-109", "FR-011-AC-13")
 def test_a_crlf_copy_maps_to_the_same_record(mapper, path: Path):
     text = path.read_text()
     model = frontmatter(text)["type"]
@@ -379,7 +398,7 @@ def test_a_crlf_copy_maps_to_the_same_record(mapper, path: Path):
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-110")
+@pytest.mark.trace("TC-110", "FR-011-AC-14")
 def test_every_unnamed_frontmatter_key_is_declared_dropped(
     mapper, mappings, path: Path
 ):
@@ -392,7 +411,7 @@ def test_every_unnamed_frontmatter_key_is_declared_dropped(
         ), f"{path.name} drops {key!r} and the mapping does not declare it"
 
 
-@pytest.mark.trace("TC-137")
+@pytest.mark.trace("TC-137", "FR-011-AC-15")
 def test_each_model_agrees_with_its_frontmatter_schema(mappings, manifest):
     """The migration must not replace one pair of drifting declarations with
     another: where a model and a frontmatter schema describe the same key, they
@@ -418,6 +437,8 @@ def test_each_model_agrees_with_its_frontmatter_schema(mappings, manifest):
                 )
             else:
                 target = emitted
+            if declared.get("type") is not None:
+                assert target.get("type") == declared["type"], f"{model}.{prop} type"
             if "pattern" in declared:
                 assert (
                     target.get("pattern") == declared["pattern"]
