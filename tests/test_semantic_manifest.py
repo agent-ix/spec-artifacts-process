@@ -5,6 +5,7 @@ Requirement FR-010.
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -35,7 +36,7 @@ def by_name(entries):
     return {e["name"]: e for e in entries}
 
 
-@pytest.mark.trace("TC-089")
+@pytest.mark.trace("TC-089", "FR-010-AC-1", "FR-010-CON-1")
 def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block):
     assert set(semantic_block) == ADMITTED_SEMANTIC_KEYS
     assert semantic_block["contract_version"] == "1.0.0"
@@ -49,12 +50,17 @@ def test_semantic_block_carries_exactly_the_admitted_keys(semantic_block):
     assert semantic_block["exports"] == artifact_type_names()
 
 
-@pytest.mark.trace("TC-093", "FR-004-AC-1", "FR-004-AC-23")
-def test_the_module_loads_with_every_declared_archetype(quire_engine):
+@pytest.mark.trace("TC-093", "FR-010-AC-5", "FR-004-AC-1", "FR-004-AC-23")
+def test_the_module_loads_with_every_declared_archetype(manifest):
     """A `semantic` key the loader cannot parse empties the whole model silently
-    (agent-ix/quire-rs#221), so the archetype set is compared, not merely counted."""
-    current = quire_engine.Registry.load_from([str(REPO_ROOT)]).archetype_names()
-    assert set(artifact_type_names()) <= set(current)
+    (agent-ix/quire-rs#221), so every declared archetype must resolve through
+    the supported CLI schema interface."""
+    for artifact_type in manifest["artifact_types"]:
+        name = artifact_type["name"]
+        result = run_quire("schema", name)
+        assert result.returncode == 0, result.stderr
+        schema = json.loads(result.stdout)
+        assert schema["archetype"] == name
 
 
 @pytest.mark.trace("TC-152", "FR-010-AC-10")
@@ -138,7 +144,7 @@ def test_an_unknown_key_is_refused(quire_engine, tmp_path):
         "skipped row is not coverage."
     ),
 )
-@pytest.mark.trace("TC-135")
+@pytest.mark.trace("TC-135", "FR-010-AC-9")
 def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
     module = tmp_path / "spec_artifacts_process"
     module.mkdir(parents=True)
@@ -155,7 +161,7 @@ def test_the_refusal_names_the_offending_key(quire_engine, tmp_path, capfd):
     assert "foo" in message
 
 
-@pytest.mark.trace("TC-096")
+@pytest.mark.trace("TC-096", "FR-010-AC-8")
 def test_the_standard_object_type_is_governed_by_its_locator(manifest):
     """`Standard` (artifact type) and `standard` (object type) are two
     declarations. A document is dispatched on frontmatter `type:`, so
@@ -173,31 +179,47 @@ def test_the_standard_object_type_is_governed_by_its_locator(manifest):
     assert standard["data_schema"] == {"schema": "schemas/Standard.json"}
 
 
-@pytest.mark.trace("TC-096")
-def test_the_engine_requires_code_on_a_standard(quire_engine):
+@pytest.mark.trace("TC-096", "FR-010-AC-8")
+def test_the_engine_requires_code_on_a_standard(tmp_path):
     """A Standard with a string `code:` validates; one without it, or with an
-    integer, is refused. Both the artifact type and the object type are run."""
+    integer, is refused. The CLI checks the artifact type and object type."""
 
-    def standard(code_line: str) -> str:
+    def standard(code_line: str, *, object_type: bool = False) -> str:
+        object_line = "object: standard\n" if object_type else ""
         return (
             '---\nid: Standard-201\ntitle: "a standard"\ntype: Standard\n'
-            f"object: standard\n{code_line}---\n"
+            f"{object_line}{code_line}---\n"
             "# Standard-201: a standard\n\n## Description\n\nText.\n"
         )
 
-    for model in ("Standard", "standard"):
-        root = str(REPO_ROOT / "spec_artifacts_process")
-        assert quire_engine.validate_document(model, root, standard("code: abc\n"))[
-            "is_valid"
-        ]
-        assert not quire_engine.validate_document(model, root, standard(""))["is_valid"]
-    root = str(REPO_ROOT / "spec_artifacts_process")
-    assert not quire_engine.validate_document("Standard", root, standard("code: 12\n"))[
-        "is_valid"
-    ]
+    def validate(name: str, code_line: str, *, object_type: bool = False):
+        document = tmp_path / f"{name}.md"
+        document.write_text(standard(code_line, object_type=object_type))
+        return run_quire(
+            "validate",
+            str(document),
+            siblings=("spec-artifacts-iso", "spec-objects-architecture"),
+        )
+
+    artifact_valid = validate("artifact-valid", "code: abc\n")
+    assert artifact_valid.returncode == 0, artifact_valid.stderr
+
+    object_valid = validate("object-valid", "code: abc\n", object_type=True)
+    assert object_valid.returncode == 0, object_valid.stderr
+
+    missing_code = validate("missing-code", "", object_type=True)
+    assert missing_code.returncode != 0
+    diagnostics = missing_code.stdout + missing_code.stderr
+    assert "[Standard]" in diagnostics
+    assert "[standard]" in diagnostics
+    assert "code" in diagnostics
+
+    invalid_code = validate("invalid-code", "code: 12\n")
+    assert invalid_code.returncode != 0
+    assert "code" in invalid_code.stdout + invalid_code.stderr
 
 
-@pytest.mark.trace("TC-128")
+@pytest.mark.trace("TC-128", "FR-010-CON-3")
 def test_the_status_and_type_vocabularies_have_one_source(manifest):
     """CR-015/CR-031 restated: the three literal copies of the test-type
     vocabulary must agree, and the admitted status markers must be exactly the
