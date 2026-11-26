@@ -27,10 +27,10 @@ type: TestMatrix
 | TC-016 | `min_rows` boundary: a `Test Case Summary` with zero data rows fails; exactly one row passes | Unit | P1 | FR-003-AC-2 | ✅ |
 | TC-017 | Contract lands without altering TestMatrix frontmatter schema or other archetypes (manifest diff assertion), and the TestMatrix entry declares `test_cases` as its only extraction: no functional, stakeholder, user-story or non-functional coverage match | Unit | P2 | FR-003-AC-9, FR-003-AC-15 | ✅ |
 | TC-018 | Empty Traces To cell fails via `column_patterns` | Unit | P2 | FR-003-AC-6 | ✅ |
-| TC-019 | Conforming SpecReview doc validates; doc missing the Findings table fails with reason `missing` | Unit | P1 | FR-002-AC-1 | 🚧 |
-| TC-020 | Severity vocabulary permutation: low/medium/high accepted; cell outside fails via `column_choices` (reason `assert`) | Unit | P1 | FR-002-AC-2 | 🚧 |
-| TC-021 | Findings ID shapes: `FND-001` accepted; `FND-`, `fnd-1`, `F-001` fail the `id_pattern` | Unit | P1 | FR-002-AC-3 | 🚧 |
-| TC-022 | Bundled `skeletons/SpecReview.md` is itself a valid SpecReview and ships in the wheel | Unit | P2 | FR-002-AC-4 | 🚧 |
+| TC-019 | Conforming SpecReview doc validates; doc missing the Findings table fails with reason `missing` | Unit | P1 | FR-002-AC-1 | ✅ |
+| TC-020 | Severity vocabulary permutation: low/medium/high accepted; cell outside fails via `column_choices` (reason `assert`) | Unit | P1 | FR-002-AC-2 | ✅ |
+| TC-021 | Findings ID shapes: `FND-001` accepted; `FND-`, `fnd-1`, `F-001` fail the `id_pattern` | Unit | P1 | FR-002-AC-3 | ✅ |
+| TC-022 | Bundled `skeletons/SpecReview.md` is itself a valid SpecReview and ships in the wheel | Integration | P2 | FR-002-AC-4 | ✅ |
 | TC-023 | SpecReview registration leaves the freeform Review archetype unaltered (manifest diff assertion) | Unit | P2 | FR-002-AC-5 | 🚧 |
 | TC-024 | Duplicate `Test ID` rows in the Test Case Summary fail validation | Unit | P2 | FR-003-AC-11 | 🚧 |
 | TC-025 | A Test Case Summary omitting the `Priority` column entirely validates (CR-018) | Unit | P0 | FR-003-AC-10 | ✅ |

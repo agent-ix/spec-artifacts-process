@@ -146,17 +146,30 @@ def _assert_no_fixtures_packaged(names: list[str]) -> None:
 
 
 @pytest.mark.integration
-@pytest.mark.trace("TC-119")
+@pytest.mark.trace("TC-119", "TC-022", "FR-002-AC-4")
 def test_no_fixture_reaches_the_wheel():
-    """No file under `tests/fixtures/` is packaged into the built wheel. Needs
-    no engine — `make build` is Poetry, so this half runs with no `quire` CLI
-    on PATH."""
+    """The valid SpecReview skeleton is included in the wheel, not test fixtures."""
+    result = subprocess.run(
+        [
+            "quire",
+            "validate",
+            "--module",
+            str(PACKAGE_ROOT),
+            str(SKELETONS_DIR / "SpecReview.md"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
     subprocess.run(
         ["make", "build"], cwd=str(REPO_ROOT), check=True, capture_output=True
     )
     wheel = sorted((REPO_ROOT / "dist").glob("*.whl"))[-1]
     with zipfile.ZipFile(wheel) as archive:
         _assert_no_fixtures_packaged(archive.namelist())
+        assert "spec_artifacts_process/skeletons/SpecReview.md" in archive.namelist()
 
 
 def test_the_wheel_fixture_check_can_fail():
