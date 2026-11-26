@@ -1,17 +1,17 @@
 {
-  "body": {
-    "endLine": 26,
-    "startLine": 10,
-    "text": "     - Frontmatter: `type: DossierDocument`; `id` such as DOS-SRS; `title`;\n       `version` for every kind except `records-of-processing`;\n       `document_kind` is srs|architecture|trace-matrix|rmm|verification-report|\n       soup|anomalies|risk-management|risk-management-plan|release-record|\n       threat-model|records-of-processing|vulnerability-management-plan; `generated_by` is\n       `quoin dossier`; `producer_identity` is `{name: quoin, version: <non-empty>}`;\n       `as_of` is an RFC 3339 instant (for example 2026-11-01T00:00:00Z),\n       required for rmm; a source-backed soup list supplies it, while a soup\n       gap document may omit it.\n     - The body is free Markdown. By convention it ends with a level-2 `Gaps`\n       heading listing one bullet per missing input, or `Gaps: none`.\n     -->\n# Software Requirements Specification\n\n## Gaps\n\nGaps: none"
-  },
+  "id": "DOS-SRS",
+  "title": "Software Requirements Specification",
+  "type": "DossierDocument",
+  "version": "1.0",
   "documentKind": "srs",
   "generatedBy": "quoin dossier",
   "producerIdentity": {
     "name": "quoin",
     "version": "0.36.8"
   },
-  "id": "DOS-SRS",
-  "title": "Software Requirements Specification",
-  "type": "DossierDocument",
-  "version": "1.0"
+  "body": {
+    "text": "     - Frontmatter: `type: DossierDocument`; `id` such as DOS-SRS; `title`;\n       `version` for every kind except `records-of-processing`;\n       `document_kind` is srs|architecture|trace-matrix|rmm|verification-report|\n       soup|anomalies|risk-management|risk-management-plan|release-record|\n       threat-model|records-of-processing|vulnerability-management-plan;\n       `generated_by` is\n       `quoin dossier`; `producer_identity` is `{name: quoin, version: <non-empty>}`;\n       `as_of` is an RFC 3339 instant (for example\n       2026-11-01T00:00:00Z), required for rmm; a source-backed soup list\n       supplies it, while a soup gap document may omit it.\n     - The body is free Markdown. By convention it ends with a level-2 `Gaps`\n       heading listing one bullet per missing input, or `Gaps: none`.\n     -->\n# Software Requirements Specification\n\n## Gaps\n\nGaps: none",
+    "startLine": 13,
+    "endLine": 31
+  }
 }

@@ -184,7 +184,7 @@ def test_every_declared_mapping_kind_is_used(mappings, semantic_block):
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-100", "FR-011-AC-4")
+@pytest.mark.trace("TC-100")
 def test_each_skeleton_maps_to_a_record_that_validates(
     mapper, schema_registry, path: Path
 ):
@@ -195,7 +195,6 @@ def test_each_skeleton_maps_to_a_record_that_validates(
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
-@pytest.mark.trace("TC-142", "FR-011-AC-4")
 def test_the_golden_record_is_reproduced_exactly(mapper, model: str):
     """The committed record is the contract. There is deliberately no
     regenerate target: a mapping change that alters a record fails here and has

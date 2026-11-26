@@ -1,75 +1,61 @@
 {
   "id": "TM-001",
+  "title": "Example module test matrix",
+  "type": "TestMatrix",
   "provenance": {
-    "digest": "sha256:a28bbafd5eb825ce95d714766bf9b1ff641cdab949aee67095b51a5a56951b20",
-    "path": "skeletons/TestMatrix.md"
+    "path": "skeletons/TestMatrix.md",
+    "digest": "sha256:703f6017b8281ca8edb866f5339122764d70d1fdc55d585e06837034b4d07256"
   },
   "testCases": [
     {
+      "line": 48,
       "id": "TC-001",
-      "line": 46,
-      "priority": "P0",
-      "status": {
-        "marker": "\u2705"
-      },
       "title": "A matching digest persists the artifact",
+      "type": "Unit",
+      "priority": "P0",
       "tracesTo": {
-        "noTrace": false,
         "tokens": [
           "FR-001-AC-1"
-        ]
-      },
-      "type": "Unit"
+        ],
+        "noTrace": false
+      }
     },
     {
+      "line": 49,
       "id": "TC-002",
-      "line": 47,
-      "priority": "P0",
-      "status": {
-        "marker": "\u2705"
-      },
       "title": "A mismatched digest rejects the import and names both digests",
+      "type": "Unit",
+      "priority": "P0",
       "tracesTo": {
-        "noTrace": false,
         "tokens": [
           "FR-001-AC-2"
-        ]
-      },
-      "type": "Unit"
+        ],
+        "noTrace": false
+      }
     },
     {
+      "line": 50,
       "id": "TC-003",
-      "line": 48,
-      "priority": "P2",
-      "status": {
-        "marker": "\ud83d\udea7",
-        "note": "not yet run at scale"
-      },
       "title": "Import throughput holds at the declared threshold",
+      "type": "Benchmark",
+      "priority": "P2",
       "tracesTo": {
-        "noTrace": false,
         "tokens": [
           "FR-003-AC-1"
-        ]
-      },
-      "type": "Benchmark"
+        ],
+        "noTrace": false
+      }
     },
     {
+      "line": 51,
       "id": "TC-004",
-      "line": 49,
-      "priority": "P1",
-      "status": {
-        "marker": "\u26d4",
-        "note": "superseded by TC-001"
-      },
       "title": "Digest computed before any transform",
+      "type": "Unit",
+      "priority": "P1",
       "tracesTo": {
-        "noTrace": true,
-        "tokens": []
-      },
-      "type": "Unit"
+        "tokens": [],
+        "noTrace": true
+      }
     }
-  ],
-  "title": "Example module test matrix",
-  "type": "TestMatrix"
+  ]
 }

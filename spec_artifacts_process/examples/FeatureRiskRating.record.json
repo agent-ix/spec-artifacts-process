@@ -1,6 +1,6 @@
 {
   "id": "FRR-001",
-  "title": "Quoin validation feature risk rating",
+  "title": "<feature group> risk rating for <intended use>",
   "type": "FeatureRiskRating",
   "scope": "supplier",
   "rating": "not_high_process_risk",
@@ -11,24 +11,24 @@
       "type": "uses_intended_use"
     },
     {
-      "target": "ix://agent-ix/spec-artifacts-process/FR-009",
+      "target": "ix://agent-ix/spec-artifacts-process/FR-024",
       "type": "rates_feature"
     }
   ],
   "provenance": {
-    "path": "examples/FeatureRiskRating.md",
-    "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "path": "skeletons/FeatureRiskRating.md",
+    "digest": "sha256:5ad9b57875eb9771b91620f983be3dee5f61b2dd2fea65ecc862d44a7d96bc4d"
   },
   "rationale": {
-    "text": "The example rating is a human judgment for the stated repository-validation use.",
+    "text": "<Explain why the rating fits this intended use.>",
     "startLine": 17,
-    "endLine": 17
+    "endLine": 19
   },
   "assuranceActivities": [
     {
-      "activity": "Validate representative valid and invalid records.",
-      "acceptanceCriterion": "Invalid records fail with a diagnostic naming the violated contract.",
-      "line": 21
+      "line": 24,
+      "activity": "<Test, inspection, or analysis>",
+      "acceptanceCriterion": "<Criterion addressed>"
     }
   ]
 }

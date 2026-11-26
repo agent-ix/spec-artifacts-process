@@ -1,38 +1,38 @@
 {
   "id": "IU-001",
-  "title": "Quoin intended use",
+  "title": "Intended use of <package>",
   "type": "IntendedUse",
   "tool": "quoin",
   "relationships": [],
   "provenance": {
-    "path": "examples/IntendedUse.md",
-    "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    "path": "skeletons/IntendedUse.md",
+    "digest": "sha256:d18fa682353c1a7a37fb23a279e68c91be6c20c76e2f03ec269844bec6ee8025"
   },
   "purpose": {
-    "text": "Quoin validates declared engineering artifacts and reports structural findings.",
-    "startLine": 5,
-    "endLine": 5
+    "text": "<Describe the package's intended purpose.>",
+    "startLine": 11,
+    "endLine": 13
   },
   "recordsProduced": [
     {
-      "recordKind": "Validation report",
-      "command": "quoin validate",
-      "line": 11
+      "line": 18,
+      "recordKind": "<record kind>",
+      "command": "`<command>`"
     }
   ],
   "whoReliesOnThem": {
-    "text": "Repository maintainers use validation reports to find issues.",
-    "startLine": 14,
-    "endLine": 14
+    "text": "<Name the people and systems that rely on these records.>",
+    "startLine": 21,
+    "endLine": 23
   },
   "limits": {
-    "text": "The tool is not a compliance oracle and does not decide product or clinical safety.",
-    "startLine": 18,
-    "endLine": 18
+    "text": "<State what the tool does not establish. It is not a compliance oracle and does not decide product or clinical safety.>",
+    "startLine": 25,
+    "endLine": 27
   },
   "operatingContext": {
-    "text": "The command reads repository documents and module manifests in a local environment.",
-    "startLine": 22,
-    "endLine": 22
+    "text": "<Describe material inputs, execution environments, external tools, and their versions/configurations.>",
+    "startLine": 29,
+    "endLine": 31
   }
 }
