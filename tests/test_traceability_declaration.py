@@ -248,6 +248,35 @@ def test_one_templated_marker_per_language(traceability: dict) -> None:
         re.compile(marker["pattern"])
 
 
+@pytest.mark.trace(
+    "FR-004-AC-3",
+)
+def test_python_trace_marker_pattern_accepts_black_wrapped_trailing_comma(
+    traceability: dict,
+) -> None:
+    marker = next(
+        form
+        for form in traceability["trace_tags"]["markers"]
+        if form["language"] == "python"
+    )
+    pattern = re.compile(marker["pattern"])
+    wrapped = (
+        "@pytest.mark.trace(\n"
+        '    "FR-004-AC-3",\n'
+        ")\n"
+        "def test_wrapped():\n"
+        "    pass\n"
+    )
+    match = pattern.search(wrapped)
+    assert match is not None
+    assert re.findall(r'"([^"]+)"', match.group(1)) == ["FR-004-AC-3"]
+
+    control = '@pytest.mark.trace("FR-004-AC-3")\ndef test_inline():\n    pass\n'
+    control_match = pattern.search(control)
+    assert control_match is not None
+    assert re.findall(r'"([^"]+)"', control_match.group(1)) == ["FR-004-AC-3"]
+
+
 @pytest.mark.trace("TC-030", "FR-004-AC-3")
 def test_shell_marker_is_a_comment_form_gated_by_entry_paths(
     traceability: dict,
