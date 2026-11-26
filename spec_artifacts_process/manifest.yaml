@@ -1496,7 +1496,7 @@ traceability:
       template: '#[trace({ids})]'
     - name: pytest-trace-marker
       language: python
-      pattern: '@pytest\.mark\.trace\(((?:\s*"[^"]*"\s*,?)+)\)'
+      pattern: '@pytest\.mark\.trace\(((?:\s*"[^"]*"\s*,?)+)\s*\)'
       template: '@pytest.mark.trace({ids})'
     - name: ts-trace-helper
       language: typescript
