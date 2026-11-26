@@ -196,7 +196,7 @@ def test_every_declared_mapping_kind_is_used(mappings, semantic_block):
 @pytest.mark.parametrize(
     "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
 )
-@pytest.mark.trace("TC-100", "FR-011-AC-4")
+@pytest.mark.trace("TC-100", "FR-011-AC-4", "FR-012-AC-3")
 def test_each_skeleton_maps_to_a_record_that_validates(
     mapper, schema_registry, path: Path
 ):
@@ -207,7 +207,7 @@ def test_each_skeleton_maps_to_a_record_that_validates(
 
 
 @pytest.mark.parametrize("model", sorted(artifact_type_names()))
-@pytest.mark.trace("TC-142", "FR-011-AC-4")
+@pytest.mark.trace("TC-142", "FR-011-AC-4", "FR-012-AC-11")
 def test_the_golden_record_is_reproduced_exactly(mapper, model: str):
     """The committed record is the contract. There is deliberately no
     regenerate target: a mapping change that alters a record fails here and has
@@ -232,12 +232,21 @@ def test_kernel_scalar_targets_follow_the_installed_semantic_core_schema(mapper)
         }
 
 
-@pytest.mark.trace("TC-115")
+@pytest.mark.trace("TC-115", "FR-012-AC-5")
 def test_the_two_standard_forms_declare_the_same_fields(mapper):
-    table = build(mapper, "Standard", skeleton("Standard.md"), "skeletons/Standard.md")
-    fence = build(
-        mapper, "Standard", skeleton("Standard.sysml.md"), "skeletons/Standard.md"
-    )
+    standard = skeleton("Standard.md")
+    sysml = skeleton("Standard.sysml.md")
+    table = build(mapper, "Standard", standard, "skeletons/Standard.md")
+    fence = build(mapper, "Standard", sysml, "skeletons/Standard.md")
+    rows = [
+        line
+        for line in standard.splitlines()
+        if line.startswith("|") and not set(line.strip()) <= set("|- ")
+    ]
+    assert rows[0] == "| Field | Type | Multiplicity | Constraints |"
+    assert len(rows) >= 2, "the typed property table has a data row"
+    assert sum(line.strip() == "```ocl" for line in standard.splitlines()) >= 1
+    assert sum(line.strip() == "```sysml" for line in sysml.splitlines()) == 1
     assert table["properties"] == fence["properties"]
     assert table["invariants"] == fence["invariants"]
     properties = {field["name"]: field for field in table["properties"]}
@@ -273,14 +282,43 @@ def test_the_two_standard_forms_declare_the_same_fields(mapper):
     assert table == fence
 
 
-@pytest.mark.trace("TC-141")
-def test_exactly_one_skeleton_carries_a_properties_section():
-    carriers = [
-        p.name
-        for p in sorted(SKELETONS_DIR.glob("*.md"))
-        if any(line.strip() == "## Properties" for line in p.read_text().split("\n"))
-    ]
-    assert carriers == ["Standard.md", "Standard.sysml.md"]
+@pytest.mark.trace("TC-141", "FR-012-AC-10")
+def test_standard_forms_and_other_archetypes_keep_their_required_structure(manifest):
+    standard = skeleton("Standard.md")
+    standard_lines = standard.splitlines()
+    properties_heading = next(
+        index
+        for index, line in enumerate(standard_lines)
+        if line.strip() == "## Properties"
+    )
+    next_heading = next(
+        (
+            index
+            for index in range(properties_heading + 1, len(standard_lines))
+            if standard_lines[index].startswith("## ")
+        ),
+        len(standard_lines),
+    )
+    assert (
+        "| Field | Type | Multiplicity | Constraints |"
+        in standard_lines[properties_heading + 1 : next_heading]
+    )
+    sysml = skeleton("Standard.sysml.md")
+    assert any(line.strip() == "## Properties" for line in sysml.splitlines())
+    assert sum(line.strip() == "```sysml" for line in sysml.splitlines()) == 1
+    for artifact_type in manifest["artifact_types"]:
+        if artifact_type["name"] == "Standard":
+            continue
+        locators = (
+            (artifact_type.get("body_extraction") or {}).get("yield_pattern") or {}
+        ).get("match") or {}
+        for locator_name, locator in locators.items():
+            heading = locator.get("under_section") or locator.get("after_heading")
+            if locator_name in {"properties", "invariants"} or heading in {
+                "Properties",
+                "Invariants",
+            }:
+                assert locator.get("required") is not True
 
 
 @pytest.mark.parametrize(

@@ -40,7 +40,7 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 
 ## Behavior
 
-- Every declared artifact type SHALL have exactly one skeleton at
+- Every declared artifact type SHALL have a skeleton at its canonical path,
   `spec_artifacts_process/skeletons/<Type>.md`.
 - Every skeleton SHALL carry frontmatter its type's `frontmatter_schema_ref` accepts, including a
   `type:` equal to the artifact type name.
@@ -51,12 +51,12 @@ states, so that a skeleton is an executable fixture rather than an example nothi
   zero error findings.
 - The record the FR-011 mapping builds from every skeleton SHALL validate against that type's
   emitted schema.
-- Exactly one skeleton — `Standard.md` — SHALL carry a `## Properties` section, and no other
-  skeleton SHALL carry one. The reason is that a Standard
-  declares the properties a conforming artifact carries and the invariants conformance requires,
-  and the other eleven types declare process content rather than a typed structure. Introducing a
-  `## Properties` section on a type whose documents do not carry one would be a new required form
-  for every consuming repository.
+- `Standard.md` SHALL carry a `## Properties` typed table. `Standard.sysml.md` SHALL carry the
+  alternate `sysml` declaration in its own `## Properties` section. A Standard declares the
+  properties a conforming artifact carries and the invariants conformance requires.
+- No archetype other than `Standard` SHALL require a `Properties` or `Invariants` body locator.
+  Those structures describe the Standard itself; making them required on another archetype would
+  impose a new document form on its consuming repositories.
 - The module SHALL author each golden record from its skeleton and validate it against its emitted
   schema, never producing it by recording whatever the reference mapping happened to output. A
   blessed output is a snapshot of the mapping's bugs, and the golden record exists precisely to
@@ -97,22 +97,22 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 |----|------------|------|------------|
 | FR-012-CON-1 | A skeleton SHALL contain no placeholder that its own archetype rejects; the shipped bytes are the fixture. | Integrity | Test |
 | FR-012-CON-2 | Adding a skeleton SHALL NOT add a required section, a required column, or a vocabulary member to any archetype. | Compatibility | Test |
-| FR-012-CON-3 | Negative fixtures SHALL live under `tests/fixtures/negative/` only, never in the shipped payload. | Packaging | Test |
+| FR-012-CON-3 | Each canonical negative fixture for an FR-012 rejection case SHALL reside under `tests/fixtures/negative/` and outside shipped package contents. | Packaging | Test |
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-012-AC-1 | `spec_artifacts_process/skeletons/` holds exactly one `<Type>.md` for each of the twelve declared artifact types, plus `Standard.sysml.md`. | Test (TC-111) |
-| FR-012-AC-2 | Every skeleton validates against its own archetype through Quire with zero error findings. | Test (TC-112) |
+| FR-012-AC-1 | A `<Type>.md` skeleton exists at the canonical path for each of the twelve declared artifact types, and `Standard.sysml.md` exists as the alternate Standard form. | Test (TC-111) |
+| FR-012-AC-2 | Every canonical skeleton path named by FR-012-AC-1 validates against its own archetype through Quire with zero error findings. | Test (TC-112) |
 | FR-012-AC-3 | For every skeleton, the FR-011 reference mapping builds a record that validates against that type's emitted schema. | Test (TC-113) |
 | FR-012-AC-4 | Every section each type's `body_extraction` marks required is present in that type's skeleton, and every asserted table in a skeleton satisfies its locator's asserts. | Test (TC-114) |
 | FR-012-AC-5 | `Standard.md` carries the typed `## Properties` table and at least one `ocl` clause; `Standard.sysml.md` declares the same fields in one `sysml` fence, and the two map to records that differ in no property. | Test (TC-115) |
 | FR-012-AC-6 | The `Standard` archetype's added `properties` and `invariants` locators are both `required: false`, and a Standard document carrying neither section still validates. | Test (TC-116) |
 | FR-012-AC-7 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and no negative fixture passes. | Test (TC-117) |
-| FR-012-AC-8 | The negative set covers each of the eleven stated rejections, one fixture per rejection. | Test (TC-118) |
+| FR-012-AC-8 | Each of the eleven stated rejection cases has its named negative fixture, which declares and produces that case's rejection reason. | Test (TC-118) |
 | FR-012-AC-9 | No file under `tests/fixtures/` is in the wheel, the sdist, or the staged npm tree, and `quire coverage` over this repository mints no id from it. | Integration (TC-119) |
-| FR-012-AC-10 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md`. | Test (TC-141) |
+| FR-012-AC-10 | `Standard.md` carries the typed table under `## Properties`, and `Standard.sysml.md` carries the alternate declaration as a `sysml` fence; other archetypes do not require `Properties` or `Invariants` locators. | Test (TC-141) |
 | FR-012-AC-11 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than rewriting it. | Test (TC-142) |
 
 ## Dependencies

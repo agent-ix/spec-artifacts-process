@@ -13,14 +13,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from conftest import NEGATIVE_DIR, SKELETONS_DIR, frontmatter
+from conftest import NEGATIVE_DIR, REPO_ROOT, SKELETONS_DIR, frontmatter
 from support.reference_mapping import MappingFailure
 
-NEGATIVES = sorted(NEGATIVE_DIR.glob("*.md"))
-
 # Every rejection FR-012 requires the corpus to cover, and the fixture that
-# covers it. The map is asserted whole (TC-118) so a rejection cannot lose its
-# fixture silently.
+# covers it. These cases are listed explicitly so the checks do not discover
+# fixtures by scanning the directory.
 REQUIRED_REJECTIONS = {
     "missing": "specreview-missing-findings.md",
     "min-rows": "specreview-zero-rows.md",
@@ -34,6 +32,9 @@ REQUIRED_REJECTIONS = {
     "orphan-fence": "standard-clause-without-fence.md",
     "clause-id": "standard-clause-id-not-identifier.md",
 }
+ADDITIONAL_NEGATIVE_FIXTURES = ("inspections-bad-verdict.md",)
+NEGATIVE_FILENAMES = tuple(REQUIRED_REJECTIONS.values()) + ADDITIONAL_NEGATIVE_FIXTURES
+NEGATIVES = tuple(NEGATIVE_DIR / name for name in NEGATIVE_FILENAMES)
 
 
 def run(mapper, path: Path):
@@ -46,7 +47,7 @@ def run(mapper, path: Path):
 
 
 @pytest.mark.parametrize("path", NEGATIVES, ids=lambda p: p.name)
-@pytest.mark.trace("TC-117", "FR-011-AC-8")
+@pytest.mark.trace("TC-117", "FR-011-AC-8", "FR-012-AC-7")
 def test_each_negative_fails_exactly_the_check_it_names(mapper, path: Path):
     front = frontmatter(path.read_text())
     assert front["expect"].startswith(
@@ -56,25 +57,36 @@ def test_each_negative_fails_exactly_the_check_it_names(mapper, path: Path):
     expected = front["expect"].split(".", 1)[1]
     with pytest.raises(MappingFailure) as raised:
         run(mapper, path)
-    assert (
-        expected in raised.value.reasons
-    ), f"{path.name} expects {expected!r} and reported {raised.value.reasons}"
+    assert raised.value.reasons == [
+        expected
+    ], f"{path.name} expects only {expected!r}, got {raised.value.reasons}"
 
 
-@pytest.mark.trace("TC-118")
-def test_the_negative_corpus_covers_every_stated_rejection():
-    present = {p.name for p in NEGATIVES}
-    assert (
-        set(REQUIRED_REJECTIONS.values()) <= present
-    ), f"missing fixtures: {sorted(set(REQUIRED_REJECTIONS.values()) - present)}"
-    reasons = {frontmatter(p.read_text())["expect"].split(".", 1)[1] for p in NEGATIVES}
-    assert (
-        set(REQUIRED_REJECTIONS) <= reasons
-    ), f"uncovered rejections: {sorted(set(REQUIRED_REJECTIONS) - reasons)}"
+@pytest.mark.parametrize(
+    ("expected", "filename"),
+    REQUIRED_REJECTIONS.items(),
+    ids=list(REQUIRED_REJECTIONS),
+)
+@pytest.mark.trace("TC-118", "FR-012-AC-8")
+def test_each_stated_rejection_has_its_named_fixture(mapper, expected, filename):
+    path = NEGATIVE_DIR / filename
+    front = frontmatter(path.read_text())
+    assert front["expect"] == f"mapping.{expected}"
+    assert front["because"].strip()
+    with pytest.raises(MappingFailure) as raised:
+        run(mapper, path)
+    assert raised.value.reasons == [expected]
+
+
+@pytest.mark.parametrize("filename", NEGATIVE_FILENAMES)
+@pytest.mark.trace("FR-012-CON-3")
+def test_named_negative_fixture_uses_the_test_fixture_path(filename):
+    assert NEGATIVE_DIR.relative_to(REPO_ROOT).as_posix() == "tests/fixtures/negative"
+    assert (NEGATIVE_DIR / filename).is_file()
 
 
 @pytest.mark.parametrize("path", NEGATIVES, ids=lambda p: p.name)
-@pytest.mark.trace("TC-117")
+@pytest.mark.trace("TC-117", "FR-012-AC-7")
 def test_no_negative_fixture_passes(mapper, path: Path):
     with pytest.raises(MappingFailure):
         run(mapper, path)
