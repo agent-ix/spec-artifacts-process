@@ -66,4 +66,4 @@ def test_spec_review_finding_id_pattern_is_enforced(tmp_path: Path) -> None:
         result = validate_text(tmp_path, example.replace("FND-001", invalid_id, 1))
         output = result.stdout + result.stderr
         assert result.returncode != 0, f"{invalid_id} must fail the findings id pattern"
-        assert "[assert]" in output and "ID" in output, output
+        assert "[assert]" in output and "does not match pattern" in output, output
