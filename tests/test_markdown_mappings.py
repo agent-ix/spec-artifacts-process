@@ -283,7 +283,7 @@ def test_the_two_standard_forms_declare_the_same_fields(mapper):
 
 
 @pytest.mark.trace("TC-141", "FR-012-AC-10")
-def test_standard_forms_use_their_declared_properties_syntax():
+def test_standard_forms_and_other_archetypes_keep_their_required_structure(manifest):
     standard = skeleton("Standard.md")
     standard_lines = standard.splitlines()
     properties_heading = next(
@@ -306,6 +306,19 @@ def test_standard_forms_use_their_declared_properties_syntax():
     sysml = skeleton("Standard.sysml.md")
     assert any(line.strip() == "## Properties" for line in sysml.splitlines())
     assert sum(line.strip() == "```sysml" for line in sysml.splitlines()) == 1
+    for artifact_type in manifest["artifact_types"]:
+        if artifact_type["name"] == "Standard":
+            continue
+        locators = (
+            (artifact_type.get("body_extraction") or {}).get("yield_pattern") or {}
+        ).get("match") or {}
+        for locator_name, locator in locators.items():
+            heading = locator.get("under_section") or locator.get("after_heading")
+            if locator_name in {"properties", "invariants"} or heading in {
+                "Properties",
+                "Invariants",
+            }:
+                assert locator.get("required") is not True
 
 
 @pytest.mark.parametrize(

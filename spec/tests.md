@@ -105,7 +105,7 @@ type: TestMatrix
 | TC-109 | A CRLF copy of a skeleton produces the same record as its LF original | Unit | P1 | FR-011-AC-13 | ✅ |
 | TC-110 | Every frontmatter key a model does not declare is listed in that model's dropped key set | Unit | P1 | FR-011-AC-14 | ✅ |
 | TC-111 | A `<Type>.md` skeleton exists at the canonical path for every declared type; `Standard.sysml.md` exists as the alternate Standard form | Unit | P0 | FR-012-AC-1 | ✅ |
-| TC-112 | Every skeleton validates against its own archetype through Quire with zero error findings | Integration | P0 | FR-012-AC-2, FR-012-CON-1 | ✅ |
+| TC-112 | Every canonical skeleton path named in TC-111 validates against its own archetype through Quire with zero error findings | Integration | P0 | FR-012-AC-2, FR-012-CON-1 | ✅ |
 | TC-113 | For every skeleton the reference mapping builds a record that validates against its emitted schema | Unit | P0 | FR-012-AC-3 | ✅ |
 | TC-114 | Every required section is present in its type's skeleton and every asserted table satisfies its locator's asserts | Unit | P0 | FR-012-AC-4 | ✅ |
 | TC-115 | `Standard.md` carries the typed `## Properties` table and an `ocl` clause; `Standard.sysml.md` declares the same fields in one `sysml` fence, and the two records differ in no property | Unit | P0 | FR-012-AC-5 | ✅ |
@@ -126,7 +126,7 @@ type: TestMatrix
 | TC-138 | The mapping totality walk visits every reachable schema and terminates when a reference cycle is present | Unit | P1 | FR-011-AC-16 | ✅ |
 | TC-139 | Two rows sharing an id in different tables of one document are accepted; two in the same table are not | Unit | P1 | FR-011-AC-17 | ✅ |
 | TC-140 | Every mapping kind named in `semantic.mappings` is used by at least one model property — no kind is declared aspirationally | Unit | P0 | FR-011-AC-18 | ✅ |
-| TC-141 | `Standard.md` carries the typed table under `## Properties`; `Standard.sysml.md` carries the alternate declaration in a `sysml` fence | Unit | P1 | FR-012-AC-10 | ✅ |
+| TC-141 | `Standard.md` carries the typed table; `Standard.sysml.md` carries the alternate `sysml` fence; other archetypes do not require `Properties` or `Invariants` locators | Unit | P1 | FR-012-AC-10 | ✅ |
 | TC-142 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than regenerating it | Unit | P0 | FR-012-AC-11 | ✅ |
 | TC-143 | A reviewer has read every emitted model's property documentation and recorded that none means a run outcome under a different name — a judgement recorded as an inspection, never presented as a test | Inspection | P1 | FR-013-AC-8 | ✅ recorded in reviews/26-09-04-semantic-module-contract-code-review.md |
 | TC-147 | `interface-acceptance-criterion` declares `required: false`, so a corpus with no `interface` documents and an `interface` document with no Acceptance Criteria section raise no missing-target finding; a section that is present still mints and binds `interface_NNN-AC-N` through every form an `FR`/`NFR` acceptance-criterion id already binds through — `traces-to`, `inspection-obligation`, the TestMatrix `Traces To` column, the declared `implements` forms, and the new `interface-verification` document reference | Unit | P0 | FR-004-AC-19 | ✅ |

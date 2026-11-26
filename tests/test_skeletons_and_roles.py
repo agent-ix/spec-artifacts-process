@@ -109,12 +109,15 @@ def test_each_declared_type_has_its_canonical_skeleton():
 
 
 @pytest.mark.parametrize(
-    "path", sorted(SKELETONS_DIR.glob("*.md")), ids=lambda p: p.name
+    "model",
+    [*sorted(artifact_type_names()), "Standard.sysml"],
+    ids=lambda model: f"{model}.md",
 )
 @pytest.mark.trace("TC-112", "FR-012-AC-2", "FR-012-AC-4", "FR-012-CON-1")
-def test_every_skeleton_validates_against_its_own_archetype(path: Path):
+def test_every_skeleton_validates_against_its_own_archetype(model: str):
     """A skeleton that does not validate sends every author who copies it into a
     failure, which is why this runs the engine rather than re-reading the YAML."""
+    path = SKELETONS_DIR / f"{model}.md"
     model = frontmatter(path.read_text())["type"]
     result = validate_with_quire_cli(model, path.read_text())
     assert result.returncode == 0, result.stdout + result.stderr

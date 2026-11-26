@@ -52,11 +52,11 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 - The record the FR-011 mapping builds from every skeleton SHALL validate against that type's
   emitted schema.
 - `Standard.md` SHALL carry a `## Properties` typed table. `Standard.sysml.md` SHALL carry the
-  alternate `sysml` declaration in its own `## Properties` section. The reason is that a Standard
-  declares the properties a conforming artifact carries and the invariants conformance requires,
-  and the other eleven types declare process content rather than a typed structure. Introducing a
-  `## Properties` section on a type whose documents do not carry one would be a new required form
-  for every consuming repository.
+  alternate `sysml` declaration in its own `## Properties` section. A Standard declares the
+  properties a conforming artifact carries and the invariants conformance requires.
+- No archetype other than `Standard` SHALL require a `Properties` or `Invariants` body locator.
+  Those structures describe the Standard itself; making them required on another archetype would
+  impose a new document form on its consuming repositories.
 - The module SHALL author each golden record from its skeleton and validate it against its emitted
   schema, never producing it by recording whatever the reference mapping happened to output. A
   blessed output is a snapshot of the mapping's bugs, and the golden record exists precisely to
@@ -104,7 +104,7 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-012-AC-1 | A `<Type>.md` skeleton exists at the canonical path for each of the twelve declared artifact types, and `Standard.sysml.md` exists as the alternate Standard form. | Test (TC-111) |
-| FR-012-AC-2 | Every skeleton validates against its own archetype through Quire with zero error findings. | Test (TC-112) |
+| FR-012-AC-2 | Every canonical skeleton path named by FR-012-AC-1 validates against its own archetype through Quire with zero error findings. | Test (TC-112) |
 | FR-012-AC-3 | For every skeleton, the FR-011 reference mapping builds a record that validates against that type's emitted schema. | Test (TC-113) |
 | FR-012-AC-4 | Every section each type's `body_extraction` marks required is present in that type's skeleton, and every asserted table in a skeleton satisfies its locator's asserts. | Test (TC-114) |
 | FR-012-AC-5 | `Standard.md` carries the typed `## Properties` table and at least one `ocl` clause; `Standard.sysml.md` declares the same fields in one `sysml` fence, and the two map to records that differ in no property. | Test (TC-115) |
@@ -112,7 +112,7 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 | FR-012-AC-7 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and no negative fixture passes. | Test (TC-117) |
 | FR-012-AC-8 | Each of the eleven stated rejection cases has its named negative fixture, which declares and produces that case's rejection reason. | Test (TC-118) |
 | FR-012-AC-9 | No file under `tests/fixtures/` is in the wheel, the sdist, or the staged npm tree, and `quire coverage` over this repository mints no id from it. | Integration (TC-119) |
-| FR-012-AC-10 | `Standard.md` carries the typed table under `## Properties`, and `Standard.sysml.md` carries the alternate declaration as a `sysml` fence. | Test (TC-141) |
+| FR-012-AC-10 | `Standard.md` carries the typed table under `## Properties`, and `Standard.sysml.md` carries the alternate declaration as a `sysml` fence; other archetypes do not require `Properties` or `Invariants` locators. | Test (TC-141) |
 | FR-012-AC-11 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than rewriting it. | Test (TC-142) |
 
 ## Dependencies
