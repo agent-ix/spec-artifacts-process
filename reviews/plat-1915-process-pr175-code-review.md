@@ -76,3 +76,28 @@ This PR changes no production code. No production gap analysis or Rust/React lan
 ## Related Code Checked
 
 The changed assertions are confined to the test oracle. I checked the changed trace markers in `tests/test_mapping_failures.py`, `tests/test_markdown_mappings.py`, and `tests/test_semantic_manifest.py`; no source function implementing these criteria changed. No dependency revision moved.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The fix computes the shipped graph's reachable closure independently to a fixed point and asserts equality with the traversal result; the explicit cycle input remains. |
+
+### FND-001 after excerpt
+
+```python
+    actual = walk(roots, edges)
+    expected = set(roots)
+    while True:
+        expanded = expected | {
+            child for name in expected for child in edges.get(name, set())
+        }
+        if expanded == expected:
+            break
+        expected = expanded
+    assert (
+        actual == expected
+    ), f"unvisited={sorted(expected - actual)} unexpected={sorted(actual - expected)}"
+    cycle = {"CycleA.json": {"CycleB.json"}, "CycleB.json": {"CycleA.json"}}
+    assert walk(["CycleA.json"], cycle) == set(cycle)
+```
