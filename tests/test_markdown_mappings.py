@@ -124,7 +124,19 @@ def test_the_totality_walk_traverses_shipped_models_and_stops_at_cycles(mappings
         return seen
 
     roots = [f"{model}.json" for model in mappings["models"]]
-    assert walk(roots, edges) >= set(roots)
+    assert set(roots) <= schemas
+    actual = walk(roots, edges)
+    expected = set(roots)
+    while True:
+        expanded = expected | {
+            child for name in expected for child in edges.get(name, set())
+        }
+        if expanded == expected:
+            break
+        expected = expanded
+    assert (
+        actual == expected
+    ), f"unvisited={sorted(expected - actual)} unexpected={sorted(actual - expected)}"
     cycle = {"CycleA.json": {"CycleB.json"}, "CycleB.json": {"CycleA.json"}}
     assert walk(["CycleA.json"], cycle) == set(cycle)
 
