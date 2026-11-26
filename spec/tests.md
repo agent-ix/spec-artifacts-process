@@ -230,6 +230,7 @@ type: TestMatrix
 | TC-247 | A `threat-model` dossier validates without `as_of`; the emitted record schema accepts the kind without `asOf`; the record-kind enum includes `threat-model`. | Unit | P1 | FR-018-AC-17 | ✅ |
 | TC-248 | The `ADR` `allowed_links` lists `segregates_for_requirement` with exactly the targets `FR` and `NFR`, does not list `requirement_segregated_by`, and keeps `realizes_requirement`. | Unit | P1 | FR-019-AC-1, FR-019-AC-2, FR-019-AC-3 | ✅ |
 | TC-249 | `quire validate` of an `ADR` that authors `segregates_for_requirement` toward a requirement reports no `disallowed-edge-type` finding. | Unit | P1 | FR-019-AC-4 | ✅ |
+| TC-250 | The trace-tag declaration contains only the supported marker, implements, and formalizes lists | Unit | P1 | FR-004-AC-41 | ✅ |
 
 ## Option Permutation Matrix
 

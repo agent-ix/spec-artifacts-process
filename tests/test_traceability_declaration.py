@@ -1274,3 +1274,25 @@ def test_formalizes_is_the_only_list_holding_qsl_forms(traceability: dict) -> No
         f["name"] for key in ("markers", "implements", "formalizes") for f in tags[key]
     ]
     assert len(names) == len(set(names))
+
+
+class TestSupportedTraceTagDeclarations:
+    """The module declares only trace-tag fields supported by Quire."""
+
+    @pytest.mark.trace("TC-250", "FR-004-AC-41")
+    def test_trace_tags_have_only_supported_lists(self, traceability: dict) -> None:
+        """A current Quire manifest has no retired trace-tag fields.
+
+        Assumptions:
+          - The fixture is the checked-in module's traceability declaration.
+          - Quire recognizes markers, implements, and formalizes as trace-tag lists.
+
+        Criteria:
+          - Each supported list is present.
+          - No unsupported or retired trace-tag field is present.
+        """
+        assert set(traceability["trace_tags"]) == {
+            "markers",
+            "implements",
+            "formalizes",
+        }
