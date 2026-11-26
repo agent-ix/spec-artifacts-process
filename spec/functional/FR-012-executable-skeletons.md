@@ -51,8 +51,9 @@ states, so that a skeleton is an executable fixture rather than an example nothi
   zero error findings.
 - The record the FR-011 mapping builds from every skeleton SHALL validate against that type's
   emitted schema.
-- Exactly one skeleton — `Standard.md` — SHALL carry a `## Properties` section, and no other
-  skeleton SHALL carry one. The reason is that a Standard
+- Exactly one skeleton — `Standard.md` — SHALL carry a `## Properties` typed table, and no other
+  skeleton SHALL carry that table. `Standard.sysml.md` carries the alternate `sysml` declaration
+  in its own `## Properties` section. The reason is that a Standard
   declares the properties a conforming artifact carries and the invariants conformance requires,
   and the other eleven types declare process content rather than a typed structure. Introducing a
   `## Properties` section on a type whose documents do not carry one would be a new required form
@@ -112,7 +113,7 @@ states, so that a skeleton is an executable fixture rather than an example nothi
 | FR-012-AC-7 | Every negative fixture fails exactly the check its `expect:` frontmatter names, and no negative fixture passes. | Test (TC-117) |
 | FR-012-AC-8 | The negative set covers each of the eleven stated rejections, one fixture per rejection. | Test (TC-118) |
 | FR-012-AC-9 | No file under `tests/fixtures/` is in the wheel, the sdist, or the staged npm tree, and `quire coverage` over this repository mints no id from it. | Integration (TC-119) |
-| FR-012-AC-10 | Exactly one skeleton carries a `## Properties` section, and it is `Standard.md`. | Test (TC-141) |
+| FR-012-AC-10 | Exactly one skeleton carries a typed table under `## Properties`, and it is `Standard.md`; `Standard.sysml.md` carries the alternate declaration as a `sysml` fence. | Test (TC-141) |
 | FR-012-AC-11 | Each golden record is authored beside its skeleton and the reference mapping reproduces it; a mapping change that alters a record fails rather than rewriting it. | Test (TC-142) |
 
 ## Dependencies
