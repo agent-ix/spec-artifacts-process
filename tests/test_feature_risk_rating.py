@@ -13,6 +13,7 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     SKELETONS_DIR,
+    diagnostics,
     quire_validate,
     run_quire,
 )
@@ -341,9 +342,9 @@ class TestFeatureRiskRating:
             if edge["type"] != "uses_intended_use"
         ]
         foreign = rating("supplier", "rates_feature")
-        foreign["relationships"][0]["target"] = (
-            "ix://agent-ix/spec-artifacts-process/FR-024"
-        )
+        foreign["relationships"][0][
+            "target"
+        ] = "ix://agent-ix/spec-artifacts-process/FR-024"
         duplicate = rating("supplier", "rates_feature")
         duplicate["relationships"].insert(1, duplicate["relationships"][0].copy())
 
@@ -417,7 +418,9 @@ class TestFeatureRiskRating:
         validator = Draft202012Validator(frontmatter_schema(schema_name))
         assert list(validator.iter_errors(document))
 
-    @pytest.mark.trace("FR-025-AC-6", "FR-025-AC-7", "FR-025-AC-14", "NFR-003-AC-1")
+    @pytest.mark.trace(
+        "FR-025-AC-6", "FR-025-AC-7", "FR-025-AC-14", "NFR-003-AC-1", "NFR-003-M-1"
+    )
     def test_rating_is_human_authored_without_computed_fields(self) -> None:
         """Keep risk values person-authored and reject undeclared fields.
 
@@ -427,7 +430,7 @@ class TestFeatureRiskRating:
             Rating has no default, computed-risk fields are absent, and extra
             properties are rejected.
 
-        Trace: FR-025-AC-6, FR-025-AC-7, NFR-003-AC-1
+        Trace: FR-025-AC-6, FR-025-AC-7, NFR-003-AC-1, NFR-003-M-1
         """
         schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
         assert "default" not in schema["properties"]["rating"]
@@ -440,6 +443,35 @@ class TestFeatureRiskRating:
             "product_criticality",
             "software_safety_class",
             "risk_acceptability",
+        }
+        mappings = load_yaml_strict(
+            (REPO_ROOT / "spec_artifacts_process/mappings.yaml").read_text()
+        )
+        rating_mapping = mappings["models"]["FeatureRiskRating"]["properties"]
+        assert set(rating_mapping) == {
+            "id",
+            "title",
+            "type",
+            "scope",
+            "rating",
+            "status",
+            "ratedBy",
+            "intendedUse",
+            "relationships",
+            "provenance",
+            "rationale",
+            "assuranceActivities",
+        }
+        assert "riskScore" not in rating_mapping
+        artifact = next(
+            item
+            for item in load_yaml_strict(MANIFEST_PATH.read_text())["artifact_types"]
+            if item["name"] == "FeatureRiskRating"
+        )
+        assert artifact["lint_rules_ref"] == []
+        assert set(artifact["body_extraction"]["yield_pattern"]["match"]) == {
+            "rationale",
+            "assurance_activities",
         }
         record_schema = json.loads((SCHEMAS_DIR / "FeatureRiskRating.json").read_text())
         assert "featureAssessments" not in record_schema["properties"]
@@ -612,7 +644,8 @@ class TestFeatureRiskRating:
         )
         adopter = (
             adopter.replace(
-                "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n    type: uses_intended_use\n",
+                "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n"
+                "    type: uses_intended_use\n",
                 "",
             )
             .replace(
@@ -671,7 +704,8 @@ class TestFeatureRiskRating:
         """
         valid = (EXAMPLES_DIR / "IntendedUse.md").read_text()
         missing_section = valid.replace(
-            "## Limits\n\nThe tool is not a compliance oracle and does not decide product or clinical safety.\n\n",
+            "## Limits\n\nThe tool is not a compliance oracle and does not "
+            "decide product or clinical safety.\n\n",
             "",
         )
         missing_path = tmp_path / "missing-limits.md"
@@ -777,7 +811,8 @@ class TestFeatureRiskRating:
             "scope: adopter\nintended_use: Integrator production context",
         )
         adopter_text = adopter_text.replace(
-            "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n    type: uses_intended_use\n",
+            "  - target: ix://agent-ix/spec-artifacts-process/IU-001\n"
+            "    type: uses_intended_use\n",
             "",
         ).replace(
             "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
@@ -786,7 +821,8 @@ class TestFeatureRiskRating:
         adopter_text = adopter_text.replace(
             "rating: not_high_process_risk", "rating: high_process_risk"
         ).replace(
-            "The named reviewer selected this rating for the stated repository-validation use.",
+            "The named reviewer selected this rating for the stated "
+            "repository-validation use.",
             "The adopter reviewer selected a different rating for its integration use.",
         )
         supplier_path = tmp_path / "supplier.md"
@@ -802,19 +838,38 @@ class TestFeatureRiskRating:
         assert "rating: not_high_process_risk" in supplier_path.read_text()
         assert "rating: high_process_risk" in adopter_path.read_text()
 
-    @pytest.mark.trace(
-        "FR-024-AC-7",
-        "FR-026-AC-7",
-        "FR-026-AC-8",
-        "FR-026-AC-9",
-        "FR-026-AC-10",
-        "FR-026-AC-11",
-        "FR-026-AC-12",
-        "FR-026-AC-13",
-        "FR-026-AC-14",
-        "FR-026-AC-15",
-        "FR-026-AC-16",
-    )
+    @pytest.mark.trace("FR-026-AC-3")
+    def test_a_feature_rating_to_an_intended_use_is_a_target_kind_mismatch(
+        self, tmp_path: Path
+    ) -> None:
+        """Reject a `rates_feature` edge that resolves to an IntendedUse.
+
+        Assumptions:
+            The rating otherwise validates and IU-001 exists in the same corpus.
+        Criteria:
+            Quire identifies the relationship's target kind as invalid.
+
+        Trace: FR-026-AC-3
+        """
+        rating_path = tmp_path / "FRR-001.md"
+        rating_path.write_text(
+            (EXAMPLES_DIR / "FeatureRiskRating.md")
+            .read_text()
+            .replace(
+                "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
+                "ix://agent-ix/spec-artifacts-process/IU-001\n    type: rates_feature",
+            )
+        )
+        intended_use = tmp_path / "IU-001.md"
+        intended_use.write_text((EXAMPLES_DIR / "IntendedUse.md").read_text())
+
+        result = quire_validate(rating_path, intended_use, scope=tmp_path)
+        found = diagnostics(result)
+        assert result.returncode != 0, result.stdout
+        assert len(found) == 1, result.stderr
+        assert "target-kind-mismatch" in found[0], found
+        assert "IU-001" in found[0], found
+
     def test_ratings_command_contract_names_output_and_failure_behavior(self) -> None:
         """Keep the ratings command contract explicit for its Quoin owner.
 
@@ -825,7 +880,6 @@ class TestFeatureRiskRating:
             Command, human output, JSON envelope, unreadable diagnostics,
             duplicate failure and read-only behavior remain specified.
 
-        Trace: FR-024-AC-7, FR-026-AC-7, FR-026-AC-8, FR-026-AC-9, FR-026-AC-10, FR-026-AC-11, FR-026-AC-12, FR-026-AC-13, FR-026-AC-14, FR-026-AC-15, FR-026-AC-16
         """
         spec = "\n".join(
             (REPO_ROOT / f"spec/functional/{name}").read_text()
@@ -855,12 +909,12 @@ class TestFeatureRiskRating:
             "The command SHALL order each `rating_ids` array lexically by rating id.",
             "An unreadable input SHALL make the result partial.",
             "A partial result due to unreadable input SHALL exit with status 1.",
-            "A partial result due to duplicate supplier ratings SHALL exit with status 1.",
-            "A duplicate supplier rating identifies the FR and every conflicting rating id and exits with status 1.",
+            "A partial result due to duplicate supplier ratings SHALL exit "
+            "with status 1.",
+            "A duplicate supplier rating identifies the FR and every "
+            "conflicting rating id and exits with status 1.",
             "A `rated_more_than_once` status",
             "A missing or non-directory `DIR/spec/` returns a command error",
-            "Quoin [FR-217](ix://agent-ix/quoin/FR-217) SHALL produce the validation report containing external tool versions.",
-            "Quoin [FR-220](ix://agent-ix/quoin/FR-220) SHALL define the external-tools configuration index referenced by that report.",
         ):
             assert contract in spec
 
@@ -881,6 +935,9 @@ class TestFeatureRiskRating:
         acceptance_spec = (
             REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
         ).read_text()
+        intended_use_spec = (
+            REPO_ROOT / "spec/functional/FR-024-intended-use-archetype.md"
+        ).read_text()
         assert (
             "| FR-027-AC-13 | The Quoin validation report identifies the versions "
             "of external tools and references their FR-220 configuration-index "
@@ -888,8 +945,13 @@ class TestFeatureRiskRating:
         ) in acceptance_spec
         assert "Quoin [FR-217](ix://agent-ix/quoin/FR-217)" in acceptance_spec
         assert "Quoin [FR-220](ix://agent-ix/quoin/FR-220)" in acceptance_spec
+        assert "| FR-024-AC-7 |" not in intended_use_spec
+        assert (
+            "External-tool report requirements are owned by [FR-027-AC-13]"
+            in intended_use_spec
+        )
 
-    @pytest.mark.trace("NFR-002-AC-1", "NFR-003-AC-1", "FR-027-AC-6")
+    @pytest.mark.trace("NFR-002-AC-1", "NFR-002-M-1", "NFR-003-AC-1", "FR-027-AC-6")
     def test_authorship_and_computed_decision_boundaries_are_schema_visible(
         self,
     ) -> None:
@@ -901,7 +963,7 @@ class TestFeatureRiskRating:
             `status` is required; generated decision fields are absent; and
             the record model contains no commit identity for acceptance.
 
-        Trace: NFR-002-AC-1, NFR-003-AC-1, FR-027-AC-6
+        Trace: NFR-002-AC-1, NFR-002-M-1, NFR-003-AC-1, FR-027-AC-6
         """
         schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
         assert "status" in schema["required"]
@@ -909,6 +971,19 @@ class TestFeatureRiskRating:
         assert schema["additionalProperties"] is False
 
         validator = Draft202012Validator(schema)
+        valid_supplier = rating("supplier", "rates_feature")
+        valid_adopter = rating("adopter", "re_rates")
+        valid_accepted_supplier = rating("supplier", "rates_feature")
+        valid_accepted_supplier["status"] = "accepted"
+        valid_accepted_supplier["rated_by"] = "Allowed Principal"
+        valid_accepted_adopter = rating("adopter", "re_rates")
+        valid_accepted_adopter["status"] = "accepted"
+        valid_accepted_adopter["rated_by"] = "Allowed Principal"
+        assert list(validator.iter_errors(valid_supplier)) == []
+        assert list(validator.iter_errors(valid_adopter)) == []
+        assert list(validator.iter_errors(valid_accepted_supplier)) == []
+        assert list(validator.iter_errors(valid_accepted_adopter)) == []
+
         supplier = rating("supplier", "rates_feature")
         supplier["relationships"] = [
             edge
