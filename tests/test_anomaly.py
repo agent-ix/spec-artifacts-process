@@ -706,21 +706,12 @@ def test_every_reported_defect_in_the_four_measurement_fixtures_has_its_expected
 
     found_b = diagnostics(quire_validate(fixture_b))
     assert len(found_b) == 2, found_b
-    assert sum("assessment" in body(diagnostic) for diagnostic in found_b) == 1, found_b
-    assert (
-        sum("safety_impact" in body(diagnostic) for diagnostic in found_b) == 1
-    ), found_b
-    assert (
-        sum(line_marker(fixture_b, "status:") in diagnostic for diagnostic in found_b)
-        == 1
-    ), found_b
-    assert (
-        sum(
-            line_marker(fixture_b, "safety_impact:") in diagnostic
-            for diagnostic in found_b
-        )
-        == 1
-    ), found_b
+    b_status = [d for d in found_b if "assessment" in body(d)]
+    b_impact = [d for d in found_b if "safety_impact" in body(d)]
+    assert len(b_status) == 1 and len(b_impact) == 1, found_b
+    assert line_marker(fixture_b, "status:") in b_status[0], found_b
+    assert line_marker(fixture_b, "safety_impact:") in b_impact[0], found_b
+    assert all(": line " in diagnostic for diagnostic in found_b), found_b
 
     found_c = fixture_c_reported(tmp_path)
     assert len(found_c) == 3 and all(": line " in d for d in found_c), found_c
