@@ -7,8 +7,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-
-from conftest import EXAMPLES_DIR, REPO_ROOT, quire_validate
+from conftest import EXAMPLES_DIR, REPO_ROOT
 
 
 def rating_text(rating_id: str, feature_id: str) -> str:
