@@ -604,7 +604,7 @@ def test_the_negative_counterparts_exist_for_every_named_defect():
 # -- NFR-001 ------------------------------------------------------------------
 
 
-@pytest.mark.trace("NFR-001-AC-1", "TC-186")
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-M-1", "TC-186")
 def test_fixture_a_reports_both_coexisting_record_defects_in_one_pass(
     mapper, schema_registry
 ):
@@ -617,7 +617,7 @@ def test_fixture_a_reports_both_coexisting_record_defects_in_one_pass(
     ]
 
 
-@pytest.mark.trace("NFR-001-AC-1", "TC-186")
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-M-1", "TC-186")
 def test_fixture_b_reports_both_coexisting_record_defects_in_one_pass(
     mapper, schema_registry
 ):
@@ -653,15 +653,87 @@ def fixture_c_reported(tmp_path: Path) -> list[str]:
     ]
 
 
-@pytest.mark.trace("NFR-001-AC-1", "TC-186")
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-M-1", "TC-186")
 def test_fixture_c_reports_all_three_defects(tmp_path: Path):
-    assert len(fixture_c_reported(tmp_path)) == 3, fixture_c_reported(tmp_path)
+    reported = fixture_c_reported(tmp_path)
+    assert len(reported) == 3, reported
+    assert sum("Rationale" in line for line in reported) == 1, reported
+    assert sum("dangling-trace-reference" in line for line in reported) == 1, reported
+    assert sum("[reference-kind-mismatch]" in line for line in reported) == 1, reported
 
 
 @pytest.mark.trace("NFR-001-AC-2", "TC-187")
 def test_fixture_c_every_defect_carries_a_line(tmp_path: Path):
     reported = fixture_c_reported(tmp_path)
     assert all(": line " in line for line in reported), reported
+
+
+@pytest.mark.trace("NFR-001-M-2")
+def test_every_reported_defect_in_the_four_measurement_fixtures_has_its_expected_line(
+    tmp_path: Path,
+):
+    """Measure line location over each complete multi-defect fixture.
+
+    Assumptions:
+        The four NFR-001 measurement fixtures inject only coexisting defects.
+    Criteria:
+        Every emitted defect has a source line; an absent field is located at
+        `status`, while a present invalid value or table/section defect points
+        to its own source line.
+
+    Trace: NFR-001-M-2
+    """
+    fixture_a = INVALID["nfr1-a-closed-no-closed-by-no-resolution"]
+    fixture_b = INVALID["nfr1-b-assessed-unassessed-no-section"]
+    fixture_c = INVALID["nfr1-c-dangling-mismatch-empty-rationale"]
+    fixture_d = INVALID[
+        "nfr1-d-closed-fixed-rationale-placeholder-author-empty-rationale"
+    ]
+
+    def line_of(path: Path, prefix: str) -> int:
+        return next(
+            number
+            for number, text in enumerate(path.read_text().splitlines(), 1)
+            if text.startswith(prefix)
+        )
+
+    def line_marker(path: Path, prefix: str) -> str:
+        return f": line {line_of(path, prefix)}:"
+
+    found_a = diagnostics(quire_validate(fixture_a))
+    assert len(found_a) == 2 and all(
+        line_marker(fixture_a, "status:") in diagnostic for diagnostic in found_a
+    )
+
+    found_b = diagnostics(quire_validate(fixture_b))
+    assert len(found_b) == 2, found_b
+    assert (
+        sum(line_marker(fixture_b, "status:") in diagnostic for diagnostic in found_b)
+        == 1
+    ), found_b
+    assert (
+        sum(
+            line_marker(fixture_b, "safety_impact:") in diagnostic
+            for diagnostic in found_b
+        )
+        == 1
+    ), found_b
+
+    found_c = fixture_c_reported(tmp_path)
+    assert len(found_c) == 3 and all(": line " in d for d in found_c), found_c
+    assert (
+        sum(line_marker(fixture_c, "status:") in diagnostic for diagnostic in found_c)
+        == 0
+    ), found_c
+
+    found_d = diagnostics(quire_validate(fixture_d))
+    assert len(found_d) == 3, found_d
+    expected_d_lines = {
+        heading_line(fixture_d, "Release Rationale"),
+        row_line(fixture_d, "| TBD |"),
+    }
+    assert {finding_lines([d])[0] for d in found_d} == expected_d_lines
+    assert all(": line " in d for d in found_d)
 
 
 @pytest.mark.parametrize(
@@ -1263,7 +1335,14 @@ def test_a_section_with_other_headers_or_no_row_fails_at_the_table(name: str):
 
 
 @pytest.mark.trace(
-    "NFR-001-AC-1", "NFR-001-AC-2", "FR-016-AC-6", "TC-186", "TC-187", "TC-212"
+    "NFR-001-AC-1",
+    "NFR-001-AC-2",
+    "NFR-001-M-1",
+    "NFR-001-M-2",
+    "FR-016-AC-6",
+    "TC-186",
+    "TC-187",
+    "TC-212",
 )
 def test_fixture_d_reports_the_section_the_author_and_the_rationale_in_one_run():
     path = INVALID["nfr1-d-closed-fixed-rationale-placeholder-author-empty-rationale"]
