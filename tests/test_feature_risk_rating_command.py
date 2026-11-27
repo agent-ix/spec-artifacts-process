@@ -67,15 +67,13 @@ def run_ratings(
 class TestFeatureRiskRatingCommand:
     """Exercise the report command against isolated repository bundles."""
 
-    @pytest.mark.trace(
-        "FR-026-AC-4",
-        "FR-026-AC-8",
-        "FR-026-AC-9",
-        "FR-026-AC-10",
-        "FR-026-AC-13",
-        "FR-026-AC-14",
-        "FR-026-AC-16",
-    )
+    @pytest.mark.trace("FR-026-AC-4")
+    @pytest.mark.trace("FR-026-AC-8")
+    @pytest.mark.trace("FR-026-AC-9")
+    @pytest.mark.trace("FR-026-AC-10")
+    @pytest.mark.trace("FR-026-AC-13")
+    @pytest.mark.trace("FR-026-AC-14")
+    @pytest.mark.trace("FR-026-AC-16")
     def test_duplicate_report_shape_sorting_and_read_only_behavior(
         self, tmp_path: Path
     ) -> None:
