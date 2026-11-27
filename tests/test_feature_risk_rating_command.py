@@ -136,6 +136,7 @@ class TestFeatureRiskRatingCommand:
             "FR-002: rated_more_than_once (rating IDs: FRR-901, FRR-902)"
             in human_result.stdout
         )
+        assert "FR-003: unrated (rating IDs: none)" in human_result.stdout
         assert human_result.returncode == 1
         after = snapshot()
         assert after == before
