@@ -659,10 +659,7 @@ def test_fixture_c_reports_all_three_defects(tmp_path: Path):
     assert len(reported) == 3, reported
     assert sum("Rationale" in line for line in reported) == 1, reported
     assert sum("dangling-trace-reference" in line for line in reported) == 1, reported
-    assert (
-        sum("kind-mismatch" in line or "mismatch" in line.lower() for line in reported)
-        == 1
-    ), reported
+    assert sum("[reference-kind-mismatch]" in line for line in reported) == 1, reported
 
 
 @pytest.mark.trace("NFR-001-AC-2", "TC-187")

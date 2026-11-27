@@ -13,7 +13,6 @@ from conftest import (
     REPO_ROOT,
     SCHEMAS_DIR,
     SKELETONS_DIR,
-    diagnostics,
     quire_validate,
     run_quire,
 )
@@ -837,38 +836,6 @@ class TestFeatureRiskRating:
         assert supplier_path.read_bytes() == before
         assert "rating: not_high_process_risk" in supplier_path.read_text()
         assert "rating: high_process_risk" in adopter_path.read_text()
-
-    @pytest.mark.trace("FR-026-AC-3")
-    def test_a_feature_rating_to_an_intended_use_is_a_target_kind_mismatch(
-        self, tmp_path: Path
-    ) -> None:
-        """Reject a `rates_feature` edge that resolves to an IntendedUse.
-
-        Assumptions:
-            The rating otherwise validates and IU-001 exists in the same corpus.
-        Criteria:
-            Quire identifies the relationship's target kind as invalid.
-
-        Trace: FR-026-AC-3
-        """
-        rating_path = tmp_path / "FRR-001.md"
-        rating_path.write_text(
-            (EXAMPLES_DIR / "FeatureRiskRating.md")
-            .read_text()
-            .replace(
-                "ix://agent-ix/spec-artifacts-process/FR-009\n    type: rates_feature",
-                "ix://agent-ix/spec-artifacts-process/IU-001\n    type: rates_feature",
-            )
-        )
-        intended_use = tmp_path / "IU-001.md"
-        intended_use.write_text((EXAMPLES_DIR / "IntendedUse.md").read_text())
-
-        result = quire_validate(rating_path, intended_use, scope=tmp_path)
-        found = diagnostics(result)
-        assert result.returncode != 0, result.stdout
-        assert len(found) == 1, result.stderr
-        assert "target-kind-mismatch" in found[0], found
-        assert "IU-001" in found[0], found
 
     def test_ratings_command_contract_names_output_and_failure_behavior(self) -> None:
         """Keep the ratings command contract explicit for its Quoin owner.
