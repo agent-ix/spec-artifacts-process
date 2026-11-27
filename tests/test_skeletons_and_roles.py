@@ -327,3 +327,17 @@ def test_the_unmodelled_concepts_name_their_owner(mappings):
 @pytest.mark.trace("TC-113")
 def test_a_golden_record_exists_for_every_declared_type(model: str):
     assert (EXAMPLES_DIR / f"{model}.record.json").is_file()
+
+
+@pytest.mark.trace("FR-006-AC-21")
+def test_every_legacy_process_example_remains_valid(schema_registry):
+    models = sorted(artifact_type_names())
+    records = [
+        json.loads(path.read_text())
+        for path in sorted(EXAMPLES_DIR.glob("*.record.json"))
+    ]
+
+    assert {record["type"] for record in records} == set(models)
+    for record in records:
+        errors = list(schema_registry(record["type"]).iter_errors(record))
+        assert errors == [], f"{record['type']} legacy example is invalid: {errors}"
