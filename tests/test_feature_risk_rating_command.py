@@ -197,6 +197,7 @@ class TestFeatureRiskRatingCommand:
         )
 
     @pytest.mark.trace("FR-026-AC-12")
+    @pytest.mark.trace("FR-026-AC-11")
     def test_unreadable_inputs_make_both_output_modes_partial(
         self, tmp_path: Path
     ) -> None:
@@ -206,8 +207,9 @@ class TestFeatureRiskRatingCommand:
             One valid FR is present alongside malformed Markdown in both input
             classes, so the command can return a partial report.
         Criteria:
-            Both output modes return a partial report and exit with status one.
-        Trace: FR-026-AC-12
+            Both output modes report repository-relative paths and nonempty
+            reasons; the command exits with status one for the partial report.
+        Trace: FR-026-AC-11, FR-026-AC-12
         """
         repo = command_repo(tmp_path, ("FR-001",))
         (repo / "spec" / "functional" / "FR-000-broken.md").write_text(
