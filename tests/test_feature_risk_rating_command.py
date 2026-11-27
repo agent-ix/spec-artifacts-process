@@ -197,6 +197,7 @@ class TestFeatureRiskRatingCommand:
         )
 
     @pytest.mark.trace("FR-026-AC-12")
+    @pytest.mark.trace("FR-026-AC-11")
     def test_unreadable_inputs_make_both_output_modes_partial(
         self, tmp_path: Path
     ) -> None:
@@ -206,8 +207,9 @@ class TestFeatureRiskRatingCommand:
             One valid FR is present alongside malformed Markdown in both input
             classes, so the command can return a partial report.
         Criteria:
-            Both output modes return a partial report and exit with status one.
-        Trace: FR-026-AC-12
+            Both output modes report repository-relative paths and nonempty
+            reasons; the command exits with status one for the partial report.
+        Trace: FR-026-AC-11, FR-026-AC-12
         """
         repo = command_repo(tmp_path, ("FR-001",))
         (repo / "spec" / "functional" / "FR-000-broken.md").write_text(
@@ -220,12 +222,65 @@ class TestFeatureRiskRatingCommand:
 
         assert json_result.returncode == 1
         unreadable = json.loads(json_result.stdout)["unreadable"]
-        assert len(unreadable) == 2
+        assert {item["path"] for item in unreadable} == {
+            "spec/functional/FR-000-broken.md",
+            "spec/ratings/broken.md",
+        }
         assert all(
-            set(item) == {"path", "reason"} and item["reason"] for item in unreadable
+            set(item) == {"path", "reason"} and item["reason"].strip()
+            for item in unreadable
         )
         assert human_result.returncode == 1
-        assert "unreadable:" in human_result.stdout
+        human_unreadable = {}
+        for line in human_result.stdout.splitlines():
+            if line.startswith("unreadable: "):
+                path, separator, reason = line.removeprefix("unreadable: ").partition(
+                    ": "
+                )
+                assert separator and reason.strip(), line
+                human_unreadable[path] = reason
+        assert set(human_unreadable) == {
+            "spec/functional/FR-000-broken.md",
+            "spec/ratings/broken.md",
+        }
+        assert all(reason.strip() for reason in human_unreadable.values())
+
+    @pytest.mark.trace("FR-026-AC-3")
+    def test_wrong_kind_rates_feature_target_is_reported(self, tmp_path: Path) -> None:
+        """Reject a resolved rates_feature edge to a non-FR artifact.
+
+        Assumptions:
+            The bundle has one valid FR, one IntendedUse target, and a supplier
+            rating whose rates_feature edge points at that IntendedUse.
+        Criteria:
+            The ratings command exits partial and reports target-kind-mismatch
+            with the invalid target and its actual kind.
+        Trace: FR-026-AC-3
+        """
+        repo = command_repo(tmp_path, ("FR-001",))
+        intended_use = repo / "spec" / "intended-use" / "IU-001.md"
+        intended_use.parent.mkdir(parents=True)
+        intended_use.write_text(
+            "---\nid: IU-001\ntype: IntendedUse\n---\nIntended use.\n"
+        )
+        rating = rating_text("FRR-100", "FR-001").replace(
+            "ix://agent-ix/spec-artifacts-process/FR-001\n    type: rates_feature",
+            "ix://agent-ix/spec-artifacts-process/IU-001\n    type: rates_feature",
+        )
+        (repo / "spec" / "ratings" / "wrong-kind.md").write_text(rating)
+
+        result = run_ratings(repo, tmp_path)
+
+        assert result.returncode == 1
+        diagnostics = json.loads(result.stderr)
+        assert isinstance(diagnostics, list), diagnostics
+        assert len(diagnostics) == 1, result.stderr
+        finding = diagnostics[0]
+        assert finding["code"] == "target-kind-mismatch"
+        assert finding["context"]["target"] == (
+            "ix://agent-ix/spec-artifacts-process/IU-001"
+        )
+        assert finding["context"]["actual_kind"] == "IntendedUse"
 
     @pytest.mark.trace("FR-026-AC-15")
     @pytest.mark.parametrize("spec_is_file", [False, True])

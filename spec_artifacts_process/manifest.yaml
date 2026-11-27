@@ -1240,6 +1240,7 @@ traceability:
     id_column: ID
     required: false
     evidence: reference-only
+    required_references: [role-objective-metrics]
   - name: role-objective
     archetype: RoleSpec
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1260,6 +1261,11 @@ traceability:
     section: Evaluations
     id_column: ID
     required: false
+    parent_target: role-rule
+    parent_id_column: Rule
+    all_children_value_warning:
+      column: Method
+      value: judgement
   - name: rubric-check
     archetype: Rubric
     exclude: ['tests/**', 'tests_integration/**', 'fixtures/**']
@@ -1267,6 +1273,16 @@ traceability:
     id_column: ID
     required: false
     evidence: reference-only
+  table_assertions:
+  - kind: unique_ids
+    name: unique-role-metric-ids
+    target: role-metric
+  - kind: all_pairs_unequal
+    name: metric-query-differs-from-evaluation-query
+    left_target: role-metric
+    left_column: Query
+    right_target: role-evaluation
+    right_column: Query or rubric
   # Requirement documents stay archetype-bound — but archetype binding requires
   # scope exclusion, because fixtures are legitimately typed. A test fixture
   # that exercises the `FR` contract *is* `type: FR`; that is what makes it a
