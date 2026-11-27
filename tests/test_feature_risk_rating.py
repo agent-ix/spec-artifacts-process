@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -52,98 +54,141 @@ def rating(scope: str, verb: str) -> dict:
     return document
 
 
-def acceptance_result(
-    status: str,
-    rated_by: str | None,
-    verifier_result: dict,
-    trailer: str,
-) -> str:
-    """Evaluate the signed-acceptance contract used by the spec examples."""
-    signer = verifier_result.get("signer", {})
-    meaning = verifier_result.get("signed_off_meaning", {})
-    if (
-        status == "accepted"
-        and verifier_result.get("protocol")
-        == "engineering-assurance.signature-verify-result/v1"
-        and verifier_result.get("status") == "signed_valid"
-        and signer.get("mapping") == "mapped"
-        and signer.get("principal") == rated_by
-        and meaning.get("presence") == "present"
-        and "feature-risk-rating-accepted" in meaning.get("values", [])
-        and trailer == "Signed-off-meaning: feature-risk-rating-accepted"
-    ):
-        return "accepted"
-    return "not_accepted"
+EA_RELEASE = "0.11.0"
 
 
-def signed_commit_evidence(tmp_path: Path) -> tuple[dict, str]:
-    """Create and verify a temporary SSH-signed commit with the exact trailer."""
-    key = tmp_path / "signing-key"
-    subprocess.run(
-        ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key)],
-        check=True,
+def engineering_assurance_binary() -> str:
+    """Require the released EA binary used by this cross-repository contract."""
+    configured = os.environ.get("EA_TEST_BINARY")
+    binary = configured or shutil.which("engineering-assurance")
+    assert binary, (
+        "EA_TEST_BINARY must name the released Engineering Assurance binary "
+        "used by the FR-027 Process integration tests."
+    )
+    version = subprocess.run(
+        [binary, "--version"], capture_output=True, text=True, check=False
+    )
+    assert version.returncode == 0, version.stderr
+    assert version.stdout.strip() == f"engineering-assurance {EA_RELEASE}", (
+        f"FR-027 integration tests require released EA {EA_RELEASE}; "
+        f"got {version.stdout.strip()!r} from {binary}"
+    )
+    return binary
+
+
+def run_git(repository: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    """Run one Git operation in a fixture repository and retain its output."""
+    environment = os.environ.copy()
+    environment.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    environment.pop("GIT_DIR", None)
+    return subprocess.run(
+        ["git", *args],
+        cwd=repository,
         capture_output=True,
         text=True,
+        env=environment,
+        check=False,
     )
-    public_key = key.with_suffix(".pub").read_text().split()
-    principal = "allowed-principal@example.invalid"
-    allowed_signers = tmp_path / "allowed_signers"
-    allowed_signers.write_text(
-        f'{principal} namespaces="git" {public_key[0]} {public_key[1]}\n'
-    )
-    repository = tmp_path / "signed-repo"
-    repository.mkdir()
 
-    def git(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run(
-            ["git", *args],
-            cwd=repository,
-            check=True,
+
+def rating_markdown(*, rating_id: str, scope: str, status: str, rated_by: str) -> str:
+    """Render the minimal schema-valid rating record used by the CLI fixtures."""
+    document = rating(scope, "rates_feature" if scope == "supplier" else "re_rates")
+    document["id"] = rating_id
+    document["status"] = status
+    document["rated_by"] = rated_by
+    return f"---\n{json.dumps(document, indent=2)}\n---\n\n# Rating\n"
+
+
+def signed_rating_repository(
+    tmp_path: Path,
+    *,
+    status: str = "accepted",
+    signed: bool = True,
+    include_trailer: bool = True,
+    allowed_principal: str = "alice@example.test",
+    map_signing_key: bool = True,
+    scopes: tuple[str, ...] = ("supplier",),
+) -> tuple[Path, Path]:
+    """Create a repository whose rating commit exercises EA's real CLI path."""
+    repository = tmp_path / "rating-repo"
+    (repository / "spec/validation").mkdir(parents=True)
+    key = tmp_path / "signing-key"
+    other_key = tmp_path / "other-key"
+    for key_path in (key, other_key):
+        generated = subprocess.run(
+            ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key_path)],
             capture_output=True,
             text=True,
+            check=False,
         )
+        assert generated.returncode == 0, generated.stderr
 
-    git("init", "-q")
-    git("config", "user.name", "Spec Test Signer")
-    git("config", "user.email", "spec-test@example.invalid")
-    git("config", "gpg.format", "ssh")
-    git("config", "user.signingkey", str(key))
-    git("config", "gpg.ssh.allowedSignersFile", str(allowed_signers))
-    (repository / "rating.md").write_text("proposal\n")
-    git("add", "rating.md")
-    git(
-        "-c",
-        "commit.gpgsign=true",
-        "commit",
-        "-S",
-        "-m",
-        "rating proposal",
-        "-m",
-        "Signed-off-meaning: feature-risk-rating-accepted",
+    allowed_signers = tmp_path / "allowed_signers"
+    mapped_key = key if map_signing_key else other_key
+    public_key = mapped_key.with_suffix(".pub").read_text().split()
+    allowed_signers.write_text(
+        f'{allowed_principal} namespaces="git" {public_key[0]} {public_key[1]}\n'
     )
-    git("verify-commit", "HEAD")
-    message = git("show", "-s", "--format=%B", "HEAD").stdout
-    trailer = next(
-        (
-            line
-            for line in message.splitlines()
-            if line.startswith("Signed-off-meaning:")
-        ),
-        "",
+
+    initialized = run_git(repository, "init", "-q", "-b", "main")
+    assert initialized.returncode == 0, initialized.stderr
+    for name, value in (
+        ("user.name", "Rating Test"),
+        ("user.email", "rating@example.test"),
+        ("gpg.format", "ssh"),
+        ("user.signingkey", str(key)),
+        ("gpg.ssh.allowedSignersFile", str(allowed_signers)),
+    ):
+        configured = run_git(repository, "config", name, value)
+        assert configured.returncode == 0, configured.stderr
+
+    for index, scope in enumerate(scopes, start=1):
+        rating_path = repository / f"spec/validation/FRR-{index:03}.md"
+        rating_path.write_text(
+            rating_markdown(
+                rating_id=f"FRR-{index:03}",
+                scope=scope,
+                status=status,
+                rated_by="alice@example.test",
+            )
+        )
+    staged = run_git(repository, "add", "spec/validation")
+    assert staged.returncode == 0, staged.stderr
+
+    commit_args = ["commit", "--quiet", "-m", "rating proposal"]
+    if signed:
+        commit_args.insert(2, "-S")
+    if include_trailer:
+        commit_args.extend(["-m", "Signed-off-meaning: feature-risk-rating-accepted"])
+    committed = run_git(repository, *commit_args)
+    assert committed.returncode == 0, committed.stderr
+    return repository, allowed_signers
+
+
+def run_rating_acceptance(
+    repository: Path, allowed_signers: Path
+) -> tuple[subprocess.CompletedProcess[str], dict]:
+    """Invoke released EA and return its command status and protocol result."""
+    request = {
+        "protocol": "engineering-assurance.rating-acceptance-request/v1",
+        "repository": str(repository.resolve()),
+        "allowed_signers": str(allowed_signers.resolve()),
+    }
+    output = subprocess.run(
+        [
+            engineering_assurance_binary(),
+            "rating-acceptance",
+            "--request",
+            json.dumps(request),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
     )
-    return {
-        "protocol": "engineering-assurance.signature-verify-result/v1",
-        "status": "signed_valid",
-        "kind": "commit",
-        "signer": {
-            "mapping": "mapped",
-            "principal": "allowed-principal@example.invalid",
-        },
-        "signed_off_meaning": {
-            "presence": "present",
-            "values": ["feature-risk-rating-accepted"],
-        },
-    }, trailer
+    result = json.loads(output.stdout)
+    assert result["protocol"] == "engineering-assurance.rating-acceptance-result/v1"
+    return output, result
 
 
 class TestFeatureRiskRating:
@@ -202,7 +247,7 @@ class TestFeatureRiskRating:
         Criteria:
             Proposed ratings reject `rated_by`; accepted ratings require it.
 
-        Trace: FR-025-AC-17, FR-027-AC-14, FR-027-AC-15
+        Trace: FR-025-AC-17
         """
         validator = Draft202012Validator(
             frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
@@ -223,98 +268,259 @@ class TestFeatureRiskRating:
         accepted["rated_by"] = "Allowed Principal"
         assert list(validator.iter_errors(accepted)) == []
 
-    @pytest.mark.trace("FR-027-AC-14")
-    def test_signed_valid_commit_does_not_accept_a_proposed_rating(
+    @pytest.mark.trace("FR-027-AC-1")
+    def test_released_ea_accepts_a_mapped_signed_rating_with_exact_meaning(
         self, tmp_path: Path
     ) -> None:
-        """A valid mapped signature and exact trailer cannot accept a proposal.
+        """Accept an accepted rating through the released EA command.
 
         Assumptions:
-            The verifier result represents a signed-valid commit by the named
-            principal, and its exact acceptance trailer is present.
+            The fixture commit is SSH-signed by the principal named in the
+            allowed-signers file and carries the exact acceptance trailer.
         Criteria:
-            A proposal is reported not_accepted even with otherwise valid
-            acceptance evidence.
+            EA reports accepted only for the matching mapped signer and exact
+            trailer, using the versioned rating-acceptance result protocol.
 
-        Trace: FR-027-AC-14
+        Trace: FR-027-AC-1
         """
-        acceptance_spec = (
-            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
-        ).read_text()
-        assert (
-            "| FR-027-AC-14 | A rating marked `proposed` is reported `not_accepted`, "
-            "including when its commit is otherwise signed-valid. | Test |"
-        ) in acceptance_spec
-        verifier_result, trailer = signed_commit_evidence(tmp_path)
-        assert verifier_result["status"] == "signed_valid"
-        assert trailer == "Signed-off-meaning: feature-risk-rating-accepted"
-        assert (
-            acceptance_result(
-                "proposed",
-                "allowed-principal@example.invalid",
-                verifier_result,
-                trailer,
-            )
-            == "not_accepted"
-        )
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 0, output.stderr
+        assert len(result["results"]) == 1
+        assert result["results"][0]["status"] == "accepted"
+        assert result["results"][0]["reason"] is None
+        assert result["results"][0]["commit"]
 
     @pytest.mark.trace("FR-027-AC-15")
-    def test_accepted_rating_requires_matching_signer_and_exact_trailer(
+    def test_released_ea_acceptance_requires_matching_signer_and_exact_trailer(
         self, tmp_path: Path
     ) -> None:
-        """Accept only matching mapped identity and the exact trailer.
+        """Require matching signer identity and meaning for an accepted rating.
 
         Assumptions:
-            The verifier result is from the versioned FR-036 protocol.
+            The positive case is accepted; each negative case changes only the
+            verified principal or the commit's meaning trailer.
         Criteria:
-            Matching accepted record/signature/trailer succeeds; signer or
-            trailer mismatch is not accepted.
+            A mismatched signer or a non-exact trailer makes an accepted
+            rating not_accepted.
 
         Trace: FR-027-AC-15
         """
-        acceptance_spec = (
-            REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
-        ).read_text()
-        assert (
-            "| FR-027-AC-15 | An accepted rating requires a `rated_by` principal "
-            "matching the verified signer and the exact acceptance trailer. | Test |"
-        ) in acceptance_spec
-        valid_result, exact_trailer = signed_commit_evidence(tmp_path)
-        assert valid_result["status"] == "signed_valid"
-        assert exact_trailer == "Signed-off-meaning: feature-risk-rating-accepted"
-        assert (
-            acceptance_result(
-                "accepted",
-                "allowed-principal@example.invalid",
-                valid_result,
-                exact_trailer,
-            )
-            == "accepted"
-        )
+        valid_repo, valid_signers = signed_rating_repository(tmp_path / "valid")
+        valid_output, valid_result = run_rating_acceptance(valid_repo, valid_signers)
+        assert valid_output.returncode == 0, valid_output.stderr
+        assert valid_result["results"][0]["status"] == "accepted"
 
-        mismatched_signer = dict(valid_result)
-        mismatched_signer["signer"] = {
-            "mapping": "mapped",
-            "principal": "Different Principal",
-        }
-        assert (
-            acceptance_result(
-                "accepted",
-                "allowed-principal@example.invalid",
-                mismatched_signer,
-                exact_trailer,
-            )
-            == "not_accepted"
+        mismatch_repo, mismatch_signers = signed_rating_repository(
+            tmp_path / "mismatch", allowed_principal="bob@example.test"
         )
-        assert (
-            acceptance_result(
-                "accepted",
-                "allowed-principal@example.invalid",
-                valid_result,
-                "Signed-off-meaning: feature-risk-rating-approved",
-            )
-            == "not_accepted"
+        mismatch_output, mismatch_result = run_rating_acceptance(
+            mismatch_repo, mismatch_signers
         )
+        assert mismatch_output.returncode == 1, mismatch_output.stderr
+        assert mismatch_result["results"][0]["status"] == "not_accepted"
+        assert mismatch_result["results"][0]["reason"] == "principal_mismatch"
+
+        trailer_repo, trailer_signers = signed_rating_repository(
+            tmp_path / "trailer", include_trailer=False
+        )
+        trailer_output, trailer_result = run_rating_acceptance(
+            trailer_repo, trailer_signers
+        )
+        assert trailer_output.returncode == 1, trailer_output.stderr
+        assert trailer_result["results"][0]["status"] == "not_accepted"
+        assert trailer_result["results"][0]["reason"] == "meaning_missing"
+
+    @pytest.mark.trace("FR-027-AC-2")
+    def test_released_ea_refuses_an_unsigned_rating_commit(
+        self, tmp_path: Path
+    ) -> None:
+        """Report an unsigned rating commit as not accepted.
+
+        Assumptions:
+            The rating is committed without an SSH signature.
+        Criteria:
+            The released command exits 1 and names the unsigned condition.
+
+        Trace: FR-027-AC-2
+        """
+        repository, allowed_signers = signed_rating_repository(tmp_path, signed=False)
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unsigned"
+
+    @pytest.mark.trace("FR-027-AC-3")
+    def test_released_ea_refuses_a_signature_without_a_mapped_principal(
+        self, tmp_path: Path
+    ) -> None:
+        """Report a valid signature from an unmapped key as not accepted.
+
+        Assumptions:
+            Allowed-signers maps a different key from the one that signed the
+            rating commit.
+        Criteria:
+            The released command names the signer mapping failure.
+
+        Trace: FR-027-AC-3
+        """
+        repository, allowed_signers = signed_rating_repository(
+            tmp_path, map_signing_key=False
+        )
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "signer_unmapped"
+
+    @pytest.mark.trace("FR-027-AC-4")
+    def test_released_ea_refuses_a_mapped_principal_that_differs_from_rated_by(
+        self, tmp_path: Path
+    ) -> None:
+        """Refuse a valid signature mapped to the wrong named principal.
+
+        Assumptions:
+            The signature key is trusted but allowed-signers maps it to Bob;
+            the rating names Alice in `rated_by`.
+        Criteria:
+            EA reports not_accepted with the principal mismatch reason.
+
+        Trace: FR-027-AC-4
+        """
+        repository, allowed_signers = signed_rating_repository(
+            tmp_path, allowed_principal="bob@example.test"
+        )
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "principal_mismatch"
+
+    @pytest.mark.trace("FR-027-AC-5")
+    def test_released_ea_refuses_a_signed_rating_without_the_exact_trailer(
+        self, tmp_path: Path
+    ) -> None:
+        """Refuse an otherwise valid signed rating without its meaning trailer.
+
+        Assumptions:
+            The rating commit is signed by the mapped `rated_by` principal.
+        Criteria:
+            EA reports not_accepted with reason `meaning_missing`.
+
+        Trace: FR-027-AC-5
+        """
+        repository, allowed_signers = signed_rating_repository(
+            tmp_path, include_trailer=False
+        )
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "meaning_missing"
+
+    @pytest.mark.trace("FR-027-AC-6")
+    def test_released_ea_uses_the_same_signature_conditions_for_both_scopes(
+        self, tmp_path: Path
+    ) -> None:
+        """Apply one mapped signed commit to supplier and adopter ratings.
+
+        Assumptions:
+            Both rating records are in one commit signed by the shared named
+            principal with the required trailer.
+        Criteria:
+            EA accepts both scopes, and the schema stores no commit identity.
+
+        Trace: FR-027-AC-6
+        """
+        repository, allowed_signers = signed_rating_repository(
+            tmp_path, scopes=("supplier", "adopter")
+        )
+        output, result = run_rating_acceptance(repository, allowed_signers)
+        schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
+
+        assert output.returncode == 0, output.stderr
+        assert [item["status"] for item in result["results"]] == [
+            "accepted",
+            "accepted",
+        ]
+        assert not {"commit_id", "digest"} & set(schema["properties"])
+
+        adopter_path = repository / "spec/validation/FRR-002.md"
+        adopter_path.write_text(
+            adopter_path.read_text().replace(
+                '"rated_by": "alice@example.test"',
+                '"rated_by": "bob@example.test"',
+            )
+        )
+        staged = run_git(repository, "add", "spec/validation/FRR-002.md")
+        assert staged.returncode == 0, staged.stderr
+        committed = run_git(
+            repository,
+            "commit",
+            "--quiet",
+            "-S",
+            "-m",
+            "update adopter rating",
+            "-m",
+            "Signed-off-meaning: feature-risk-rating-accepted",
+        )
+        assert committed.returncode == 0, committed.stderr
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert [item["status"] for item in result["results"]] == [
+            "accepted",
+            "not_accepted",
+        ]
+        assert result["results"][1]["reason"] == "principal_mismatch"
+
+    @pytest.mark.trace("FR-027-AC-11")
+    def test_released_ea_fails_closed_for_unavailable_and_malformed_signers(
+        self, tmp_path: Path
+    ) -> None:
+        """Never accept when allowed-signers input is missing or malformed.
+
+        Assumptions:
+            The rating itself is signed-valid and carries the exact trailer.
+        Criteria:
+            Missing and malformed allowed-signers inputs both produce
+            not_accepted, never a successful FR-037 invalid-input response.
+
+        Trace: FR-027-AC-11
+        """
+        for malformed in (False, True):
+            case = tmp_path / ("malformed" if malformed else "missing")
+            case.mkdir()
+            repository, allowed_signers = signed_rating_repository(case)
+            allowed_signers.unlink()
+            if malformed:
+                allowed_signers.mkdir()
+
+            output, result = run_rating_acceptance(repository, allowed_signers)
+
+            assert output.returncode == 1, output.stderr
+            assert result["results"][0]["status"] == "not_accepted"
+            assert result["results"][0]["reason"] == "unverifiable"
+
+        unreadable_case = tmp_path / "unreadable"
+        repository, allowed_signers = signed_rating_repository(unreadable_case)
+        allowed_signers.chmod(0)
+        unreadable = allowed_signers
+        if os.access(unreadable, os.R_OK):
+            unreadable = Path("/proc/kcore")
+        assert (
+            unreadable.is_file()
+        ), "no unreadable allowed-signers fixture is available"
+        assert not os.access(
+            unreadable, os.R_OK
+        ), "the unreadable allowed-signers fixture is readable in this environment"
+        output, result = run_rating_acceptance(repository, unreadable)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
@@ -885,11 +1091,8 @@ class TestFeatureRiskRating:
         ):
             assert contract in spec
 
-    @pytest.mark.trace("FR-027-AC-13")
-    def test_validation_report_requires_tool_versions_and_configuration_entries(
-        self,
-    ) -> None:
-        """Bind the external-tool report criterion to its named contracts.
+    def test_validation_report_owner_is_named_in_the_requirements(self) -> None:
+        """Keep the Quoin report ownership references explicit in the requirements.
 
         Assumptions:
             Quoin FR-217 and FR-220 own the report and configuration index.
@@ -897,7 +1100,6 @@ class TestFeatureRiskRating:
             FR-027 assigns report production and version-index entries to those
             requirements.
 
-        Trace: FR-027-AC-13
         """
         acceptance_spec = (
             REPO_ROOT / "spec/functional/FR-027-human-acceptance-of-risk-ratings.md"
@@ -918,7 +1120,7 @@ class TestFeatureRiskRating:
             in intended_use_spec
         )
 
-    @pytest.mark.trace("NFR-002-AC-1", "NFR-002-M-1", "NFR-003-AC-1", "FR-027-AC-6")
+    @pytest.mark.trace("NFR-002-AC-1", "NFR-002-M-1", "NFR-003-AC-1")
     def test_authorship_and_computed_decision_boundaries_are_schema_visible(
         self,
     ) -> None:
@@ -930,7 +1132,7 @@ class TestFeatureRiskRating:
             `status` is required; generated decision fields are absent; and
             the record model contains no commit identity for acceptance.
 
-        Trace: NFR-002-AC-1, NFR-002-M-1, NFR-003-AC-1, FR-027-AC-6
+        Trace: NFR-002-AC-1, NFR-002-M-1, NFR-003-AC-1
         """
         schema = frontmatter_schema("feature-risk-rating-frontmatter.schema.json")
         assert "status" in schema["required"]
