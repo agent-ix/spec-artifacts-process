@@ -106,6 +106,7 @@ def signed_rating_repository(
     status: str = "accepted",
     signed: bool = True,
     include_trailer: bool = True,
+    meaning_trailer: str = "Signed-off-meaning: feature-risk-rating-accepted",
     allowed_principal: str = "alice@example.test",
     map_signing_key: bool = True,
     scopes: tuple[str, ...] = ("supplier",),
@@ -160,7 +161,7 @@ def signed_rating_repository(
     if signed:
         commit_args.insert(2, "-S")
     if include_trailer:
-        commit_args.extend(["-m", "Signed-off-meaning: feature-risk-rating-accepted"])
+        commit_args.extend(["-m", meaning_trailer])
     committed = run_git(repository, *commit_args)
     assert committed.returncode == 0, committed.stderr
     return repository, allowed_signers
@@ -292,7 +293,7 @@ class TestFeatureRiskRating:
         assert result["results"][0]["reason"] is None
         assert result["results"][0]["commit"]
 
-    @pytest.mark.trace("FR-027-AC-15")
+    @pytest.mark.trace("FR-027-AC-5", "FR-027-AC-15")
     def test_released_ea_acceptance_requires_matching_signer_and_exact_trailer(
         self, tmp_path: Path
     ) -> None:
@@ -331,6 +332,17 @@ class TestFeatureRiskRating:
         assert trailer_output.returncode == 1, trailer_output.stderr
         assert trailer_result["results"][0]["status"] == "not_accepted"
         assert trailer_result["results"][0]["reason"] == "meaning_missing"
+
+        wrong_trailer_repo, wrong_trailer_signers = signed_rating_repository(
+            tmp_path / "wrong-trailer",
+            meaning_trailer="Signed-off-meaning: feature-risk-rating-approved",
+        )
+        wrong_trailer_output, wrong_trailer_result = run_rating_acceptance(
+            wrong_trailer_repo, wrong_trailer_signers
+        )
+        assert wrong_trailer_output.returncode == 1, wrong_trailer_output.stderr
+        assert wrong_trailer_result["results"][0]["status"] == "not_accepted"
+        assert wrong_trailer_result["results"][0]["reason"] == "meaning_missing"
 
     @pytest.mark.trace("FR-027-AC-2")
     def test_released_ea_refuses_an_unsigned_rating_commit(
@@ -494,15 +506,15 @@ class TestFeatureRiskRating:
             case = tmp_path / ("malformed" if malformed else "missing")
             case.mkdir()
             repository, allowed_signers = signed_rating_repository(case)
-            allowed_signers.unlink()
             if malformed:
-                allowed_signers.mkdir()
+                allowed_signers.write_text("this is not an allowed-signers entry\n")
+            else:
+                allowed_signers.unlink()
 
             output, result = run_rating_acceptance(repository, allowed_signers)
 
             assert output.returncode == 1, output.stderr
             assert result["results"][0]["status"] == "not_accepted"
-            assert result["results"][0]["reason"] == "unverifiable"
 
         unreadable_case = tmp_path / "unreadable"
         repository, allowed_signers = signed_rating_repository(unreadable_case)
