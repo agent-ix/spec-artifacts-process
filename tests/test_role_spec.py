@@ -97,12 +97,16 @@ def coverage(corpus: Path) -> dict:
     return json.loads(result.stdout)
 
 
-def bundle(corpus: Path) -> subprocess.CompletedProcess:
+def bundle(
+    corpus: Path, *, strict: bool = False
+) -> subprocess.CompletedProcess:
     """`quire validate --okf` over a corpus: the run that resolves references."""
+    strict_args = ["--strict"] if strict else []
     return subprocess.run(
         [
             "quire",
             "validate",
+            *strict_args,
             "--okf",
             "--scope",
             str(corpus),
@@ -445,7 +449,7 @@ def test_unreferenced_metric_warns_without_changing_validation_status(
         source.replace(reference, reference.replace("MIND-M02", "MIND-M01"))
     )
 
-    result = bundle(consumer)
+    result = matrix(consumer)
 
     assert result.returncode == 0, result.stderr
     assert "target-id-unreferenced" in result.stderr, result.stderr
@@ -482,7 +486,7 @@ def test_metric_query_must_differ_from_evaluation_query_but_may_match_trigger(
     assert query_source.count(metric_query) == 1
     query_spec.write_text(query_source.replace(metric_query, evaluation_query))
 
-    query_result = bundle(query_consumer)
+    query_result = bundle(query_consumer, strict=True)
 
     assert query_result.returncode != 0, query_result.stderr
     mismatch = next(
@@ -573,7 +577,7 @@ def test_all_judgement_evaluations_warn_without_changing_validation_status(
     assert source.count(deterministic) == 1
     role_spec.write_text(source.replace(deterministic, judgement))
 
-    result = bundle(consumer)
+    result = matrix(consumer)
 
     assert result.returncode == 0, result.stderr
     warning = next(

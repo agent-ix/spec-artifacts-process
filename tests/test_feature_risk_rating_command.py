@@ -270,11 +270,8 @@ class TestFeatureRiskRatingCommand:
         result = run_ratings(repo, tmp_path)
 
         assert result.returncode == 1
-        diagnostics = [
-            json.loads(line)
-            for line in result.stderr.splitlines()
-            if line.strip()
-        ]
+        diagnostics = json.loads(result.stderr)
+        assert isinstance(diagnostics, list), diagnostics
         assert len(diagnostics) == 1, result.stderr
         finding = diagnostics[0]
         assert finding["code"] == "target-kind-mismatch"
