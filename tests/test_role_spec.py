@@ -5,15 +5,17 @@ case, so each case is checked for the cell, field or id that names it rather tha
 for a bare nonzero exit. The corpus fixtures under `tests/fixtures/roles/corpus/`
 are whole repositories, because reference resolution and minting read a corpus.
 
-Not covered here, because the engine cannot express them yet (FR-021): criteria
-parented through a column, the unused-metric and all-judgement warnings
-(SWM-247), and the cross-table distinctness and id-uniqueness asserts (SWM-248).
+The tests below exercise the public Quire commands for FR-021's parented
+criteria, unused-metric and all-judgement warnings, and cross-table/id
+uniqueness assertions. The module declares the data model; Quire implements the
+checks.
 """
 
 from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -111,6 +113,33 @@ def bundle(corpus: Path) -> subprocess.CompletedProcess:
         text=True,
         check=False,
     )
+
+
+def matrix(corpus: Path) -> subprocess.CompletedProcess:
+    """Run the public matrix JSON command over one consuming fixture."""
+    return subprocess.run(
+        [
+            "quire",
+            "matrix",
+            "--scope",
+            str(corpus),
+            "--module",
+            str(PACKAGE_ROOT),
+            "--format",
+            "json",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def valid_consumer(tmp_path: Path) -> Path:
+    """Copy the valid RoleSpec bundle into an isolated consuming repository."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    consumer = tmp_path / "consumer"
+    shutil.copytree(VALID, consumer)
+    return consumer
 
 
 def dangling(corpus: Path) -> list[str]:
@@ -349,6 +378,213 @@ def test_every_negative_fixture_is_one_declared_case():
 @pytest.mark.parametrize("name,needle", _params(ROLE_SPEC_CASES, "FR-021-AC-4"))
 def test_an_objective_with_no_metric_fails_naming_the_objective(name: str, needle):
     fails_naming(name, needle)
+
+
+@pytest.mark.trace("FR-021-AC-2")
+def test_matrix_json_reports_a_rule_without_any_evaluation(tmp_path: Path):
+    """Show an evaluation-free rule as a parent with no criterion.
+
+    Assumptions:
+        The consumer fixture is valid except that MIND-R06 has no evaluation.
+    Criteria:
+        Quire matrix JSON reports MIND-R06 with an empty criterion list.
+
+    Trace: FR-021-AC-2
+    """
+    consumer = valid_consumer(tmp_path)
+    role_spec = consumer / "spec" / "roles" / "minder.md"
+    source = role_spec.read_text()
+    evaluation = (
+        "| MIND-R06-E1 | MIND-R06 | hook-events | "
+        "hooks.minder_loop_removal_events | deterministic | "
+        "hooks.minder_loop_removed_without_owner_instruction | evaluator | = | "
+        "0 | events | session-end |"
+    )
+    assert source.count(evaluation) == 1
+    role_spec.write_text(source.replace(evaluation + "\n", ""))
+
+    result = matrix(consumer)
+
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    groups = report.get("parented_target_groups")
+    assert isinstance(groups, list), report
+    group = next(
+        (
+            item
+            for item in groups
+            if item.get("parent_target") == "role-rule"
+            and item.get("parent_id") == "MIND-R06"
+        ),
+        None,
+    )
+    assert group is not None, report
+    assert group.get("child_target") == "role-evaluation", group
+    assert group.get("child_ids") == [], group
+
+
+@pytest.mark.trace("FR-021-AC-5")
+def test_unreferenced_metric_warns_without_changing_validation_status(
+    tmp_path: Path,
+):
+    """Warn about a metric that no objective names without failing validation.
+
+    Assumptions:
+        MIND-M02 remains a declared metric but both objectives name MIND-M01.
+    Criteria:
+        Quire emits the unused-target warning naming MIND-M02 and exits zero.
+
+    Trace: FR-021-AC-5
+    """
+    consumer = valid_consumer(tmp_path)
+    role_spec = consumer / "spec" / "roles" / "minder.md"
+    source = role_spec.read_text()
+    reference = "| MIND-O02 | Every detected problem is acted on quickly | MIND-M02 |"
+    assert source.count(reference) == 1
+    role_spec.write_text(
+        source.replace(reference, reference.replace("MIND-M02", "MIND-M01"))
+    )
+
+    result = bundle(consumer)
+
+    assert result.returncode == 0, result.stderr
+    assert "target-id-unreferenced" in result.stderr, result.stderr
+    warning = next(
+        (
+            line
+            for line in result.stderr.splitlines()
+            if "target-id-unreferenced" in line and "MIND-M02" in line
+        ),
+        None,
+    )
+    assert warning is not None, result.stderr
+
+
+@pytest.mark.trace("FR-021-AC-6")
+def test_metric_query_must_differ_from_evaluation_query_but_may_match_trigger(
+    tmp_path: Path,
+):
+    """Reject query equality while allowing equality with an evaluation trigger.
+
+    Assumptions:
+        Both variants retain the valid RoleSpec and rubric reference structure.
+    Criteria:
+        Query equality fails naming MIND-M01 and MIND-R01-E1; Trigger-only
+        equality validates successfully.
+
+    Trace: FR-021-AC-6
+    """
+    query_consumer = valid_consumer(tmp_path / "query")
+    query_spec = query_consumer / "spec" / "roles" / "minder.md"
+    query_source = query_spec.read_text()
+    metric_query = "ledger.idle_capacity_minutes_with_ready_work"
+    evaluation_query = "ledger.unknown_lane_not_acted_ticks"
+    assert query_source.count(metric_query) == 1
+    query_spec.write_text(query_source.replace(metric_query, evaluation_query))
+
+    query_result = bundle(query_consumer)
+
+    assert query_result.returncode != 0, query_result.stderr
+    mismatch = next(
+        (
+            line
+            for line in query_result.stderr.splitlines()
+            if "MIND-M01" in line and "MIND-R01-E1" in line
+        ),
+        None,
+    )
+    assert mismatch is not None, query_result.stderr
+
+    trigger_consumer = valid_consumer(tmp_path / "trigger")
+    trigger_spec = trigger_consumer / "spec" / "roles" / "minder.md"
+    trigger_source = trigger_spec.read_text()
+    trigger_query = "ledger.unknown_lane_ticks"
+    assert trigger_source.count(metric_query) == 1
+    trigger_spec.write_text(trigger_source.replace(metric_query, trigger_query))
+
+    trigger_result = bundle(trigger_consumer)
+
+    assert trigger_result.returncode == 0, trigger_result.stderr
+
+
+@pytest.mark.trace("FR-021-AC-7")
+def test_duplicate_id_in_one_role_spec_table_fails_naming_the_id(
+    tmp_path: Path,
+):
+    """Reject duplicate metric ids within the same RoleSpec table.
+
+    Assumptions:
+        MIND-M01 and MIND-M02 are valid ids before the second id is changed.
+    Criteria:
+        Quire validation fails with a duplicate-id diagnostic naming MIND-M01.
+
+    Trace: FR-021-AC-7
+    """
+    consumer = valid_consumer(tmp_path)
+    role_spec = consumer / "spec" / "roles" / "minder.md"
+    source = role_spec.read_text()
+    duplicate_row = "| MIND-M02 | Detection-to-action latency, p90 |"
+    assert source.count(duplicate_row) == 1
+    role_spec.write_text(
+        source.replace(duplicate_row, duplicate_row.replace("MIND-M02", "MIND-M01"))
+    )
+
+    result = bundle(consumer)
+
+    assert result.returncode != 0, result.stderr
+    duplicate = next(
+        (
+            line
+            for line in result.stderr.splitlines()
+            if "MIND-M01" in line and "duplicate" in line.lower()
+        ),
+        None,
+    )
+    assert duplicate is not None, result.stderr
+
+
+@pytest.mark.trace("FR-021-AC-11")
+def test_all_judgement_evaluations_warn_without_changing_validation_status(
+    tmp_path: Path,
+):
+    """Warn when every evaluation under a rule uses judgement.
+
+    Assumptions:
+        MIND-R02's deterministic evaluation becomes judgement with a valid
+        rubric reference, leaving its existing judgement evaluation unchanged.
+    Criteria:
+        Quire emits the all-judgement warning naming MIND-R02 and exits zero.
+
+    Trace: FR-021-AC-11
+    """
+    consumer = valid_consumer(tmp_path)
+    role_spec = consumer / "spec" / "roles" / "minder.md"
+    source = role_spec.read_text()
+    deterministic = (
+        "| MIND-R02-E1 | MIND-R02 | ledger | ledger.failed_probe_ticks | "
+        "deterministic | ledger.probe_failure_without_defect_row | evaluator | "
+        "= | 0 | ticks | tick |"
+    )
+    judgement = (
+        "| MIND-R02-E1 | MIND-R02 | ledger | ledger.failed_probe_ticks | "
+        "judgement | rubric-minder@1#failed-probe | director | >= | 2 | score | "
+        "daily |"
+    )
+    assert source.count(deterministic) == 1
+    role_spec.write_text(source.replace(deterministic, judgement))
+
+    result = bundle(consumer)
+
+    assert result.returncode == 0, result.stderr
+    warning = next(
+        (
+            line
+            for line in result.stderr.splitlines()
+            if "parent-children-all-match" in line and "MIND-R02" in line
+        ),
+        None,
+    )
+    assert warning is not None, result.stderr
 
 
 @pytest.mark.trace("FR-021-AC-1")
