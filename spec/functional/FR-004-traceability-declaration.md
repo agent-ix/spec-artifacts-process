@@ -267,6 +267,7 @@ modules can version apart.
 | FR-004-AC-38 | `trace_tags.formalizes` declares exactly one form, `qsl-formalizes-comment`, with `language: qsl`, `syntax: comment`, pattern `^//\s*formalizes:\s*(.*)$` and template `// formalizes: {ids}`. | Test (TC-227) |
 | FR-004-AC-39 | The pattern captures the id list of `// formalizes: FR-012, FR-012-AC-3` as `FR-012, FR-012-AC-3` and of `// formalizes: ix://agent-ix/quire-rs/FR-001` as that qualified id, matches none of `formalizes: FR-001` (no `//`), `//formalizes FR-001` (no colon), `// verifies: FR-001` and `/// formalizes: FR-001`, and matches `// formalizes:`, `// formalizes:   ` and `// formalizes: ,` with an empty or comma-only capture. | Test (TC-228) |
 | FR-004-AC-40 | No form with `language: qsl` appears under `trace_tags.markers` or `trace_tags.implements`, no form of another language appears under `trace_tags.formalizes`, and no form name occurs in two of the three lists. | Test (TC-229) |
+| FR-004-AC-41 | `trace_tags` contains only the supported `markers`, `implements`, and `formalizes` declarations, so Quire accepts the module manifest without unknown fields. | Test (TC-250) |
 
 > **CR-064 note (PLAT-1079, 2026-09-27):** measured against this repository
 > before authoring the above, not assumed from the ticket that asked for it.
