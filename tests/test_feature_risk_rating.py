@@ -54,7 +54,7 @@ def rating(scope: str, verb: str) -> dict:
     return document
 
 
-EA_RELEASE = "0.11.0"
+EA_RELEASE = os.environ.get("EA_TEST_RELEASE", "0.11.0")
 
 
 def engineering_assurance_binary() -> str:
@@ -291,6 +291,35 @@ class TestFeatureRiskRating:
         assert len(result["results"]) == 1
         assert result["results"][0]["status"] == "accepted"
         assert result["results"][0]["reason"] is None
+        assert result["results"][0]["commit"]
+
+    @pytest.mark.trace("FR-027-AC-14")
+    @pytest.mark.skipif(
+        EA_RELEASE != "0.11.1",
+        reason="proposed-rating rejection requires Engineering Assurance 0.11.1",
+    )
+    def test_released_ea_does_not_accept_a_signed_proposed_rating(
+        self, tmp_path: Path
+    ) -> None:
+        """A valid signer and trailer cannot make a proposal accepted.
+
+        Assumptions:
+            The proposal's commit is signed by its mapped principal and has
+            the exact acceptance trailer; only the rating status is proposed.
+        Criteria:
+            The released EA command reports `not_accepted` with
+            `status_proposed` even when the signature evidence is valid.
+
+        Trace: FR-027-AC-14
+        """
+        repository, allowed_signers = signed_rating_repository(
+            tmp_path, status="proposed"
+        )
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "status_proposed"
         assert result["results"][0]["commit"]
 
     @pytest.mark.trace("FR-027-AC-5", "FR-027-AC-15")
