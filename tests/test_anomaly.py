@@ -1334,16 +1334,8 @@ def test_a_section_with_other_headers_or_no_row_fails_at_the_table(name: str):
     assert "release_rationale" in found[0]
 
 
-@pytest.mark.trace(
-    "NFR-001-AC-1",
-    "NFR-001-AC-2",
-    "NFR-001-M-1",
-    "NFR-001-M-2",
-    "FR-016-AC-6",
-    "TC-186",
-    "TC-187",
-    "TC-212",
-)
+@pytest.mark.trace("NFR-001-AC-1", "NFR-001-AC-2", "NFR-001-M-1", "NFR-001-M-2")
+@pytest.mark.trace("FR-016-AC-6", "TC-186", "TC-187", "TC-212")
 def test_fixture_d_reports_the_section_the_author_and_the_rationale_in_one_run():
     path = INVALID["nfr1-d-closed-fixed-rationale-placeholder-author-empty-rationale"]
     found = diagnostics(quire_validate(path))
