@@ -282,7 +282,6 @@ class TestFeatureRiskRating:
             EA reports accepted only for the matching mapped signer and exact
             trailer, using the versioned rating-acceptance result protocol.
 
-        Trace: FR-027-AC-1
         """
         repository, allowed_signers = signed_rating_repository(tmp_path)
         output, result = run_rating_acceptance(repository, allowed_signers)
@@ -306,7 +305,6 @@ class TestFeatureRiskRating:
             A mismatched signer or a non-exact trailer makes an accepted
             rating not_accepted.
 
-        Trace: FR-027-AC-15
         """
         valid_repo, valid_signers = signed_rating_repository(tmp_path / "valid")
         valid_output, valid_result = run_rating_acceptance(valid_repo, valid_signers)
@@ -355,7 +353,6 @@ class TestFeatureRiskRating:
         Criteria:
             The released command exits 1 and names the unsigned condition.
 
-        Trace: FR-027-AC-2
         """
         repository, allowed_signers = signed_rating_repository(tmp_path, signed=False)
         output, result = run_rating_acceptance(repository, allowed_signers)
@@ -376,7 +373,6 @@ class TestFeatureRiskRating:
         Criteria:
             The released command names the signer mapping failure.
 
-        Trace: FR-027-AC-3
         """
         repository, allowed_signers = signed_rating_repository(
             tmp_path, map_signing_key=False
@@ -399,7 +395,6 @@ class TestFeatureRiskRating:
         Criteria:
             EA reports not_accepted with the principal mismatch reason.
 
-        Trace: FR-027-AC-4
         """
         repository, allowed_signers = signed_rating_repository(
             tmp_path, allowed_principal="bob@example.test"
@@ -421,7 +416,6 @@ class TestFeatureRiskRating:
         Criteria:
             EA reports not_accepted with reason `meaning_missing`.
 
-        Trace: FR-027-AC-5
         """
         repository, allowed_signers = signed_rating_repository(
             tmp_path, include_trailer=False
@@ -444,7 +438,6 @@ class TestFeatureRiskRating:
         Criteria:
             EA accepts both scopes, and the schema stores no commit identity.
 
-        Trace: FR-027-AC-6
         """
         repository, allowed_signers = signed_rating_repository(
             tmp_path, scopes=("supplier", "adopter")
@@ -500,7 +493,6 @@ class TestFeatureRiskRating:
             Missing and malformed allowed-signers inputs both produce
             not_accepted, never a successful FR-037 invalid-input response.
 
-        Trace: FR-027-AC-11
         """
         for malformed in (False, True):
             case = tmp_path / ("malformed" if malformed else "missing")
