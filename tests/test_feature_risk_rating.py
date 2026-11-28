@@ -226,7 +226,7 @@ def install_verifier_process_failure(
             [
                 'case " $* " in\n',
                 '  *" verify-commit "*) sleep 90; '
-                f'touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n',
+                f"touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n",
                 "esac\n",
             ]
         )
@@ -339,7 +339,7 @@ class TestFeatureRiskRating:
         accepted["rated_by"] = "Allowed Principal"
         assert list(validator.iter_errors(accepted)) == []
 
-    @pytest.mark.trace("FR-027-AC-1")
+    @pytest.mark.trace("FR-027-AC-1", "FR-027-AC-7")
     def test_released_ea_accepts_a_mapped_signed_rating_with_exact_meaning(
         self, tmp_path: Path
     ) -> None:
@@ -352,6 +352,7 @@ class TestFeatureRiskRating:
             EA reports accepted only for the matching mapped signer and exact
             trailer, using the versioned rating-acceptance result protocol.
 
+        Trace: FR-027-AC-1, FR-027-AC-7
         """
         repository, allowed_signers = signed_rating_repository(tmp_path)
         output, result = run_rating_acceptance(repository, allowed_signers)
@@ -685,7 +686,16 @@ class TestFeatureRiskRating:
     def test_released_ea_fails_closed_for_unparseable_verifier_output(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A successful Git process with malformed verifier fields is refused."""
+        """A successful Git process with malformed verifier fields is refused.
+
+        Assumptions:
+            The rating commit is signed and the real EA command uses the
+            captured Git verifier process for its signature evidence.
+        Criteria:
+            Unparseable verifier output never produces an accepted rating.
+
+        Trace: FR-027-AC-10
+        """
         repository, allowed_signers = signed_rating_repository(tmp_path)
         _, calls = install_verifier_process_failure(
             tmp_path, monkeypatch, failure="malformed-output"
