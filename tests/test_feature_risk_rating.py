@@ -55,7 +55,7 @@ def rating(scope: str, verb: str) -> dict:
     return document
 
 
-EA_RELEASE = os.environ.get("EA_TEST_RELEASE", "0.11.0")
+EA_RELEASE = os.environ.get("EA_TEST_RELEASE", "0.11.1")
 
 
 def engineering_assurance_binary() -> str:
@@ -226,7 +226,7 @@ def install_verifier_process_failure(
             [
                 'case " $* " in\n',
                 '  *" verify-commit "*) sleep 90; '
-                f'touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n',
+                f"touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n",
                 "esac\n",
             ]
         )
