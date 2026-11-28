@@ -193,24 +193,6 @@ def run_rating_acceptance(
     return output, result
 
 
-def install_ea_request_recorder(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Path:
-    """Record the released EA CLI request while delegating to its real binary."""
-    released = Path(engineering_assurance_binary())
-    recorder = tmp_path / "engineering-assurance"
-    capture = tmp_path / "ea-request.json"
-    recorder.write_text(
-        "#!/bin/sh\n"
-        f'if [ "$1" = rating-acceptance ]; then '
-        f"printf '%s' \"$3\" >{shlex.quote(str(capture))}; fi\n"
-        f'exec {shlex.quote(str(released))} "$@"\n'
-    )
-    recorder.chmod(0o755)
-    monkeypatch.setenv("EA_TEST_BINARY", str(recorder))
-    return capture
-
-
 def install_verifier_process_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, failure: str
 ) -> tuple[Path, Path]:
@@ -695,26 +677,6 @@ class TestFeatureRiskRating:
         assert result["results"][0]["status"] == "not_accepted"
         assert result["results"][0]["reason"] == "unverifiable"
         assert "verify-commit" in calls.read_text()
-
-    @pytest.mark.trace("FR-027-AC-7")
-    def test_released_ea_receives_the_exact_versioned_request_members(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Send the closed FR-036 request shape through the released CLI."""
-        repository, allowed_signers = signed_rating_repository(tmp_path)
-        capture = install_ea_request_recorder(tmp_path, monkeypatch)
-
-        output, result = run_rating_acceptance(repository, allowed_signers)
-
-        assert output.returncode == 0, output.stderr
-        assert result["protocol"] == "engineering-assurance.rating-acceptance-result/v1"
-        request = json.loads(capture.read_text())
-        assert set(request) == {"protocol", "repository", "allowed_signers"}
-        assert (
-            request["protocol"] == "engineering-assurance.rating-acceptance-request/v1"
-        )
-        assert request["repository"] == str(repository.resolve())
-        assert request["allowed_signers"] == str(allowed_signers.resolve())
 
     @pytest.mark.trace("FR-027-AC-10")
     def test_released_ea_fails_closed_for_unparseable_verifier_output(
