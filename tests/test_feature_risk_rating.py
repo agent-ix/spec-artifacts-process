@@ -193,6 +193,39 @@ def run_rating_acceptance(
     return output, result
 
 
+def run_raw_rating_request(request: dict) -> subprocess.CompletedProcess[str]:
+    """Invoke the released EA boundary without assuming its result is valid."""
+    return subprocess.run(
+        [
+            engineering_assurance_binary(),
+            "rating-acceptance",
+            "--request",
+            json.dumps(request),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def install_ea_request_recorder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Path:
+    """Record the released EA CLI request while delegating to its real binary."""
+    released = Path(engineering_assurance_binary())
+    recorder = tmp_path / "engineering-assurance"
+    capture = tmp_path / "ea-request.json"
+    recorder.write_text(
+        "#!/bin/sh\n"
+        f'if [ "$1" = rating-acceptance ]; then '
+        f"printf '%s' \"$3\" >{shlex.quote(str(capture))}; fi\n"
+        f'exec {shlex.quote(str(released))} "$@"\n'
+    )
+    recorder.chmod(0o755)
+    monkeypatch.setenv("EA_TEST_BINARY", str(recorder))
+    return capture
+
+
 def install_verifier_process_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, failure: str
 ) -> tuple[Path, Path]:
@@ -217,6 +250,15 @@ def install_verifier_process_failure(
             [
                 'case " $* " in\n',
                 '  *" verify-commit "*) kill -KILL "$PPID"; exit 0 ;;\n',
+                "esac\n",
+            ]
+        )
+    elif failure == "malformed-output":
+        lines.extend(
+            [
+                'case " $* " in\n',
+                '  *"--format=%G?%x00%GF%x00%GS"*) '
+                'printf "not-a-verifier-record\\n"; exit 0 ;;\n',
                 "esac\n",
             ]
         )
@@ -643,6 +685,71 @@ class TestFeatureRiskRating:
         assert result["results"][0]["status"] == "not_accepted"
         assert result["results"][0]["reason"] == "unverifiable"
         assert "verify-commit" in calls.read_text()
+
+    @pytest.mark.trace("FR-027-AC-7")
+    def test_released_ea_receives_the_exact_versioned_request_members(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Send the closed FR-036 request shape through the released CLI."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        capture = install_ea_request_recorder(tmp_path, monkeypatch)
+
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 0, output.stderr
+        assert result["protocol"] == "engineering-assurance.rating-acceptance-result/v1"
+        request = json.loads(capture.read_text())
+        assert set(request) == {"protocol", "repository", "allowed_signers"}
+        assert (
+            request["protocol"] == "engineering-assurance.rating-acceptance-request/v1"
+        )
+        assert request["repository"] == str(repository.resolve())
+        assert request["allowed_signers"] == str(allowed_signers.resolve())
+
+    @pytest.mark.trace("FR-027-AC-10")
+    def test_released_ea_fails_closed_for_unparseable_verifier_output(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A successful Git process with malformed verifier fields is refused."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        _, calls = install_verifier_process_failure(
+            tmp_path, monkeypatch, failure="malformed-output"
+        )
+
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
+        assert "--format=%G?%x00%GF%x00%GS" in calls.read_text()
+
+    @pytest.mark.trace("FR-027-AC-12")
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"protocol": "engineering-assurance.rating-acceptance-request/v0"},
+            {
+                "protocol": "engineering-assurance.rating-acceptance-request/v1",
+                "repository": "/tmp/not-a-repository",
+            },
+        ],
+    )
+    def test_released_ea_refuses_wrong_or_incomplete_request_protocols(
+        self, payload: dict
+    ) -> None:
+        """Malformed request members cannot produce an accepted result."""
+        output = run_raw_rating_request(payload)
+
+        assert output.returncode != 0 or "not_accepted" in output.stdout
+        if output.stdout.strip():
+            try:
+                result = json.loads(output.stdout)
+            except json.JSONDecodeError:
+                result = None
+            if result is not None and "results" in result:
+                assert all(
+                    item["status"] == "not_accepted" for item in result["results"]
+                )
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
