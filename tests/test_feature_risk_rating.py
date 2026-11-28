@@ -193,6 +193,39 @@ def run_rating_acceptance(
     return output, result
 
 
+def run_signature_verification(
+    repository: Path, revision: str, allowed_signers: Path
+) -> tuple[subprocess.CompletedProcess[str], dict]:
+    """Invoke the released EA process with the exact FR-036 request document."""
+    request = {
+        "protocol": "engineering-assurance.signature-verify-request/v1",
+        "repository": str(repository.resolve()),
+        "revision": revision,
+        "kind": "commit",
+        "allowed_signers": str(allowed_signers.resolve()),
+    }
+    assert set(request) == {
+        "protocol",
+        "repository",
+        "revision",
+        "kind",
+        "allowed_signers",
+    }
+    output = subprocess.run(
+        [
+            engineering_assurance_binary(),
+            "signature-verify",
+            "--request",
+            json.dumps(request),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    result = json.loads(output.stdout)
+    return output, result
+
+
 def install_verifier_process_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, failure: str
 ) -> tuple[Path, Path]:
@@ -226,7 +259,7 @@ def install_verifier_process_failure(
             [
                 'case " $* " in\n',
                 '  *" verify-commit "*) sleep 90; '
-                f'touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n',
+                f"touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n",
                 "esac\n",
             ]
         )
@@ -361,6 +394,84 @@ class TestFeatureRiskRating:
         assert result["results"][0]["status"] == "accepted"
         assert result["results"][0]["reason"] is None
         assert result["results"][0]["commit"]
+
+    @pytest.mark.trace("FR-027-AC-7")
+    def test_ea_main_process_boundary_uses_the_versioned_fr036_protocol(
+        self, tmp_path: Path
+    ) -> None:
+        """Exercise the FR-036 request/result contract through EA's real CLI.
+
+        Assumptions:
+            The fixture commit is signed by the principal in allowed-signers.
+        Criteria:
+            The Process-side request has exactly the versioned FR-036 members,
+            and EA main returns the versioned result protocol before the
+            rating-acceptance workflow accepts the same commit.
+        """
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        revision = run_git(repository, "rev-parse", "HEAD")
+        assert revision.returncode == 0, revision.stderr
+
+        verification, result = run_signature_verification(
+            repository, revision.stdout.strip(), allowed_signers
+        )
+        assert verification.returncode == 0, verification.stderr
+        assert result["protocol"] == "engineering-assurance.signature-verify-result/v1"
+        assert result["kind"] == "commit"
+        assert result["status"] == "signed_valid"
+        assert result["verified_commit_id"] == revision.stdout.strip()
+
+        acceptance, accepted = run_rating_acceptance(repository, allowed_signers)
+        assert acceptance.returncode == 0, acceptance.stderr
+        assert (
+            accepted["protocol"] == "engineering-assurance.rating-acceptance-result/v1"
+        )
+        assert accepted["results"][0]["status"] == "accepted"
+
+    @pytest.mark.trace("FR-027-AC-12")
+    @pytest.mark.parametrize("invalid_member", ["wrong_protocol", "missing_revision"])
+    def test_ea_main_process_boundary_rejects_invalid_fr036_requests(
+        self, tmp_path: Path, invalid_member: str
+    ) -> None:
+        """Refuse a wrong protocol or missing required member at the EA boundary.
+
+        Assumptions:
+            The request otherwise names a real signed commit and readable
+            allowed-signers file.
+        Criteria:
+            A protocol mismatch or incomplete request fails closed; it cannot
+            produce a signed-valid result.
+        """
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        revision = run_git(repository, "rev-parse", "HEAD")
+        assert revision.returncode == 0, revision.stderr
+        request = {
+            "protocol": "engineering-assurance.signature-verify-request/v1",
+            "repository": str(repository.resolve()),
+            "revision": revision.stdout.strip(),
+            "kind": "commit",
+            "allowed_signers": str(allowed_signers.resolve()),
+        }
+        if invalid_member == "wrong_protocol":
+            request["protocol"] = "engineering-assurance.signature-verify-request/v2"
+        else:
+            del request["revision"]
+
+        output = subprocess.run(
+            [
+                engineering_assurance_binary(),
+                "signature-verify",
+                "--request",
+                json.dumps(request),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        error = json.loads(output.stdout)
+        assert output.returncode != 0, output.stderr
+        assert error["protocol"] == "engineering-assurance.error/v1"
+        assert error["code"] == "signature_verify_request_invalid"
 
     @pytest.mark.trace("FR-027-AC-14")
     @pytest.mark.skipif(
