@@ -207,6 +207,7 @@ def install_verifier_process_failure(
     bin_directory = tmp_path / "bin"
     bin_directory.mkdir()
     calls = tmp_path / "git-calls.log"
+    timeout_completed = tmp_path / "verifier-timeout-shim-completed"
     shim = bin_directory / "git"
     lines = [
         "#!/bin/sh\n",
@@ -224,7 +225,8 @@ def install_verifier_process_failure(
         lines.extend(
             [
                 'case " $* " in\n',
-                '  *" verify-commit "*) sleep 90; exit 0 ;;\n',
+                '  *" verify-commit "*) sleep 90; '
+                f'touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n',
                 "esac\n",
             ]
         )
@@ -677,6 +679,7 @@ class TestFeatureRiskRating:
         assert result["results"][0]["status"] == "not_accepted"
         assert result["results"][0]["reason"] == "unverifiable"
         assert "verify-commit" in calls.read_text()
+        assert not (tmp_path / "verifier-timeout-shim-completed").exists()
 
     @pytest.mark.trace("FR-027-AC-10")
     def test_released_ea_fails_closed_for_unparseable_verifier_output(
