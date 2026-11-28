@@ -207,6 +207,7 @@ def install_verifier_process_failure(
     bin_directory = tmp_path / "bin"
     bin_directory.mkdir()
     calls = tmp_path / "git-calls.log"
+    timeout_completed = tmp_path / "verifier-timeout-shim-completed"
     shim = bin_directory / "git"
     lines = [
         "#!/bin/sh\n",
@@ -217,6 +218,24 @@ def install_verifier_process_failure(
             [
                 'case " $* " in\n',
                 '  *" verify-commit "*) kill -KILL "$PPID"; exit 0 ;;\n',
+                "esac\n",
+            ]
+        )
+    elif failure == "timeout":
+        lines.extend(
+            [
+                'case " $* " in\n',
+                '  *" verify-commit "*) sleep 90; '
+                f'touch {shlex.quote(str(timeout_completed))}; exit 0 ;;\n',
+                "esac\n",
+            ]
+        )
+    elif failure == "malformed-output":
+        lines.extend(
+            [
+                'case " $* " in\n',
+                '  *"--format=%G?%x00%GF%x00%GS"*) '
+                'printf "not-a-verifier-record\\n"; exit 0 ;;\n',
                 "esac\n",
             ]
         )
@@ -643,6 +662,41 @@ class TestFeatureRiskRating:
         assert result["results"][0]["status"] == "not_accepted"
         assert result["results"][0]["reason"] == "unverifiable"
         assert "verify-commit" in calls.read_text()
+
+    @pytest.mark.trace("FR-027-AC-9")
+    def test_released_ea_fails_closed_when_verifier_process_times_out(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A verifier child that exceeds the release timeout is not accepted."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        _, calls = install_verifier_process_failure(
+            tmp_path, monkeypatch, failure="timeout"
+        )
+
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
+        assert "verify-commit" in calls.read_text()
+        assert not (tmp_path / "verifier-timeout-shim-completed").exists()
+
+    @pytest.mark.trace("FR-027-AC-10")
+    def test_released_ea_fails_closed_for_unparseable_verifier_output(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A successful Git process with malformed verifier fields is refused."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        _, calls = install_verifier_process_failure(
+            tmp_path, monkeypatch, failure="malformed-output"
+        )
+
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
+        assert "--format=%G?%x00%GF%x00%GS" in calls.read_text()
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
