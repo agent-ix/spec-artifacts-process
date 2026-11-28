@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 from pathlib import Path
@@ -190,6 +191,56 @@ def run_rating_acceptance(
     result = json.loads(output.stdout)
     assert result["protocol"] == "engineering-assurance.rating-acceptance-result/v1"
     return output, result
+
+
+def install_verifier_process_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, failure: str
+) -> tuple[Path, Path]:
+    """Exercise the released EA CLI with a real verifier-child process failure."""
+    released = Path(engineering_assurance_binary())
+    executable = tmp_path / "engineering-assurance"
+    shutil.copy2(released, executable)
+    executable.chmod(0o755)
+
+    real_git = shutil.which("git")
+    assert real_git, "Git is required by the released rating-acceptance command"
+    bin_directory = tmp_path / "bin"
+    bin_directory.mkdir()
+    calls = tmp_path / "git-calls.log"
+    shim = bin_directory / "git"
+    lines = [
+        "#!/bin/sh\n",
+        f"printf '%s\\n' \"$*\" >>{shlex.quote(str(calls))}\n",
+    ]
+    if failure == "unexpected-exit":
+        lines.extend(
+            [
+                'case " $* " in\n',
+                '  *" verify-commit "*) kill -KILL "$PPID"; exit 0 ;;\n',
+                "esac\n",
+            ]
+        )
+    lines.extend(
+        [
+            f'{shlex.quote(real_git)} "$@"\n',
+            "status=$?\n",
+        ]
+    )
+    if failure == "cannot-start":
+        lines.extend(
+            [
+                'if [ "$1" = status ] && [ "$status" -eq 0 ]; then\n',
+                f"  chmod 000 {shlex.quote(str(executable))}\n",
+                "fi\n",
+            ]
+        )
+    lines.append('exit "$status"\n')
+    shim.write_text("".join(lines))
+    shim.chmod(0o755)
+
+    monkeypatch.setenv("EA_TEST_BINARY", str(executable))
+    monkeypatch.setenv("PATH", f"{bin_directory}:{os.environ['PATH']}")
+    return executable, calls
 
 
 class TestFeatureRiskRating:
@@ -554,6 +605,44 @@ class TestFeatureRiskRating:
         assert output.returncode == 1, output.stderr
         assert result["results"][0]["status"] == "not_accepted"
         assert result["results"][0]["reason"] == "unverifiable"
+
+    @pytest.mark.trace("FR-027-AC-8")
+    def test_released_ea_fails_closed_when_verifier_process_cannot_start(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A verifier child that becomes unavailable is reported not_accepted."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        executable, calls = install_verifier_process_failure(
+            tmp_path, monkeypatch, failure="cannot-start"
+        )
+
+        try:
+            output, result = run_rating_acceptance(repository, allowed_signers)
+        finally:
+            executable.chmod(0o755)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
+        assert "status --porcelain" in calls.read_text()
+        assert "verify-commit" not in calls.read_text()
+
+    @pytest.mark.trace("FR-027-AC-9")
+    def test_released_ea_fails_closed_when_verifier_process_exits_unexpectedly(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A verifier child killed during signature verification is not accepted."""
+        repository, allowed_signers = signed_rating_repository(tmp_path)
+        _, calls = install_verifier_process_failure(
+            tmp_path, monkeypatch, failure="unexpected-exit"
+        )
+
+        output, result = run_rating_acceptance(repository, allowed_signers)
+
+        assert output.returncode == 1, output.stderr
+        assert result["results"][0]["status"] == "not_accepted"
+        assert result["results"][0]["reason"] == "unverifiable"
+        assert "verify-commit" in calls.read_text()
 
     @pytest.mark.trace("FR-025-AC-8", "FR-025-AC-9", "FR-025-AC-11", "FR-025-AC-16")
     def test_supplier_intended_use_is_one_typed_relationship(self) -> None:
