@@ -682,7 +682,7 @@ class TestFeatureRiskRating:
         assert "verify-commit" in calls.read_text()
         assert not (tmp_path / "verifier-timeout-shim-completed").exists()
 
-    @pytest.mark.trace("FR-027-AC-10")
+    @pytest.mark.trace("FR-027-AC-10", "FR-027-AC-12")
     def test_released_ea_fails_closed_for_unparseable_verifier_output(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -692,9 +692,11 @@ class TestFeatureRiskRating:
             The rating commit is signed and the real EA command uses the
             captured Git verifier process for its signature evidence.
         Criteria:
-            Unparseable verifier output never produces an accepted rating.
+            Unparseable verifier output never produces an accepted rating;
+            malformed verifier response members are rejected by the released
+            EA implementation and the public result remains not_accepted.
 
-        Trace: FR-027-AC-10
+        Trace: FR-027-AC-10, FR-027-AC-12
         """
         repository, allowed_signers = signed_rating_repository(tmp_path)
         _, calls = install_verifier_process_failure(
